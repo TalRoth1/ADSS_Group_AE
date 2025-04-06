@@ -1,6 +1,10 @@
 package Presentation;
 
+import java.util.List;
+
+import Domain.Item;
 import Domain.SupplierFacade;
+import Utils.DeliveryMethod;
 
 public class SupplierService
 {
@@ -11,9 +15,9 @@ public class SupplierService
         sf = new SupplierFacade();
     }
 
-    public void addSupplier(String name, String address, String phoneNumber, String email)
+    public void addSupplier(int supplierID, int companyID, int bankAccount, int paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems)
     {
-        
-        sf.addSupplier(name, address, phoneNumber, email);
+        SupplierPL supplier = new SupplierPL(supplierID, companyID, bankAccount, paymentMethod, contactMail, contactPhone, deliveryMethod, suppliedItems);
+        sf.addSupplier(supplier);
     }
 }

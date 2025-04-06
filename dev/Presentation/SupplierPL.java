@@ -1,5 +1,5 @@
 package Presentation;
-
+import Utils.DeliveryMethod;
 import java.util.List;
 
 import Domain.Item;
@@ -12,11 +12,11 @@ public class SupplierPL
     private int paymentMethod;
     private String contactMail;
     private String contactPhone;
-    private Enum deliveryMethod;
+    private DeliveryMethod deliveryMethod;
     private List<Item> suppliedItems;
 
 
-    public SupplierPL(int supplierID, int companyID, int bankAccount, int paymentMethod, String contactMail, String contactPhone, Enum deliveryMethod, List<Item> suppliedItems)
+    public SupplierPL(int supplierID, int companyID, int bankAccount, int paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems)
     {
         this.supplierID = supplierID;
         this.companyID = companyID;
@@ -83,12 +83,12 @@ public class SupplierPL
         return contactPhone;
     }
 
-    public void setDeliveryMethod(Enum deliveryMethod) 
+    public void setDeliveryMethod(DeliveryMethod deliveryMethod) 
     {
         this.deliveryMethod = deliveryMethod;
     }
 
-    public Enum getDeliveryMethod() 
+    public DeliveryMethod getDeliveryMethod() 
     {
         return deliveryMethod;
     }

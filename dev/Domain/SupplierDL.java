@@ -1,5 +1,5 @@
 package Domain;
-
+import Utils.DeliveryMethod;
 import java.util.List;
 
 class SupplierDL
@@ -10,11 +10,10 @@ class SupplierDL
     private int paymentMethod;
     private String contactMail;
     private String contactPhone;
-    private Enum deliveryMethod;
+    private DeliveryMethod deliveryMethod;
     private List<Item> suppliedItems;
 
-
-    public SupplierDL(int supplierID, int companyID, int banckAccount, int paymentMethod, String contactMail, String contactPhone, Enum deliveryMethod, List<Item> suppliedItems) {
+    public SupplierDL(int supplierID, int companyID, int banckAccount, int paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems) {
         this.supplierID = supplierID;
         this.companyID = companyID;
         this.banckAccount = banckAccount;
@@ -80,12 +79,12 @@ class SupplierDL
         return contactPhone;
     }
 
-    public void setDeliveryMethod(Enum deliveryMethod) 
+    public void setDeliveryMethod(DeliveryMethod deliveryMethod) 
     {
         this.deliveryMethod = deliveryMethod;
     }
 
-    public Enum getDeliveryMethod() 
+    public DeliveryMethod getDeliveryMethod() 
     {
         return deliveryMethod;
     }

@@ -1,5 +1,5 @@
 package Domain;
-
+import Presentation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +16,19 @@ public class SupplierFacade
 
     public void addSupplier(SupplierPL supplier) 
     {
-        SupplierDL supplier = new SupplierDL(nextId++, name, address, phoneNumber, email);
-        suppliers.add(supplier);
+        SupplierDL newSupplier = new SupplierDL(nextId++, supplier.getCompanyID(), supplier.getBankAccount(), supplier.getPaymentMethod(), supplier.getContactMail(), supplier.getContactPhone(), supplier.getDeliveryMethod(), supplier.getSuppliedItems());
+        suppliers.add(newSupplier);
+    }
+
+    public SupplierDL getSupplier(int supplierID) 
+    {
+        for (SupplierDL supplier : suppliers) 
+        {
+            if (supplier.getSupplierID() == supplierID) 
+            {
+                return supplier;
+            }
+        }
+        return null; // Supplier not found
     }
 }
