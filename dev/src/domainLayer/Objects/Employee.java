@@ -11,7 +11,7 @@ public class Employee {
     private String username; 
     private String password; 
     protected boolean finishWorking;
-    public Role jobType;
+    private boolean isLoggedIn=false;
 
     public Employee(int id, String name, String bankAccount, int salary, Date startDate, int vacationDays, int sickDays, String username, String password) {
         this.id = id;
@@ -86,12 +86,6 @@ public class Employee {
     }
     public void setFinishWorking(boolean finishWorking) {
         this.finishWorking = finishWorking;
-    }
-    public Role getJobType() {
-        return jobType;
-    }
-    public void setJobType(Role jobType) {
-        this.jobType = jobType;
     }
 
 }
