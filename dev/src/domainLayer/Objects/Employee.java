@@ -26,6 +26,17 @@ public class Employee {
         this.finishWorking = false; 
     }
 
+    public enum Training {
+        TeamManagement,
+        CancellationCard
+    }
+
+
+    public void setTraining(Training training) {
+        
+
+    }
+
     // Getters and Setters
     public int getId() {
         return id;

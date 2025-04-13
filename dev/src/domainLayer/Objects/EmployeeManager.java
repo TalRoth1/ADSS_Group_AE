@@ -1,14 +1,15 @@
 
-import java.util.Date;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class EmployeeManager extends Employee{
 
     private Map<Integer, ShiftEmployee> allEmployees;
+    
     public EmployeeManager(int id, String name, String bankAccount, int salary, Date startDate, int vacationDays, int sickDays, String username, String password) {
         super(id, name, bankAccount, salary, startDate, vacationDays, sickDays, username, password);
         allEmployees = new HashMap<>();
@@ -17,11 +18,12 @@ public class EmployeeManager extends Employee{
 
     //methods 
     public void addEmployee(ShiftEmployee employee) {
+       
         allEmployees.put(employee.getId(), employee);
     }
 
     public void removeEmployee(ShiftEmployee employee) {
-        allEmployees.remove(employee);
+        allEmployees.remove(employee.getId());
     }
 
     public boolean checkEmployee(int id) {
@@ -100,6 +102,40 @@ public class EmployeeManager extends Employee{
            employee.removeRole(role);
     }
 
+    public void addTrainingToEmployee(int employeeID, Training training){
+        if (!checkEmployee(employeeID)){
+            throw new IllegalArgumentException("employee not exist");
+        }
+        ShiftEmployee employee = allEmployees.get(employeeID);
+        employee.addTraining(training);
+    }
+
+    public void removeTrainingFromEmployee(int employeeID, Training training){
+        if (!checkEmployee(employeeID)){
+            throw new IllegalArgumentException("employee not exist");
+        }
+        ShiftEmployee employee = allEmployees.get(employeeID);
+        employee.removeTraining(training);
+    }
+
+    public Map<Role, List<Employee>> getAvailableEmployees(Shift shift) { /////////////////////
+        Map<Role, List<Employee>> availableEmployees = new HashMap<>();
+        for (ShiftEmployee employee : allEmployees.values()) {
+            if (!employee.isFinishWorking() && employee.getPreferedShifts().contains(shift)) {
+                for (Role role : employee.getRoles()) {
+                    if (!availableEmployees.containsKey(role)) {
+                        availableEmployees.put(role, new ArrayList<>());
+                    }
+                    availableEmployees.get(role).add(employee);
+                }
+                // Add the employee to the list of available employees for the shift type
+               // availableEmployees.computeIfAbsent(shift.getShiftType(), k -> new ArrayList<>()).add(employee);
+            }
+        }
+        return availableEmployees;
+    }
+
+    //החלפת מנהל משמרת, החלפת משמרות, הוספת העדפות
 
     
 }

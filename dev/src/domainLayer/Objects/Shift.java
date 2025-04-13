@@ -24,7 +24,7 @@ public class Shift {
     }
 
     // Getters and Setters
-    public List<Integer> getAssignedEmployeesID() {
+    public Map<Integer, Role> getAssignedEmployeesID() {
         return assignedEmployeesID;
     }
 
@@ -68,7 +68,7 @@ public class Shift {
 
     //methods
     public void addEmployee(ShiftEmployee e, Role role) {
-        if (this.assignedEmployeesID.contains(e.getId())) {
+        if (this.assignedEmployeesID.containsKey(e.getId())) {
             throw new IllegalArgumentException("Employee already assigned to this shift.");
         }
         if (!this.requiredRoles.containsKey(role)) {
@@ -77,15 +77,15 @@ public class Shift {
         if (this.requiredRoles.get(role) <= 0) {
             throw new IllegalArgumentException("No more employees required for this role.");
         }
-        this.assignedEmployeesID.add(e.getId(), role);
+        this.assignedEmployeesID.put(e.getId(), role);
         this.requiredRoles.put(role, this.requiredRoles.get(role) - 1);
     }
 
     public void removeEmployee(ShiftEmployee e){
-        if (!this.assignedEmployeesID.contains(e.getId())) {
+        if (!this.assignedEmployeesID.containsKey(e.getId())) {
             throw new IllegalArgumentException("Employee not assigned to this shift.");
         }
-        Role role = e.getRole(); 
+        Role role = this.assignedEmployeesID.get(e.getId());
         this.assignedEmployeesID.remove(e.getId());
         this.requiredRoles.put(role, this.requiredRoles.get(role) + 1);
     }
