@@ -1,3 +1,5 @@
+package DomainLayer;
+
 import java.util.Date;
 
 public class Employee {
@@ -29,6 +31,15 @@ public class Employee {
     public enum Training {
         TeamManagement,
         CancellationCard
+    }
+
+    public boolean login(String password) {
+        if (this.password.equals(password)) {
+            this.isLoggedIn = true;
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
