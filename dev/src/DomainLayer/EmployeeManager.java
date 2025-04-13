@@ -19,19 +19,18 @@ public class EmployeeManager extends Employee{
 
     //methods 
     public void addEmployee(ShiftEmployee employee) {
-       
         allEmployees.put(employee.getId(), employee);
     }
 
-    public void removeEmployee(ShiftEmployee employee) {
-        allEmployees.remove(employee.getId());
+    public void removeEmployee(int id) {
+        allEmployees.remove(id);
     }
 
     public boolean checkEmployee(int id) {
         return allEmployees.containsKey(id);
     }
 
-    public void updateBankAcountEmployee(int employeeId, String bankAccount) {
+    public void updateBankAccountEmployee(int employeeId, String bankAccount) {
         if (!checkEmployee(employeeId)) {
             throw new IllegalArgumentException("Employee not found");
         }
@@ -43,6 +42,8 @@ public class EmployeeManager extends Employee{
         if (!checkEmployee(employeeId)) {
             throw new IllegalArgumentException("Employee not found");
         }
+        if(salary<0)
+            throw new IllegalArgumentException("invalid salary");
         ShiftEmployee employee = allEmployees.get(employeeId);   
         employee.setSalary(salary);
     }
@@ -51,6 +52,8 @@ public class EmployeeManager extends Employee{
         if (!checkEmployee(employeeId)) {
             throw new IllegalArgumentException("Employee not found");
         }
+        if(vacationDays<0)
+            throw new IllegalArgumentException("invalid vacationDays");
         ShiftEmployee employee = allEmployees.get(employeeId);   
         employee.setVacationDays(vacationDays);
     }
@@ -59,6 +62,8 @@ public class EmployeeManager extends Employee{
         if (!checkEmployee(employeeId)) {
             throw new IllegalArgumentException("Employee not found");
         }
+        if(sickDays<0)
+            throw new IllegalArgumentException("invalid sickDays");
         ShiftEmployee employee = allEmployees.get(employeeId);   
         employee.setSickDays(sickDays);
     }
@@ -74,7 +79,6 @@ public class EmployeeManager extends Employee{
         ShiftEmployee employee = allEmployees.get(id);
         if (employee.isFinishWorking())
             throw new IllegalArgumentException("Employee already fired");
-        
         employee.setFinishWorking(true);
     }
 
@@ -82,6 +86,8 @@ public class EmployeeManager extends Employee{
         if (!checkEmployee(employeeID)){
             throw new IllegalArgumentException("employee not exist");
         }
+        if (role==null)
+            throw new IllegalArgumentException("invalid role");
         ShiftEmployee employee = allEmployees.get(employeeID);
         employee.addRole(role);
     }
@@ -92,7 +98,6 @@ public class EmployeeManager extends Employee{
         }
         ShiftEmployee employee = allEmployees.get(employeeID);
         employee.changeRole(oldRole, newRole);
-
     }
 
     public void deleteRoleFromEmployee(int employeeID, Role role){
@@ -119,24 +124,36 @@ public class EmployeeManager extends Employee{
         employee.removeTraining(training);
     }
 
-    public Map<Role, List<Employee>> getAvailableEmployees(Shift shift) { /////////////////////
-        Map<Role, List<Employee>> availableEmployees = new HashMap<>();
+    public List<Employee> getAvailableEmployees(Shift shift, Role role) {
+        List<Employee> availableEmployees = new ArrayList<>();
         for (ShiftEmployee employee : allEmployees.values()) {
-            if (!employee.isFinishWorking() && employee.getPreferedShifts().contains(shift)) {
-                for (Role role : employee.getRoles()) {
-                    if (!availableEmployees.containsKey(role)) {
-                        availableEmployees.put(role, new ArrayList<>());
-                    }
-                    availableEmployees.get(role).add(employee);
+            if (employee.isAvailable(shift)) {
+                if (!availableEmployees.contains(role)) {
+                    availableEmployees.add(employee);
                 }
-                // Add the employee to the list of available employees for the shift type
-               // availableEmployees.computeIfAbsent(shift.getShiftType(), k -> new ArrayList<>()).add(employee);
             }
         }
         return availableEmployees;
     }
 
-    //החלפת מנהל משמרת, החלפת משמרות, הוספת העדפות
+    public void changeShiftManager(Shift shift, int oldManager, int newManager) {
+        if (!allEmployees.containsKey(newManager) || !allEmployees.containsKey(oldManager) ) {
+            throw new IllegalArgumentException("manager not found in the system.");
+        }
+        if(allEmployees.get(newManager).getRoles().contains(Role.SHIFT_MANAGER)) {
+            throw new IllegalArgumentException("this employee cant be shift Manager");
+        }
+        shift.setShiftManagerId(newManager);
+    }
 
-    
+    public void setRequiredRoles(Shift shift, Role role, int numOfEmployees) {
+        if(shift != null)
+        shift.setRequiredRoles(role, numOfEmployees);
+    }
+
+    public void setShiftManager(Shift shift, int id){
+        shift.setShiftManagerId(id);
+    }
+
+    //, החלפת משמרות, הוספת העדפות
 }

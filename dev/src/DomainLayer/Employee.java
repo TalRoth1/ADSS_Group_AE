@@ -12,8 +12,10 @@ public class Employee {
     private int sickDays;
     private String username; 
     private String password; 
-    protected boolean finishWorking;
-    private boolean isLoggedIn=false;
+    protected boolean finishWorking; //is fired or still in the company
+    private boolean isLoggedIn = false;
+
+
 
     public Employee(int id, String name, String bankAccount, int salary, Date startDate, int vacationDays, int sickDays, String username, String password) {
         this.id = id;
@@ -41,6 +43,7 @@ public class Employee {
             return false;
         }
     }
+
 
 
     public void setTraining(Training training) {

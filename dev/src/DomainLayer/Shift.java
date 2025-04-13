@@ -63,8 +63,22 @@ public class Shift {
         }
         this.shiftManagerId = shiftManagerId;
     }
-    public Map<Role, Integer> getRequiredRoles() {
-        return requiredRoles;
+
+    public int getRequiredEmployees(Role role){
+        return this.requiredRoles.get(role);
+    }
+
+    public void setRequiredRoles(Role role, int num) {
+        if (!this.requiredRoles.containsKey(role)) {
+            throw new IllegalArgumentException("Role not required for this shift.");
+        }
+        if (this.requiredRoles.get(role) == num) {
+            throw new IllegalArgumentException("Number of employees required is already set to this value.");
+        }
+        if (num < 0 ) {
+            throw new IllegalArgumentException("Number of employees cannot be negative");
+        }
+        this.requiredRoles.put(role, num);
     }
 
 
