@@ -1,13 +1,13 @@
 package DomainLayer;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Employee {
     private int id;
     private String name;
     private String bankAccount;
     private int salary;
-    private Date startDate;
+    private LocalDate startDate;
     private int vacationDays;
     private int sickDays;
     private String username; 
@@ -17,7 +17,7 @@ public class Employee {
 
 
 
-    public Employee(int id, String name, String bankAccount, int salary, Date startDate, int vacationDays, int sickDays, String username, String password) {
+    public Employee(int id, String name, String bankAccount, int salary, LocalDate startDate, int vacationDays, int sickDays, String username, String password) {
         this.id = id;
         this.name = name;
         this.bankAccount = bankAccount;
@@ -77,10 +77,10 @@ public class Employee {
     public void setSalary(int salary) {
         this.salary = salary;
     }
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
     public int getVacationDays() {

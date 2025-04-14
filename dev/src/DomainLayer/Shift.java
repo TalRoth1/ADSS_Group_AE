@@ -1,11 +1,12 @@
 package DomainLayer;
 
-import java.util.Date;
+
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Shift {
-    private Date date;
+    private LocalDate date;
     private ShiftType shiftType;
     private int startTime; 
     private int endTime;
@@ -13,7 +14,7 @@ public class Shift {
     private Map<Role, Integer> requiredRoles; // roles and number of employees required
     private Map<Integer, Role> assignedEmployeesID; 
 
-    public Shift(Date date, ShiftType shiftType, int startTime,int endTime, int shiftManagerId) {
+    public Shift(LocalDate date, ShiftType shiftType, int startTime,int endTime, int shiftManagerId) {
         this.date = date;
         this.shiftType = shiftType;
         this.startTime = startTime;
@@ -51,10 +52,10 @@ public class Shift {
         return assignedEmployeesID;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
     public ShiftType getShiftType() {

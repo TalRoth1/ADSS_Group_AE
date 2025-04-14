@@ -2,17 +2,22 @@ package PresentationLayer;
 
 import DomainLayer.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CLI {
     public static Scanner scanner = new Scanner(System.in);
     EmployeeFacade employeeFacade;
     private int id;
     private String password;
+    private LocalDate now;
 
     public CLI() {
-
         employeeFacade = new EmployeeFacade();
+        now = LocalDate.now();
         loginCLI();
     }
 
@@ -82,30 +87,53 @@ public class CLI {
         }
     }
 
-   /* private void ShiftEmployee() {
-        //TODO: implement
-    }*/
-    /*private void addEmployeeManager() {
-        System.out.println("Enter the details of the new Employee Manager");
-        System.out.println("ID:");
-        int id = scanner.nextInt();
-        System.out.println("username:");
-        username = String.valueOf(scanner.nextInt());
-        System.out.println("Please enter your password:");
-        password = scanner.nextLine();
-        //fill in the rest of the fields of Employee
-    }*/
+//    private void ShiftEmployee() {
+//        //TODO: implement
+//    }
+//    we will implement this probably in the next assignment
+//    private void addEmployeeManager() {
+//        System.out.println("Enter the details of the new Employee Manager");
+//        System.out.println("ID:");
+//        int id = scanner.nextInt();
+//        System.out.println("username:");
+//        username = String.valueOf(scanner.nextInt());
+//        System.out.println("Please enter your password:");
+//        password = scanner.nextLine();
+//        //fill in the rest of the fields of Employee
+//    }
 
-    /*private void setShifts() {
-
-    }*/
+    private void setShifts() {
+//        String pref = employeeFacade.getPreferences(id);
+        String stringDate = "";
+        while (!isValidDate(stringDate, "^(0[1-9]|[1-2][0-9]|3[01])-(0[1-9]|1[0-2])-(\\d{4})$")) {
+            System.out.println("Please enter the date of the shift in format of dd-mm-yyyy");
+            stringDate = scanner.nextLine();
+        }
+        LocalDate date = convertStringToDate(stringDate);
+        if(date.isBefore(now)) {
+            System.out.println("You can't set shifts to the past, choose again");
+            setShifts();
+        }
+//        TODO: ask Liat for how long we want to enable to set shifts
+//        if (date.getDayOfYear() / 7 > now.getDayOfYear() / 7 + 1 && !(date.getDayOfYear() < 8 && date.getYear() - now.getYear() == 1)) {
+//            System.out.println("you can only set shift for this week and the next one");
+//            setShifts();
+//        }
+        if(date.getDayOfWeek().getValue() == 7) {
+            System.out.println("Shabbat is rest day, please choose again");
+            setShifts();
+        }
+//        System.out.println(pref);
+        createShift(date);
+        EmployeeManager();
+    }
 
     private void fireEmployee() {
         System.out.println("Please Enter Employee's ID to fire");
         int employeeId = scanner.nextInt();
         scanner.nextLine();
         String response = employeeFacade.fireEmployee(employeeId, id);
-        if(response != null)
+        if(!response.isEmpty())
             System.out.println(response);
         EmployeeManager();
     }
@@ -143,12 +171,26 @@ public class CLI {
         }
         String role = roles[choice - 1].toString();
         String response = employeeFacade.hireEmployee(employeeID, id, name ,bankAccount, salary, employeePassword, role);
-        if(response != null) {
+        if(!response.isEmpty()) {
             System.out.println(response);
         }
         EmployeeManager();
     }
     private void logout(int id) {
         employeeFacade.logout(id);
+    }
+
+    private LocalDate convertStringToDate(String s) {//only works for dd-mm-yyyy
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        return LocalDate.parse(s, formatter);
+    }
+
+    private static boolean isValidDate(String date, String pattern) {
+        // Compile the regex pattern
+        Pattern compiledPattern = Pattern.compile(pattern);
+        // Create a matcher for the input date
+        Matcher matcher = compiledPattern.matcher(date);
+        // Check if the date matches the pattern
+        return matcher.matches();
     }
 }

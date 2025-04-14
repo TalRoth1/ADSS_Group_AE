@@ -1,7 +1,8 @@
 package DomainLayer;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,10 +11,10 @@ import java.util.Map;
 public class EmployeeManager extends Employee{
 
     private Map<Integer, ShiftEmployee> allEmployees;
-    private Map<Date, Shift> morningShifts;
-    private Map<Date, Shift> eveningShifts;
+    private Map<LocalDate, Shift> morningShifts;
+    private Map<LocalDate, Shift> eveningShifts;
     
-    public EmployeeManager(int id, String name, String bankAccount, int salary, Date startDate, int vacationDays, int sickDays, String username, String password) {
+    public EmployeeManager(int id, String name, String bankAccount, int salary, LocalDate startDate, int vacationDays, int sickDays, String username, String password) {
         super(id, name, bankAccount, salary, startDate, vacationDays, sickDays, username, password);
         allEmployees = new HashMap<>();
     }
@@ -23,7 +24,7 @@ public class EmployeeManager extends Employee{
         allEmployees.put(employee.getId(), employee);
     }
 
-    public void addEmployee(int id, String name, String bankAccount, int salary, Date startDate, int vacationDays, int sickDays, String username, String password) {
+    public void addEmployee(int id, String name, String bankAccount, int salary, LocalDate startDate, int vacationDays, int sickDays, String username, String password) {
         ShiftEmployee employee = new ShiftEmployee(id, name, bankAccount, salary, startDate, vacationDays, sickDays, username, password);
         allEmployees.put(id, employee);
     }
@@ -74,13 +75,28 @@ public class EmployeeManager extends Employee{
         employee.setSickDays(sickDays);
     }
 
-    public void fireEmployee(int id){
+    public String getPreferences() {
+//        TODO: implement
+    }
+
+    public String fireEmployee(int id){
         if (!checkEmployee(id))
-            throw new IllegalArgumentException("Employee not found");
+            return id + " not exist";
         ShiftEmployee employee = allEmployees.get(id);
         if (employee.isFinishWorking())
-            throw new IllegalArgumentException("Employee already fired");
+            return "Employee already fired";
         employee.setFinishWorking(true);
+        return "";
+    }
+
+    public ShiftEmployee hireEmployee(int employeeId, String employeeName, String bankAccount, int salary,
+                               String employeePassword, Role role){
+        if(checkEmployee(employeeId))
+            return null;
+        ShiftEmployee shiftEmployee = new ShiftEmployee(employeeId, employeeName, bankAccount, salary,
+                employeePassword, role); //TODO: ask Liat about ShiftEmployee constructor
+        allEmployees.put(employeeId, shiftEmployee);
+        return shiftEmployee;
     }
 
     public void addRoleToEmployee(int employeeID, Role role){
@@ -213,13 +229,13 @@ public class EmployeeManager extends Employee{
         ShiftEmployee employee = allEmployees.get(employeeID);
         String morning="Morning Shifts:\n";
         String evening="Evening Shifts:\n";
-        for(Date d : morningShifts.keySet()){
+        for(LocalDate d : morningShifts.keySet()){
             Shift s = morningShifts.get(d);
             if(s.getAssignedEmployeesID().containsKey(employeeID)){
                 morning += s.getDate() +", "+"Role: " + s.getRole(employeeID) + "\n";
             }
         }
-        for(Date d : eveningShifts.keySet()){
+        for(LocalDate d : eveningShifts.keySet()){
             Shift s = eveningShifts.get(d);
             if(s.getAssignedEmployeesID().containsKey(employeeID)){
                 evening += s.getDate() + ", "+"Role: " + s.getRole(employeeID) + "\n";

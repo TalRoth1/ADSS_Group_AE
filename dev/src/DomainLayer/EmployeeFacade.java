@@ -18,11 +18,6 @@ public class EmployeeFacade {
         return null;
     }
 
-    public void logout(int id) {
-        Employee e = getEmployee(id);
-        e.logout();
-    }
-
     public String fireEmployee(int employeeId, int empManagerId) {
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
@@ -34,7 +29,7 @@ public class EmployeeFacade {
             return "Can't fire employee: No employee found with ID " + employeeId;
     }
 
-    public String hireEmployee(int employeeId, int empManagerId, String name, String bankAccount, int salary,
+    public String hireEmployee(int employeeId, int empManagerId, String employeeName, String bankAccount, int salary,
                                String employeePassword, String role) {
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
@@ -42,8 +37,30 @@ public class EmployeeFacade {
             return "Can't hire employee: " + employeeId + " already hired";
         else {
             EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-            //didn't finish this method yet
+            ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName,
+                    bankAccount, salary, employeePassword, convertStringToRole(role));
+            if(shiftEmployee == null)
+                return "Can't hire employee: " + employeeId + " already hired";
+
+            addShiftEmployee(employeeId, shiftEmployee);
+            return "";
         }
+    }
+
+    public void logout(int id) {
+        Employee e = getEmployee(id);
+        e.logout();
+    }
+
+    public String getPreferences(int empManagerId) {
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.getPreferences();
+    }
+
+    private void addShiftEmployee(int employeeId, ShiftEmployee shiftEmployee) {
+        shiftEmployees.put(employeeId, shiftEmployee);
     }
 
     private Employee getEmployee(int id) {
@@ -53,12 +70,22 @@ public class EmployeeFacade {
         return employee;
     }
 
-
     private boolean isLoggedIn(int id) {
         return getEmployee(id).isLoggedIn();
     }
 
     private EmployeeManager getEmployeeManager(int id) {
         return employeeManagers.get(id);
+    }
+
+    private Role convertStringToRole(String roleName) {
+        if (roleName == null) {
+            throw new IllegalArgumentException("Role name cannot be null");
+        }
+        try {
+            return Role.valueOf(roleName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid role name: " + roleName);
+        }
     }
 }

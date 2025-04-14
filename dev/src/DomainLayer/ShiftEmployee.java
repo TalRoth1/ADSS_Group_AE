@@ -1,6 +1,7 @@
 package DomainLayer;
 
-import java.util.Date;
+
+import java.time.LocalDate;
 import java.util.List;
 
 public class ShiftEmployee extends Employee {
@@ -8,7 +9,7 @@ public class ShiftEmployee extends Employee {
     private List<Role> roles;
     private List<Training> trainings;
 
-    public ShiftEmployee(int id, String name, String bankAccount, int salary, Date startDate, int vacationDays, int sickDays, String username, String password) {
+    public ShiftEmployee(int id, String name, String bankAccount, int salary, LocalDate startDate, int vacationDays, int sickDays, String username, String password) {
         super(id, name, bankAccount, salary, startDate, vacationDays, sickDays, username, password);
         this.preferredShifts = null;
         this.roles = null;
