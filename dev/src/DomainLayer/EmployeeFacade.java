@@ -56,7 +56,7 @@ public class EmployeeFacade {
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.getPreferences();
+        return employeeManager.getPrefAllemployees();
     }
 
     private void addShiftEmployee(int employeeId, ShiftEmployee shiftEmployee) {
