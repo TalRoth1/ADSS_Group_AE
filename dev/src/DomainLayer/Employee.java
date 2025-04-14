@@ -44,8 +44,7 @@ public class Employee {
         }
     }
 
-    public void logout() {
-        this.isLoggedIn = false;
+    public void logout() { this.isLoggedIn = false;
     }
 
     public void setTraining(Training training) {

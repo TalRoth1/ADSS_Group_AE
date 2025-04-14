@@ -59,7 +59,7 @@ public class CLI {
                 fireEmployee();
                 break;
             case 3:
-                hire();
+                hireEmployee();
                 break;
             case 4:
                 changeRole();
@@ -74,7 +74,7 @@ public class CLI {
                 changeEmployeeData();
                 break;
             case 8:
-                employeeFacade.logout(id);
+                logout(id);
                 loginCLI();
             default:
                 System.out.println("This is not a valid Employee Manager action");
@@ -104,9 +104,51 @@ public class CLI {
         System.out.println("Please Enter Employee's ID to fire");
         int employeeId = scanner.nextInt();
         scanner.nextLine();
-        String ans = employeeFacade.fireEmployee(employeeId, id);
-        if(!ans.isEmpty())
-            System.out.println(ans);
+        String response = employeeFacade.fireEmployee(employeeId, id);
+        if(response != null)
+            System.out.println(response);
         EmployeeManager();
+    }
+
+    private void hireEmployee() {
+        System.out.println("Please enter the new Employee details");
+        System.out.println("ID:");
+        int employeeID = scanner.nextInt();
+        scanner.nextLine();
+        System.out.println("Name:");
+        String name = scanner.nextLine();
+        System.out.println("Bank Account:");
+        String bankAccount = scanner.nextLine();
+        System.out.println("Salary:");
+        int salary = scanner.nextInt();
+        scanner.nextLine();
+        System.out.println("Password:");
+        String employeePassword = scanner.nextLine();
+
+        //choose role
+        Role[] roles = Role.values(); // Role.values() return the enum values
+        System.out.println("Choose a role:");
+        for (int i = 0; i < roles.length; i++)
+            System.out.println((i + 1) + ". " + roles[i]);
+        int choice = -1;
+        while(choice < 1 || choice > roles.length) {
+            System.out.println("Enter your choice: ");
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+                scanner.nextLine();
+            } else {
+                scanner.nextLine();
+                System.out.println("Invalid input, Please enter a number.");
+            }
+        }
+        String role = roles[choice - 1].toString();
+        String response = employeeFacade.hireEmployee(employeeID, id, name ,bankAccount, salary, employeePassword, role);
+        if(response != null) {
+            System.out.println(response);
+        }
+        EmployeeManager();
+    }
+    private void logout(int id) {
+        employeeFacade.logout(id);
     }
 }
