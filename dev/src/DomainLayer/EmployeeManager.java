@@ -10,16 +10,22 @@ import java.util.Map;
 public class EmployeeManager extends Employee{
 
     private Map<Integer, ShiftEmployee> allEmployees;
+    private Map<Date, Shift> morningShifts;
+    private Map<Date, Shift> eveningShifts;
     
     public EmployeeManager(int id, String name, String bankAccount, int salary, Date startDate, int vacationDays, int sickDays, String username, String password) {
         super(id, name, bankAccount, salary, startDate, vacationDays, sickDays, username, password);
         allEmployees = new HashMap<>();
     }
-    
 
     //methods 
     public void addEmployee(ShiftEmployee employee) {
         allEmployees.put(employee.getId(), employee);
+    }
+
+    public void addEmployee(int id, String name, String bankAccount, int salary, Date startDate, int vacationDays, int sickDays, String username, String password) {
+        ShiftEmployee employee = new ShiftEmployee(id, name, bankAccount, salary, startDate, vacationDays, sickDays, username, password);
+        allEmployees.put(id, employee);
     }
 
     public void removeEmployee(int id) {
@@ -66,11 +72,6 @@ public class EmployeeManager extends Employee{
             throw new IllegalArgumentException("invalid sickDays");
         ShiftEmployee employee = allEmployees.get(employeeId);   
         employee.setSickDays(sickDays);
-    }
-
-    public void addEmployee(int id, String name, String bankAccount, int salary, Date startDate, int vacationDays, int sickDays, String username, String password) {
-        ShiftEmployee employee = new ShiftEmployee(id, name, bankAccount, salary, startDate, vacationDays, sickDays, username, password);
-        allEmployees.put(id, employee);
     }
 
     public void fireEmployee(int id){
@@ -146,6 +147,36 @@ public class EmployeeManager extends Employee{
         shift.setShiftManagerId(newManager);
     }
 
+    public String shiftReplacement(Shift shift, int empID, int replacementID) {
+        if (!allEmployees.containsKey(empID) || !allEmployees.containsKey(replacementID)) {
+            throw new IllegalArgumentException("employee not found in the system.");
+        }
+        if(replacementID == empID) {
+            throw new IllegalArgumentException("replacement employee cannot be the same as the original employee.");
+        }
+        if (!shift.getAssignedEmployeesID().containsKey(empID)) {
+            throw new IllegalArgumentException("employee not assigned to this shift.");
+        }
+        if (shift.getAssignedEmployeesID().containsKey(replacementID)) {
+            throw new IllegalArgumentException("replacement employee already assigned to this shift.");
+        }
+        ShiftEmployee employee = allEmployees.get(empID);
+        ShiftEmployee replacement = allEmployees.get(replacementID);
+        if(!replacement.getPreferredShifts().contains(shift)) {
+            throw new IllegalArgumentException("replacement employee does not have this shift in their preferred shifts.");
+        }
+        if(replacement.getRoles().contains(shift.getAssignedEmployeesID().get(empID))){
+            throw new IllegalArgumentException("replacement employee does not have the same role as the original employee.");
+        }
+           shift.removeEmployee(empID);
+           shift.addEmployee(replacementID, shift.getAssignedEmployeesID().get(empID));
+            return "Shift replacement successful: " + employee.getName() + " has been replaced by " + replacement.getName() + " for shift " + shift.getShiftString();
+    }
+
+
+
+
+    //getters and setters
     public void setRequiredRoles(Shift shift, Role role, int numOfEmployees) {
         if(shift != null)
         shift.setRequiredRoles(role, numOfEmployees);
@@ -155,5 +186,48 @@ public class EmployeeManager extends Employee{
         shift.setShiftManagerId(id);
     }
 
-    //, החלפת משמרות, הוספת העדפות
+    public String getPrefAllemployees(){
+        String s = "" ;
+        for (ShiftEmployee e : allEmployees.values()){
+            s = s + e.getName() + " " + e.getId() + " Roles: " + e.getRoles() +
+                   //"\n this week shifts : " +"\n" + e.getLastPref(0) +
+                    "\n next week shiftspref : " +"\n"+ e.getPreferredShifts() +"\n" ;
+        }
+        return s;
+    }
+
+    public String getPrefEmployee(int id){
+        if (!checkEmployee(id)){
+            throw new IllegalArgumentException("employee not exist");
+        }
+        ShiftEmployee employee = allEmployees.get(id);
+        return employee.getName() + " " + employee.getId() + " Roles: " + employee.getRoles() +
+                "\n next week shifts pref: " +"\n"+ employee.getPreferredShifts() +"\n" ;
+    }
+
+    
+    public String getEmployeeShifts(int employeeID) {
+        if (!checkEmployee(employeeID)) {
+            throw new IllegalArgumentException("employee not exist");
+        }
+        ShiftEmployee employee = allEmployees.get(employeeID);
+        String morning="Morning Shifts:\n";
+        String evening="Evening Shifts:\n";
+        for(Date d : morningShifts.keySet()){
+            Shift s = morningShifts.get(d);
+            if(s.getAssignedEmployeesID().containsKey(employeeID)){
+                morning += s.getDate() +", "+"Role: " + s.getRole(employeeID) + "\n";
+            }
+        }
+        for(Date d : eveningShifts.keySet()){
+            Shift s = eveningShifts.get(d);
+            if(s.getAssignedEmployeesID().containsKey(employeeID)){
+                evening += s.getDate() + ", "+"Role: " + s.getRole(employeeID) + "\n";
+            }
+        }
+        return "Employee: " + employee.getName() + " "+ employeeID + "\n" + morning + "\n" + evening;
+    }
+
+
+//set shifts, facade, emp choose pref
 }
