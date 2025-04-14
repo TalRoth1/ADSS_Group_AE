@@ -12,7 +12,7 @@ public class Employee {
     private int sickDays;
     private String username; 
     private String password; 
-    protected boolean finishWorking; //is fired or still in the company
+    protected boolean finishWorking; //is fired 
     private boolean isLoggedIn = false;
 
 

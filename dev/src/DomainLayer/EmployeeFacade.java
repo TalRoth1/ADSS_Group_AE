@@ -28,7 +28,8 @@ public class EmployeeFacade {
             return "You are not logged in";
         if(shiftEmployees.containsKey(employeeId)) {
             EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-            return employeeManager.fireEmployee(employeeId);
+            employeeManager.fireEmployee(employeeId);
+            return "Employee " + employeeId + " fired successfully";
         }
         else
             return "Can't fire employee: No employee found with ID " + employeeId;
@@ -61,4 +62,8 @@ public class EmployeeFacade {
     private EmployeeManager getEmployeeManager(int id) {
         return employeeManagers.get(id);
     }
+
+    
+
+
 }

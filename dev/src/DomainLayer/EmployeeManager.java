@@ -36,51 +36,56 @@ public class EmployeeManager extends Employee{
         return allEmployees.containsKey(id);
     }
 
-    public void updateBankAccountEmployee(int employeeId, String bankAccount) {
+    public String updateBankAccountEmployee(int employeeId, String bankAccount) {
         if (!checkEmployee(employeeId)) {
-            throw new IllegalArgumentException("Employee not found");
+            return "Employee not found";
         }
         ShiftEmployee employee = allEmployees.get(employeeId);   
         employee.setBankAccount(bankAccount);
+        return "Bank account updated successfully";
     }
 
-    public void updateSalaryEmployee(int employeeId, int salary) {
+    public String updateSalaryEmployee(int employeeId, int salary) {
         if (!checkEmployee(employeeId)) {
-            throw new IllegalArgumentException("Employee not found");
+           return "Employee not found";
         }
         if(salary<0)
-            throw new IllegalArgumentException("invalid salary");
+            return "invalid salary";
         ShiftEmployee employee = allEmployees.get(employeeId);   
         employee.setSalary(salary);
+        return "Salary updated successfully";
     }
 
-    public void updateVacationDaysEmployee(int employeeId, int vacationDays) {
+    public String updateVacationDaysEmployee(int employeeId, int vacationDays) {
         if (!checkEmployee(employeeId)) {
-            throw new IllegalArgumentException("Employee not found");
+            return "Employee not found";
         }
         if(vacationDays<0)
-            throw new IllegalArgumentException("invalid vacationDays");
+            return "invalid vacationDays";
         ShiftEmployee employee = allEmployees.get(employeeId);   
         employee.setVacationDays(vacationDays);
+        return "Vacation days updated successfully";
     }
 
-    public void updateSickDaysEmployee(int employeeId, int sickDays) {
+    public String updateSickDaysEmployee(int employeeId, int sickDays) {
         if (!checkEmployee(employeeId)) {
-            throw new IllegalArgumentException("Employee not found");
+            return "Employee not found";
         }
         if(sickDays<0)
-            throw new IllegalArgumentException("invalid sickDays");
+            return "invalid sickDays";
         ShiftEmployee employee = allEmployees.get(employeeId);   
         employee.setSickDays(sickDays);
+        return "Sick days updated successfully";
     }
 
-    public void fireEmployee(int id){
+    public String fireEmployee(int id){
         if (!checkEmployee(id))
-            throw new IllegalArgumentException("Employee not found");
+            return "Employee not found";
         ShiftEmployee employee = allEmployees.get(id);
         if (employee.isFinishWorking())
-            throw new IllegalArgumentException("Employee already fired");
+            return"Employee already fired";
         employee.setFinishWorking(true);
+        return "Employee " + employee.getName() + " has been fired successfully.";
     }
 
     public void addRoleToEmployee(int employeeID, Role role){
