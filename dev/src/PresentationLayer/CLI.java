@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class CLI {
     public static Scanner scanner = new Scanner(System.in);
     EmployeeFacade employeeFacade;
-    private String username;
+    private int id;
     private String password;
 
     public CLI() {
@@ -18,15 +18,15 @@ public class CLI {
 
     private void loginCLI() {
         System.out.println("LOGIN:");
-        System.out.println("Please enter your username:");
-        username = String.valueOf(scanner.nextInt());
+        System.out.println("Please enter your ID:");
+        id = scanner.nextInt();
         scanner.nextLine();
         System.out.println("Please enter your password:");
         password = scanner.nextLine();
        /* if (username.equals("abcde") && password.equals("12345"))
             addEmployeeManager();
         else {*/
-            Employee emp = employeeFacade.login(username, password);
+            Employee emp = employeeFacade.login(id, password);
             if (emp == null) {
                 System.out.println("Can't log in, please try again");
                 loginCLI();
@@ -56,7 +56,7 @@ public class CLI {
                 setShifts();
                 break;
             case 2:
-                fire();
+                fireEmployee();
                 break;
             case 3:
                 hire();
@@ -96,4 +96,17 @@ public class CLI {
         //fill in the rest of the fields of Employee
     }*/
 
+    /*private void setShifts() {
+
+    }*/
+
+    private void fireEmployee() {
+        System.out.println("Please Enter Employee's ID to fire");
+        int employeeId = scanner.nextInt();
+        scanner.nextLine();
+        String ans = employeeFacade.fireEmployee(employeeId, id);
+        if(!ans.isEmpty())
+            System.out.println(ans);
+        EmployeeManager();
+    }
 }

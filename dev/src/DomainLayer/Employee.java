@@ -96,8 +96,7 @@ public class Employee {
     public void setSickDays(int sickDays) {
         this.sickDays = sickDays;
     }
-    public String getUsername() {
-        return username;
+    public String getUsername() { return username;
     }
     public void setUsername(String username) {
         this.username = username;
@@ -114,5 +113,6 @@ public class Employee {
     public void setFinishWorking(boolean finishWorking) {
         this.finishWorking = finishWorking;
     }
+    public boolean isLoggedIn() { return isLoggedIn; }
 
 }
