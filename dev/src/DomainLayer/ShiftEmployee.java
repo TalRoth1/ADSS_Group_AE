@@ -28,30 +28,28 @@ public class ShiftEmployee extends Employee {
     }
 
     //methods
-    public void addRole(Role role) {
+    public String addRole(Role role) {
         if(role == null) {
-            throw new IllegalArgumentException("Role cannot be null.");
+            return "Role cannot be null.";
         }
         if(this.roles.contains(role)) {
-            throw new IllegalArgumentException("Role already exists in the list of roles.");
+            return this.getName() +" is already " + role;
         }
         this.roles.add(role);
+        return null;
     }
 
-    public void removeRole(Role role) {
-        if(role == null) {
-            throw new IllegalArgumentException("Role cannot be null.");
-        }
-        if(!this.roles.contains(role)) {
-            throw new IllegalArgumentException("Role does not exist in the list of roles.");
-        }
+    public String removeRole(Role role) {
+        if(role == null)
+            return "Role cannot be null.";
+        if(!this.roles.contains(role))
+           return "Role does not exist in the list of roles.";
+
         this.roles.remove(role);
+        return null;
     }
 
     public void addTraining(Training training) {
-        if(this.trainings.contains(training)) {
-            throw new IllegalArgumentException("Training already exists in the list of trainings.");
-        }
         if(training == null) {
             throw new IllegalArgumentException("Training cannot be null.");
         }
@@ -72,18 +70,19 @@ public class ShiftEmployee extends Employee {
     }
     
 
-    public void changeRole(Role oldRole, Role newRole) {
+    public String changeRole(Role oldRole, Role newRole) {
         if(this.roles.contains(newRole)) {
-            throw new IllegalArgumentException("Role already exists in the list of roles.");
+           return "Role already exists in the list of roles.";
         }
         if(oldRole == null || newRole == null) {
-            throw new IllegalArgumentException("Old Role or New Role cannot be null.");
+            return "Old Role or New Role cannot be null.";
         }
         if(!this.roles.contains(oldRole)) {
-            throw new IllegalArgumentException("Old Role does not exist in the list of roles.");
+            return "Old Role does not exist in the list of roles.";
         }
         this.roles.add(newRole);
         this.roles.remove(oldRole);
+        return null;
     }
 
     public void addPreferredShift(Shift shift) {

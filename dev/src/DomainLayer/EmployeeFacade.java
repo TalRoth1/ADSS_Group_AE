@@ -21,7 +21,7 @@ public class EmployeeFacade {
     public String fireEmployee(int employeeId, int empManagerId) {
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
-        if(shiftEmployees.containsKey(employeeId)) {
+        if(checkEmployee(employeeId)) {
             EmployeeManager employeeManager = getEmployeeManager(empManagerId);
             return employeeManager.fireEmployee(employeeId);
         }
@@ -30,21 +30,48 @@ public class EmployeeFacade {
     }
 
     public String hireEmployee(int employeeId, int empManagerId, String employeeName, String bankAccount, int salary,
-                               String employeePassword, String role) {
+                               String employeePassword, Role role) {
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
-        if(shiftEmployees.containsKey(employeeId))
+        if(checkEmployee(employeeId))
             return "Can't hire employee: " + employeeId + " already hired";
         else {
             EmployeeManager employeeManager = getEmployeeManager(empManagerId);
             ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName,
-                    bankAccount, salary, employeePassword, convertStringToRole(role));
+                    bankAccount, salary, employeePassword, role);
             if(shiftEmployee == null)
                 return "Can't hire employee: " + employeeId + " already hired";
 
             addShiftEmployee(employeeId, shiftEmployee);
-            return "";
+            return null;
         }
+    }
+
+    public String changeRoleToEmployee(int employeeId, int empManagerId, Role oldRole, Role newRole) {
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        if(!checkEmployee(employeeId))
+            return employeeId + " doesn't exist";
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.changeRoleToEmployee(employeeId, oldRole, newRole);
+    }
+
+    public String addRoleToEmployee(int employeeId, int empManagerId, Role newRole) {
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        if(!checkEmployee(employeeId))
+            return employeeId + " doesn't exist";
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.addRoleToEmployee(employeeId, newRole);
+    }
+
+    public String deleteRoleFromEmployee(int employeeId, int empManagerId, Role roleToDelete) {
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        if(!checkEmployee(employeeId))
+            return employeeId + " doesn't exist";
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.deleteRoleFromEmployee(employeeId, roleToDelete);
     }
 
     public void logout(int id) {
@@ -76,6 +103,10 @@ public class EmployeeFacade {
 
     private EmployeeManager getEmployeeManager(int id) {
         return employeeManagers.get(id);
+    }
+
+    private boolean checkEmployee(int id) {
+        return shiftEmployees.containsKey(id);
     }
 
     private Role convertStringToRole(String roleName) {

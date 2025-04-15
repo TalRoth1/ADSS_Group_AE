@@ -67,13 +67,13 @@ public class CLI {
                 hireEmployee();
                 break;
             case 4:
-                changeRole();
+                changeRoleToEmployee();
                 break;
             case 5:
-                addRole();
+                addRoleToEmployee();
                 break;
             case 6:
-                deleteRole();
+                deleteRoleFromEmployee();
                 break;
             case 7:
                 changeEmployeeData();
@@ -133,7 +133,7 @@ public class CLI {
         int employeeId = scanner.nextInt();
         scanner.nextLine();
         String response = employeeFacade.fireEmployee(employeeId, id);
-        if(!response.isEmpty())
+        if(response != null)
             System.out.println(response);
         EmployeeManager();
     }
@@ -154,30 +154,72 @@ public class CLI {
         String employeePassword = scanner.nextLine();
 
         //choose role
-        Role[] roles = Role.values(); // Role.values() return the enum values
-        System.out.println("Choose a role:");
-        for (int i = 0; i < roles.length; i++)
-            System.out.println((i + 1) + ". " + roles[i]);
-        int choice = -1;
-        while(choice < 1 || choice > roles.length) {
-            System.out.println("Enter your choice: ");
-            if (scanner.hasNextInt()) {
-                choice = scanner.nextInt();
-                scanner.nextLine();
-            } else {
-                scanner.nextLine();
-                System.out.println("Invalid input, Please enter a number.");
-            }
-        }
-        String role = roles[choice - 1].toString();
-        String response = employeeFacade.hireEmployee(employeeID, id, name ,bankAccount, salary, employeePassword, role);
-        if(!response.isEmpty()) {
+        Role selectedRole = selectRole("Choose a role:");
+        String response = employeeFacade.hireEmployee(employeeID, id, name ,bankAccount, salary, employeePassword, selectedRole);
+        if(response != null)
             System.out.println(response);
-        }
         EmployeeManager();
     }
+
+    private void changeRoleToEmployee()
+    {
+        System.out.println("Please enter employee ID:");
+        int employeeID = scanner.nextInt();
+        scanner.nextLine();
+        Role oldRole = selectRole("Choose Role To Change:");
+        Role newRole = selectRole("To What Role:");
+
+        String response = employeeFacade.changeRoleToEmployee(employeeID, id, oldRole, newRole);
+        if (response != null)
+            System.out.println(response);
+        EmployeeManager();
+    }
+
+    private void addRoleToEmployee() {
+        System.out.println("Please enter employee ID:");
+        int employeeID = scanner.nextInt();
+        scanner.nextLine();
+        Role newRole = selectRole("Choose Role To Add:");
+        String response = employeeFacade.addRoleToEmployee(employeeID, id, newRole);
+        if(response != null)
+            System.out.println(response);
+        EmployeeManager();
+    }
+
+    private void deleteRoleFromEmployee() {
+        System.out.println("Please enter employee ID:");
+        int employeeID = scanner.nextInt();
+        scanner.nextLine();
+        Role toDelete = selectRole("Choose Role To Delete:");
+        String response = employeeFacade.deleteRoleFromEmployee(employeeID, id, toDelete);
+        if(response != null)
+            System.out.println(response);
+        EmployeeManager();
+    }
+
     private void logout(int id) {
         employeeFacade.logout(id);
+    }
+
+    private Role selectRole(String prompt) {
+        System.out.println(prompt);
+        Role[] roles = Role.values(); //Role.values() return the enum values
+
+        for (int i = 0; i < roles.length; i++)
+            System.out.println((i + 1) + ". " + roles[i].toString());
+
+        int choice = -1;
+        while (choice < 1 || choice > roles.length) {
+            System.out.print("Enter choice (1-" + roles.length + "): ");
+            if (scanner.hasNextInt())
+                choice = scanner.nextInt();
+            else {
+                scanner.next();
+                System.out.println("Invalid input, please enter a number.");
+            }
+        }
+        scanner.nextLine();
+        return roles[choice - 1];
     }
 
     private LocalDate convertStringToDate(String s) {//only works for dd-mm-yyyy

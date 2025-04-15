@@ -86,7 +86,7 @@ public class EmployeeManager extends Employee{
         if (employee.isFinishWorking())
             return "Employee already fired";
         employee.setFinishWorking(true);
-        return "";
+        return null;
     }
 
     //this method not good yet, need to ask liat about ShiftEmployee constructor and then fix
@@ -100,30 +100,30 @@ public class EmployeeManager extends Employee{
         return shiftEmployee;
     }
 
-    public void addRoleToEmployee(int employeeID, Role role){
-        if (!checkEmployee(employeeID)){
-            throw new IllegalArgumentException("employee not exist");
-        }
-        if (role==null)
-            throw new IllegalArgumentException("invalid role");
+    public String addRoleToEmployee(int employeeID, Role role){
+        if (!checkEmployee(employeeID))
+            return employeeID + " doesn't exist";
+        if (role == null)
+            return "invalid role";
+
         ShiftEmployee employee = allEmployees.get(employeeID);
-        employee.addRole(role);
+        return employee.addRole(role);
     }
 
-    public void changeRoleToEmployee(int employeeID, Role oldRole, Role newRole){
-        if (!checkEmployee(employeeID)){
-            throw new IllegalArgumentException("employee not exist");
-        }
+    public String changeRoleToEmployee(int employeeID, Role oldRole, Role newRole){
+        if (!checkEmployee(employeeID))
+            return employeeID + " doesn't exist";
+
         ShiftEmployee employee = allEmployees.get(employeeID);
-        employee.changeRole(oldRole, newRole);
+        return employee.changeRole(oldRole, newRole);
     }
 
-    public void deleteRoleFromEmployee(int employeeID, Role role){
+    public String deleteRoleFromEmployee(int employeeID, Role role){
         if (!checkEmployee(employeeID)){
-            throw new IllegalArgumentException("employee not exist");
+            return employeeID + " doesn't exist";
         }
         ShiftEmployee employee = allEmployees.get(employeeID);
-           employee.removeRole(role);
+            return employee.removeRole(role);
     }
 
     public void addTrainingToEmployee(int employeeID, Training training){

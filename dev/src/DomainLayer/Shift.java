@@ -44,7 +44,7 @@ public class Shift {
             return assignedEmployeesID.get(id).toString();
         if (id <= 0)
             throw new IllegalArgumentException("ID is invalid. ");
-        return "";
+        return null;
     }
 
     // Getters and Setters
