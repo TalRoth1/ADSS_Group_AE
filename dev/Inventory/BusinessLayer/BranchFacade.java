@@ -14,7 +14,7 @@ public class BranchFacade
         nextBranchID = 1;
     }
 
-    protected static BranchFacade getInstance() 
+    public static BranchFacade getInstance()
     {
         if(instance == null) 
         {
@@ -30,7 +30,7 @@ public class BranchFacade
         return instance;
     }
 
-    protected synchronized int addBranch(String name, String address) 
+    public synchronized int addBranch(String name, String address)
     {
         if(name != null && address != null)
         {
@@ -44,15 +44,22 @@ public class BranchFacade
         }
     }
 
-    protected void removeBranch(int branchID) 
+    public void removeBranch(int branchID)
     {
         synchronized(this.branches)
         {
-            branches.remove(branchID);
+            if(branches.containsKey(branchID))
+            {
+                branches.remove(branchID);
+            }
+            else
+            {
+                throw new IllegalArgumentException("Branch with this id not found");
+            }
         }
     }
 
-    protected void changeBranchName(String newName, int branchID) 
+    public void changeBranchName(String newName, int branchID)
     {
         synchronized(branches)
         {
@@ -68,10 +75,14 @@ public class BranchFacade
                     throw new IllegalArgumentException("New Name for branch can't be null");
                 }
             }
+            else
+            {
+                throw new IllegalArgumentException("Branch with this id not found");
+            }
         }
     }
 
-    protected void changeBranchAddress(String newAddress, int branchID) 
+    public void changeBranchAddress(String newAddress, int branchID)
     {
         synchronized(branches)
         {
@@ -87,6 +98,59 @@ public class BranchFacade
                     throw new IllegalArgumentException("New Address for branch can't be null");
                 }
             }
+            else
+            {
+                throw new IllegalArgumentException("Branch with this id not found");
+            }
         }
+    }
+
+    public String getBranchName(int id)
+    {
+        synchronized(this.branches)
+        {
+            if(branches.containsKey(id))
+            {
+                return branches.get(id).getName();
+            }
+            else
+            {
+                throw new IllegalArgumentException("Branch with this id not found");
+            }
+        }
+    }
+
+    public String getBranchAddress(int id)
+    {
+        synchronized(this.branches)
+        {
+            if(branches.containsKey(id))
+            {
+                return branches.get(id).getAddress();
+            }
+            else
+            {
+                throw new IllegalArgumentException("Branch with this id not found");
+            }
+        }
+    }
+
+    public String getListOfAllBranches()
+    {
+        StringBuilder sb = new StringBuilder();
+        synchronized (branches)
+        {
+            if (branches.isEmpty())
+            {
+                throw new IllegalArgumentException("Branch not founded");
+            }
+            for (Map.Entry<Integer, BranchBL> entry : branches.entrySet())
+            {
+                int id = entry.getKey();
+                BranchBL branch = entry.getValue();
+                sb.append("Branch ID: ").append(id).append(", Name: ").append(branch.getName()).append(", Address: ").append(branch.getAddress()).append("\n");
+            }
+        }
+        return sb.toString();
     }
 }
