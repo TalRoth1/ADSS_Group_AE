@@ -23,11 +23,8 @@ public class CLI {
 
     private void loginCLI() {
         System.out.println("LOGIN:");
-        System.out.println("Please enter your ID:");
-        id = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Please enter your password:");
-        password = scanner.nextLine();
+        id = readInt("Please enter your ID:");
+        password = readString("Please enter your password:");
        /* if (username.equals("abcde") && password.equals("12345"))
             addEmployeeManager();
         else {*/
@@ -43,6 +40,7 @@ public class CLI {
     }
 
     private void EmployeeManager() {
+        //TODO: maybe use the assistant method selectFromList
         System.out.println("Select Employee Manager Action:");
         System.out.println("1. Set Shifts");
         System.out.println("2. Fire Employee");
@@ -87,9 +85,6 @@ public class CLI {
         }
     }
 
-//    private void ShiftEmployee() {
-//        //TODO: implement
-//    }
 //    we will implement this probably in the next assignment
 //    private void addEmployeeManager() {
 //        System.out.println("Enter the details of the new Employee Manager");
@@ -103,7 +98,7 @@ public class CLI {
 //    }
 
     private void setShifts() {
-//        String pref = employeeFacade.getPreferences(id);
+        String pref = employeeFacade.getPreferences(id);
         String stringDate = "";
         while (!isValidDate(stringDate, "^(0[1-9]|[1-2][0-9]|3[01])-(0[1-9]|1[0-2])-(\\d{4})$")) {
             System.out.println("Please enter the date of the shift in format of dd-mm-yyyy");
@@ -123,15 +118,13 @@ public class CLI {
             System.out.println("Shabbat is rest day, please choose again");
             setShifts();
         }
-//        System.out.println(pref);
+        System.out.println(pref);
         createShift(date);
         EmployeeManager();
     }
 
     private void fireEmployee() {
-        System.out.println("Please Enter Employee's ID to fire");
-        int employeeId = scanner.nextInt();
-        scanner.nextLine();
+        int employeeId = readInt("Please enter Employee's ID to fire: ");
         String response = employeeFacade.fireEmployee(employeeId, id);
         if(response != null)
             System.out.println(response);
@@ -140,21 +133,14 @@ public class CLI {
 
     private void hireEmployee() {
         System.out.println("Please enter the new Employee details");
-        System.out.println("ID:");
-        int employeeID = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Name:");
-        String name = scanner.nextLine();
-        System.out.println("Bank Account:");
-        String bankAccount = scanner.nextLine();
-        System.out.println("Salary:");
-        int salary = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Password:");
-        String employeePassword = scanner.nextLine();
+        int employeeID = readInt("ID: ");
+        String name = readString("Name");
+        String bankAccount = readString("Bank Account: ");
+        int salary = readInt("Salary: ");
+        String employeePassword = readString("Password: ");
 
         //choose role
-        Role selectedRole = selectRole("Choose a role:");
+        Role selectedRole = selectFromList("Choose a role:", Role.values());
         String response = employeeFacade.hireEmployee(employeeID, id, name ,bankAccount, salary, employeePassword, selectedRole);
         if(response != null)
             System.out.println(response);
@@ -163,11 +149,9 @@ public class CLI {
 
     private void changeRoleToEmployee()
     {
-        System.out.println("Please enter employee ID:");
-        int employeeID = scanner.nextInt();
-        scanner.nextLine();
-        Role oldRole = selectRole("Choose Role To Change:");
-        Role newRole = selectRole("To What Role:");
+        int employeeID = readInt("Please enter employee ID: ");
+        Role oldRole = selectFromList("Choose Role To Change:", Role.values());
+        Role newRole = selectFromList("To What Role:", Role.values());
 
         String response = employeeFacade.changeRoleToEmployee(employeeID, id, oldRole, newRole);
         if (response != null)
@@ -176,10 +160,8 @@ public class CLI {
     }
 
     private void addRoleToEmployee() {
-        System.out.println("Please enter employee ID:");
-        int employeeID = scanner.nextInt();
-        scanner.nextLine();
-        Role newRole = selectRole("Choose Role To Add:");
+        int employeeID = readInt("Please enter employee ID: ");
+        Role newRole = selectFromList("Choose Role To Add:", Role.values());
         String response = employeeFacade.addRoleToEmployee(employeeID, id, newRole);
         if(response != null)
             System.out.println(response);
@@ -187,39 +169,145 @@ public class CLI {
     }
 
     private void deleteRoleFromEmployee() {
-        System.out.println("Please enter employee ID:");
-        int employeeID = scanner.nextInt();
-        scanner.nextLine();
-        Role toDelete = selectRole("Choose Role To Delete:");
+        int employeeID = readInt("Please enter employee ID: ");
+        Role toDelete = selectFromList("Choose Role To Delete:", Role.values());
         String response = employeeFacade.deleteRoleFromEmployee(employeeID, id, toDelete);
         if(response != null)
             System.out.println(response);
         EmployeeManager();
     }
 
+    private void changeEmployeeData() {
+        String[] labels = { "Salary", "Bank Account", "Vacation Days" };
+        String option = selectFromList("Select Employee Data to change:", labels);
+        switch (option) {
+            case "Salary" -> updateSalary();
+            case "Bank Account" -> updateBankAccount();
+            case "Vacation Days" -> updateVacationDays();
+        }
+    }
+
+    private void updateSalary() {
+        int employeeId = readInt("Please enter employee ID: ");
+        int salary = readInt("Enter the new Salary: ");
+        String response = employeeFacade.updateSalary(employeeId, id, salary);
+        if(response != null)
+            System.out.println(response);
+        EmployeeManager();
+    }
+
+    private void updateBankAccount() {
+        int employeeId = readInt("Please enter employee ID: ");
+        String bankAccount = readString("Enter the new Bank Account: ");
+        String response = employeeFacade.updateBankAccount(employeeId, id, bankAccount);
+        if(response != null)
+            System.out.println(response);
+        EmployeeManager();
+    }
+    private void updateVacationDays() {
+        int employeeId = readInt("Please enter employee ID: ");
+        int vacationDays = readInt("Enter the new Vacation Days: ");
+        String response = employeeFacade.updateVacationDays(employeeId, id, vacationDays);
+        if(response != null)
+            System.out.println(response);
+        EmployeeManager();
+    }
+
+    //TODO: להוסיף מתודה של לעדכן קרן השתלמות ואולי גם לעדכן סיסמה?
+
     private void logout(int id) {
         employeeFacade.logout(id);
     }
 
-    private Role selectRole(String prompt) {
-        System.out.println(prompt);
-        Role[] roles = Role.values(); //Role.values() return the enum values
+    private void shiftEmployee() {
+        System.out.println("Select Shift Employee Action:");
+        System.out.println("1. Set preferences");
+        System.out.println("2. Get preferences");
+        System.out.println("3. logout");
+        int option = scanner.nextInt();
+        scanner.nextLine();
 
-        for (int i = 0; i < roles.length; i++)
-            System.out.println((i + 1) + ". " + roles[i].toString());
+        switch (option) {
+            case 1:
+                setPreferences();
+                break;
+            case 2:
+                getPrefEmployee();
+            case 3:
+                logout(id);
+                loginCLI();
+            default:
+                System.out.println("This is not a valid Shift Employee action");
+                shiftEmployee();
+        }
+    }
 
+    private void getPrefEmployee() {
+        System.out.println(employeeFacade.getPrefEmployee(id));
+        shiftEmployee();
+    }
+
+    private <T> T selectFromList(String title, T[] options) {
         int choice = -1;
-        while (choice < 1 || choice > roles.length) {
-            System.out.print("Enter choice (1-" + roles.length + "): ");
-            if (scanner.hasNextInt())
+        while (choice < 1 || choice > options.length) {
+            System.out.println(title);
+            for (int i = 0; i < options.length; i++) {
+                System.out.println((i + 1) + ". " + options[i].toString());
+            }
+
+            System.out.print("Enter choice (1-" + options.length + "): ");
+            if (scanner.hasNextInt()) {
                 choice = scanner.nextInt();
-            else {
+            } else {
                 scanner.next();
                 System.out.println("Invalid input, please enter a number.");
             }
+            scanner.nextLine();
         }
-        scanner.nextLine();
-        return roles[choice - 1];
+
+        return options[choice - 1];
+    }
+
+//    private Role selectRole(String prompt) {
+//        System.out.println(prompt);
+//        Role[] roles = Role.values(); //Role.values() return the enum values
+//
+//        for (int i = 0; i < roles.length; i++)
+//            System.out.println((i + 1) + ". " + roles[i].toString());
+//
+//        int choice = -1;
+//        while (choice < 1 || choice > roles.length) {
+//            System.out.print("Enter choice (1-" + roles.length + "): ");
+//            if (scanner.hasNextInt())
+//                choice = scanner.nextInt();
+//            else {
+//                scanner.next();
+//                System.out.println("Invalid input, please enter a number.");
+//            }
+//        }
+//        scanner.nextLine();
+//        return roles[choice - 1];
+//    }
+
+
+    private int readInt(String prompt) {
+        int value;
+        while (true) {
+            System.out.println(prompt);
+            if (scanner.hasNextInt()) {
+                value = scanner.nextInt();
+                scanner.nextLine();
+                return value;
+            } else {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine();
+            }
+        }
+    }
+
+    private String readString(String prompt) {
+        System.out.println(prompt);
+        return scanner.nextLine();
     }
 
     private LocalDate convertStringToDate(String s) {//only works for dd-mm-yyyy

@@ -38,34 +38,31 @@ public class EmployeeManager extends Employee{
     }
 
     public String updateBankAccountEmployee(int employeeId, String bankAccount) {
-        if (!checkEmployee(employeeId)) {
-            return "Employee not found";
-        }
+        if(!checkEmployee(employeeId))
+            return employeeId + " not exist";
         ShiftEmployee employee = allEmployees.get(employeeId);   
         employee.setBankAccount(bankAccount);
-        return "Bank account updated successfully";
+        return null;
     }
 
     public String updateSalaryEmployee(int employeeId, int salary) {
-        if (!checkEmployee(employeeId)) {
-           return "Employee not found";
-        }
-        if(salary<0)
+        if(!checkEmployee(employeeId))
+            return employeeId + " not exist";
+        if(salary < 0)
             return "invalid salary";
         ShiftEmployee employee = allEmployees.get(employeeId);   
         employee.setSalary(salary);
-        return "Salary updated successfully";
+        return null;
     }
 
     public String updateVacationDaysEmployee(int employeeId, int vacationDays) {
-        if (!checkEmployee(employeeId)) {
-            return "Employee not found";
-        }
-        if(vacationDays<0)
+        if(!checkEmployee(employeeId))
+            return employeeId + " not exist";
+        if(vacationDays < 0)
             return "invalid vacationDays";
         ShiftEmployee employee = allEmployees.get(employeeId);   
         employee.setVacationDays(vacationDays);
-        return "Vacation days updated successfully";
+        return null;
     }
 
     public String updateSickDaysEmployee(int employeeId, int sickDays) {

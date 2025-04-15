@@ -74,6 +74,33 @@ public class EmployeeFacade {
         return employeeManager.deleteRoleFromEmployee(employeeId, roleToDelete);
     }
 
+    public String updateSalary(int employeeId, int empManagerId, int salary) {
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        if(!checkEmployee(employeeId))
+            return employeeId + " doesn't exist";
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.updateSalaryEmployee(employeeId, salary);
+    }
+
+    public String updateBankAccount(int employeeId, int empManagerId, String bankAccount) {
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        if(!checkEmployee(employeeId))
+            return employeeId + " doesn't exist";
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.updateBankAccountEmployee(employeeId, bankAccount);
+    }
+
+    public String updateVacationDays(int employeeId, int empManagerId, int vacationDays) {
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        if(!checkEmployee(employeeId))
+            return employeeId + " doesn't exist";
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.updateVacationDaysEmployee(employeeId, vacationDays);
+    }
+
     public void logout(int id) {
         Employee e = getEmployee(id);
         e.logout();
@@ -84,6 +111,18 @@ public class EmployeeFacade {
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.getPrefAllemployees();
+    }
+
+    public String getPrefEmployee(int id) {
+        if(!checkEmployee(id))
+            return id + " doesn't exist";
+        if(!isLoggedIn(id))
+            return "You are not logged in";
+        //כרגע אין פונקציה כזאת במחלקה עובד, אלא רק במחלקה מנהל כ"א.TODO
+        //אבל אין את הID של מנהל כ"א כדי ליצור אובייקט כזה ואז להפעיל עליו את הפונקציה המתאימה
+        //וגם זה לא הגיוני שכאשר עובד ירצה לראות את המשמרות שלו, הוא יצטרך את את מנהל כ"א
+        return "not finisht yetttt";
+
     }
 
     private void addShiftEmployee(int employeeId, ShiftEmployee shiftEmployee) {
@@ -109,14 +148,14 @@ public class EmployeeFacade {
         return shiftEmployees.containsKey(id);
     }
 
-    private Role convertStringToRole(String roleName) {
-        if (roleName == null) {
-            throw new IllegalArgumentException("Role name cannot be null");
-        }
-        try {
-            return Role.valueOf(roleName.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid role name: " + roleName);
-        }
-    }
+//    private Role convertStringToRole(String roleName) {
+//        if (roleName == null) {
+//            throw new IllegalArgumentException("Role name cannot be null");
+//        }
+//        try {
+//            return Role.valueOf(roleName.toUpperCase());
+//        } catch (IllegalArgumentException e) {
+//            throw new IllegalArgumentException("Invalid role name: " + roleName);
+//        }
+//    }
 }

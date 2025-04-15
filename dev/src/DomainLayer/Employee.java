@@ -68,15 +68,11 @@ public class Employee {
     public String getBankAccount() {
         return bankAccount;
     }
-    public void setBankAccount(String bankAccount) {
-        this.bankAccount = bankAccount;
-    }
+    public void setBankAccount(String bankAccount) {this.bankAccount = bankAccount;}
     public int getSalary() {
         return salary;
     }
-    public void setSalary(int salary) {
-        this.salary = salary;
-    }
+    public void setSalary(int salary) { this.salary = salary;}
     public LocalDate getStartDate() {
         return startDate;
     }
@@ -86,17 +82,14 @@ public class Employee {
     public int getVacationDays() {
         return vacationDays;
     }
-    public void setVacationDays(int vacationDays) {
-        this.vacationDays = vacationDays;
-    }
+    public void setVacationDays(int vacationDays) { this.vacationDays = vacationDays;}
     public int getSickDays() {
         return sickDays;
     }
     public void setSickDays(int sickDays) {
         this.sickDays = sickDays;
     }
-    public String getUsername() { return username;
-    }
+    public String getUsername() { return username;}
     public void setUsername(String username) {
         this.username = username;
     }
