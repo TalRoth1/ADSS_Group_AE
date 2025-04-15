@@ -8,28 +8,28 @@ public class BranchBL
     private final Object nameLock = new Object();
     private final Object addressLock = new Object();
 
-    public BranchBL(int id, String name, String adress)
+    protected BranchBL(int id, String name, String adress)
     {
         this.branchID = id;
         this.name = name;
         this.address = adress;
     }
 
-    public int getID()
+    protected int getID()
     {
         return branchID;
     }
 
-    public String getName()
+    protected String getName()
     {
         return this.name;
     }
 
-    public String getAddress()
+    protected String getAddress()
     {
         return this.address;
     }
-    public void setName(String newName)
+    protected void setName(String newName)
     {
         synchronized(this.nameLock)
         {
@@ -37,7 +37,7 @@ public class BranchBL
         }
     }
 
-    public void setAddress(String newAddress)
+    protected void setAddress(String newAddress)
     {
         synchronized(this.addressLock)
         {

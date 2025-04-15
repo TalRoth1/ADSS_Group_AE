@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BranchFacade 
-
 {
     private static BranchFacade instance = null;
     private Map<Integer, BranchBL> branches = new HashMap<>();
@@ -15,7 +14,7 @@ public class BranchFacade
         nextBranchID = 1;
     }
 
-    public static BranchFacade getInstance() 
+    protected static BranchFacade getInstance() 
     {
         if(instance == null) 
         {
@@ -31,7 +30,7 @@ public class BranchFacade
         return instance;
     }
 
-    public synchronized int addBranch(String name, String address) 
+    protected synchronized int addBranch(String name, String address) 
     {
         if(name != null && address != null)
         {
@@ -45,7 +44,7 @@ public class BranchFacade
         }
     }
 
-    public void removeBranch(int branchID) 
+    protected void removeBranch(int branchID) 
     {
         synchronized(this.branches)
         {
@@ -53,7 +52,7 @@ public class BranchFacade
         }
     }
 
-    public void changeBranchName(String newName, int branchID) 
+    protected void changeBranchName(String newName, int branchID) 
     {
         synchronized(branches)
         {
@@ -72,7 +71,7 @@ public class BranchFacade
         }
     }
 
-    public void changeBranchAddress(String newAddress, int branchID) 
+    protected void changeBranchAddress(String newAddress, int branchID) 
     {
         synchronized(branches)
         {
