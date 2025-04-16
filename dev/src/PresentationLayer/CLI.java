@@ -4,6 +4,7 @@ import DomainLayer.*;
 
 import java.time.LocalDate;
 import java.time.DayOfWeek;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -101,14 +102,7 @@ public class CLI {
 
     private void setShifts() {
         String pref = employeeFacade.getPreferences(id);
-        String stringDate = "";
-        String pattern = "^(0[1-9]|[1-2][0-9]|3[01])-(0[1-9]|1[0-2])-(\\d{4})$";
-        while (!isValidDate(stringDate, pattern)) {
-            System.out.println("Please enter the date of the shift in format of dd-mm-yyyy");
-            stringDate = scanner.nextLine();
-        }
-
-        LocalDate date = convertStringToDate(stringDate);
+        LocalDate date = readDate("Please enter the date of the shift ");
         DayOfWeek today = now.getDayOfWeek();
 
         //check if it's Thursday or later
@@ -154,6 +148,7 @@ public class CLI {
         String name = readString("Name");
         String bankAccount = readString("Bank Account: ");
         int salary = readInt("Salary: ");
+        LocalDate localDate = readDate("Start Date: ");
         String employeePassword = readString("Password: ");
 
         //choose role
@@ -385,17 +380,23 @@ public class CLI {
         return scanner.nextLine();
     }
 
-    private LocalDate convertStringToDate(String s) {//only works for dd-mm-yyyy
+    private LocalDate readDate(String prompt) {
+        String input = "";
+        String pattern = "^(0[1-9]|[1-2][0-9]|3[01])-(0[1-9]|1[0-2])-(\\d{4})$";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        return LocalDate.parse(s, formatter);
-    }
 
-    private static boolean isValidDate(String date, String pattern) {
-        // Compile the regex pattern
-        Pattern compiledPattern = Pattern.compile(pattern);
-        // Create a matcher for the input date
-        Matcher matcher = compiledPattern.matcher(date);
-        // Check if the date matches the pattern
-        return matcher.matches();
+        while (true) {
+            System.out.print(prompt + "(in format of dd-mm-yyyy)");
+            input = scanner.nextLine();
+            if (input.matches(pattern)) {
+                try {
+                    return LocalDate.parse(input, formatter);
+                } catch (DateTimeParseException e) {
+                    // just in case regex filters didnt catch the error
+                    System.out.println("Invalid date format. Please try again.");
+                }
+            } else
+                System.out.println("Invalid format. Please use dd-mm-yyyy.");
+        }
     }
 }
