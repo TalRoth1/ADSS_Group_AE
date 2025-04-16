@@ -3,6 +3,8 @@ package PresentationLayer;
 import DomainLayer.*;
 
 import java.time.LocalDate;
+import java.time.DayOfWeek;
+import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -100,23 +102,38 @@ public class CLI {
     private void setShifts() {
         String pref = employeeFacade.getPreferences(id);
         String stringDate = "";
-        while (!isValidDate(stringDate, "^(0[1-9]|[1-2][0-9]|3[01])-(0[1-9]|1[0-2])-(\\d{4})$")) {
+        String pattern = "^(0[1-9]|[1-2][0-9]|3[01])-(0[1-9]|1[0-2])-(\\d{4})$";
+        while (!isValidDate(stringDate, pattern)) {
             System.out.println("Please enter the date of the shift in format of dd-mm-yyyy");
             stringDate = scanner.nextLine();
         }
+
         LocalDate date = convertStringToDate(stringDate);
+        DayOfWeek today = now.getDayOfWeek();
+
+        //check if it's Thursday or later
+        if (today.getValue() < DayOfWeek.THURSDAY.getValue()) {
+            System.out.println("You can only set shifts starting from Thursday.");
+            EmployeeManager(); //TODO: maybe call setShifts() instead, ask Liat
+        }
+        //check if date is in the past
         if(date.isBefore(now)) {
             System.out.println("You can't set shifts to the past, choose again");
-            setShifts();
+            EmployeeManager();
         }
-//        TODO: ask Liat for how long we want to enable to set shifts
-//        if (date.getDayOfYear() / 7 > now.getDayOfYear() / 7 + 1 && !(date.getDayOfYear() < 8 && date.getYear() - now.getYear() == 1)) {
-//            System.out.println("you can only set shift for this week and the next one");
-//            setShifts();
-//        }
+
+        //allow shifts only for next week
+        //now.with(DayOfWeek.SUNDAY) gets the most recent Sunday before/equal to today.
+        long weeksBetween = ChronoUnit.WEEKS.between(now.with(DayOfWeek.SUNDAY), date.with(DayOfWeek.SUNDAY));
+        if (weeksBetween != 1) {
+            System.out.println("You can only set shift for NEXT week.");
+            EmployeeManager();
+        }
+
+        //don't allow shifts on SHABBAT
         if(date.getDayOfWeek().getValue() == 7) {
             System.out.println("Shabbat is rest day, please choose again");
-            setShifts();
+            EmployeeManager();
         }
         System.out.println(pref);
         createShift(date);
@@ -178,12 +195,17 @@ public class CLI {
     }
 
     private void changeEmployeeData() {
-        String[] labels = { "Salary", "Bank Account", "Vacation Days" };
+        String[] labels = {"Salary", "Bank Account", "Vacation Days", "Sick Days", "Education Fund",
+                "Social Benefits", "Password"};
         String option = selectFromList("Select Employee Data to change:", labels);
         switch (option) {
             case "Salary" -> updateSalary();
             case "Bank Account" -> updateBankAccount();
             case "Vacation Days" -> updateVacationDays();
+            case "Sick Days" -> updateSickDays();
+            case "Education Fund" -> updateEducationFund();
+            case "Social Benefits" -> updateSocialBenefits();
+            case "Password" -> updatePassword();
         }
     }
 
@@ -213,7 +235,42 @@ public class CLI {
         EmployeeManager();
     }
 
-    //TODO: להוסיף מתודה של לעדכן קרן השתלמות ואולי גם לעדכן סיסמה?
+    private void updateSickDays() {
+        int employeeId = readInt("Please enter employee ID: ");
+        int sickDays = readInt("Enter the new Sick Days: ");
+        String response = employeeFacade.updateSickDays(employeeId, id, sickDays);
+        if(response != null)
+            System.out.println(response);
+        EmployeeManager();
+    }
+
+    private void updateEducationFund() {
+        int employeeId = readInt("Please enter employee ID: ");
+        double educationFund = readDouble("Enter the new Education Fund: ");
+        String response = employeeFacade.updateEducationFund(employeeId, id, educationFund);
+        if(response != null)
+            System.out.println(response);
+        EmployeeManager();
+    }
+
+    private void updateSocialBenefits() {
+        int employeeId = readInt("Please enter employee ID: ");
+        double socialBenefits = readDouble("Enter the new Education Fund: ");
+        String response = employeeFacade.updateSocialBenefits(employeeId, id, socialBenefits);
+        if(response != null)
+            System.out.println(response);
+        EmployeeManager();
+
+    }
+
+    private void updatePassword() {
+        int employeeId = readInt("Please enter employee ID: ");
+        String password = readString("Enter the new Password: ");
+        String response = employeeFacade.updatePassword(employeeId, id, password);
+        if(response != null)
+            System.out.println(response);
+        EmployeeManager();
+    }
 
     private void logout(int id) {
         employeeFacade.logout(id);
@@ -246,6 +303,8 @@ public class CLI {
         System.out.println(employeeFacade.getPrefEmployee(id));
         shiftEmployee();
     }
+
+    //assistant methods
 
     private <T> T selectFromList(String title, T[] options) {
         int choice = -1;
@@ -299,6 +358,22 @@ public class CLI {
                 scanner.nextLine();
                 return value;
             } else {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine();
+            }
+        }
+    }
+
+    private double readDouble(String prompt) {
+        double value;
+        while (true) {
+            System.out.println(prompt);
+            if (scanner.hasNextDouble()) {
+                value = scanner.nextDouble();
+                scanner.nextLine();
+                return value;
+            }
+            else {
                 System.out.println("Invalid input. Please enter a number.");
                 scanner.nextLine();
             }

@@ -101,6 +101,42 @@ public class EmployeeFacade {
         return employeeManager.updateVacationDaysEmployee(employeeId, vacationDays);
     }
 
+    public String updateSickDays(int employeeId, int empManagerId, int sickDays) {
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        if(!checkEmployee(employeeId))
+            return employeeId + " doesn't exist";
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.updateSickDaysEmployee(employeeId, sickDays);
+    }
+
+    public String updateEducationFund(int employeeId, int empManagerId, double educationFund) {
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        if(!checkEmployee(employeeId))
+            return employeeId + " doesn't exist";
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.updateEducationFund(employeeId, educationFund);
+    }
+
+    public String updateSocialBenefits(int employeeId, int empManagerId, double socialBenefits) {
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        if(!checkEmployee(employeeId))
+            return employeeId + " doesn't exist";
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.updateSocialBenefits(employeeId, socialBenefits);
+    }
+
+    public String updatePassword(int employeeId, int empManagerId, String password) {
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        if(!checkEmployee(employeeId))
+            return employeeId + " doesn't exist";
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.updatePassword(employeeId, password);
+    }
+
     public void logout(int id) {
         Employee e = getEmployee(id);
         e.logout();
@@ -121,7 +157,7 @@ public class EmployeeFacade {
         //כרגע אין פונקציה כזאת במחלקה עובד, אלא רק במחלקה מנהל כ"א.TODO
         //אבל אין את הID של מנהל כ"א כדי ליצור אובייקט כזה ואז להפעיל עליו את הפונקציה המתאימה
         //וגם זה לא הגיוני שכאשר עובד ירצה לראות את המשמרות שלו, הוא יצטרך את את מנהל כ"א
-        return "not finisht yetttt";
+        return "not finish yetttt";
 
     }
 

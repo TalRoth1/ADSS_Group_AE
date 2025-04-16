@@ -10,6 +10,8 @@ public class Employee {
     private LocalDate startDate;
     private int vacationDays;
     private int sickDays;
+    private double educationFund; //monthly amount
+    private double socialBenefits;//monthly amount
     private String username; 
     private String password; 
     protected boolean finishWorking; //is fired 
@@ -25,6 +27,8 @@ public class Employee {
         this.startDate = startDate;
         this.vacationDays = vacationDays;
         this.sickDays = sickDays;
+        this.educationFund = 0;
+        this.socialBenefits = 0;
         this.username = username;
         this.password = password;
         this.finishWorking = false; 
@@ -89,6 +93,10 @@ public class Employee {
     public void setSickDays(int sickDays) {
         this.sickDays = sickDays;
     }
+    public double getEducationFund() { return educationFund;}
+    public void setEducationFund(double educationFund) { this.educationFund = educationFund;}
+    public double getSocialBenefits() {return socialBenefits;}
+    public void setSocialBenefits(double socialBenefits) {this.socialBenefits = socialBenefits;}
     public String getUsername() { return username;}
     public void setUsername(String username) {
         this.username = username;

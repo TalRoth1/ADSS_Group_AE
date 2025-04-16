@@ -66,14 +66,43 @@ public class EmployeeManager extends Employee{
     }
 
     public String updateSickDaysEmployee(int employeeId, int sickDays) {
-        if (!checkEmployee(employeeId)) {
-            return "Employee not found";
-        }
-        if(sickDays<0)
+        if (!checkEmployee(employeeId))
+            return employeeId + " not exist";
+        if(sickDays < 0)
             return "invalid sickDays";
         ShiftEmployee employee = allEmployees.get(employeeId);   
         employee.setSickDays(sickDays);
-        return "Sick days updated successfully";
+        return null;
+    }
+
+    public String updateEducationFund(int employeeId, double educationFund) {
+        if (!checkEmployee(employeeId))
+            return employeeId + " not exist";
+        if(educationFund < 0)
+            return "invalid educationFund";
+        ShiftEmployee employee = allEmployees.get(employeeId);
+        employee.setEducationFund(educationFund);
+        return null;
+    }
+
+    public String updateSocialBenefits(int employeeId, double socialBenefits) {
+        if (!checkEmployee(employeeId))
+            return employeeId + " not exist";
+        if(socialBenefits < 0)
+            return "invalid educationFund";
+        ShiftEmployee employee = allEmployees.get(employeeId);
+        employee.setSocialBenefits(socialBenefits);
+        return null;
+    }
+
+    public String updatePassword(int employeeId, String password) {
+        if(!checkEmployee(employeeId))
+            return employeeId + " not exist";
+        if(password == null)
+            return "invalid password";
+        ShiftEmployee employee = allEmployees.get(employeeId);
+        employee.setPassword(password);
+        return null;
     }
 
     public String fireEmployee(int id){
