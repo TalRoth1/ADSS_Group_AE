@@ -11,4 +11,14 @@ public class TruckDL {
         return weight <= MaxWeight;
     }
     
+    public TruckDL(int number, String model, String type, float weight, float maxWeight) {
+        this.Number = number;
+        this.Model = model;
+        this.Type = type;
+        this.Weight = weight;
+        this.MaxWeight = maxWeight;
+    }
+    public String toString() {
+        return "Truck Number: " + Number + ", Model: " + Model + ", Type: " + Type + ", Weight: " + Weight + ", Max Weight: " + MaxWeight;
+    }
 }
