@@ -2,10 +2,11 @@ package DomainLayer;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 public class ShipmentDL {
     public Date Date; // includes the hour and time zone
-    public TruckDL TruckNumber;
+    public TruckDL Truck;
     public DriverDL DriverName;
     public LocationDL Origin;
     public List<LocationDL> Destinations;
@@ -20,8 +21,13 @@ public class ShipmentDL {
         this.Destinations = dest;
     }
 
+    private void setTruck(TruckDL newTruck)
+    {
+        this.Truck = newTruck;
+    }
+
     public ShipmentDL(TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String,Integer>> items) {
-        this.TruckNumber = truck;
+        this.Truck = truck;
         this.DriverName = driver;
         this.Origin = origin;
         this.Destinations = destinations;
@@ -43,7 +49,10 @@ public class ShipmentDL {
 
     public void RemoveDestinations(List<LocationDL> destinations)
     {
-        
+        Document.Remove(destinations);
+        List<LocationDL> curr = new ArrayList<>(this.Destinations);
+        curr.removeAll(destinations);
+        SetDestinations(curr);
         
     }
 
@@ -52,8 +61,18 @@ public class ShipmentDL {
         SetDestinations(Document.getLocations());
     }
 
-    private void UpdateDestinationsFromList()
+    public boolean EditTruck(Integer number , List<TruckDL> trucks)
     {
-        
+        for(TruckDL truck : trucks)
+        {
+            if (truck.Number == number)
+            {
+                setTruck(truck);
+                return true;   
+            }
+        }
+        return false;
     }
 }
+
+

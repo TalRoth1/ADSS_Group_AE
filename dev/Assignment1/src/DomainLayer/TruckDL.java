@@ -21,4 +21,9 @@ public class TruckDL {
     public String toString() {
         return "Truck Number: " + Number + ", Model: " + Model + ", Type: " + Type + ", Weight: " + Weight + ", Max Weight: " + MaxWeight;
     }
+
+    public Integer GetNumber()
+    {
+        return this.Number;
+    }
 }

@@ -13,6 +13,11 @@ public class ShipmentFacade {
         shipments.add(shipment);
     }
 
+    public void RemoveShipment(ShipmentDL shipment)
+    {
+        shipments.remove(shipment);
+    }
+
     public LocationDL AddLocation(String street, int streetNumber, String city, int contactNumber, String contactName, String zone) {
         LocationDL location = new LocationDL(street, streetNumber, city, contactNumber, contactName, zone);
         locations.add(location);

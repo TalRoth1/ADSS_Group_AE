@@ -11,7 +11,12 @@ public class ShipmentDocumentDL {
         this.Weight = 69;
     }
 
-    public boolean Edit(Map <LocationDL, Map <String,Integer>> newItems)
+    /*
+    gets map of maps
+    removes all items with 0 or less quantity
+    adds new ones
+    */
+    public boolean Edit(Map<LocationDL, Map<String,Integer>> newItems)
     {
         for (LocationDL newLocation : newItems.keySet())
         {
@@ -25,12 +30,24 @@ public class ShipmentDocumentDL {
             {
                 items.put(newLocation , newItems.get(newLocation));
             }
-            
         }
+        CheckItems();
         return true;
 
     }
-
+    
+    //checks for items with 0 or negative quantity
+    private void CheckItems()
+    {
+        for (LocationDL location : items.keySet())
+        {
+            if (items.get(location).size() == 0)
+            {
+                items.remove(location);
+            }
+        }
+    }
+    //removes the items listed
     public boolean Remove(Map <LocationDL, Map <String,Integer>> newItems)
     {
         for (LocationDL newLocationR : newItems.keySet())
@@ -50,14 +67,29 @@ public class ShipmentDocumentDL {
         return true;
     }
 
+    public boolean Remove(List<LocationDL> locations)
+    {
+        for (LocationDL LocationToRemove : locations)
+        {
+            items.remove(LocationToRemove);
+        }
+        return true;
+    }
 
+    //helper function
     private Map<String,Integer> editItems (Map<String, Integer> newItemsList, Map<String, Integer> currItemsList)
     {
         for (String newItemName : newItemsList.keySet())
         {
-            currItemsList.put(newItemName , newItemsList.get(newItemName));
+            if (newItemsList.get(newItemName) <= 0)
+            {
+                currItemsList.remove(newItemName);
+            }
+            else
+            {
+                currItemsList.put(newItemName , newItemsList.get(newItemName));
+            }
         }
-
         return currItemsList;
     }
 
