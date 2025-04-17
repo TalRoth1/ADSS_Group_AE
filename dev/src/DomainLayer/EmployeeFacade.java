@@ -1,5 +1,6 @@
 package DomainLayer;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,16 +30,17 @@ public class EmployeeFacade {
             return "Can't fire employee: No employee found with ID " + employeeId;
     }
 
-    public String hireEmployee(int employeeId, int empManagerId, String employeeName, String bankAccount, int salary,
-                               String employeePassword, Role role) {
+    public String hireEmployee(int employeeId, int empManagerId, String employeeName, String bankAccount,
+                               int salary, LocalDate startDate, int vacationDays, int sickDays,
+                               double educationFund, double socialBenefits, String employeePassword, Role role) {
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         if(checkEmployee(employeeId))
             return "Can't hire employee: " + employeeId + " already hired";
         else {
             EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-            ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName,
-                    bankAccount, salary, employeePassword, role);
+            ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName, bankAccount,
+                    salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
             if(shiftEmployee == null)
                 return "Can't hire employee: " + employeeId + " already hired";
 
@@ -154,7 +156,7 @@ public class EmployeeFacade {
             return id + " doesn't exist";
         if(!isLoggedIn(id))
             return "You are not logged in";
-        //כרגע אין פונקציה כזאת במחלקה עובד, אלא רק במחלקה מנהל כ"א.TODO
+        //להגיד לליאת: כרגע אין פונקציה כזאת במחלקה עובד, אלא רק במחלקה מנהל כ"א.TODO
         //אבל אין את הID של מנהל כ"א כדי ליצור אובייקט כזה ואז להפעיל עליו את הפונקציה המתאימה
         //וגם זה לא הגיוני שכאשר עובד ירצה לראות את המשמרות שלו, הוא יצטרך את את מנהל כ"א
         return "not finish yetttt";

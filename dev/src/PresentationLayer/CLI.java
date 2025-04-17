@@ -8,8 +8,8 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+//import java.util.regex.Matcher;
+//import java.util.regex.Pattern;
 
 public class CLI {
     public static Scanner scanner = new Scanner(System.in);
@@ -43,48 +43,26 @@ public class CLI {
     }
 
     private void EmployeeManager() {
-        //TODO: maybe use the assistant method selectFromList
-        System.out.println("Select Employee Manager Action:");
-        System.out.println("1. Set Shifts");
-        System.out.println("2. Fire Employee");
-        System.out.println("3. Hire Employee");
-        System.out.println("4. change Employee's role");
-        System.out.println("5. add role to employee");
-        System.out.println("6. delete Employee's role");
-        System.out.println("7. change Employee's data");
-        System.out.println("8. logout");
-
-        int option = scanner.nextInt();
-        scanner.nextLine();
+        String[] actions = {"Set Shifts", "Fire Employee", "Hire Employee", "Change Employee's Role",
+                "Add Role to Employee", "Delete Employee's Role", "Change Employee's Data", "Logout"};
+        String option = selectFromList("Select Employee Manager Action:", actions);
 
         switch (option) {
-            case 1:
-                setShifts();
-                break;
-            case 2:
-                fireEmployee();
-                break;
-            case 3:
-                hireEmployee();
-                break;
-            case 4:
-                changeRoleToEmployee();
-                break;
-            case 5:
-                addRoleToEmployee();
-                break;
-            case 6:
-                deleteRoleFromEmployee();
-                break;
-            case 7:
-                changeEmployeeData();
-                break;
-            case 8:
+            case "Set Shifts" -> setShifts();
+            case "Fire Employee" -> fireEmployee();
+            case "Hire Employee" -> hireEmployee();
+            case "Change Employee's Role" -> changeRoleToEmployee();
+            case "Add Role to Employee" -> addRoleToEmployee();
+            case "Delete Employee's Role" -> deleteRoleFromEmployee();
+            case "Change Employee's Data" -> changeEmployeeData();
+            case "Logout" -> {
                 logout(id);
                 loginCLI();
-            default:
+            }
+            default -> {
                 System.out.println("This is not a valid Employee Manager action");
                 EmployeeManager();
+            }
         }
     }
 
@@ -148,12 +126,17 @@ public class CLI {
         String name = readString("Name");
         String bankAccount = readString("Bank Account: ");
         int salary = readInt("Salary: ");
-        LocalDate localDate = readDate("Start Date: ");
+        LocalDate startDate = readDate("Start Date: ");
+        int vacationDays = readInt("Vacation Days");
+        int sickDays = readInt("Sick Days");
+        double educationFund = readDouble("Education fund: ");
+        double socialBenefits = readDouble("Social Benefits: ");
         String employeePassword = readString("Password: ");
 
         //choose role
         Role selectedRole = selectFromList("Choose a role:", Role.values());
-        String response = employeeFacade.hireEmployee(employeeID, id, name ,bankAccount, salary, employeePassword, selectedRole);
+        String response = employeeFacade.hireEmployee(employeeID, id, name ,bankAccount, salary, startDate,
+                vacationDays, sickDays, educationFund, socialBenefits, employeePassword, selectedRole);
         if(response != null)
             System.out.println(response);
         EmployeeManager();
@@ -272,28 +255,22 @@ public class CLI {
     }
 
     private void shiftEmployee() {
-        System.out.println("Select Shift Employee Action:");
-        System.out.println("1. Set preferences");
-        System.out.println("2. Get preferences");
-        System.out.println("3. logout");
-        int option = scanner.nextInt();
-        scanner.nextLine();
+        String[] actions = {"Set Preferences", "Get Preferences", "Logout"};
+        String option = selectFromList("Select Shift Employee Action:", actions);
 
         switch (option) {
-            case 1:
-                setPreferences();
-                break;
-            case 2:
-                getPrefEmployee();
-            case 3:
+            case "Set Preferences" -> setPreferences();
+            case "Get Preferences" -> getPrefEmployee();
+            case "Logout" -> {
                 logout(id);
                 loginCLI();
-            default:
+            }
+            default -> {
                 System.out.println("This is not a valid Shift Employee action");
                 shiftEmployee();
+            }
         }
     }
-
     private void getPrefEmployee() {
         System.out.println(employeeFacade.getPrefEmployee(id));
         shiftEmployee();

@@ -2,6 +2,7 @@ package DomainLayer;
 
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ShiftEmployee extends Employee {
@@ -9,10 +10,14 @@ public class ShiftEmployee extends Employee {
     private List<Role> roles;
     private List<Training> trainings;
 
-    public ShiftEmployee(int id, String name, String bankAccount, int salary, LocalDate startDate, int vacationDays, int sickDays, String username, String password) {
-        super(id, name, bankAccount, salary, startDate, vacationDays, sickDays, username, password);
+    public ShiftEmployee(int id, String name, String bankAccount, int salary, LocalDate startDate,
+                         int vacationDays, int sickDays, double educationFund, double socialBenefits,
+                         String password, Role role) {
+        super(id, name, bankAccount, salary, startDate, vacationDays, sickDays, educationFund,
+                socialBenefits, password);
         this.preferredShifts = null;
-        this.roles = null;
+        this.roles = new ArrayList<>();
+        roles.add(role);
     }
     public List<Shift> getPreferredShifts() {
         return preferredShifts;

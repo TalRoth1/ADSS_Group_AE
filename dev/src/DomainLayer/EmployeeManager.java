@@ -14,8 +14,11 @@ public class EmployeeManager extends Employee{
     private Map<LocalDate, Shift> morningShifts;
     private Map<LocalDate, Shift> eveningShifts;
     
-    public EmployeeManager(int id, String name, String bankAccount, int salary, LocalDate startDate, int vacationDays, int sickDays, String username, String password) {
-        super(id, name, bankAccount, salary, startDate, vacationDays, sickDays, username, password);
+    public EmployeeManager(int id, String name, String bankAccount, int salary, LocalDate startDate,
+                           int vacationDays, int sickDays, double educationFund, double socialBenefits,
+                           String password) {
+        super(id, name, bankAccount, salary, startDate, vacationDays, sickDays, educationFund,
+                socialBenefits, password);
         allEmployees = new HashMap<>();
     }
 
@@ -24,10 +27,11 @@ public class EmployeeManager extends Employee{
         allEmployees.put(employee.getId(), employee);
     }
 
-    public void addEmployee(int id, String name, String bankAccount, int salary, LocalDate startDate, int vacationDays, int sickDays, String username, String password) {
-        ShiftEmployee employee = new ShiftEmployee(id, name, bankAccount, salary, startDate, vacationDays, sickDays, username, password);
-        allEmployees.put(id, employee);
-    }
+//    Maybe don't need this function because Erez made function hire
+//    public void addEmployee(int id, String name, String bankAccount, int salary, LocalDate startDate, int vacationDays, int sickDays, String username, String password) {
+//        ShiftEmployee employee = new ShiftEmployee(id, name, bankAccount, salary, startDate, vacationDays, sickDays, username, password);
+//        allEmployees.put(id, employee);
+//    }
 
     public void removeEmployee(int id) {
         allEmployees.remove(id);
@@ -115,13 +119,14 @@ public class EmployeeManager extends Employee{
         return null;
     }
 
-    //this method not good yet, need to ask liat about ShiftEmployee constructor and then fix
     public ShiftEmployee hireEmployee(int employeeId, String employeeName, String bankAccount, int salary,
+                                      LocalDate startDate, int vacationDays, int sickDays,
+                                      double educationFund, double socialBenefits,
                                       String employeePassword, Role role){
         if(checkEmployee(employeeId))
             return null;
         ShiftEmployee shiftEmployee = new ShiftEmployee(employeeId, employeeName, bankAccount, salary,
-                employeePassword, role); //TODO: ask Liat about ShiftEmployee constructor
+                startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
         allEmployees.put(employeeId, shiftEmployee);
         return shiftEmployee;
     }
@@ -215,9 +220,6 @@ public class EmployeeManager extends Employee{
            shift.addEmployee(replacementID, shift.getAssignedEmployeesID().get(empID));
             return "Shift replacement successful: " + employee.getName() + " has been replaced by " + replacement.getName() + " for shift " + shift.getShiftString();
     }
-
-
-
 
     //getters and setters
     public void setRequiredRoles(Shift shift, Role role, int numOfEmployees) {
