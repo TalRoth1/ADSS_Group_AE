@@ -1,8 +1,8 @@
 package DomainLayer;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
 
 public class ShipmentDL {
     public Date Date; // includes the hour and time zone
@@ -12,7 +12,23 @@ public class ShipmentDL {
     public List<LocationDL> Destinations;
     public ShipmentDocumentDL Document;
 
-    public Boolean DriverCheck() {
+    public Boolean DriverCheck(DriverDL driver) {
+        TruckDL truck = this.Truck;
+        String truckType = Truck.GetType();
+        String driverLicense = driver.LicenseType;
+        return truckType.equals(driverLicense);
+    }
+
+    public Boolean EditDriver(DriverDL driver) {
+        if (!DriverCheck(driver)) {
+            return false;
+        }
+        this.DriverName = driver;
+        return true;
+    }
+
+    public Boolean EditOrigin(LocationDL origin) {
+        this.Origin = origin;
         return true;
     }
 

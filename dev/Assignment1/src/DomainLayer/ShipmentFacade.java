@@ -36,5 +36,27 @@ public class ShipmentFacade {
         return truck;
     }
 
-    
+    public void EditShipement(ShipmentDL shipment, TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String,Integer>> items) {
+        //assuming that the shipment exists in the list
+        int index = shipments.indexOf(shipment);
+        ShipmentDL shipmentToEdit = shipments.get(index);
+        if(truck != null) {
+            shipmentToEdit.EditTruck(truck.GetNumber(), trucks);
+        }
+        if(driver != null) {
+            Boolean check = shipmentToEdit.EditDriver(driver);
+            if(!check) {
+                System.out.println("Driver does not have the right license for this truck");
+            }
+        }
+        if(origin != null) {
+            shipmentToEdit.EditOrigin(origin);
+        }
+        if(destinations != null) {
+            shipmentToEdit.EditDestinations(items);
+        }
+        if(items != null) {
+            shipmentToEdit.EditDestinations(items);
+        }
+    }
 }

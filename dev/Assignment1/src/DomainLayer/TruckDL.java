@@ -26,4 +26,14 @@ public class TruckDL {
     {
         return this.Number;
     }
+
+    public String GetModel()
+    {
+        return this.Model;
+    }
+
+    public String GetType()
+    {
+        return this.Type;
+    }
 }
