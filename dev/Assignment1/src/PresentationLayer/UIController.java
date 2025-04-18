@@ -10,6 +10,7 @@ import DomainLayer.LocationDL;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import DomainLayer.ShipmentDL;
 
 public class UIController {
     public ShipmentFacade shipmentFacade;
@@ -207,6 +208,91 @@ public class UIController {
         System.out.println("Please enter the truck max weight: ");
         float maxWeight = Float.parseFloat(System.console().readLine());
         shipmentFacade.AddTruck(number, model, type, maxWeight);
+    }
+
+    public void EditTruck(ShipmentDL shipment) {
+        TruckDL truck = ChooseTruck();
+        shipmentFacade.EditShipement(shipment, truck, null, null, null, null);
+    }
+
+    public void EditDriver(ShipmentDL shipment) {
+        DriverDL driver = ChooseDriver();
+        shipmentFacade.EditShipement(shipment, null, driver, null, null, null);
+    }
+
+    public void EditOrigin(ShipmentDL shipment) {
+        LocationDL origin = ChooseStart();
+        shipmentFacade.EditShipement(shipment, null, null, origin, null, null);
+    }
+
+    public void EditDestinations(ShipmentDL shipment) {
+        List<LocationDL> locations = ChooseLocations();
+        Map<LocationDL, Map<String,Integer>> items = ChooseItems(locations);
+        shipmentFacade.EditShipement(shipment, null, null, null, locations, items);
+    }
+
+    public void EditItems(ShipmentDL shipment) {
+        List<LocationDL> locations = shipment.Destinations;
+        Map<LocationDL, Map<String,Integer>> items = ChooseItems(locations);
+        shipmentFacade.EditShipement(shipment, null, null, null, null, items);
+    }
+
+    public void EditShipement()
+    {
+        List<ShipmentDL> shipments = shipmentFacade.shipments;
+        ShipmentDL shipment = null;
+        System.out.println("Please choose a shipment from the list below: ");
+        for (int i = 0; i < shipments.size(); i++) {
+            System.out.println(i + ": " + shipments.get(i).toString());
+        }
+        System.out.println("Enter the number of the shipment you want to edit: ");
+        int choice = Integer.parseInt(System.console().readLine());
+        boolean flag = true;
+        while(flag)
+        {
+            if (choice >= 0 && choice < shipments.size()) {
+                shipment = shipments.get(choice);
+                flag = false;
+            }
+            else {
+                System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        flag = true;
+        while(flag)
+        {
+            System.out.println("Please choose what you want to edit: ");
+            System.out.println("1. Truck");
+            System.out.println("2. Driver");
+            System.out.println("3. Origin");
+            System.out.println("4. Destinations");
+            System.out.println("5. Items");
+            System.out.println("6. Finish editing shipment");
+            int choice2 = Integer.parseInt(System.console().readLine());
+            switch(choice2) {
+                case 1:
+                    EditTruck(shipment);
+                    break;
+                case 2:
+                    EditDriver(shipment);
+                    break;
+                case 3:
+                    EditOrigin(shipment);
+                    break;
+                case 4:
+                    EditDestinations(shipment);
+                    break;
+                case 5:
+                    EditItems(shipment);
+                    break;
+                case 6:
+                    flag = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        
     }
 
 }

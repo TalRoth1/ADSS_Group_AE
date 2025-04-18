@@ -14,7 +14,7 @@ public class ShipmentDL {
 
     public Boolean DriverCheck(DriverDL driver) {
         TruckDL truck = this.Truck;
-        String truckType = Truck.GetType();
+        String truckType = truck.GetType();
         String driverLicense = driver.LicenseType;
         return truckType.equals(driverLicense);
     }
