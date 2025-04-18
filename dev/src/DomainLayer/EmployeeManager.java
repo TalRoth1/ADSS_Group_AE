@@ -3,6 +3,8 @@ package DomainLayer;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import DomainLayer.Training;
+
 
 
 public class EmployeeManager extends Employee{
@@ -20,11 +22,12 @@ public class EmployeeManager extends Employee{
     }
 
     //methods 
-    public void removeEmployee(int id) {
+    public String removeEmployee(int id) { //delete employee from the system
         allEmployees.remove(id);
+        return null;
     }
 
-    public boolean checkEmployee(int id) {
+    public boolean checkEmployee(int id) { 
         return allEmployees.containsKey(id);
     }
 

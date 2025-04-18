@@ -34,10 +34,6 @@ public class Employee {
         this.finishWorking = false; 
     }
 
-    public enum Training {
-        TeamManagement,
-        CancellationCard
-    }
 
     public boolean login(String password) {
         if (this.password.equals(password)) {
