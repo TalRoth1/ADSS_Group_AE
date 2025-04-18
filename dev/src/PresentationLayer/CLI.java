@@ -17,6 +17,7 @@ public class CLI {
     private int id;
     private String password;
     private LocalDate now;
+    
 
     public CLI() {
         employeeFacade = new EmployeeFacade();
@@ -79,19 +80,19 @@ public class CLI {
 //    }
 
     private void setShifts() {
-        String pref = employeeFacade.getPreferences(id);
+        //String pref = employeeFacade.getPreferences(id); not sure we need id
         LocalDate date = readDate("Please enter the date of the shift ");
         DayOfWeek today = now.getDayOfWeek();
 
         //check if it's Thursday or later
         if (today.getValue() < DayOfWeek.THURSDAY.getValue()) {
             System.out.println("You can only set shifts starting from Thursday.");
-            EmployeeManager(); //TODO: maybe call setShifts() instead, ask Liat
+            EmployeeManager(); 
         }
         //check if date is in the past
         if(date.isBefore(now)) {
             System.out.println("You can't set shifts to the past, choose again");
-            EmployeeManager();
+            EmployeeManager(); 
         }
 
         //allow shifts only for next week
@@ -99,7 +100,7 @@ public class CLI {
         long weeksBetween = ChronoUnit.WEEKS.between(now.with(DayOfWeek.SUNDAY), date.with(DayOfWeek.SUNDAY));
         if (weeksBetween != 1) {
             System.out.println("You can only set shift for NEXT week.");
-            EmployeeManager();
+            EmployeeManager(); 
         }
 
         //don't allow shifts on SHABBAT
@@ -107,10 +108,24 @@ public class CLI {
             System.out.println("Shabbat is rest day, please choose again");
             EmployeeManager();
         }
-        System.out.println(pref);
-        createShift(date);
+        //System.out.println(pref); not sure we need it
+        String [] labels = {"Morning", "Evening"};
+        String shiftType = selectFromList("Select Shift Type:", labels);
+        employeeFacade.addEmployeesToShift(date, shiftType);
         EmployeeManager();
     }
+
+    private void addEmployeesToShift(LocalDate date, String shiftType) {
+        //מוצג למסך רשימה של הקופאיות שזמינות למשמרת
+        //מנהל כ"א בוחר קופאית מתוך הרשימה
+לעבור על כל התפקידים ולבחור עבור קופאית כמה אתה רוצה שיהיו
+ואז המספר הה נשלח לפונקציה set required rol
+נגיד קופאית, 3
+
+        //לקרוא לפונקציה שמשבצת עובדים לפי תפקידים
+    }
+
+
 
     private void fireEmployee() {
         int employeeId = readInt("Please enter Employee's ID to fire: ");

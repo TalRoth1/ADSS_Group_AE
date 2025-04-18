@@ -156,9 +156,7 @@ public class EmployeeFacade {
             return id + " doesn't exist";
         if(!isLoggedIn(id))
             return "You are not logged in";
-        //להגיד לליאת: כרגע אין פונקציה כזאת במחלקה עובד, אלא רק במחלקה מנהל כ"א.TODO
-        //אבל אין את הID של מנהל כ"א כדי ליצור אובייקט כזה ואז להפעיל עליו את הפונקציה המתאימה
-        //וגם זה לא הגיוני שכאשר עובד ירצה לראות את המשמרות שלו, הוא יצטרך את את מנהל כ"א
+            
         return "not finish yetttt";
 
     }

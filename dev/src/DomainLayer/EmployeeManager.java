@@ -23,16 +23,6 @@ public class EmployeeManager extends Employee{
     }
 
     //methods 
-    public void addEmployee(ShiftEmployee employee) {
-        allEmployees.put(employee.getId(), employee);
-    }
-
-//    Maybe don't need this function because Erez made function hire
-//    public void addEmployee(int id, String name, String bankAccount, int salary, LocalDate startDate, int vacationDays, int sickDays, String username, String password) {
-//        ShiftEmployee employee = new ShiftEmployee(id, name, bankAccount, salary, startDate, vacationDays, sickDays, username, password);
-//        allEmployees.put(id, employee);
-//    }
-
     public void removeEmployee(int id) {
         allEmployees.remove(id);
     }
@@ -221,6 +211,40 @@ public class EmployeeManager extends Employee{
             return "Shift replacement successful: " + employee.getName() + " has been replaced by " + replacement.getName() + " for shift " + shift.getShiftString();
     }
 
+    public String createShift(LocalDate date, ShiftType shiftType){
+        if (date == null || shiftType == null) {
+            return "invalid date or shift type";
+        }
+        Shift shift = new Shift(date, shiftType);
+        if (shiftType == ShiftType.MORNING) {
+            morningShifts.put(date, shift);
+        } else if (shiftType == ShiftType.EVENING) {
+            eveningShifts.put(date, shift);
+        }
+        for(Role role : Role.values()){
+            shift.setRequiredRoles(role, int num)
+        }
+        return null;
+    }
+
+    public String addEmployeesToShift(int id, LocalDate date, ShiftType shiftType, Role role){
+        if (!checkEmployee(id)) {
+            return "employee not exist";
+        }
+        Employee employee = allEmployees.get(id);
+        if (employee.isFinishWorking()){
+            return "this employee is fired";
+        }
+        Shift shift = null;
+        if (shiftType == ShiftType.MORNING) {
+            shift = morningShifts.get(date);
+        } else if (shiftType == ShiftType.EVENING) {
+            shift = eveningShifts.get(date);
+        }
+        shift.addEmployee(id, role);
+        return null;
+    }
+
     //getters and setters
     public void setRequiredRoles(Shift shift, Role role, int numOfEmployees) {
         if(shift != null)
@@ -273,6 +297,9 @@ public class EmployeeManager extends Employee{
         return "Employee: " + employee.getName() + " "+ employeeID + "\n" + morning + "\n" + evening;
     }
 
+    public String getAvailableEmployess(Shift shift, Role role) {
+        
+    }
 
 //set shifts, facade, emp choose pref
 }
