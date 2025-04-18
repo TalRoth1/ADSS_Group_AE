@@ -1,5 +1,6 @@
 package Presentation;
 
+import java.util.Date;
 import java.util.List;
 
 import Utils.OrderStatus;
@@ -8,6 +9,7 @@ public class OrderPL
 {
     private final int orderID;
     private final int supplierID;
+    private final Date orderDate;
     private List<OrderItemPL> orderItems;
     private OrderStatus orderStatus;
 
@@ -16,8 +18,17 @@ public class OrderPL
     {
         this.orderID = orderID;
         this.supplierID = supplierID;
+        this.orderDate = new Date(); // Set the order date to the current date
         this.orderItems = orderItems;
         this.orderStatus = OrderStatus.IN_PROGRESS;
+    }
+    OrderPL(int orderID, int supplierID, Date orderDate, List<OrderItemPL> orderItems, OrderStatus orderStatus)
+    {
+        this.orderID = orderID;
+        this.supplierID = supplierID;
+        this.orderDate = orderDate;
+        this.orderItems = orderItems;
+        this.orderStatus = orderStatus;
     }
 
     public int getOrderID()
@@ -38,6 +49,10 @@ public class OrderPL
     public OrderStatus getOrderStatus()
     {
         return orderStatus;
+    }
+    public Date getOrderDate()
+    {
+        return orderDate;
     }
 
     public void setOrderStatus(OrderStatus orderStatus)

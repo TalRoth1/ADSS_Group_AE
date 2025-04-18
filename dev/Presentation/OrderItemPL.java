@@ -2,22 +2,17 @@ package Presentation;
 
 public class OrderItemPL
 {
-    private String name;
-    private int itemID;
+    private final int itemID;
     private int quantity;
-    private float price;
+    private final int catalogID;
+    private float totalPrice;
     
-    OrderItemPL(String name, int itemID, int quantity, float price)
+    OrderItemPL(int itemID, int quantity, int catalogID, float totalPrice)
     {
-        this.name = name;
         this.itemID = itemID;
         this.quantity = quantity;
-        this.price = price;
-    }
-
-    public String getName()
-    {
-        return name;
+        this.catalogID = catalogID;
+        this.totalPrice = totalPrice;
     }
 
     public int getItemID()
@@ -30,9 +25,14 @@ public class OrderItemPL
         return quantity;
     }
 
-    public float getPrice()
+    public int getCatalogID()
     {
-        return price;
+        return catalogID;
+    }
+
+    public float getTotalPrice()
+    {
+        return totalPrice;
     }
 
     public void setQuantity(int quantity)
@@ -40,8 +40,8 @@ public class OrderItemPL
         this.quantity = quantity;
     }
 
-    public void setPrice(float price)
+    public void setTotalPrice(float totalPrice)
     {
-        this.price = price;
+        this.totalPrice = totalPrice;
     }
 }
