@@ -2,17 +2,22 @@ package Presentation;
 
 import java.util.List;
 
+import Utils.OrderStatus;
+
 public class OrderPL
 {
-    private int orderID;
-    private int supplierID;
+    private final int orderID;
+    private final int supplierID;
     private List<OrderItemPL> orderItems;
+    private OrderStatus orderStatus;
+
     
     OrderPL(int orderID, int supplierID, List<OrderItemPL> orderItems)
     {
         this.orderID = orderID;
         this.supplierID = supplierID;
         this.orderItems = orderItems;
+        this.orderStatus = OrderStatus.IN_PROGRESS;
     }
 
     public int getOrderID()
@@ -28,6 +33,16 @@ public class OrderPL
     public List<OrderItemPL> getOrderItems()
 {
         return orderItems;
+    }
+
+    public OrderStatus getOrderStatus()
+    {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus)
+    {
+        this.orderStatus = orderStatus;
     }
 
     public void setOrderItems(List<OrderItemPL> orderItems)

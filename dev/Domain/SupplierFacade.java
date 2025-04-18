@@ -6,6 +6,7 @@ import java.util.List;
 public class SupplierFacade
 {
     private List<SupplierDL> suppliers;
+    private List<AgreementDL> agreements;
     private int nextId;
     
     public SupplierFacade() 

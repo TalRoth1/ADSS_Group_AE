@@ -20,4 +20,21 @@ public class SupplierService
         SupplierPL supplier = new SupplierPL(supplierID, companyID, bankAccount, paymentMethod, contactMail, contactPhone, deliveryMethod, suppliedItems);
         sf.addSupplier(supplier);
     }
+
+    public List<Item> getSuppliedItems(int supplierID)
+    {
+        return null;
+    }
+    public void addAgreement(){
+
+    }
+
+    public void changeAgreement(){
+
+    }
+
+    public void removeAgreement(){
+
+    }
+
 }
