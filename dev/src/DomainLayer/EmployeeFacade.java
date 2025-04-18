@@ -22,28 +22,24 @@ public class EmployeeFacade {
     public String fireEmployee(int employeeId, int empManagerId) {
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
-        if(checkEmployee(employeeId)) {
-            EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-            return employeeManager.fireEmployee(employeeId);
-        }
-        else
+        if(!checkEmployee(employeeId)) 
             return "Can't fire employee: No employee found with ID " + employeeId;
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.fireEmployee(employeeId);
     }
 
     public String hireEmployee(int employeeId, int empManagerId, String employeeName, String bankAccount,
                                int salary, LocalDate startDate, int vacationDays, int sickDays,
                                double educationFund, double socialBenefits, String employeePassword, Role role) {
-        if(!isLoggedIn(empManagerId))
+        if(!isLoggedIn(empManagerId)) ////////nedd to check mikrey katze
             return "You are not logged in";
         if(checkEmployee(employeeId))
             return "Can't hire employee: " + employeeId + " already hired";
         else {
             EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-            ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName, bankAccount,
+            employeeManager.hireEmployee(employeeId, employeeName, bankAccount,
                     salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
-            if(shiftEmployee == null)
-                return "Can't hire employee: " + employeeId + " already hired";
-
+            ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
             addShiftEmployee(employeeId, shiftEmployee);
             return null;
         }
@@ -130,13 +126,13 @@ public class EmployeeFacade {
         return employeeManager.updateSocialBenefits(employeeId, socialBenefits);
     }
 
-    public String updatePassword(int employeeId, int empManagerId, String password) {
-        if(!isLoggedIn(empManagerId))
+    public String updatePassword(int employeeId, String oldPassword, String newPassword) {
+        if(!isLoggedIn(employeeId))
             return "You are not logged in";
         if(!checkEmployee(employeeId))
             return employeeId + " doesn't exist";
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.updatePassword(employeeId, password);
+        EmployeeManager employee = getEmployeeManager(employeeId);
+        return employee.updatePassword(oldPassword, newPassword);
     }
 
     public void logout(int id) {

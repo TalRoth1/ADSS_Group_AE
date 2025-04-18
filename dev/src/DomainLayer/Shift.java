@@ -8,8 +8,10 @@ import java.util.Map;
 public class Shift {
     private LocalDate date;
     private ShiftType shiftType;
-    private int startTime; 
-    private int endTime;
+    private int startTime; // 24-hour format: e.g. 9:00 AM = 900, 10:30 PM = 2230
+    // Morning shifts: default start time is 600 (6:00 AM) and end time is 1400 (2:00 PM)
+    // Evening shifts: default start time is 1400 (2:00 PM) and end time is 2200 (10:00 PM)
+    private int endTime; // 24-hour formatc like startTime
     private int shiftManagerId;
     private Map<Role, Integer> requiredRoles; // roles and number of employees required
     private Map<Integer, Role> assignedEmployeesID; 
@@ -27,13 +29,13 @@ public class Shift {
     }
 
     public String toString() {
+        String assigned = getEmployeesInfo();
         return "Shift{" +
                 "date=" + date +
                 ", shiftType=" + shiftType +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
-                ", shiftManagerId=" + shiftManagerId +
-                ", assignedEmployeesID=" + assignedEmployeesID +
+                ", assignedEmployeesID=" + assigned +
                 '}';
     }
 
@@ -87,48 +89,62 @@ public class Shift {
     }
 
     public int getRequiredEmployees(Role role){
-        return this.requiredRoles.get(role);
+        return requiredRoles.get(role);
     }
 
     public String getShiftString() {
-        return this.date.toString()+" "+this.shiftType.toString();
+        return date.toString()+" "+shiftType.toString();
     }
-    public void setRequiredRoles(Role role, int num) {
-        if (!this.requiredRoles.containsKey(role)) {
-            throw new IllegalArgumentException("Role not required for this shift.");
+    public String setRequiredRoles(Role role, int num) {
+        if (!requiredRoles.containsKey(role)) {
+            return "Role not required for this shift";
         }
-        if (this.requiredRoles.get(role) == num) {
-            throw new IllegalArgumentException("Number of employees required is already set to this value.");
+        if (requiredRoles.get(role) == num) {
+            return "Number of employees required is already set to this value";
         }
         if (num < 0 ) {
-            throw new IllegalArgumentException("Number of employees cannot be negative");
+            return "Number of employees cannot be negative";
         }
-        this.requiredRoles.put(role, num);
+        requiredRoles.put(role, num);
+        return null;
+    }
+
+    public String getEmployeesInfo(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Shift Manager ID: ").append(shiftManagerId).append("\n");
+        sb.append("Assigned Employees: \n");
+        for (Map.Entry<Integer, Role> entry : assignedEmployeesID.entrySet()) {
+            sb.append("Employee ID: ").append(entry.getKey()).append(", Role: ").append(entry.getValue()).append("\n");
+        }
+        return null;
     }
 
 
     //methods
-    public void addEmployee(int id, Role role) {
-        if (this.assignedEmployeesID.containsKey(id)) {
-            throw new IllegalArgumentException("Employee already assigned to this shift.");
+    public String addEmployee(int id, Role role) {
+
+        if (assignedEmployeesID.containsKey(id)) {
+            return "Employee already assigned to this shift.";
         }
-        if (!this.requiredRoles.containsKey(role)) {
-            throw new IllegalArgumentException("Role not required for this shift.");
+        if (!requiredRoles.containsKey(role)) {
+            return "Role not required for this shift.";
         }
-        if (this.requiredRoles.get(role) <= 0) {
-            throw new IllegalArgumentException("No more employees required for this role.");
+        if (requiredRoles.get(role) <= 0) {
+            return "No more employees required for this role.";
         }
-        this.assignedEmployeesID.put(id, role);
-        this.requiredRoles.put(role, this.requiredRoles.get(role) - 1);
+        assignedEmployeesID.put(id, role);
+        requiredRoles.put(role, this.requiredRoles.get(role) - 1);
+        return null;
     }
 
-    public void removeEmployee(int id){
-        if (!this.assignedEmployeesID.containsKey(id)) {
-            throw new IllegalArgumentException("Employee not assigned to this shift.");
+    public String removeEmployee(int id){
+        if (!assignedEmployeesID.containsKey(id)) {
+            return "Employee not assigned to this shift.";
         }
-        Role role = this.assignedEmployeesID.get(id);
-        this.assignedEmployeesID.remove(id);
-        this.requiredRoles.put(role, this.requiredRoles.get(role) + 1);
+        Role role = assignedEmployeesID.get(id);
+        assignedEmployeesID.remove(id);
+        requiredRoles.put(role, requiredRoles.get(role) + 1);
+        return null;
     }
 
 }

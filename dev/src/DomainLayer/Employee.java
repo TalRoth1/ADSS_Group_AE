@@ -51,9 +51,17 @@ public class Employee {
     public void logout() { this.isLoggedIn = false;
     }
 
+    public String updatePassword(String oldPassword, String newPassword) {
+        if (this.password.equals(oldPassword)) {
+            this.password = newPassword;
+            return null;
+        } else {
+            return "Old password is incorrect.";
+        }
+    }
+
     public void setTraining(Training training) {
         
-
     }
 
     // Getters and Setters
@@ -110,5 +118,7 @@ public class Employee {
         this.finishWorking = finishWorking;
     }
     public boolean isLoggedIn() { return isLoggedIn; }
+
+
 
 }
