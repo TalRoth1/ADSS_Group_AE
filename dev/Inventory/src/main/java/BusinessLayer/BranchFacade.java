@@ -1,4 +1,4 @@
-package Inventory.BusinessLayer;
+package BusinessLayer;
 
 import java.util.HashMap;
 import java.util.Map;

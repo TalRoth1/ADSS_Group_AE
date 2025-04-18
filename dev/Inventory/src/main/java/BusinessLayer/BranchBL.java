@@ -1,4 +1,4 @@
-package Inventory.BusinessLayer;
+package BusinessLayer;
 
 public class BranchBL
 {

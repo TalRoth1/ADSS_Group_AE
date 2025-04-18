@@ -1,6 +1,6 @@
-package Inventory.ServiceLayer;
+package ServiceLayer;
 
-import Inventory.BusinessLayer.BranchFacade;
+import BusinessLayer.BranchFacade;
 
 public class BranchService
 {

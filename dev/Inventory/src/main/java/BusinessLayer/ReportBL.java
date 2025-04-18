@@ -1,4 +1,4 @@
-package Inventory.BusinessLayer;
+package BusinessLayer;
 import java.time.LocalDateTime;
 
 public class ReportBL

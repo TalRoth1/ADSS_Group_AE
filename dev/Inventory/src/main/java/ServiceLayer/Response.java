@@ -1,4 +1,4 @@
-package Inventory.ServiceLayer;
+package ServiceLayer;
 
 public class Response
 {
