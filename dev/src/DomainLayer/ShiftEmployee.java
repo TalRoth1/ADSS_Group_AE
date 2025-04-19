@@ -43,6 +43,7 @@ public class ShiftEmployee extends Employee {
         return roles;
     }
 
+
     //methods
 
     public String addRole(Role role) {

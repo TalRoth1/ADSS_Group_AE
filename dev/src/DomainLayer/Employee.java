@@ -56,6 +56,11 @@ public class Employee {
         }
     }
 
+    public enum Training {
+        TeamManagement,
+        CancellationCard
+    }
+
     public void setTraining(Training training) {
         
     }
