@@ -1,0 +1,6 @@
+package BusinessLayer;
+
+class ProductFacade
+{
+
+}
