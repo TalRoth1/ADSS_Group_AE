@@ -97,4 +97,9 @@ public class ShipmentDocumentDL {
     {
         return new ArrayList<>(items.keySet());
     }
+
+    public Map<LocationDL, Map<String, Integer>> getItemsMap()
+    {
+        return items;
+    }
 }

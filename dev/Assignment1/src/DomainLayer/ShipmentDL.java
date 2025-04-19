@@ -26,6 +26,27 @@ public class ShipmentDL {
         this.DriverName = driver;
         return true;
     }
+    
+    public Boolean WeightCheck(Map<String, Float> itemWeights)
+    {
+        //assuming all items in Document exists in itemWeight
+        float sum =0;
+        Map<LocationDL, Map<String, Integer>> curr = Document.getItemsMap();
+        for (LocationDL loc : curr.keySet())
+        {
+            Map<String , Integer> locList = curr.get(loc);
+            for(String itemToCheck : locList.keySet())
+            {
+                int itemAmount = locList.get(itemToCheck);
+                sum += itemAmount * itemWeights.get(itemToCheck);
+            }
+        }
+        if(sum > Truck.GetMaxWeight())
+        {
+            return false;
+        }
+        return true;
+    }
 
     public Boolean EditOrigin(LocationDL origin) {
         this.Origin = origin;
@@ -51,10 +72,22 @@ public class ShipmentDL {
         this.Date = new Date();
     }
 
-    public void EditDestinations(Map<LocationDL, Map<String, Integer>> items)
+    public Boolean EditDestinations(Map<LocationDL, Map<String, Integer>> items, Map<String,Float> itemWeights)
     {
+        ShipmentDocumentDL temp = getDocument();
         Document.Edit(items);
+        if(!WeightCheck(itemWeights))
+        {
+            Document = temp;
+            return false;
+        }
         UpdateDestinationsFromDoc();
+        return true;
+    }
+
+    public ShipmentDocumentDL getDocument()
+    {
+        return Document;
     }
 
     public void AddDestinations(Map<LocationDL, Map<String, Integer>> items)
@@ -77,14 +110,21 @@ public class ShipmentDL {
         SetDestinations(Document.getLocations());
     }
 
-    public boolean EditTruck(Integer number , List<TruckDL> trucks)
+
+
+    public boolean EditTruck(Integer number , List<TruckDL> trucks, Map<String, Float> itemWeights)
     {
         for(TruckDL truck : trucks)
         {
             if (truck.Number == number)
             {
+                TruckDL prev = this.Truck;
                 setTruck(truck);
-                return true;   
+                if(WeightCheck(itemWeights) && DriverCheck(DriverName))
+                {
+                    return true; 
+                }
+                setTruck(prev);
             }
         }
         return false;

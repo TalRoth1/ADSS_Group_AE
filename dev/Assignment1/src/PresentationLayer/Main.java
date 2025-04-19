@@ -1,8 +1,11 @@
 package PresentationLayer;
 
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
         UIController uiController = new UIController();
+        Scanner scanner = new Scanner(System.in);
 
         System.out.println("Welcome to the Delivery Management System!");
         boolean exit = false;
@@ -13,13 +16,14 @@ public class Main {
             System.out.println("3. Add a new truck");
             System.out.println("4. Add a new driver");
             System.out.println("5. Add a new location");
-            System.out.println("6. Exit");
+            System.out.println("6. Add a new item");
+            System.out.println("7. Exit");
             boolean flag = true;
             int choice = 0;
             while(flag) {
-                System.out.println("Please enter your choice (1-6): ");
-                String input = System.console().readLine();
-                if (input.matches("[1-6]")) {
+                System.out.println("Please enter your choice (1-7): ");
+                String input = scanner.nextLine();
+                if (input.matches("[1-7]")) {
                     choice = Integer.parseInt(input);
                     flag = false;
                 } else {
@@ -44,6 +48,9 @@ public class Main {
                     uiController.AddLocation();
                     break;
                 case 6:
+                    uiController.AddItem();
+                    break;
+                case 7:
                     System.out.println("Exiting the program. Goodbye!");
                     exit = true;
                     break;

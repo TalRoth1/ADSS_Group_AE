@@ -21,6 +21,11 @@ public class LocationDL {
         return Street + " " + StreetNumber + ", " + City + ", " + Zone + ", Contact: " + ContactName + ", Phone: " + ContactNumber;
     }
 
+    public String getZone()
+    {
+        return Zone;
+    }
+
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;

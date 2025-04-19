@@ -36,4 +36,9 @@ public class TruckDL {
     {
         return this.Type;
     }
+
+    public float GetMaxWeight()
+    {
+        return MaxWeight;
+    }
 }

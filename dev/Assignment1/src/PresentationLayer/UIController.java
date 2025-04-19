@@ -9,11 +9,13 @@ import DomainLayer.DriverDL;
 import DomainLayer.LocationDL;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.HashMap;
 import DomainLayer.ShipmentDL;
 
 public class UIController {
     public ShipmentFacade shipmentFacade;
+    Scanner scanner = new Scanner(System.in);
     public UIController() {
         shipmentFacade = new ShipmentFacade();
     }
@@ -30,7 +32,7 @@ public class UIController {
                 System.out.println(i + ": " + locations.get(i).toString());
             }
             System.out.println("Enter the number of the location you want to choose: ");
-            int choice = Integer.parseInt(System.console().readLine());
+            int choice = Integer.parseInt(scanner.nextLine());
             if (choice >= 0 && choice < locations.size()) {
                 startLocation = locations.get(choice);
                 flag = false;
@@ -47,8 +49,24 @@ public class UIController {
     public List<LocationDL> ChooseLocations()
     {
         boolean flag = true;
-        List<LocationDL> locations = shipmentFacade.locations;
+        List<LocationDL> locations = new ArrayList<>();
+        while(flag)
+        {
+            System.out.println("Please input a zone: ");
+            String zone = scanner.nextLine();
+            List<LocationDL> locationsByZone = shipmentFacade.LocationByZone(zone);
+            if(locationsByZone.size() == 0)
+            {
+                System.out.println("No locations found in this zone. Please try again.");
+            }
+            else
+            {
+                locations = locationsByZone;
+                flag = false;
+            }
+        }
         List<LocationDL> selectedLocations = new ArrayList<>();
+        flag = true;
         while(flag)
         {
             System.out.println("Please choose a location from the list below: ");
@@ -60,7 +78,7 @@ public class UIController {
                 }
             }
             System.out.println("Enter the number of the location you want to choose: ");
-            int choice = Integer.parseInt(System.console().readLine());
+            int choice = Integer.parseInt(scanner.nextLine());
             if (choice >= 0 && choice < locations.size()) {
                 selectedLocations.add(locations.get(choice));
             }
@@ -85,7 +103,7 @@ public class UIController {
                 System.out.println(i + ": " + trucks.get(i).toString());
             }
             System.out.println("Enter the number of the truck you want to choose: ");
-            int choice = Integer.parseInt(System.console().readLine());
+            int choice = Integer.parseInt(scanner.nextLine());
             if (choice >= 0 && choice < trucks.size()) {
                 truck = trucks.get(choice);
                 flag = false;
@@ -110,7 +128,7 @@ public class UIController {
                 System.out.println(i + ": " + drivers.get(i).toString());
             }
             System.out.println("Enter the number of the driver you want to choose: ");
-            int choice = Integer.parseInt(System.console().readLine());
+            int choice = Integer.parseInt(scanner.nextLine());
             if (choice >= 0 && choice < drivers.size()) {
                 driver = drivers.get(choice);
                 flag = false;
@@ -129,7 +147,7 @@ public class UIController {
         Map<LocationDL, Map<String,Integer>> items = new HashMap<>();
         while(flag)
         {
-            System.out.println("Please choose a location from the list below: ");
+            System.out.println("Please choose a location from the list below to select its items: ");
             for (int i = 0; i < locations.size(); i++) {
                 System.out.println(i + ": " + locations.get(i).toString());
                 if((i+1) == locations.size())
@@ -138,20 +156,36 @@ public class UIController {
                 }
             }
             System.out.println("Enter the number of the location you want to choose: ");
-            int choice = Integer.parseInt(System.console().readLine());
+            int choice = Integer.parseInt(scanner.nextLine());
             if (choice >= 0 && choice < locations.size()) {
                 LocationDL location = locations.get(choice);
                 Map<String,Integer> itemList = new HashMap<>();
                 boolean flag2 = true;
                 while(flag2){
-                    System.out.println("Please enter the item name: ");
-                    String itemName = System.console().readLine();
-                    System.out.println("Please enter the item quantity: ");
-                    int itemQuantity = Integer.parseInt(System.console().readLine());
-                    itemList.put(itemName, itemQuantity);
-                    System.out.println("Do you want to add more items? (yes/no)");
-                    String answer = System.console().readLine();
-                    if(answer.equalsIgnoreCase("no"))
+                    System.out.println("Please choose an item: ");
+                    List<String> itemsToChoose = shipmentFacade.GetItems();
+                    boolean flag3 = true;
+                    while(flag3)
+                    {
+                        for (int i = 0; i < itemsToChoose.size(); i++) {
+                            System.out.println(i + ": " + itemsToChoose.get(i));
+                        }
+                        System.out.println("Enter the number of the item you want to choose: ");
+                        int choice2 = Integer.parseInt(scanner.nextLine());
+                        if (choice2 >= 0 && choice2 < itemsToChoose.size()) {
+                            String itemName = itemsToChoose.get(choice2);
+                            flag3 = false;
+                            System.out.println("Please enter the item quantity: ");
+                            int itemQuantity = Integer.parseInt(scanner.nextLine());
+                            itemList.put(itemName, itemQuantity);
+                        }
+                        else {
+                            System.out.println("Invalid choice. Please try again.");
+                        }
+                    }
+                    System.out.println("Do you want to add more items? (y/n)");
+                    String answer = scanner.nextLine();
+                    if(answer.equalsIgnoreCase("n"))
                         flag2 = false;
                 }
                 items.put(location, itemList);
@@ -172,69 +206,136 @@ public class UIController {
         TruckDL truck = ChooseTruck();
         DriverDL driver = ChooseDriver();
         Map<LocationDL, Map<String,Integer>> items = ChooseItems(locations);
-        shipmentFacade.CreateShipment(truck, driver, startLocation, locations, items);
+        boolean flag = true;
+        while (flag) {
+            try {
+                shipmentFacade.CreateShipment(truck, driver, startLocation, locations, items);
+                flag = false;
+            } catch (Exception e) {
+                if(e.getMessage().equals("Driver does not have the right license for this truck")) {
+                    System.out.println("Driver does not have the right license for this truck. Please choose a different driver.");
+                    driver = ChooseDriver();
+                } else if (e.getMessage().equals("Truck is overweight")) {
+                    System.out.println("Truck is overweight. How would you like to proceed?");
+                    System.out.println("1. Choose a different truck");
+                    System.out.println("2. Edit the items in the shipment");
+                    System.out.println("3. Edit the destinations in the shipment");
+                    boolean flag2 = true;
+                    while(flag2) {
+                        int choice = Integer.parseInt(scanner.nextLine());
+                        switch(choice) {
+                            case 1:
+                                flag2 = false;
+                                truck = ChooseTruck();
+                                break;
+                            case 2:
+                                flag2 = false;
+                                items = ChooseItems(locations);
+                                break;
+                            case 3:
+                                flag2 = false;
+                                locations = ChooseLocations();
+                                items = ChooseItems(locations);
+                                break;
+                            default:
+                                System.out.println("Invalid choice. Please try again.");
+                        }
+                        
+                    }
+                } 
+            }
+        }
+        
     }
 
     public void AddLocation() {
         System.out.println("Please enter the street: ");
-        String street = System.console().readLine();
+        String street = scanner.nextLine();
         System.out.println("Please enter the street number: ");
-        int streetNumber = Integer.parseInt(System.console().readLine());
+        int streetNumber = Integer.parseInt(scanner.nextLine());
         System.out.println("Please enter the city: ");
-        String city = System.console().readLine();
+        String city = scanner.nextLine();
         System.out.println("Please enter the contact number: ");
-        int contactNumber = Integer.parseInt(System.console().readLine());
+        int contactNumber = Integer.parseInt(scanner.nextLine());
         System.out.println("Please enter the contact name: ");
-        String contactName = System.console().readLine();
+        String contactName = scanner.nextLine();
         System.out.println("Please enter the zone: ");
-        String zone = System.console().readLine();
+        String zone = scanner.nextLine();
         shipmentFacade.AddLocation(street, streetNumber, city, contactNumber, contactName, zone);
     }
     
     public void AddDriver() {
         System.out.println("Please enter the driver name: ");
-        String name = System.console().readLine();
+        String name = scanner.nextLine();
         System.out.println("Please enter the license type: ");
-        String licenseType = System.console().readLine();
+        String licenseType = scanner.nextLine();
         shipmentFacade.AddDriver(name, licenseType);
     }
     public void AddTruck() {
         System.out.println("Please enter the truck number: ");
-        int number = Integer.parseInt(System.console().readLine());
+        int number = Integer.parseInt(scanner.nextLine());
         System.out.println("Please enter the truck model: ");
-        String model = System.console().readLine();
+        String model = scanner.nextLine();
         System.out.println("Please enter the truck type: ");
-        String type = System.console().readLine();
+        String type = scanner.nextLine();
         System.out.println("Please enter the truck max weight: ");
-        float maxWeight = Float.parseFloat(System.console().readLine());
+        float maxWeight = Float.parseFloat(scanner.nextLine());
         shipmentFacade.AddTruck(number, model, type, maxWeight);
+    }
+
+    public void AddItem() {
+        System.out.println("Please enter the item name: ");
+        String itemName = scanner.nextLine();
+        System.out.println("Please enter the item weight: ");
+        float weight = Float.parseFloat(scanner.nextLine());
+        shipmentFacade.AddItem(itemName, weight);
     }
 
     public void EditTruck(ShipmentDL shipment) {
         TruckDL truck = ChooseTruck();
-        shipmentFacade.EditShipement(shipment, truck, null, null, null, null);
+        try {
+            shipmentFacade.EditShipement(shipment, truck, null, null, null, null);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void EditDriver(ShipmentDL shipment) {
         DriverDL driver = ChooseDriver();
-        shipmentFacade.EditShipement(shipment, null, driver, null, null, null);
+        try {
+            shipmentFacade.EditShipement(shipment, null, driver, null, null, null);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void EditOrigin(ShipmentDL shipment) {
         LocationDL origin = ChooseStart();
-        shipmentFacade.EditShipement(shipment, null, null, origin, null, null);
+        try {
+            shipmentFacade.EditShipement(shipment, null, null, origin, null, null);
+        } catch (Exception e) {
+            System.out.println("An error occurred while editing the shipment: " + e.getMessage());
+        }
     }
 
     public void EditDestinations(ShipmentDL shipment) {
         List<LocationDL> locations = ChooseLocations();
         Map<LocationDL, Map<String,Integer>> items = ChooseItems(locations);
-        shipmentFacade.EditShipement(shipment, null, null, null, locations, items);
+        try {
+            shipmentFacade.EditShipement(shipment, null, null, null, locations, items);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void EditItems(ShipmentDL shipment) {
         List<LocationDL> locations = shipment.Destinations;
         Map<LocationDL, Map<String,Integer>> items = ChooseItems(locations);
-        shipmentFacade.EditShipement(shipment, null, null, null, null, items);
+        try {
+            shipmentFacade.EditShipement(shipment, null, null, null, null, items);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void EditShipement()
@@ -246,7 +347,7 @@ public class UIController {
             System.out.println(i + ": " + shipments.get(i).toString());
         }
         System.out.println("Enter the number of the shipment you want to edit: ");
-        int choice = Integer.parseInt(System.console().readLine());
+        int choice = Integer.parseInt(scanner.nextLine());
         boolean flag = true;
         while(flag)
         {
@@ -268,7 +369,7 @@ public class UIController {
             System.out.println("4. Destinations");
             System.out.println("5. Items");
             System.out.println("6. Finish editing shipment");
-            int choice2 = Integer.parseInt(System.console().readLine());
+            int choice2 = Integer.parseInt(scanner.nextLine());
             switch(choice2) {
                 case 1:
                     EditTruck(shipment);
