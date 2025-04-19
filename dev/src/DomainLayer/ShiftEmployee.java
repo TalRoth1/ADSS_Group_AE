@@ -7,6 +7,7 @@ import java.util.List;
 
 public class ShiftEmployee extends Employee {
     private List<Shift> preferredShifts;
+    private List<Shift> assignedShifts; 
     private List<Role> roles;
     private List<Training> trainings;
 
@@ -17,6 +18,8 @@ public class ShiftEmployee extends Employee {
                 socialBenefits, password);
         this.preferredShifts = null;
         this.roles = new ArrayList<>();
+        this.trainings = new ArrayList<>();
+        this.assignedShifts = new ArrayList<>();
         roles.add(role);
     }
     public String getPreferredShiftsToString() {
@@ -126,6 +129,28 @@ public class ShiftEmployee extends Employee {
         return null;
     }
 
+    public String addAssignedShift(Shift shift) {
+        if(assignedShifts.contains(shift)) {
+            return "Shift already exists in the list of assigned shifts.";
+        }
+        if(shift == null) {
+            return "Shift cannot be null.";
+        }
+        assignedShifts.add(shift);
+        return null;
+    }
+
+    public String removeAssignedShift(Shift shift) {
+        if(!assignedShifts.contains(shift)) {
+            return "Shift doesnt exists in the list of assigned shifts.";
+        }
+        if(shift == null) {
+            return "Shift cannot be null.";
+        }
+        assignedShifts.remove(shift);
+        return null;
+    }
+
     public boolean isAvailable(Shift shift) {
         if(isFinishWorking() || preferredShifts == null) {
             return false;
@@ -145,5 +170,13 @@ public class ShiftEmployee extends Employee {
             shift.getEmployeesInfo();
         }
     }
+
+    public List<Shift> getAssignedShifts() {
+        return assignedShifts;
+    }
+    public List<Shift> getPrefShifts() {
+        return preferredShifts;}
+ 
+
 
 }

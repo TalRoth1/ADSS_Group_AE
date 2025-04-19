@@ -182,7 +182,7 @@ public class EmployeeFacade {
         return employeeManagers.get(id);
     }
 
-    public String addTrainingToEmployee(int employeeId, int empManagerId, Training training) {
+  /*  public String addTrainingToEmployee(int employeeId, int empManagerId, Training training) {
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
@@ -193,7 +193,7 @@ public class EmployeeFacade {
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.removeTrainingFromEmployee(employeeId, training);
-    }
+    } */
 
     public String changeShiftManager(Shift shift, int employeeId, int empManagerId, int newShiftManagerId) {
         if(!isLoggedIn(empManagerId))
@@ -221,6 +221,28 @@ public class EmployeeFacade {
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.addEmployeeToShift(employeeId, date, shift, role);
+    }
+
+    public String removeEmployeeFromShift(int employeeId, Shift shift, int empManagerId) {
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.removeEmployeeFromShift(employeeId, shift);
+    }
+
+    public String getAvailableEmployees(Shift shift, Role role) {
+        if(shift == null) {
+            return "Shift is null";
+        }
+        EmployeeManager employeeManager = getEmployeeManager(shift.getShiftManagerId());
+        return employeeManager.getAvailableEmployees(shift, role);
+    }
+
+    public String getEmployeeShifts(int employeeID) {
+        if(!isLoggedIn(employeeID))
+            return "You are not logged in";
+        EmployeeManager employeeManager = getEmployeeManager(employeeID);
+        return employeeManager.getEmployeeShifts(employeeID);
     }
 
 
@@ -262,9 +284,69 @@ public class EmployeeFacade {
         return shift.getShiftString();
     }
 
+    public String setShiftManager(int empManagerId, Shift shift, int id){
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        shift.setShiftManagerId(id);
+        return null;
+    }
+
 
     // shift employee methods
-    
+
+    public String getPreferredShiftsToString(int employeeId) {
+        ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
+        return shiftEmployee.getPreferredShiftsToString();
+    }
+
+    public String addRole(int id, Role role){
+        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
+        return shiftEmployee.addRole(role);
+    }
+
+    public String removeRole(int id, Role role){
+        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
+        return shiftEmployee.removeRole(role);
+    }
+
+    public String changeRole(int id,Role oldRole, Role newRole){
+        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
+        return shiftEmployee.changeRole(oldRole, newRole);
+    }
+
+    public String addPreferredShift(int id, Shift shift) {
+        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
+        return shiftEmployee.addPreferredShift(shift);
+    }
+
+    public String removePreferredShift(int id, Shift shift) {
+        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
+        return shiftEmployee.removePreferredShift(shift);
+    }
+
+    public String addAssignedShift(int id, Shift shift) {
+        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
+        return shiftEmployee.addAssignedShift(shift);
+    }
+
+    public String removeAssignedShift(int id, Shift shift) {
+        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
+        return shiftEmployee.removeAssignedShift(shift);
+    }
+
+    public boolean isAvailable(int id, Shift shift) {
+        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
+        return shiftEmployee.isAvailable(shift);
+    }
+
+    public void getAssignedEmployeesInfo(int managerId, Shift shift) {
+        ShiftEmployee shiftEmployee = shiftEmployees.get(managerId);
+        shift.getEmployeesInfo();
+    }
+
+
+
+
 
 
 

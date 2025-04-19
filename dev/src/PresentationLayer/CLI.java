@@ -109,21 +109,49 @@ public class CLI {
             EmployeeManager();
         }
         //System.out.println(pref); not sure we need it
-        String [] labels = {"Morning", "Evening"};
-        String shiftType = selectFromList("Select Shift Type:", labels);
-        employeeFacade.addEmployeesToShift(date, shiftType);
+
+        ShiftType shiftType = selectFromList("Select Shift Type:", ShiftType.values());
+        int startTime = readInt("Please enter the start time of the shift , 24-hour format: e.g. 9:00 AM = 900: ");
+        int endTime = readInt("Please enter the end time of the shift , 24-hour format: e.g. 5:00 PM = 1700: ");
+        employeeFacade.createShift(date, shiftType, startTime, endTime, id, -1);
+        System.out.println("Please choose Shift Manager ");
+        Shift shift = new Shift(date, shiftType, startTime, endTime, -1);
+        System.out.println(employeeFacade.getAvailableEmployees(shift, Role.SHIFT_MANAGER));
+        int shiftManagerId = readInt("Please enter the ID of the Shift Manager: ");
+        employeeFacade.setShiftManager(id, shift, shiftManagerId);
+        for (Role role : Role.values()) {
+            if (role != Role.SHIFT_MANAGER) {
+                int numOfEmployees = readInt("Please enter the number of employees for " + role + ": ");
+                String response = employeeFacade.setRequiredRoles(id, shift, role, numOfEmployees);
+                if(response != null) {
+                    System.out.println(response);
+                    EmployeeManager(); //לבדוק איך להחזיר לשורה 123.5
+                    }
+                for(int i = 0; i < numOfEmployees; i++) {
+                    System.out.println("Please choose " + role + " for the shift from the following employees: ");
+                    System.out.println(employeeFacade.getAvailableEmployees(shift, role));
+                    int employeeId = readInt("Please enter the ID of the employee: ");
+                    String res = employeeFacade.addEmployeeToShift(employeeId, shift, role, date, id);
+                    if(res != null) {
+                        System.out.println(res);
+                        EmployeeManager();
+                    }
+                }
+            }
+        }
         EmployeeManager();
     }
 
-    private void addEmployeesToShift(LocalDate date, String shiftType) {
-        //מוצג למסך רשימה של הקופאיות שזמינות למשמרת
-        //מנהל כ"א בוחר קופאית מתוך הרשימה
-לעבור על כל התפקידים ולבחור עבור קופאית כמה אתה רוצה שיהיו
-ואז המספר הה נשלח לפונקציה set required rol
-נגיד קופאית, 3
+//     private void addEmployeeToShift(LocalDate date, String shiftType) {
+//         System.err.println(employeeFacade.getAvailableEmployees(date, shiftType, id));
+//         //מוצג למסך רשימה של הקופאיות שזמינות למשמרת
+//         //מנהל כ"א בוחר קופאית מתוך הרשימה
+// // לעבור על כל התפקידים ולבחור עבור קופאית כמה אתה רוצה שיהיו
+// // ואז המספר הה נשלח לפונקציה set required rol
+// // נגיד קופאית, 3
 
-        //לקרוא לפונקציה שמשבצת עובדים לפי תפקידים
-    }
+//         //לקרוא לפונקציה שמשבצת עובדים לפי תפקידים
+//     }
 
 
 

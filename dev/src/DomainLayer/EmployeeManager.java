@@ -3,7 +3,7 @@ package DomainLayer;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import DomainLayer.Training;
+//import DomainLayer.Training;
 
 
 
@@ -96,6 +96,10 @@ public class EmployeeManager extends Employee{
         if (employee.isFinishWorking())
             return "Employee already fired";
         employee.setFinishWorking(true);
+        for (Shift shift : employee.getAssignedShifts()) {
+            shift.removeEmployee(id);
+        }
+       
         return null;
     }
 
@@ -148,16 +152,31 @@ public class EmployeeManager extends Employee{
     }
 
     public String changeShiftManager(Shift shift, int oldManager, int newManager) {
+        ShiftEmployee oldManagerE = allEmployees.get(oldManager);
+        ShiftEmployee newManagerE = allEmployees.get(newManager);
         if (!checkEmployee(oldManager) || !checkEmployee(oldManager)) {
             return "manager not found in the system";
         }
-        if(allEmployees.get(newManager).getRoles().contains(Role.SHIFT_MANAGER)) {
+        if(!newManagerE.getRoles().contains(Role.SHIFT_MANAGER)) {
             return "this employee cant be shift Manager";
         }
-        if(!allEmployees.get(newManager).getPreferredShifts().contains(shift)) {
+        if(!newManagerE.getPreferredShifts().contains(shift)) {
             return "new manager is not available for this shift";
         }
+        if(shift.getAssignedEmployeesID().containsKey(newManager)) {
+            return "new manager is already assigned to this shift";
+        }
+        if(shift.getAssignedEmployeesID().containsKey(oldManager)) {
+            return "old manager is not assigned to this shift";
+        }
+        if(shift.getShiftManagerId() != oldManager) {
+            return "old manager is not the shift manager of this shift";
+        }
         shift.setShiftManagerId(newManager);
+        oldManagerE.removeAssignedShift(shift);
+        newManagerE.addAssignedShift(shift);
+        shift.removeEmployee(oldManager);
+        shift.addEmployee(newManager, Role.SHIFT_MANAGER);
         return null;
     }
 
@@ -183,7 +202,9 @@ public class EmployeeManager extends Employee{
             return "replacement employee does not have the same role as the original employee";
         }
            shift.removeEmployee(empID);
+           employee.removeAssignedShift(shift);
            shift.addEmployee(replacementID, shift.getAssignedEmployeesID().get(empID));
+           replacement.addAssignedShift(shift);
            return null;
     }
 
@@ -236,6 +257,23 @@ public class EmployeeManager extends Employee{
             return "this employee is already assigned to this shift";
         }
         shift.addEmployee(id, role);
+        employee.addAssignedShift(shift);
+        return null;
+    }
+
+    public String removeEmployeeFromShift(int id, Shift shift) {
+        if (!checkEmployee(id)) {
+            return "employee not exist";
+        }
+        ShiftEmployee employee = allEmployees.get(id);
+        if (employee.isFinishWorking()){
+            return "this employee is fired";
+        }
+        if (!shift.getAssignedEmployeesID().containsKey(id)) {
+            return "this employee is not assigned to this shift";
+        }
+        shift.removeEmployee(id);
+        employee.removeAssignedShift(shift);
         return null;
     }
 
@@ -290,7 +328,7 @@ public class EmployeeManager extends Employee{
         return "Employee: " + employee.getName() + " "+ employeeID + "\n" + morning + "\n" + evening;
     }
 
-    public String getAvailableEmployess(Shift shift, Role role) { //all the employees that can work in this shift and have this role
+    public String getAvailableEmployees(Shift shift, Role role) { //all the employees that can work in this shift and have this role
         String res = "Available employyess for this shift and role:" + role.toString() + "\n";
         for (ShiftEmployee employee : allEmployees.values()) {
             if (employee.getRoles().contains(role) && employee.isAvailable(shift)) {

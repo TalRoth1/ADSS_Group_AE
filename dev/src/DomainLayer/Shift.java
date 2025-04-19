@@ -15,6 +15,7 @@ public class Shift {
     private int shiftManagerId;
     private Map<Role, Integer> requiredRoles; // roles and number of employees required
     private Map<Integer, Role> assignedEmployeesID; 
+    private Map<Integer, Role> availableEmployeesID;
 
     public Shift(LocalDate date, ShiftType shiftType, int startTime,int endTime, int shiftManagerId) {
         this.date = date;
@@ -50,8 +51,17 @@ public class Shift {
     }
 
     // Getters and Setters
+
     public Map<Integer, Role> getAssignedEmployeesID() {
         return assignedEmployeesID;
+    }
+    public String getAssignedEmployeesIDToString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Assigned Employees: \n");
+        for (Map.Entry<Integer, Role> entry : assignedEmployeesID.entrySet()) {
+            sb.append("Employee ID: ").append(entry.getKey()).append(", Role: ").append(entry.getValue()).append("\n");
+        }
+        return sb.toString();
     }
 
     public LocalDate getDate() {
@@ -134,6 +144,7 @@ public class Shift {
         }
         assignedEmployeesID.put(id, role);
         requiredRoles.put(role, this.requiredRoles.get(role) - 1);
+
         return null;
     }
 
@@ -146,5 +157,25 @@ public class Shift {
         requiredRoles.put(role, requiredRoles.get(role) + 1);
         return null;
     }
+
+    public String addPrefemployee(int id, Role role) {
+        if (availableEmployeesID.containsKey(id)) {
+            return "Employee already assigned to this shift.";
+        }
+        if (!requiredRoles.containsKey(role)) {
+            return "Role not required for this shift.";
+        }
+        availableEmployeesID.put(id, role);
+        return null;
+    }
+    public String removePrefemployee(int id){
+        if (!availableEmployeesID.containsKey(id)) {
+            return "Employee not assigned to this shift.";
+        }
+        availableEmployeesID.remove(id);
+        return null;
+    }
+
+
 
 }
