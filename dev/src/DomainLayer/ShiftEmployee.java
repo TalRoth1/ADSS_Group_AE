@@ -1,25 +1,25 @@
 package DomainLayer;
 
-
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class ShiftEmployee extends Employee {
     private List<Shift> preferredShifts;
     private List<Shift> assignedShifts; 
     private List<Role> roles;
-    private List<Training> trainings;
-    private List<Shift> pastShifts; //!!!!!!
+    private Set<Shift> pastShifts = new HashSet<>();
 
-    public ShiftEmployee(int id, String name, String bankAccount, int salary, LocalDate startDate,
+    public ShiftEmployee(int id, String name, String branch, String bankAccount, int salary, LocalDate startDate,
                          int vacationDays, int sickDays, double educationFund, double socialBenefits,
                          String password, Role role) {
-        super(id, name, bankAccount, salary, startDate, vacationDays, sickDays, educationFund,
+        super(id, name,branch, bankAccount, salary, startDate, vacationDays, sickDays, educationFund,
                 socialBenefits, password);
-        this.preferredShifts = null;
+        this.preferredShifts = new ArrayList<>();
         this.roles = new ArrayList<>();
-        this.trainings = new ArrayList<>();
         this.assignedShifts = new ArrayList<>();
         roles.add(role);
     }
@@ -33,19 +33,14 @@ public class ShiftEmployee extends Employee {
         }
         return res;
     }
+    public String getAssignedEmployeesInfo(Shift shift) {
+        if(shift.getShiftManagerId() == this.getId()) {
+            return shift.getEmployeesInfo();
+        }
+        return "You are not authorized to view assigned employees for this shift.";
+    }
 
-    public List<Shift> getPreferredShifts(){
-        return preferredShifts;
-    }
-    public void setPreferredShifts(List<Shift> preferredShifts) {
-        this.preferredShifts = preferredShifts;
-    }
-    public List<Training> getTrainings() {
-        return trainings;
-    }
-    public List<Role> getRoles() {
-        return roles;
-    }
+ 
     // כשסיים לעבוד אסור לו לבחור משמרות ולהשתבץ!
 
     //methods
@@ -70,27 +65,7 @@ public class ShiftEmployee extends Employee {
         return null;
     }
 
-    public String addTraining(Training training) {
-        if(training == null) {
-            return "Training cannot be null.";
-        }
-        if(trainings.contains(training)) {
-            return "Training already exists in the list of trainings.";
-        }
-        trainings.add(training);
-        return null;
-    }
-
-    public String removeTraining(Training training) {
-        if(training == null) {
-            return "Training cannot be null.";
-        }
-        if(!trainings.contains(training)) {
-            return "Training does not exist in the list of trainings.";
-        }
-        trainings.remove(training);
-        return null;
-    }
+    
     
 
     public String changeRole(Role oldRole, Role newRole) {
@@ -173,32 +148,52 @@ public class ShiftEmployee extends Employee {
         }
         return preferredShifts.contains(shift);
     }
+
+    public void archiveOldShiftsWeekly(LocalDate today) {
+        // Find the start of this week (e.g., Monday)
+        LocalDate startOfThisWeek = today.with(java.time.DayOfWeek.SUNDAY);
+        Iterator<Shift> iterator = assignedShifts.iterator();
+        while (iterator.hasNext()) {
+            Shift shift = iterator.next();
+            if (shift.getDate().isBefore(startOfThisWeek)) {
+                pastShifts.add(shift);
+                iterator.remove();
+            }
+        }
+        //remove shifts older than 7 years
+        pastShifts.removeIf(shift -> shift.getDate().isBefore(today.minusYears(7)));
+    }
     
   //  public boolean isShiftManager(){
    //     return this.trainings.contains(Training.TeamManagement)&&trainings.contains(Training.CancellationCard);
   //  }
 
-    public void getAssignedEmployeesInfo(Shift shift) {
-        if(shift.getShiftManagerId() == this.getId()) { //allow shift manager to see all employees in the shift
-            shift.getEmployeesInfo();
-        }
+    public boolean isShiftManager() {
+        return roles.contains(Role.SHIFT_MANAGER);
     }
 
     public List<Shift> getAssignedShifts() {
         return assignedShifts;
     }
+    public void setAssignedShifts(List<Shift> assignedShifts) {
+        this.assignedShifts = assignedShifts;
+    }
     public List<Shift> getPrefShifts() {
         return preferredShifts;
     }
+    public void setPrefShifts(List<Shift> preferredShifts) {
+        this.preferredShifts = preferredShifts;
+    }
 
-    public List<Shift> getPastShifts() {
+    public Set<Shift> getPastShifts() {
         return pastShifts;
     }
-    public void setPastShifts(List<Shift> pastShifts) {
+    public void setPastShifts(Set<Shift> pastShifts) {
         this.pastShifts = pastShifts;
     }
-    public void setAssignedShifts(List<Shift> assignedShifts) {
-        this.assignedShifts = assignedShifts;
+
+    public List<Role> getRoles() {
+        return roles;
     }
 
  

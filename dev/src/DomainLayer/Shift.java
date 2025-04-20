@@ -23,10 +23,13 @@ public class Shift {
         this.startTime = startTime;
         this.endTime = endTime;
         this.shiftManagerId = shiftManagerId;
+        this.requiredRoles = new HashMap<>();
+        this.availableEmployeesID = new HashMap<>();
+        this.assignedEmployeesID = new HashMap<>();
         for (Role role : Role.values()) {
             this.requiredRoles.put(role, 0); // Initialize roles with 0 required employees
         }
-        this.assignedEmployeesID = new HashMap<>();
+        
     }
 
     public String toString() {
@@ -91,12 +94,12 @@ public class Shift {
     public int getShiftManagerId() {
         return shiftManagerId;
     }
-    public void setShiftManagerId(int shiftManagerId) {
+    public String setShiftManagerId(int shiftManagerId) {
         if (shiftManagerId <= 0) {
-            throw new IllegalArgumentException("Shift manager ID is invalid. ");
+            return "Shift manager ID is invalid. ";
         }
-        
         this.shiftManagerId = shiftManagerId;
+        return null;
     }
 
     public int getRequiredEmployees(Role role){
@@ -127,7 +130,7 @@ public class Shift {
         for (Map.Entry<Integer, Role> entry : assignedEmployeesID.entrySet()) {
             sb.append("Employee ID: ").append(entry.getKey()).append(", Role: ").append(entry.getValue()).append("\n");
         }
-        return null;
+        return sb.toString();
     }
 
 
@@ -161,7 +164,7 @@ public class Shift {
 
     public String addPrefemployee(int id, Role role) {
         if (availableEmployeesID.containsKey(id)) {
-            return "Employee already assigned to this shift.";
+            return "already available for this shift.";
         }
         if (!requiredRoles.containsKey(role)) {
             return "Role not required for this shift.";
@@ -177,6 +180,17 @@ public class Shift {
         return null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Shift shift = (Shift) o;
+        return date.equals(shift.date) && shiftType == shift.shiftType;
+    }
 
+    @Override
+    public int hashCode() {
+        return date.hashCode() + shiftType.hashCode();
+    }      
 
 }

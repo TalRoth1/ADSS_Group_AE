@@ -1,6 +1,8 @@
 package DomainLayer;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Employee {
     private int id;
@@ -14,11 +16,13 @@ public class Employee {
     private double socialBenefits;//monthly amount
     private String password; 
     protected boolean finishWorking; //is fired 
-    private boolean isLoggedIn = false;
+    private boolean isLoggedIn;
+    private Set<Training> trainings = new HashSet<>(); // Set to store unique trainings
+    private String branch;
 
 
 
-    public Employee(int id, String name, String bankAccount, int salary, LocalDate startDate,
+    public Employee(int id, String name,String branch, String bankAccount, int salary, LocalDate startDate,
                     int vacationDays, int sickDays, double educationFund, double socialBenefits,
                     String password) {
         this.id = id;
@@ -32,6 +36,8 @@ public class Employee {
         this.socialBenefits = socialBenefits;
         this.password = password;
         this.finishWorking = false; 
+        this.isLoggedIn = false;
+        this.branch = branch; 
     }
 
 
@@ -61,8 +67,30 @@ public class Employee {
         CancellationCard
     }
 
-    public void setTraining(Training training) {
-        
+
+    public Set<Training> getTrainings() {
+        return new HashSet<>(trainings);
+    }
+    public String addTraining(Training training) {
+        if(training == null) {
+            return "Training cannot be null.";
+        }
+        if(trainings.contains(training)) {
+            return "Training already exists in the list of trainings.";
+        }
+        trainings.add(training);
+        return null;
+    }
+
+    public String removeTraining(Training training) {
+        if(training == null) {
+            return "Training cannot be null.";
+        }
+        if(!trainings.contains(training)) {
+            return "Training does not exist in the list of trainings.";
+        }
+        trainings.remove(training);
+        return null;
     }
 
     // Getters and Setters
@@ -119,6 +147,13 @@ public class Employee {
         this.finishWorking = finishWorking;
     }
     public boolean isLoggedIn() { return isLoggedIn; }
+
+    public String getBranchId() {
+        return branch;
+    }
+    public void setBranchId(String branchId) {
+        this.branch = branchId;
+    }
 
 
 

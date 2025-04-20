@@ -1,12 +1,11 @@
 package PresentationLayer;
 
 import DomainLayer.*;
-
-import java.time.LocalDate;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
-import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 //import java.util.regex.Matcher;
 //import java.util.regex.Pattern;
@@ -14,6 +13,7 @@ import java.util.Scanner;
 public class CLI {
     public static Scanner scanner = new Scanner(System.in);
     EmployeeFacade employeeFacade;
+    ShiftFacade shiftFacade;
     private int id;
     private String password;
     private LocalDate now;
@@ -51,12 +51,14 @@ public class CLI {
     }
 
     private void EmployeeManager() {
-        String[] actions = {"Set Shifts", "Fire Employee", "Hire Employee", "Change Employee's Role",
-                "Add Role to Employee", "Delete Employee's Role", "Change Employee's Data", "Logout"};
+        String[] actions = {"Set Shifts", "Add Employee to Exist Shift", "Fire Employee", "Hire Employee",
+                            "Change Employee's Role", "Add Role to Employee", "Delete Employee's Role",
+                            "Change Employee's Data", "Logout"};
         String option = selectFromList("Select Employee Manager Action:", actions);
 
         switch (option) {
             case "Set Shifts" -> setShifts();
+            case "Add Employee to Exist Shift" -> addEmployeeToExistShift();
             case "Fire Employee" -> fireEmployee();
             case "Hire Employee" -> hireEmployee();
             case "Change Employee's Role" -> changeRoleToEmployee();
@@ -86,9 +88,12 @@ public class CLI {
 //        //fill in the rest of the fields of Employee
 //    }
 
+
+    
+
     private void setShifts() {
-        //choose date with helper method
-        LocalDate dateOfShift = chooseDate();
+        ShowPrefAllEmployees();
+        LocalDate dateOfShift = chooseDate(); //choose date with helper method
         if(dateOfShift == null) 
             EmployeeManager(); // If date is invalid, return to EmployeeManager
 
@@ -98,142 +103,39 @@ public class CLI {
         int startTime = shiftTimes[0];
         int endTime = shiftTimes[1];
     
-        employeeFacade.createShift(dateOfShift, shiftType, startTime, endTime, id, -1);
+        shiftFacade.createShift(dateOfShift, shiftType, startTime, endTime, id, -1);
         Shift shift = new Shift(dateOfShift, shiftType, startTime, endTime, -1);
 
         //choose shift manager
-        System.out.println("Please choose Shift Manager ");
-        System.out.println(employeeFacade.getAvailableEmployees(shift, Role.SHIFT_MANAGER));
-        int shiftManagerId = readInt("Please enter the ID of the Shift Manager: ");
-        employeeFacade.setShiftManager(id, shift, shiftManagerId);
+        int shiftManagerId = getEmployeeForShift(shift, Role.SHIFT_MANAGER);
+        shiftFacade.setShiftManager(id, shift, shiftManagerId);
 
         //choose number of employees for each role
         for (Role role : Role.values()) {
             if (role != Role.SHIFT_MANAGER) 
-                chooseNumOfEmployeesForShift(role, shift, dateOfShift, id);
+                chooseNumOfEmployeesForShift(role, shift, id);
         }
         EmployeeManager(); 
     }
 
-    private LocalDate chooseDate() {
-        LocalDate dateOfShift = readDate("Please enter the date of the shift ");
-        DayOfWeek today = now.getDayOfWeek();
-
-        //check if it's Thursday or later
-        if (today.getValue() < DayOfWeek.THURSDAY.getValue()) {
-            System.out.println("You can only set shifts starting from Thursday.");
-            return null; // Return null to indicate invalid date
+    private void addEmployeeToExistShift() {
+        ShowPrefAllEmployees();
+        LocalDate dateOfShift = chooseDate(); //choose date with helper method
+        if(dateOfShift == null) 
+            EmployeeManager(); // If date is invalid, return to EmployeeManager
+        ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
+        Shift shift = shiftFacade.getShift(dateOfShift, shiftType, id);
+        if(shift == null) {
+            System.out.println("Shift not found OR you are not connected. please try again");
+            EmployeeManager();
         }
-        //check if date is in the past
-        if(dateOfShift.isBefore(now)) {
-            System.out.println("You can't set shifts to the past, choose again");
-            return null; 
-        }
-         //allow shifts only for next week
-        //now.with(DayOfWeek.SUNDAY) gets the most recent Sunday before/equal to today.
-        long weeksBetween = ChronoUnit.WEEKS.between(now.with(DayOfWeek.SUNDAY), dateOfShift.with(DayOfWeek.SUNDAY));
-        if (weeksBetween != 1) {
-            System.out.println("You can only set shift for NEXT week.");
-            return null;
-        }
-
-        //don't allow shifts on SHABBAT
-        if(dateOfShift.getDayOfWeek().getValue() == 7) {
-            System.out.println("Shabbat is rest day, please choose again");
-            return null;
-        }
-        return dateOfShift;
-    }
-
-    private int[] getValidShiftTimes(ShiftType shiftType) {
-        Integer[] startTimeOptions = (shiftType == ShiftType.MORNING) ? MORNING_SHIFT_START_TIMES
-            : EVENING_SHIFT_START_TIMES;
-    
-        Integer[] endTimeOptions = (shiftType == ShiftType.MORNING) ? MORNING_SHIFT_END_TIMES
-            : EVENING_SHIFT_END_TIMES;
-    
-        // Start time selection
-        int startTime = selectFromList("Select start time (24-hour format):", startTimeOptions);
-    
-        // End time selection with validation
-        int endTime = selectFromList("Select end time (must be after start):", endTimeOptions);
-        while (endTime <= startTime) {
-            System.out.println("End time must be after start time. Please choose again.");
-            endTime = selectFromList("Select end time (must be after start):", endTimeOptions);
-        }
-    
-        return new int[]{startTime, endTime};
-    }
-
-    private void chooseNumOfEmployeesForShift(Role role, Shift shift, LocalDate date, int empManagerId) {
-        while (true) {
-            int numOfEmployees = readInt("Please enter the number of employees for " + role + ": ");
-            String response = employeeFacade.setRequiredRoles(empManagerId, shift, role, numOfEmployees);
-            if (response != null) {
-                System.out.println(response);
-                continue;
-            }
-            addEmployeeToShift(shift, role, date, empManagerId, numOfEmployees);
-            break;
-        }
-    }
-
-    private void addEmployeeToShift(Shift shift, Role role, LocalDate date, int empManagerId, int numOfEmployees) {
-        for (int i = 0; i < numOfEmployees; i++) {
-            while (true) {
-                System.out.println("Please choose " + role + " for the shift from the following employees: ");
-                System.out.println(employeeFacade.getAvailableEmployees(shift, role));
-                int employeeId = readInt("Please enter the ID of the employee: ");
-                String res = employeeFacade.addEmployeeToShift(employeeId, shift, role, date, empManagerId);
-                if (res != null) {
-                    System.out.println(res);
-                    continue;
-                }
-                break;
-            }
-        }
-    }
-
-
-        //         while (true) {
-        //         int numOfEmployees = readInt("Please enter the number of employees for " + role + ": ");
-        //         String response = employeeFacade.setRequiredRoles(id, shift, role, numOfEmployees);
-        //         if(response != null) {
-        //             System.out.println(response);
-        //             continue; //ask for the number of employees again
-        //             }
-        //         for(int i = 0; i < numOfEmployees; i++) {
-        //             while(true) {
-        //             System.out.println("Please choose " + role + " for the shift from the following employees: ");
-        //             System.out.println(employeeFacade.getAvailableEmployees(shift, role));
-        //             int employeeId = readInt("Please enter the ID of the employee: ");
-        //             String res = employeeFacade.addEmployeeToShift(employeeId, shift, role, dateOfShift, id);
-        //             if(res != null) {
-        //                 System.out.println(res);
-        //                 continue; //ask for the employee again
-        //             }
-        //             break; //employee added successfully, move to the next one
-        //             }
-        //         }
-        //         break; //Role is set successfully, move to the next role
-        //         }
-        //     }
-        // }
-        // EmployeeManager();
-    // }
-
-//     private void addEmployeeToShift(LocalDate date, String shiftType) {
-//         System.err.println(employeeFacade.getAvailableEmployees(date, shiftType, id));
-//         //מוצג למסך רשימה של הקופאיות שזמינות למשמרת
-//         //מנהל כ"א בוחר קופאית מתוך הרשימה
-// // לעבור על כל התפקידים ולבחור עבור קופאית כמה אתה רוצה שיהיו
-// // ואז המספר הה נשלח לפונקציה set required rol
-// // נגיד קופאית, 3
-
-//         //לקרוא לפונקציה שמשבצת עובדים לפי תפקידים
-//     }
-
-
+        Role role = selectFromList("Choose a role:", Role.values());
+        int employeeId = getEmployeeForShift(shift, role);
+        String response = shiftFacade.addEmployeeToShift(employeeId, shift, role, id);
+        if(response != null)
+            System.out.println(response);
+        EmployeeManager();
+     }
 
     private void fireEmployee() {
         int employeeId = readInt("Please enter Employee's ID to fire: ");
@@ -255,10 +157,11 @@ public class CLI {
         double educationFund = readDouble("Education fund: ");
         double socialBenefits = readDouble("Social Benefits: ");
         String employeePassword = readString("Password: ");
+        String branch = readString("Branch: ");
 
         //choose role
         Role selectedRole = selectFromList("Choose a role:", Role.values());
-        String response = employeeFacade.hireEmployee(employeeID, id, name ,bankAccount, salary, startDate,
+        String response = employeeFacade.hireEmployee(employeeID, id, name, branch ,bankAccount, salary, startDate,
                 vacationDays, sickDays, educationFund, socialBenefits, employeePassword, selectedRole);
         if(response != null)
             System.out.println(response);
@@ -399,7 +302,114 @@ public class CLI {
         shiftEmployee();
     }
 
+    
+
     //assistant methods
+
+    private void ShowPrefAllEmployees() {
+        System.out.println("First, you will see all employees along with their shift preferences.");
+        System.out.println("Later, when assigning roles, you'll be shown only employees who are available.");
+        System.out.println("You may still choose unavailable employees if needed — the system will alert you about that.");
+        System.out.println(employeeFacade.getPrefAllEmployees(id));
+    }
+
+    private void chooseNumOfEmployeesForShift(Role role, Shift shift, int empManagerId) {
+        while (true) {
+            int numOfEmployees = readInt("Please enter the number of employees for " + role + ": ");
+            String response = shiftFacade.setRequiredRoles(empManagerId, shift, role, numOfEmployees);
+            if (response != null) {
+                System.out.println(response);
+                continue;
+            }
+            addEmployeesWithSameRoleToShift(shift, role, empManagerId, numOfEmployees);
+            break;
+        }
+    }
+
+    private void addEmployeesWithSameRoleToShift(Shift shift, Role role, int empManagerId, int numOfEmployees) {
+        for (int i = 0; i < numOfEmployees; i++) {
+            while (true) {
+                int employeeId = getEmployeeForShift(shift, role);
+                String res = shiftFacade.addEmployeeToShift(employeeId, shift, role, empManagerId);
+                if(res != null) {
+                    System.out.println(res);
+                    continue; //ask for the employee again
+                }
+                break; //employee added successfully, move to the next one
+            }
+        }
+    }
+
+    private int getEmployeeForShift(Shift shift, Role role) {
+    while (true) {
+        System.out.println("Please choose " + role + " for the shift from the following available employees:");
+        System.out.println(employeeFacade.getAvailableEmployees(shift, role));
+        int employeeId = readInt("Please enter the ID of the employee: ");
+
+        if (!shiftFacade.isAvailable(employeeId, shift)) {
+            System.out.println("This employee is not available for this shift.");
+            int choice = readInt("If you still want to add them, enter 1. Otherwise, enter 0: ");
+            if (choice == 1) {
+                return employeeId; // confirmed override
+            } else {
+                System.out.println("Please choose another employee.");
+                continue;
+            }
+        }
+        return employeeId; // available employee
+        }
+    }
+
+    private LocalDate chooseDate() {
+        LocalDate dateOfShift = readDate("Please enter the date of the shift ");
+        DayOfWeek today = now.getDayOfWeek();
+
+        //check if it's Thursday/Friday/Saturday
+        if (today.getValue() < DayOfWeek.THURSDAY.getValue() || today.getValue() > DayOfWeek.SATURDAY.getValue()) {
+            System.out.println("You can only set shifts from Thursday to Saturday");
+            return null; // Return null to indicate invalid date
+        }
+        //check if date is in the past
+        if(dateOfShift.isBefore(now)) {
+            System.out.println("You can't set shifts to the past, choose again");
+            return null; 
+        }
+         //allow shifts only for next week
+        //now.with(DayOfWeek.SUNDAY) gets the most recent Sunday before/equal to today.
+        long weeksBetween = ChronoUnit.WEEKS.between(now.with(DayOfWeek.SUNDAY), dateOfShift.with(DayOfWeek.SUNDAY));
+        if (weeksBetween != 1) {
+            System.out.println("You can only set shift for NEXT week.");
+            return null;
+        }
+
+        //don't allow shifts on SHABBAT
+        if(dateOfShift.getDayOfWeek().getValue() == 7) {
+            System.out.println("Shabbat is rest day, please choose again");
+            return null;
+        }
+        return dateOfShift;
+    }
+
+    private int[] getValidShiftTimes(ShiftType shiftType) {
+        Integer[] startTimeOptions = (shiftType == ShiftType.MORNING) ? MORNING_SHIFT_START_TIMES
+            : EVENING_SHIFT_START_TIMES;
+    
+        Integer[] endTimeOptions = (shiftType == ShiftType.MORNING) ? MORNING_SHIFT_END_TIMES
+            : EVENING_SHIFT_END_TIMES;
+    
+        // Start time selection
+        int startTime = selectFromList("Select start time (24-hour format):", startTimeOptions);
+    
+        // End time selection with validation
+        int endTime = selectFromList("Select end time (must be after start):", endTimeOptions);
+        while (endTime <= startTime) {
+            System.out.println("End time must be after start time. Please choose again.");
+            endTime = selectFromList("Select end time (must be after start):", endTimeOptions);
+        }
+    
+        return new int[]{startTime, endTime};
+    }
+
 
     private <T> T selectFromList(String title, T[] options) {
         int choice = -1;

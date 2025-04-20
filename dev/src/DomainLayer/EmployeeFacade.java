@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EmployeeFacade {
+public class EmployeeFacade { //employee related methods
     private Map<Integer, EmployeeManager> employeeManagers;
     private Map<Integer, ShiftEmployee> shiftEmployees;
 
@@ -42,13 +42,13 @@ public class EmployeeFacade {
         return employeeManager.fireEmployee(employeeId);
     }
 
-    public String hireEmployee(int employeeId, int empManagerId, String employeeName, String bankAccount,int salary, LocalDate startDate, int vacationDays, int sickDays,double educationFund, double socialBenefits, String employeePassword, Role role) {
+    public String hireEmployee(int employeeId, int empManagerId, String branch,String employeeName, String bankAccount,int salary, LocalDate startDate, int vacationDays, int sickDays,double educationFund, double socialBenefits, String employeePassword, Role role) {
         if(!isEmployeeManager(employeeId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId)) ////////nedd to check mikrey katze with date
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        employeeManager.hireEmployee(employeeId, employeeName, bankAccount,salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
+        employeeManager.hireEmployee(employeeId, employeeName, branch, bankAccount,salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
         ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
         addShiftEmployee(employeeId, shiftEmployee);
         return null;     
@@ -135,22 +135,13 @@ public class EmployeeFacade {
         return employeeManager.updateSocialBenefits(employeeId, socialBenefits);
     }
 
-   
-    public String logout(int id) {
-        if(!isLoggedIn(id))
-            return "You are not logged in";
-        Employee e = getEmployee(id);
-        e.logout();
-        return null;
-    }
-
-    public String getPreferences(int empManagerId) {
+    public String getPrefAllEmployees(int empManagerId) {
         if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.getPrefAllemployees();
+        return employeeManager.getPrefAllEmployees();
     }
 
     
@@ -195,40 +186,6 @@ public class EmployeeFacade {
         return employeeManager.removeTrainingFromEmployee(employeeId, training);
     } */
 
-    public String changeShiftManager(Shift shift, int employeeId, int empManagerId, int newShiftManagerId) {
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.changeShiftManager(shift, employeeId, newShiftManagerId);
-    }
-
-    public String shiftReplacement(Shift shift, int employeeId, int empManagerId, int newEmployeeId) {
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.shiftReplacement(shift, employeeId, newEmployeeId);
-    }
-
-    public String createShift(LocalDate date, ShiftType shiftType, int start, int end,int empManagerId, int shiftManagerId) {
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.createShift(date, shiftType, start, end, shiftManagerId);
-    }
-
-    public String addEmployeeToShift(int employeeId, Shift shift,Role role,LocalDate date ,int empManagerId) {
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.addEmployeeToShift(employeeId, date, shift, role);
-    }
-
-    public String removeEmployeeFromShift(int employeeId, Shift shift, int empManagerId) {
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.removeEmployeeFromShift(employeeId, shift);
-    }
 
     public String getAvailableEmployees(Shift shift, Role role) {
         if(shift == null) {
@@ -243,52 +200,6 @@ public class EmployeeFacade {
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(employeeID);
         return employeeManager.getEmployeeShifts(employeeID);
-    }
-
-
-    // shift methods
-    public String getEmployeeInfo(int shiftManagerId, Shift shift) {
-        if(!isLoggedIn(shiftManagerId))
-            return "You are not logged in";
-        ShiftEmployee shiftEmployee = shiftEmployees.get(shiftManagerId);
-        return shift.getEmployeesInfo();
-    }
-
-    public String getShiftInfo(int shiftManagerId, Shift shift) {
-        if(!isLoggedIn(shiftManagerId))
-            return "You are not logged in";
-        ShiftEmployee shiftEmployee = shiftEmployees.get(shiftManagerId);
-        return shift.toString();
-    }
-
-    public String addEmployee(int employeeId, Shift shift, int empManagerId, Role role) {
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        return shift.addEmployee(employeeId, role);
-    }
-
-    public String removeEmployee(int employeeId, Shift shift, int empManagerId) {
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        return shift.removeEmployee(employeeId);
-    }
-    public String setRequiredRoles(int empManagerId, Shift shift, Role role, int num) {
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        return shift.setRequiredRoles(role, num);
-    }
-
-    public String getShiftString(int empManagerId, Shift shift) {
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        return shift.getShiftString();
-    }
-
-    public String setShiftManager(int empManagerId, Shift shift, int id){
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        shift.setShiftManagerId(id);
-        return null;
     }
 
 
@@ -314,36 +225,15 @@ public class EmployeeFacade {
         return shiftEmployee.changeRole(oldRole, newRole);
     }
 
-    public String addPreferredShift(int id, Shift shift) {
-        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
-        return shiftEmployee.addPreferredShift(shift);
+    public String logout(int id) {
+        if(!isLoggedIn(id))
+            return "You are not logged in";
+        Employee e = getEmployee(id);
+        e.logout();
+        return null;
     }
 
-    public String removePreferredShift(int id, Shift shift) {
-        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
-        return shiftEmployee.removePreferredShift(shift);
-    }
-
-    public String addAssignedShift(int id, Shift shift) {
-        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
-        return shiftEmployee.addAssignedShift(shift);
-    }
-
-    public String removeAssignedShift(int id, Shift shift) {
-        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
-        return shiftEmployee.removeAssignedShift(shift);
-    }
-
-    public boolean isAvailable(int id, Shift shift) {
-        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
-        return shiftEmployee.isAvailable(shift);
-    }
-
-    public void getAssignedEmployeesInfo(int managerId, Shift shift) {
-        ShiftEmployee shiftEmployee = shiftEmployees.get(managerId);
-        shift.getEmployeesInfo();
-    }
-
+   
 
 
 
