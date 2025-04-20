@@ -96,6 +96,8 @@ public class EmployeeManager extends Employee{
         if (employee.isFinishWorking())
             return "Employee already fired";
         employee.setFinishWorking(true);
+        employee.setPreferredShifts(null);
+        employee.setAssignedShifts(null);
         for (Shift shift : employee.getAssignedShifts()) {
             shift.removeEmployee(id);
         }
@@ -181,7 +183,7 @@ public class EmployeeManager extends Employee{
     }
 
     public String shiftReplacement(Shift shift, int empID, int replacementID) {
-        if (!checkEmployee(empID) || !checkEmployee(replacementID)) {
+        if (!checkEmployee(empID) || !checkEmployee(replacementID) ) {
             return "employee not found in the system";
         }
         if(replacementID == empID) {
@@ -195,6 +197,9 @@ public class EmployeeManager extends Employee{
         }
         ShiftEmployee employee = allEmployees.get(empID);
         ShiftEmployee replacement = allEmployees.get(replacementID);
+        if (employee.isFinishWorking() || replacement.isFinishWorking()) {
+            return "this employee is fired";
+        }
         if(!replacement.getPreferredShifts().contains(shift)) {
             return "replacement employee is not available for this shift";
         }
@@ -283,8 +288,24 @@ public class EmployeeManager extends Employee{
             shift.setRequiredRoles(role, numOfEmployees);
     }
 
-    public void setShiftManager(Shift shift, int id){
+    public String setShiftManager(Shift shift, int id){
+        if(!checkEmployee(id) ){
+            return "employee not exist";
+        }
+        if(allEmployees.get(id).isFinishWorking()){
+            return "this employee is fired";
+        }
+        if(!allEmployees.get(id).getRoles().contains(Role.SHIFT_MANAGER)) {
+            return "this employee cant be shift Manager";
+        }
+        if(shift.getShiftManagerId() == id) {
+            return "this employee is already the shift manager";
+        }
+        if(shift.getAssignedEmployeesID().containsKey(id)) {
+            return "this employee is already assigned to this shift";
+        }   
         shift.setShiftManagerId(id);
+        return null;
     }
 
     public String getPrefAllemployees(){ //all the shifts of all employees

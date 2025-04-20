@@ -95,6 +95,7 @@ public class Shift {
         if (shiftManagerId <= 0) {
             throw new IllegalArgumentException("Shift manager ID is invalid. ");
         }
+        
         this.shiftManagerId = shiftManagerId;
     }
 

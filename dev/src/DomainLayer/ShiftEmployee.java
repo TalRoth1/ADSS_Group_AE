@@ -10,6 +10,7 @@ public class ShiftEmployee extends Employee {
     private List<Shift> assignedShifts; 
     private List<Role> roles;
     private List<Training> trainings;
+    private List<Shift> pastShifts; //!!!!!!
 
     public ShiftEmployee(int id, String name, String bankAccount, int salary, LocalDate startDate,
                          int vacationDays, int sickDays, double educationFund, double socialBenefits,
@@ -45,7 +46,7 @@ public class ShiftEmployee extends Employee {
     public List<Role> getRoles() {
         return roles;
     }
-
+    // כשסיים לעבוד אסור לו לבחור משמרות ולהשתבץ!
 
     //methods
 
@@ -108,6 +109,9 @@ public class ShiftEmployee extends Employee {
     }
 
     public String addPreferredShift(Shift shift) {
+        if(isFinishWorking()) {
+            return "Employee has finished working and cannot add preferred shifts.";
+        }
         if(preferredShifts.contains(shift)) {
             return "Shift already exists in the list of preferred shifts.";
         }
@@ -119,6 +123,9 @@ public class ShiftEmployee extends Employee {
     }
 
     public String removePreferredShift(Shift shift) {
+        if(isFinishWorking()) {
+            return "Employee has finished working and cannot remove preferred shifts.";
+        }
         if(!preferredShifts.contains(shift)) {
             return "Shift doesnt exists in the list of preferred shifts.";
         }
@@ -130,6 +137,9 @@ public class ShiftEmployee extends Employee {
     }
 
     public String addAssignedShift(Shift shift) {
+        if(isFinishWorking()) {
+            return "Employee has finished working and cannot add assigned shifts.";
+        }
         if(assignedShifts.contains(shift)) {
             return "Shift already exists in the list of assigned shifts.";
         }
@@ -141,6 +151,9 @@ public class ShiftEmployee extends Employee {
     }
 
     public String removeAssignedShift(Shift shift) {
+        if(isFinishWorking()) {
+            return "Employee has finished working and cannot remove assigned shifts.";
+        }
         if(!assignedShifts.contains(shift)) {
             return "Shift doesnt exists in the list of assigned shifts.";
         }
@@ -175,7 +188,19 @@ public class ShiftEmployee extends Employee {
         return assignedShifts;
     }
     public List<Shift> getPrefShifts() {
-        return preferredShifts;}
+        return preferredShifts;
+    }
+
+    public List<Shift> getPastShifts() {
+        return pastShifts;
+    }
+    public void setPastShifts(List<Shift> pastShifts) {
+        this.pastShifts = pastShifts;
+    }
+    public void setAssignedShifts(List<Shift> assignedShifts) {
+        this.assignedShifts = assignedShifts;
+    }
+
  
 
 
