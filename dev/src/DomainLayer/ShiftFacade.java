@@ -43,11 +43,11 @@ public class ShiftFacade { //shift related methods
         return employeeManagers.get(id);
     }
 
-    public String changeShiftManager(Shift shift, int employeeId, int empManagerId, int newShiftManagerId) {
+    public String changeShiftManager(Shift shift, int oldShiftManagerId, int newShiftManagerId, int empManagerId) {
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.changeShiftManager(shift, employeeId, newShiftManagerId);
+        return employeeManager.changeShiftManager(shift, oldShiftManagerId, newShiftManagerId);
     }
 
     public String shiftReplacement(Shift shift, int employeeId, int empManagerId, int newEmployeeId) {

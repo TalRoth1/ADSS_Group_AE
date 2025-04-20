@@ -51,18 +51,21 @@ public class CLI {
     }
 
     private void EmployeeManager() {
-        String[] actions = {"Set Shifts", "Add Employee to Exist Shift", "Fire Employee", "Hire Employee",
-                            "Change Employee's Role", "Add Role to Employee", "Delete Employee's Role",
+        String[] actions = {"Set Shifts", "Add Employee to Exist Shift", "Remove Employee From Exist Shift",
+                            "Fire Employee", "Hire Employee", "Change Employee's Role",
+                            "Add Role to Employee", "Change Shift Manager", "Delete Employee's Role",
                             "Change Employee's Data", "Logout"};
         String option = selectFromList("Select Employee Manager Action:", actions);
 
         switch (option) {
             case "Set Shifts" -> setShifts();
             case "Add Employee to Exist Shift" -> addEmployeeToExistShift();
+            case "Remove Employee From Exist Shift" -> removeEmployeeFromExistShift();
             case "Fire Employee" -> fireEmployee();
             case "Hire Employee" -> hireEmployee();
             case "Change Employee's Role" -> changeRoleToEmployee();
             case "Add Role to Employee" -> addRoleToEmployee();
+            case "Change Shift Manager " -> changeShiftManager();
             case "Delete Employee's Role" -> deleteRoleFromEmployee();
             case "Change Employee's Data" -> changeEmployeeData();
             case "Logout" -> {
@@ -107,7 +110,7 @@ public class CLI {
         Shift shift = new Shift(dateOfShift, shiftType, startTime, endTime, -1);
 
         //choose shift manager
-        int shiftManagerId = getEmployeeForShift(shift, Role.SHIFT_MANAGER);
+        int shiftManagerId = chooseEmployeeForShift(shift, Role.SHIFT_MANAGER);
         shiftFacade.setShiftManager(id, shift, shiftManagerId);
 
         //choose number of employees for each role
@@ -130,8 +133,25 @@ public class CLI {
             EmployeeManager();
         }
         Role role = selectFromList("Choose a role:", Role.values());
-        int employeeId = getEmployeeForShift(shift, role);
+        int employeeId = chooseEmployeeForShift(shift, role);
         String response = shiftFacade.addEmployeeToShift(employeeId, shift, role, id);
+        if(response != null)
+            System.out.println(response);
+        EmployeeManager();
+     }
+
+     private void removeEmployeeFromExistShift() {
+        int employeeId = readInt("Please enter Employee's ID to remove: ");
+        LocalDate dateOfShift = chooseDate(); //choose date with helper method
+        if(dateOfShift == null) 
+            EmployeeManager(); // If date is invalid, return to EmployeeManager
+        ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
+        Shift shift = shiftFacade.getShift(dateOfShift, shiftType, id);
+        if(shift == null) {
+            System.out.println("Shift not found OR you are not connected. please try again");
+            EmployeeManager();
+        }
+        String response = shiftFacade.removeEmployeeFromShift(employeeId, shift, id);
         if(response != null)
             System.out.println(response);
         EmployeeManager();
@@ -184,6 +204,24 @@ public class CLI {
         int employeeID = readInt("Please enter employee ID: ");
         Role newRole = selectFromList("Choose Role To Add:", Role.values());
         String response = employeeFacade.addRoleToEmployee(employeeID, id, newRole);
+        if(response != null)
+            System.out.println(response);
+        EmployeeManager();
+    }
+
+    private void changeShiftManager() {
+        int oldShiftManagerId = readInt("Please enter old shift manager ID: ");
+        LocalDate dateOfShift = chooseDate(); //choose date with helper method
+        if(dateOfShift == null) 
+            EmployeeManager(); // If date is invalid, return to EmployeeManager
+        ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
+        Shift shift = shiftFacade.getShift(dateOfShift, shiftType, id);
+        if(shift == null) {
+            System.out.println("Shift not found OR you are not connected. please try again");
+            EmployeeManager();
+        }
+        int newShiftManagerId = chooseEmployeeForShift(shift, Role.SHIFT_MANAGER);
+        String response = shiftFacade.changeShiftManager(shift, oldShiftManagerId, newShiftManagerId, id);
         if(response != null)
             System.out.println(response);
         EmployeeManager();
@@ -285,7 +323,7 @@ public class CLI {
         String option = selectFromList("Select Shift Employee Action:", actions);
 
         switch (option) {
-            case "Set Preferences" -> setPreferences();
+            //case "Set Preferences" -> setPreferences(); //TODO: ask Liat if she did some methods and then implement
             case "Get Preferences" -> getPrefEmployee();
             case "Logout" -> {
                 logout(id);
@@ -329,7 +367,7 @@ public class CLI {
     private void addEmployeesWithSameRoleToShift(Shift shift, Role role, int empManagerId, int numOfEmployees) {
         for (int i = 0; i < numOfEmployees; i++) {
             while (true) {
-                int employeeId = getEmployeeForShift(shift, role);
+                int employeeId = chooseEmployeeForShift(shift, role);
                 String res = shiftFacade.addEmployeeToShift(employeeId, shift, role, empManagerId);
                 if(res != null) {
                     System.out.println(res);
@@ -340,7 +378,7 @@ public class CLI {
         }
     }
 
-    private int getEmployeeForShift(Shift shift, Role role) {
+    private int chooseEmployeeForShift(Shift shift, Role role) {
     while (true) {
         System.out.println("Please choose " + role + " for the shift from the following available employees:");
         System.out.println(employeeFacade.getAvailableEmployees(shift, role));

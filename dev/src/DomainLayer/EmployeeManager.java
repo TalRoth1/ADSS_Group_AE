@@ -170,9 +170,6 @@ public class EmployeeManager extends Employee{
         if(!newManagerE.getRoles().contains(Role.SHIFT_MANAGER)) {
             return "this employee cant be shift Manager";
         }
-        if(!newManagerE.getPrefShifts().contains(shift)) {
-            return "new manager is not available for this shift";
-        }
         if(shift.getAssignedEmployeesID().containsKey(newManager)) {
             return "new manager is already assigned to this shift";
         }
