@@ -145,13 +145,13 @@ public class EmployeeFacade { //employee related methods
     }
 
     
-    public String getPrefEmployee(int id) {
-        if(!isEmployeeManager(id))
+    public String getPrefEmployee(int employeeId, int empManagerId) {
+        if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
-        if(!isLoggedIn(id))
+        if(!isLoggedIn(empManagerId))
             return "You are not logged in";
-        EmployeeManager employeeManager = getEmployeeManager(id);
-        return employeeManager.getPrefEmployee(id);
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.getPrefEmployee(employeeId);
     }
 
     private void addShiftEmployee(int employeeId, ShiftEmployee shiftEmployee) {

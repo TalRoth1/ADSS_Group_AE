@@ -360,7 +360,7 @@ public class EmployeeManager extends Employee{
     }
 
     public String getAvailableEmployees(Shift shift, Role role) { //all the employees that can work in this shift and have this role
-        String res = "Available employyess for this shift and role:" + role.toString() + "\n";
+        String res = "Available employees for this shift and role: " + role.toString() + "\n";
         for (ShiftEmployee employee : allEmployees.values()) {
             if (employee.getRoles().contains(role) && employee.isAvailable(shift)) {
                     res += employee.getName() + " " + employee.getId() + "\n";
