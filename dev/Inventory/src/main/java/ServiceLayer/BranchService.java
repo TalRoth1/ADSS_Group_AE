@@ -61,4 +61,20 @@ public class BranchService
             return new Response(null, e.getMessage());
         }
     }
+
+    public Response GetAllBranches()
+    {
+        try
+        {
+            String allBranches = bf.getListOfAllBranches();
+            int total = bf.getTotalBranchCount();
+            allBranches += "Total Branches: " + total + ".";
+            return new Response(allBranches, null);
+        }
+        catch (Exception e)
+        {
+            return new Response(null, e.getMessage());
+        }
+    }
+
 }

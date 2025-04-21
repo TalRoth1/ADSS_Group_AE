@@ -153,4 +153,13 @@ public class BranchFacade
         }
         return sb.toString();
     }
+
+    public int getTotalBranchCount()
+    {
+        synchronized (branches)
+        {
+            return branches.size();
+        }
+    }
+
 }
