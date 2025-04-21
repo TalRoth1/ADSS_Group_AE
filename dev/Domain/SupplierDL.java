@@ -1,5 +1,7 @@
 package Domain;
 import Utils.DeliveryMethod;
+
+import java.util.ArrayList;
 import java.util.List;
 
 class SupplierDL
@@ -12,8 +14,9 @@ class SupplierDL
     private String contactPhone;
     private DeliveryMethod deliveryMethod;
     private List<Item> suppliedItems;
+    private List<AgreementDL> agreements;
 
-    public SupplierDL(int supplierID, int companyID, int banckAccount, int paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems) {
+    public SupplierDL(int supplierID, int companyID, int banckAccount, int paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems, AgreementDL agreement) {
         this.supplierID = supplierID;
         this.companyID = companyID;
         this.banckAccount = banckAccount;
@@ -22,6 +25,8 @@ class SupplierDL
         this.contactPhone = contactPhone;
         this.deliveryMethod = deliveryMethod;
         this.suppliedItems = suppliedItems;
+        this.agreements = new ArrayList<AgreementDL>();
+        this.agreements.add(agreement);
     }
 
     public int getSupplierID() 
@@ -107,5 +112,30 @@ class SupplierDL
     public void removeSuppliedItem(Item item) 
     {
         this.suppliedItems.remove(item);
+    }
+
+    public void addAgreement(AgreementDL agreement) 
+    {
+        this.agreements.add(agreement);
+    }
+
+    public void removeAgreement(int agreementID) 
+    {
+        for (AgreementDL agreement : this.agreements) {
+            if (agreement.getAgreementID() == agreementID) {
+                this.agreements.remove(agreement);
+                break;
+            }
+        }
+    }
+
+    public void setAgreements(List<AgreementDL> agreements) 
+    {
+        this.agreements = agreements;
+    }
+
+    public List<AgreementDL> getAgreements() 
+    {
+        return agreements;
     }
 }

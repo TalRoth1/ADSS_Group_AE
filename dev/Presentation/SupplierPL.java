@@ -1,5 +1,7 @@
 package Presentation;
 import Utils.DeliveryMethod;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import Domain.Item;
@@ -14,9 +16,10 @@ public class SupplierPL
     private String contactPhone;
     private DeliveryMethod deliveryMethod;
     private List<Item> suppliedItems;
+    private List<AgreementPL> agreements;
 
 
-    public SupplierPL(int supplierID, int companyID, int bankAccount, int paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems)
+    public SupplierPL(int supplierID, int companyID, int bankAccount, int paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems, AgreementPL agreement)
     {
         this.supplierID = supplierID;
         this.companyID = companyID;
@@ -26,6 +29,8 @@ public class SupplierPL
         this.contactPhone = contactPhone;
         this.deliveryMethod = deliveryMethod;
         this.suppliedItems = suppliedItems;
+        this.agreements = new ArrayList<>();
+        this.agreements.add(agreement);
     }
 
     public int getSupplierID() 
@@ -111,5 +116,14 @@ public class SupplierPL
     public void removeSuppliedItem(Item item) 
     {
         this.suppliedItems.remove(item);
+    }
+
+    public void setAgreements(List<AgreementPL> agreements) 
+    {
+        this.agreements = agreements;
+    }
+    public List<AgreementPL> getAgreements() 
+    {
+        return agreements;
     }
 }

@@ -15,15 +15,15 @@ public class SupplierService
         sf = new SupplierFacade();
     }
 
-    public void addSupplier(int supplierID, int companyID, int bankAccount, int paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems)
+    public void addSupplier(int supplierID, int companyID, int bankAccount, int paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems, AgreementPL agreement)
     {
-        SupplierPL supplier = new SupplierPL(supplierID, companyID, bankAccount, paymentMethod, contactMail, contactPhone, deliveryMethod, suppliedItems);
+        SupplierPL supplier = new SupplierPL(supplierID, companyID, bankAccount, paymentMethod, contactMail, contactPhone, deliveryMethod, suppliedItems, agreement);
         sf.addSupplier(supplier);
     }
 
     public List<Item> getSuppliedItems(int supplierID)
     {
-        return null;
+        return sf.getSuppliedItems(supplierID);
     }
     public void addAgreement(){
 
@@ -36,5 +36,4 @@ public class SupplierService
     public void removeAgreement(){
 
     }
-
 }
