@@ -199,8 +199,6 @@ public class CLI
     }
 
 
-// ... (rest of the code remains unchanged)
-
     private void openProductsInterface()
     {
         ProductService PS = sf.getProductService();
