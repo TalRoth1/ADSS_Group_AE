@@ -14,22 +14,22 @@ public class ReportBL
         this.body = body;
     }
 
-    protected String getName()
+    public String getName()
     {
         return name;
     }
 
-    protected String getDateString()
+    public String getDateString()
     {
         return date.toString();
     }
 
-    protected LocalDateTime getDate()
+    public LocalDateTime getDate()
     {
         return date;
     }
 
-    protected String getBody()
+    public String getBody()
     {
         return body;
     }

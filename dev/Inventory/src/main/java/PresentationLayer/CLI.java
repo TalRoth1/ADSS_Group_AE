@@ -193,7 +193,6 @@ public class CLI
         }
     }
 
-
     private void printBranchesMenu()
     {
         System.out.println("1. Add new Branch.");
@@ -203,7 +202,6 @@ public class CLI
         System.out.println("5. Show All Branches.");
         System.out.println("0. Return to main menu.");
     }
-
 
     private void openProductsInterface()
     {
@@ -310,8 +308,6 @@ public class CLI
         }
     }
 
-
-
     private void printProductsMenu()
     {
         System.out.println("1. Add new Product.");
@@ -319,7 +315,6 @@ public class CLI
         System.out.println("3. Update Product.");
         System.out.println("0. Return to main menu.");
     }
-
 
     private void openItemsInterface()
     {
@@ -452,7 +447,6 @@ public class CLI
         }
     }
 
-
     private void printItemsMenu()
     {
         System.out.println("1. Add new Item.");
@@ -462,11 +456,90 @@ public class CLI
         System.out.println("0. Return to main menu.");
     }
 
-
-
     private void openReportsInterface()
     {
+        ReportService RS = sf.getReportService();
+        boolean backToMainMenu = false;
 
+        while (!backToMainMenu)
+        {
+            printReportsMenu();
+            displayControlButtons();
+            String choice = getTextFromUser();
+
+            switch (choice)
+            {
+                case "0":
+                    clearScreen();
+                    backToMainMenu = true;
+                    break;
+
+                case "1":
+                    clearScreen();
+                    Response deficiency = RS.DeficencyReport();
+                    if (deficiency.getErrorMessage() == null)
+                    {
+                        display("Deficiency Report:\n" + deficiency.getResponseValue());
+                    }
+                    else
+                    {
+                        display("Error: " + deficiency.getErrorMessage());
+                    }
+                    break;
+
+                case "2":
+                    clearScreen();
+                    Response sales = RS.SalesReport();
+                    if (sales.getErrorMessage() == null)
+                    {
+                        display("Sales Report:\n" + sales.getResponseValue());
+                    }
+                    else
+                    {
+                        display("Error: " + sales.getErrorMessage());
+                    }
+                    break;
+
+                case "3":
+                    clearScreen();
+                    Response defected = RS.DefectedReport();
+                    if (defected.getErrorMessage() == null)
+                    {
+                        display("Defected Items Report:\n" + defected.getResponseValue());
+                    }
+                    else
+                    {
+                        display("Error: " + defected.getErrorMessage());
+                    }
+                    break;
+
+                case "4":
+                    clearScreen();
+                    Response expired = RS.ExpiredReport();
+                    if (expired.getErrorMessage() == null)
+                    {
+                        display("Expired Items Report:\n" + expired.getResponseValue());
+                    }
+                    else
+                    {
+                        display("Error: " + expired.getErrorMessage());
+                    }
+                    break;
+
+                default:
+                    display("Invalid choice. Please try again.");
+            }
+
+            waitForUser();
+        }
+    }
+
+    private void printReportsMenu() {
+        System.out.println("1. View Deficiency Report.");
+        System.out.println("2. View Sales Report.");
+        System.out.println("3. View Defected Items Report.");
+        System.out.println("4. View Expired Items Report.");
+        System.out.println("0. Return to main menu.");
     }
 
     public void clearScreen()
