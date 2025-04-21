@@ -2,7 +2,6 @@ package Presentation;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import Domain.OrderDL;
 import Domain.OrderFacade;
 import Domain.OrderItemDL;
@@ -14,10 +13,10 @@ public class OrderService {
         of = new OrderFacade();
     }
 
-    public void createOrder(int supplierID, List<OrderItemPL> items) {
+    public void createOrder(int supplierID, String destination, List<OrderItemPL> items) {
         // validate input
         if (supplierID <= 0) {
-            System.out.println("Invalid supplier ID: " + supplierID);
+            System.out.println("Error creating order\nInvalid supplier ID: " + supplierID);
             return;
         }
         // convert data types
@@ -28,7 +27,7 @@ public class OrderService {
         }
         //forward the request to the domain layer
         try {
-            of.createOrder(supplierID, orderItems);
+            of.createOrder(supplierID, destination, orderItems);
         } catch (IllegalArgumentException e) {
             System.out.println("Error creating order: " + e.getMessage());
         }
@@ -58,6 +57,7 @@ public class OrderService {
         }
 
     }
+
     public void cancelOrder(int orderID) {
         // validate input
         if (orderID <= 0) {
@@ -88,6 +88,7 @@ public class OrderService {
         }
         return orderPL;
     }
+
     public List<OrderPL> getOrderHistory(int supplierID){
         // validate input
         if (supplierID <= 0) {
@@ -114,6 +115,6 @@ public class OrderService {
             OrderItemPL orderItemPL = new OrderItemPL(item.getItemID(), item.getQuantity(), item.getCatalogID(), item.getTotalPrice());
             orderItems.add(orderItemPL);
         }
-        return new OrderPL(order.getOrderID(), order.getSupplierID(), order.getOrderDate(), orderItems, order.getOrderStatus());
+        return new OrderPL(order.getOrderID(), order.getSupplierID(), order.getOrderDate(), order.getDestination(), orderItems, order.getOrderStatus());
     }
 }

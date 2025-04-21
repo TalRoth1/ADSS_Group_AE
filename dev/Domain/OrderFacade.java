@@ -2,7 +2,6 @@ package Domain;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import Utils.OrderStatus;
 
 public class OrderFacade {
@@ -14,8 +13,8 @@ public class OrderFacade {
         this.orders = new ArrayList<>();
     }
 
-    public void createOrder(int supplierID, List<OrderItemDL> items) {
-        OrderDL newOrder = new OrderDL(nextID++, supplierID, items);
+    public void createOrder(int supplierID, String destination, List<OrderItemDL> items) {
+        OrderDL newOrder = new OrderDL(nextID++, supplierID, destination, items);
         orders.add(newOrder);
     }
 
