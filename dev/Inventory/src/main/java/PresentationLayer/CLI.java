@@ -4,6 +4,10 @@ import ServiceLayer.BranchService;
 import ServiceLayer.ReportService;
 import ServiceLayer.Response;
 import ServiceLayer.ServiceFactory;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 
 import java.util.Scanner;
 
@@ -101,8 +105,10 @@ public class CLI
                     clearScreen();
                     System.out.print("Enter branch name: ");
                     String name = getTextFromUser();
+
                     System.out.print("Enter branch address: ");
                     String address = getTextFromUser();
+
                     Response response1 = BS.AddBranch(name, address);
                     if (response1.getErrorMessage() == null)
                     {
@@ -220,14 +226,19 @@ public class CLI
                     clearScreen();
                     System.out.print("Enter product name: ");
                     String name = getTextFromUser();
+
                     System.out.print("Enter cost price: ");
                     double costPrice = getValidDoubleFromUser();
+
                     System.out.print("Enter selling price: ");
                     double sellingPrice = getValidDoubleFromUser();
+
                     System.out.print("Enter discount (%): ");
                     int discount = getValidIntegerFromUser();
+
                     System.out.print("Enter producer ID: ");
-                    long producerID = getValidIntegerFromUser();
+                    int producerID = getValidIntegerFromUser();
+
                     System.out.print("Enter categories (comma-separated): ");
                     String[] categories = getTextFromUser().split(",");
 
@@ -262,16 +273,22 @@ public class CLI
                     clearScreen();
                     System.out.print("Enter product ID to update: ");
                     int productID = getValidIntegerFromUser();
+
                     System.out.print("Enter new product name: ");
                     String newName = getTextFromUser();
+
                     System.out.print("Enter new cost price: ");
                     double newCost = getValidDoubleFromUser();
+
                     System.out.print("Enter new selling price: ");
                     double newSelling = getValidDoubleFromUser();
+
                     System.out.print("Enter new discount (%): ");
                     int newDiscount = getValidIntegerFromUser();
+
                     System.out.print("Enter new producer ID: ");
                     int newProducer = getValidIntegerFromUser();
+
                     System.out.print("Enter new categories (comma-separated): ");
                     String[] newCategories = getTextFromUser().split(",");
 
@@ -306,8 +323,146 @@ public class CLI
 
     private void openItemsInterface()
     {
+        ItemService IS = sf.getItemService();
+        boolean backToMainMenu = false;
 
+        while (!backToMainMenu)
+        {
+            printItemsMenu();
+            displayControlButtons();
+            String choice = getTextFromUser();
+
+            switch (choice)
+            {
+                case "0":
+                    clearScreen();
+                    backToMainMenu = true;
+                    break;
+
+                case "1":
+                    clearScreen();
+                    System.out.print("Enter product ID: ");
+                    int productID = getValidIntegerFromUser();
+
+                    System.out.print("Enter item name: ");
+                    String name = getTextFromUser();
+
+                    System.out.print("Is the item defective? (true/false): ");
+                    boolean isDef = Boolean.parseBoolean(getTextFromUser());
+
+                    System.out.print("Enter expiration date (yyyy-MM-dd): ");
+                    LocalDateTime expirationDate;
+                    while (true)
+                    {
+                        try
+                        {
+                            String dateInput = getTextFromUser();
+                            LocalDate date = LocalDate.parse(dateInput);
+                            expirationDate = date.atTime(23, 59);
+                            break;
+                        }
+                        catch (Exception e)
+                        {
+                            display("Invalid format. Please use yyyy-MM-dd.");
+                        }
+                    }
+
+                    System.out.print("Enter branch ID: ");
+                    int branchID = getValidIntegerFromUser();
+
+                    System.out.print("Enter location segments (comma-separated): ");
+                    String[] location = getTextFromUser().split(",");
+
+                    Response addResponse = IS.AddItem(productID, name, isDef, expirationDate, branchID, location);
+                    if (addResponse.getErrorMessage() == null)
+                    {
+                        display("Item added successfully. ID: " + addResponse.getResponseValue());
+                    }
+                    else
+                    {
+                        display("Error: " + addResponse.getErrorMessage());
+                    }
+                    break;
+
+                case "2":
+                    clearScreen();
+                    System.out.print("Enter item ID to remove: ");
+                    int removeID = getValidIntegerFromUser();
+
+                    Response removeResponse = IS.RemoveItem(removeID);
+                    if (removeResponse.getErrorMessage() == null)
+                    {
+                        display(removeResponse.getResponseValue());
+                    }
+                    else
+                    {
+                        display("Error: " + removeResponse.getErrorMessage());
+                    }
+                    break;
+
+                case "3":
+                    clearScreen();
+                    System.out.print("Enter item ID to purchase: ");
+                    int purchaseID = getValidIntegerFromUser();
+
+                    Response purchaseResponse = IS.PurchaseItem(purchaseID);
+                    if (purchaseResponse.getErrorMessage() == null)
+                    {
+                        display(purchaseResponse.getResponseValue());
+                    }
+                    else
+                    {
+                        display("Error: " + purchaseResponse.getErrorMessage());
+                    }
+                    break;
+
+                case "4":
+                    clearScreen();
+                    System.out.print("Enter item ID to update: ");
+                    int itemID = getValidIntegerFromUser();
+
+                    System.out.print("Enter new name: ");
+                    String newName = getTextFromUser();
+
+                    System.out.print("Is the item defective? (true/false): ");
+                    boolean newIsDef = Boolean.parseBoolean(getTextFromUser());
+
+                    System.out.print("Enter new branch ID: ");
+                    int newBranchID = getValidIntegerFromUser();
+
+                    System.out.print("Enter new location segments (comma-separated): ");
+                    String[] newLocation = getTextFromUser().split(",");
+
+                    Response updateResponse = IS.UpdateItem(itemID, newName, newIsDef, newBranchID, newLocation);
+                    if (updateResponse.getErrorMessage() == null)
+                    {
+                        display(updateResponse.getResponseValue());
+                    }
+                    else
+                    {
+                        display("Error: " + updateResponse.getErrorMessage());
+                    }
+                    break;
+
+                default:
+                    display("Invalid choice. Please try again.");
+            }
+
+            waitForUser();
+        }
     }
+
+
+    private void printItemsMenu()
+    {
+        System.out.println("1. Add new Item.");
+        System.out.println("2. Remove Item.");
+        System.out.println("3. Purchase Item.");
+        System.out.println("4. Update Item.");
+        System.out.println("0. Return to main menu.");
+    }
+
+
 
     private void openReportsInterface()
     {
