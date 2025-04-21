@@ -195,11 +195,13 @@ public class EmployeeFacade { //employee related methods
         return employeeManager.getAvailableEmployees(shift, role);
     }
 
-    public String getEmployeeShifts(int employeeID) {
-        if(!isLoggedIn(employeeID))
+    public String getEmployeeShifts(int employeeId, int empManagerId) {
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
+        if(!isLoggedIn(empManagerId))
             return "You are not logged in";
-        EmployeeManager employeeManager = getEmployeeManager(employeeID);
-        return employeeManager.getEmployeeShifts(employeeID);
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.getEmployeeShifts(employeeId);
     }
 
 

@@ -55,7 +55,7 @@ public class CLI {
                             "Fire Employee", "Hire Employee", "Change Employee's Role",
                             "Add Role to Employee", "Change Shift Manager", "Replace Employee",
                             "Delete Employee's Role", "Change Employee's Data",
-                            "Show Employee's preferences", "Logout"};
+                            "Show Employee's preferences", "Show Employee's shifts", "Logout"};
         String option = selectFromList("Select Employee Manager Action:", actions);
 
         switch (option) {
@@ -71,6 +71,7 @@ public class CLI {
             case "Delete Employee's Role" -> deleteRoleFromEmployee();
             case "Change Employee's Data" -> changeEmployeeData();
             case "Show Employee's preferences" -> getPrefEmployee();
+            case "Show mployee's shifts" -> getEmployeeShifts();
             case "Logout" -> {
                 logout(userId);
                 loginCLI();
@@ -280,6 +281,18 @@ public class CLI {
         EmployeeManager();  
     }
 
+    private void getEmployeeShifts() {
+        int employeeId = readInt("Please enter Employee's ID: ");
+        String response = employeeFacade.getEmployeeShifts(employeeId, userId);
+        if (response != null) 
+            System.out.println(response);
+        EmployeeManager();  
+    }
+    
+    private void logout(int id) {
+        employeeFacade.logout(id);
+    }
+
     private void updateSalary() {
         int employeeId = readInt("Please enter employee ID: ");
         int salary = readInt("Enter the new Salary: ");
@@ -343,17 +356,13 @@ public class CLI {
     //     EmployeeManager();
     // }
 
-    private void logout(int id) {
-        employeeFacade.logout(id);
-    }
-
     private void shiftEmployee() {
-        String[] actions = {"Set Preferences", "Get Preferences", "Logout"};
+        String[] actions = {"Set Preferences", "Remove Preferred Shift", "Get Preferences", "Logout"};
         String option = selectFromList("Select Shift Employee Action:", actions);
 
         switch (option) {
-            //case "Set Preferences" -> setPreferences(); //TODO: ask Liat if she did some methods and then implement
-            //case הסרת העדפות ממשמרות
+            //case "Set Preferences" -> setPreferences();
+            case "Remove Preferred Shift" -> removePreferredShift();
             //case "Show my Preferences" -> ; //צפייה בפרטי משמרות אליהן אני רשום
             case "Logout" -> {
                 logout(userId);
@@ -366,8 +375,21 @@ public class CLI {
         }
     }
    
-
-    
+    private void removePreferredShift() {
+        LocalDate dateOfShift = chooseDate(); //choose date with helper method
+        if(dateOfShift == null) 
+            shiftEmployee(); // If date is invalid, return to EmployeeManager
+        ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
+        Shift shift = shiftFacade.getShift(dateOfShift, shiftType, userId);
+        if(shift == null) {
+            System.out.println("Shift not found OR you are not connected. please try again");
+            shiftEmployee();
+        }
+        String response = shiftFacade.removePreferredShift(userId, shift);
+        if(response != null)
+            System.out.println(response);
+        shiftEmployee();
+    }
 
     //assistant methods
 

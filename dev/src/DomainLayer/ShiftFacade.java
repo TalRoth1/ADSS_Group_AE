@@ -21,6 +21,7 @@ public class ShiftFacade { //shift related methods
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.getShift(date, shiftType);
     }
+    
     public Employee login(int id, String password) {
         Employee e = getEmployee(id);
         if(e != null && e.login(password))
