@@ -3,7 +3,7 @@ package Presentation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
+import Domain.OrderDL;
 import Domain.OrderFacade;
 import Domain.SupplierFacade;
 import Utils.DeliveryMethod;
@@ -45,14 +45,19 @@ public class CLI
                     getSuppliedItems(Scanner);
                     break;
                 case "6":
+                    createOrder(Scanner);
                     break;
                 case "7":
+                    getOrderDetails(Scanner);
                     break;
                 case "8":
+                    changeOrder(Scanner);
                     break;
                 case "9":
+                    cancelOrder(Scanner);
                     break;
                 case "10":
+                    getOrderHistory(Scanner);
                     break;
                 case "11":
                     break;
@@ -198,22 +203,95 @@ public class CLI
     {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(scanner.nextLine());
+        System.out.println("Agreement ID:");
+        int agreementID = Integer.parseInt(scanner.nextLine());
         System.out.println("Destination:");
         String destination = scanner.nextLine();
         System.out.println("Order Items (Item ID and Quantity seperated by ,):");
-        List<OrderItemDL> items = new ArrayList<>();
+        List<int[]> items = new ArrayList<>();
         String cont = "Y";
         while( cont == "Y")
         {
-            String[] item = scanner.nextLine().split(",");
+            String[] item = scanner.nextLine().split(", ");
             if(item.length != 2)
             {
                 System.out.println("Invalid input. Please enter the Order Items in the format: Item ID, Quantity");
                 continue;
             }
-            items.add(new OrderItemDL(Integer.parseInt(item[0]), Integer.parseInt(item[1])));
+            items.add(new int[] {Integer.parseInt(item[0]), Integer.parseInt(item[1])});
             System.out.println("Do you want to add another item? (Y/N):");
             cont = scanner.nextLine().toUpperCase();
         }
-        of.createOrder(supplierID, destination, items);
+        of.createOrder(supplierID, destination, agreementID, items);
+    }
+
+    public void getOrderDetails(Scanner scanner)
+    {
+        System.out.println("Please enter the Following Information:\nOrder ID:");
+        int orderID = Integer.parseInt(scanner.nextLine());
+        try
+        {
+            System.out.println(of.getOrder(orderID));
+        }
+        catch(IllegalArgumentException e)
+        {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void changeOrder(Scanner scanner)
+    {
+        System.out.println("Please enter the Following Information:\nOrder ID:");
+        int orderID = Integer.parseInt(scanner.nextLine());
+        System.out.println("New Destination:");
+        String destination = scanner.nextLine();
+        System.out.println("New Agreement ID:");
+        int agreementID = Integer.parseInt(scanner.nextLine());
+        System.out.println("New Order Items (Item ID and Quantity seperated by ,):");
+        List<int[]> items = new ArrayList<>();
+        String cont = "Y";
+        while( cont == "Y")
+        {
+            String[] item = scanner.nextLine().split(", ");
+            if(item.length != 2)
+            {
+                System.out.println("Invalid input. Please enter the Order Items in the format: Item ID, Quantity");
+                continue;
+            }
+            items.add(new int[] {Integer.parseInt(item[0]), Integer.parseInt(item[1])});
+            System.out.println("Do you want to add another item? (Y/N):");
+            cont = scanner.nextLine().toUpperCase();
+        }
+        of.changeOrder(orderID, destination, agreementID, items);
+    }
+
+    public void cancelOrder(Scanner scanner)
+    {
+        System.out.println("Please enter the Following Information:\nOrder ID:");
+        int orderID = Integer.parseInt(scanner.nextLine());
+        try{
+            of.cancelOrder(orderID);
+        }
+        catch(IllegalArgumentException e){
+            System.out.println(e.getMessage());
+        }  
+    }
+
+    public void getOrderHistory(Scanner scanner){
+        System.out.println("Please enter the Following Information:\nSupplier ID:");
+        int supplierID = Integer.parseInt(scanner.nextLine());
+        List<OrderDL> orderHistory = of.getOrderHistory(supplierID);
+        if(orderHistory.isEmpty())
+        {
+            System.out.println("No orders found for this supplier.");
+        }
+        else
+        {
+            System.out.println("Order History:");
+            for(OrderDL order : orderHistory)
+            {
+                System.out.println(order + "\n");
+            }
+        }
+    }
 }

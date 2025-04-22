@@ -5,9 +5,9 @@ public class OrderItemSL
     private final int itemID;
     private int quantity;
     private final int catalogID;
-    private float totalPrice;
+    private double totalPrice;
     
-    OrderItemSL(int itemID, int quantity, int catalogID, float totalPrice){
+    OrderItemSL(int itemID, int quantity, int catalogID, double totalPrice){
         this.itemID = itemID;
         this.quantity = quantity;
         this.catalogID = catalogID;
@@ -26,7 +26,7 @@ public class OrderItemSL
         return catalogID;
     }
 
-    public float getTotalPrice(){
+    public double getTotalPrice(){
         return totalPrice;
     }
 
@@ -34,7 +34,7 @@ public class OrderItemSL
         this.quantity = quantity;
     }
 
-    public void setTotalPrice(float totalPrice){
+    public void setTotalPrice(double totalPrice){
         this.totalPrice = totalPrice;
     }
 }

@@ -25,8 +25,44 @@ public class AgreementDL
         return billOfQuantities;
     }
 
+    public DiscountDL getDiscount(int itemID)
+    {
+        for (DiscountDL discount : billOfQuantities)
+        {
+            if (discount.getcatalogID() == itemID)
+            {
+                return discount;
+            }
+        }
+        return null;
+    }
+
     public void setBillOfQuantities(List<DiscountDL> billOfQuantities)
     {
         this.billOfQuantities = billOfQuantities;
+    }
+
+    public Item getItem(int itemID)
+    {
+        for (Item item : itemCatalog.keySet())
+        {
+            if (item.getItemID() == itemID)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public int getItemCatalogID(int itemID)
+    {
+        for (Map.Entry<Item, Integer> entry : itemCatalog.entrySet())
+        {
+            if (entry.getKey().getItemID() == itemID)
+            {
+                return entry.getValue();
+            }
+        }
+        return -1;
     }
 }
