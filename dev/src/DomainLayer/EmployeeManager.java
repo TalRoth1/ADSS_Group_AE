@@ -208,9 +208,6 @@ public class EmployeeManager extends Employee{
         if(shift.getShiftManagerId() == empID || shift.getShiftManagerId() == replacementID) {
             return "shift manager cannot be replaced, there is a different option to change the shift manager";
         }
-        if(!replacement.getPrefShifts().contains(shift)) {
-            return "replacement employee is not available for this shift";
-        }
         if(replacement.getRoles().contains(shift.getAssignedEmployeesID().get(empID))){
             return "replacement employee does not have the same role as the original employee";
         }

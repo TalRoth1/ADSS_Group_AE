@@ -1,8 +1,11 @@
 package DomainLayer;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.Collections;
 
 public class ShiftFacade { //shift related methods
 
@@ -153,6 +156,13 @@ public class ShiftFacade { //shift related methods
     public void getAssignedEmployeesInfo(int managerId, Shift shift) {
         ShiftEmployee shiftEmployee = shiftEmployees.get(managerId);
         shift.getEmployeesInfo();
+    }
+
+    public Set<Shift> getPastShifts(int empManagerId) {
+        if(!isLoggedIn(empManagerId))
+            return Collections.emptySet(); 
+        ShiftEmployee shiftEmployee = shiftEmployees.get(empManagerId);
+        return shiftEmployee.getPastShifts();
     }
 
 
