@@ -5,12 +5,13 @@ import java.util.List;
 import Domain.OrderDL;
 import Domain.OrderFacade;
 import Domain.OrderItemDL;
+import Domain.SupplierFacade;
 
 public class OrderService {
     private OrderFacade of;
-    
-    public OrderService() {
-        of = new OrderFacade();
+
+    public OrderService(SupplierFacade sf) {
+        of = new OrderFacade(sf);
     }
 
     public void createOrder(int supplierID, String destination, List<OrderItemSL> items) {
@@ -22,10 +23,11 @@ public class OrderService {
         // convert data types
         List<OrderItemDL> orderItems = new ArrayList<>();
         for (OrderItemSL item : items) {
-            OrderItemDL orderItem = new OrderItemDL(item.getItemID(), item.getQuantity(), item.getCatalogID(), item.getTotalPrice());
+            OrderItemDL orderItem = new OrderItemDL(item.getItemID(), item.getQuantity(), item.getCatalogID(),
+                    item.getTotalPrice());
             orderItems.add(orderItem);
         }
-        //forward the request to the domain layer
+        // forward the request to the domain layer
         try {
             of.createOrder(supplierID, destination, orderItems);
         } catch (IllegalArgumentException e) {
@@ -46,10 +48,11 @@ public class OrderService {
         // convert data types
         List<OrderItemDL> orderItems = new ArrayList<>();
         for (OrderItemSL item : newItems) {
-            OrderItemDL orderItem = new OrderItemDL(item.getItemID(), item.getQuantity(), item.getCatalogID(), item.getTotalPrice());
+            OrderItemDL orderItem = new OrderItemDL(item.getItemID(), item.getQuantity(), item.getCatalogID(),
+                    item.getTotalPrice());
             orderItems.add(orderItem);
         }
-        //forward the request to the domain layer
+        // forward the request to the domain layer
         try {
             of.changeOrder(orderID, orderItems);
         } catch (IllegalArgumentException e) {
@@ -64,7 +67,7 @@ public class OrderService {
             System.out.println("Invalid order ID: " + orderID);
             return;
         }
-        //forward the request to the domain layer
+        // forward the request to the domain layer
         try {
             of.cancelOrder(orderID);
         } catch (IllegalArgumentException e) {
@@ -72,14 +75,15 @@ public class OrderService {
         }
 
     }
-    public OrderSL getOrder(int orderID){
+
+    public OrderSL getOrder(int orderID) {
         // validate input
         if (orderID <= 0) {
             System.out.println("Invalid order ID: " + orderID);
             return null;
         }
         OrderSL orderPL = null;
-        //forward the request to the domain layer
+        // forward the request to the domain layer
         try {
             OrderDL order = of.getOrder(orderID);
             orderPL = convertToOrderSL(order);
@@ -89,13 +93,13 @@ public class OrderService {
         return orderPL;
     }
 
-    public List<OrderSL> getOrderHistory(int supplierID){
+    public List<OrderSL> getOrderHistory(int supplierID) {
         // validate input
         if (supplierID <= 0) {
             System.out.println("Invalid supplier ID: " + supplierID);
             return null;
         }
-        //forward the request to the domain layer
+        // forward the request to the domain layer
         try {
             List<OrderDL> orderHistory = of.getOrderHistory(supplierID);
             List<OrderSL> orderPLs = new ArrayList<>();
@@ -112,9 +116,11 @@ public class OrderService {
     public OrderSL convertToOrderSL(OrderDL order) {
         List<OrderItemSL> orderItems = new ArrayList<>();
         for (OrderItemDL item : order.getOrderItems()) {
-            OrderItemSL orderItemPL = new OrderItemSL(item.getItemID(), item.getQuantity(), item.getCatalogID(), item.getTotalPrice());
+            OrderItemSL orderItemPL = new OrderItemSL(item.getItemID(), item.getQuantity(), item.getCatalogID(),
+                    item.getTotalPrice());
             orderItems.add(orderItemPL);
         }
-        return new OrderSL(order.getOrderID(), order.getSupplierID(), order.getOrderDate(), order.getDestination(), orderItems, order.getOrderStatus());
+        return new OrderSL(order.getOrderID(), order.getSupplierID(), order.getOrderDate(), order.getDestination(),
+                orderItems, order.getOrderStatus());
     }
 }

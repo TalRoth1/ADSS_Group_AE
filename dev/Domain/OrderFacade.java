@@ -5,7 +5,7 @@ import java.util.List;
 import Utils.OrderStatus;
 
 public class OrderFacade {
-    
+
     private List<OrderDL> orders;
     private final SupplierFacade sf;
     private int nextID = 0;
@@ -15,8 +15,7 @@ public class OrderFacade {
         this.orders = new ArrayList<>();
     }
 
-    public void createOrder(int supplierID, String destination, int agreementID, List<int[]> Orders)
-    {
+    public void createOrder(int supplierID, String destination, int agreementID, List<int[]> Orders) {
         List<OrderItemDL> items = new ArrayList<>();
         for (int[] order : Orders) {
             int itemID = order[0];
@@ -30,8 +29,9 @@ public class OrderFacade {
         orders.add(newOrder);
     }
 
-    public void changeOrder(int orderID, String destination, int agreementID, List<int[]> newItems) throws IllegalArgumentException {
-        try{
+    public void changeOrder(int orderID, String destination, int agreementID, List<int[]> newItems)
+            throws IllegalArgumentException {
+        try {
             OrderDL order = getOrder(orderID);
             List<OrderItemDL> items = new ArrayList<>();
             for (int[] item : newItems) {
@@ -45,8 +45,7 @@ public class OrderFacade {
             order.setOrderItems(items);
             order.setAgreementID(agreementID);
             order.setDestination(destination);
-        }
-        catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Order not found: " + orderID);
         }
     }
@@ -54,7 +53,8 @@ public class OrderFacade {
     public void cancelOrder(int orderID) throws IllegalArgumentException {
         for (OrderDL order : orders) {
             if (order.getOrderID() == orderID) {
-                order.setOrderStatus(OrderStatus.CANCELLED);;
+                order.setOrderStatus(OrderStatus.CANCELLED);
+                ;
                 return;
             }
         }
@@ -70,7 +70,7 @@ public class OrderFacade {
         throw new IllegalArgumentException("Order not found: " + orderID);
     }
 
-    public List<OrderDL> getOrderHistory(int supplierID){
+    public List<OrderDL> getOrderHistory(int supplierID) {
         List<OrderDL> orderHistory = new ArrayList<>();
         for (OrderDL order : orders) {
             if (order.getSupplierID() == supplierID) {
@@ -83,8 +83,8 @@ public class OrderFacade {
     private double calculateTotalPrice(int quantity, int catalogID, int supplierID, int agreementID) {
         double price = quantity * sf.getAgreement(supplierID, agreementID).getItem(catalogID).getPrice();
         DiscountDL discount = sf.getAgreement(supplierID, agreementID).getDiscount(catalogID);
-        if(discount != null){
-            if(discount.getMinimumQuantity() <= quantity){
+        if (discount != null) {
+            if (discount.getMinimumQuantity() <= quantity) {
                 price -= price * discount.getDiscountPercentage() / 100;
             }
         }

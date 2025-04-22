@@ -1,11 +1,11 @@
 package Domain;
+
 import Utils.DeliveryMethod;
 import Utils.PaymentMethod;
 
 import java.util.List;
 
-public class SupplierDL
-{
+public class SupplierDL {
     private int supplierID;
     private int companyID;
     private int banckAccount;
@@ -16,8 +16,8 @@ public class SupplierDL
     private List<AgreementDL> agreements;
     private int nextAgreementID = 0; // Static variable to keep track of the next agreement ID
 
-    public SupplierDL(int supplierID, int companyID, int banckAccount, PaymentMethod paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<AgreementDL> agreements)
-    {
+    public SupplierDL(int supplierID, int companyID, int banckAccount, PaymentMethod paymentMethod, String contactMail,
+            String contactPhone, DeliveryMethod deliveryMethod, List<AgreementDL> agreements) {
         this.supplierID = supplierID;
         this.companyID = companyID;
         this.banckAccount = banckAccount;
@@ -28,78 +28,63 @@ public class SupplierDL
         this.agreements = agreements;
     }
 
-    public int getSupplierID() 
-    {
+    public int getSupplierID() {
         return supplierID;
     }
 
-    public void setCompanyID(int companyID) 
-    {
+    public void setCompanyID(int companyID) {
         this.companyID = companyID;
     }
 
-    public int getCompanyID() 
-    {
+    public int getCompanyID() {
         return companyID;
     }
 
-    public void setBanckAccount(int banckAccount) 
-    {
+    public void setBanckAccount(int banckAccount) {
         this.banckAccount = banckAccount;
     }
 
-    public int getBanckAccount() 
-    {
+    public int getBanckAccount() {
         return banckAccount;
     }
 
-    public void setPaymentMethod(PaymentMethod paymentMethod) 
-    {
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 
-    public PaymentMethod getPaymentMethod()
-    {
+    public PaymentMethod getPaymentMethod() {
         return paymentMethod;
     }
 
-    public void setContactMail(String contactMail) 
-    {
+    public void setContactMail(String contactMail) {
         this.contactMail = contactMail;
     }
 
-    public String getContactMail() 
-    {
+    public String getContactMail() {
         return contactMail;
     }
 
-    public void setContactPhone(String contactPhone) 
-    {
+    public void setContactPhone(String contactPhone) {
         this.contactPhone = contactPhone;
     }
 
-    public String getContactPhone() 
-    {
+    public String getContactPhone() {
         return contactPhone;
     }
 
-    public void setDeliveryMethod(DeliveryMethod deliveryMethod) 
-    {
+    public void setDeliveryMethod(DeliveryMethod deliveryMethod) {
         this.deliveryMethod = deliveryMethod;
     }
 
-    public DeliveryMethod getDeliveryMethod() 
-    {
+    public DeliveryMethod getDeliveryMethod() {
         return deliveryMethod;
     }
 
-    public void addAgreement(AgreementDL agreement) 
-    {
+    public void addAgreement(AgreementDL agreement) {
         this.agreements.add(agreement);
     }
 
-    public void removeAgreement(int agreementID) 
-    {
+    public void removeAgreement(int agreementID) {
         for (AgreementDL agreement : this.agreements) {
             if (agreement.getAgreementID() == agreementID) {
                 this.agreements.remove(agreement);
@@ -108,18 +93,15 @@ public class SupplierDL
         }
     }
 
-    public void setAgreements(List<AgreementDL> agreements) 
-    {
+    public void setAgreements(List<AgreementDL> agreements) {
         this.agreements = agreements;
     }
 
-    public List<AgreementDL> getAgreements() 
-    {
+    public List<AgreementDL> getAgreements() {
         return agreements;
     }
 
-    public int getNextAgreementID() 
-    {
+    public int getNextAgreementID() {
         return nextAgreementID++;
     }
 }

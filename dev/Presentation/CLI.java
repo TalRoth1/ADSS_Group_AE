@@ -9,26 +9,22 @@ import Domain.SupplierFacade;
 import Utils.DeliveryMethod;
 import Utils.PaymentMethod;
 
-public class CLI
-{
+public class CLI {
     private SupplierFacade sf;
     private OrderFacade of;
 
-    public CLI(SupplierFacade sf, OrderFacade of)
-    {
+    public CLI(SupplierFacade sf, OrderFacade of) {
         this.sf = sf;
         this.of = of;
     }
-    public void run()
-    {
+
+    public void run() {
         boolean running = true;
         Scanner Scanner = new Scanner(System.in);
-        while(running)
-        {
+        while (running) {
             loadMenu();
             String input = Scanner.nextLine();
-            switch(input)
-            {
+            switch (input) {
                 case "1":
                     addSupplier(Scanner);
                     break;
@@ -70,43 +66,39 @@ public class CLI
             }
         }
         Scanner.close();
-    }    
-
-    public void printRoleMenu()
-    {
-            System.out.println("1. Admin");
-            System.out.println("2. User");
-            System.out.println("3. Guest");
-            System.out.println("4. Exit");
-    }
-    
-    public void loadMenu()
-    {
-            System.out.println("1. Add Supplier");
-            System.out.println("2. Add Agreement");
-            System.out.println("3. Change Agreement");
-            System.out.println("4. Remove Agreement");
-            System.out.println("5. Get Supplied Items");
-            System.out.println("6. Create Order");
-            System.out.println("7. Get Order Details");
-            System.out.println("8. Change Order");
-            System.out.println("9. Cancel Order");
-            System.out.println("10. Get Order History");
-            System.out.println("11. Load Data");
-            System.out.println("12. Exit\n");
-            System.out.println("Please select an option:");
     }
 
-    public void addSupplier(Scanner Scanner)
-    {
+    public void printRoleMenu() {
+        System.out.println("1. Admin");
+        System.out.println("2. User");
+        System.out.println("3. Guest");
+        System.out.println("4. Exit");
+    }
+
+    public void loadMenu() {
+        System.out.println("1. Add Supplier");
+        System.out.println("2. Add Agreement");
+        System.out.println("3. Change Agreement");
+        System.out.println("4. Remove Agreement");
+        System.out.println("5. Get Supplied Items");
+        System.out.println("6. Create Order");
+        System.out.println("7. Get Order Details");
+        System.out.println("8. Change Order");
+        System.out.println("9. Cancel Order");
+        System.out.println("10. Get Order History");
+        System.out.println("11. Load Data");
+        System.out.println("12. Exit\n");
+        System.out.println("Please select an option:");
+    }
+
+    public void addSupplier(Scanner Scanner) {
         System.out.println("Please enter the Following Information:\nCompany ID:");
         int companyID = Integer.parseInt(Scanner.nextLine());
         System.out.println("Bank Account:");
         int bankAccount = Integer.parseInt(Scanner.nextLine());
         System.out.println("Payment Method (Cash or credit):");
         PaymentMethod paymentMethod = PaymentMethod.getPaymentMethod(Scanner.nextLine());
-        while(paymentMethod == null)
-        {
+        while (paymentMethod == null) {
             System.out.println("Invalid payment method. Please enter 'Cash' or 'Credit':");
             paymentMethod = PaymentMethod.getPaymentMethod(Scanner.nextLine());
         }
@@ -116,27 +108,24 @@ public class CLI
         String contactPhone = Scanner.nextLine();
         System.out.println("Delivery Method (Scheduled, On Order or Pickup):");
         DeliveryMethod deliveryMethod = DeliveryMethod.fromString(Scanner.nextLine());
-        while(deliveryMethod == null)
-        {
+        while (deliveryMethod == null) {
             System.out.println("Invalid delivery method. Please enter 'Scheduled', 'On Order' or 'Pickup':");
             deliveryMethod = DeliveryMethod.fromString(Scanner.nextLine());
         }
         sf.addSupplier(companyID, bankAccount, paymentMethod, contactEmail, contactPhone, deliveryMethod, null);
     }
 
-    public void addAgreement(Scanner Scanner)
-    {
+    public void addAgreement(Scanner Scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(Scanner.nextLine());
         System.out.println("Bill of Quantities (Item ID, Minimum quantity and Discount seperated by ,):");
         List<String[]> billOfQuantities = new ArrayList<>();
         String cont = "Y";
-        while( cont == "Y")
-        {
+        while (cont == "Y") {
             String[] discount = Scanner.nextLine().split(",");
-            if(discount.length != 3)
-            {
-                System.out.println("Invalid input. Please enter the Bill of Quantities in the format: Item ID, Minimum quantity, Discount");
+            if (discount.length != 3) {
+                System.out.println(
+                        "Invalid input. Please enter the Bill of Quantities in the format: Item ID, Minimum quantity, Discount");
                 continue;
             }
             billOfQuantities.add(discount);
@@ -146,8 +135,7 @@ public class CLI
         sf.addAgreement(supplierID, billOfQuantities);
     }
 
-    public void changeAgreement(Scanner scanner)
-    {
+    public void changeAgreement(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(scanner.nextLine());
         System.out.println("Agreement ID:");
@@ -155,12 +143,11 @@ public class CLI
         System.out.println("New Bill of Quantities (Item ID, Minimum quantity and Discount seperated by ,):");
         List<String[]> billOfQuantities = new ArrayList<>();
         String cont = "Y";
-        while( cont == "Y")
-        {
+        while (cont == "Y") {
             String[] discount = scanner.nextLine().split(",");
-            if(discount.length != 3)
-            {
-                System.out.println("Invalid input. Please enter the Bill of Quantities in the format: Item ID, Minimum quantity, Discount");
+            if (discount.length != 3) {
+                System.out.println(
+                        "Invalid input. Please enter the Bill of Quantities in the format: Item ID, Minimum quantity, Discount");
                 continue;
             }
             billOfQuantities.add(discount);
@@ -170,8 +157,7 @@ public class CLI
         sf.changeAgreement(supplierID, agreementID, billOfQuantities);
     }
 
-    public void removeAgreement(Scanner scanner)
-    {
+    public void removeAgreement(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(scanner.nextLine());
         System.out.println("Agreement ID:");
@@ -179,28 +165,22 @@ public class CLI
         sf.removeAgreement(supplierID, agreementID);
     }
 
-    public void getSuppliedItems(Scanner scanner)
-    {
+    public void getSuppliedItems(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(scanner.nextLine());
         List<String> suppliedItems = sf.getSuppliedItems(supplierID);
-        if(suppliedItems.isEmpty())
-        {
+        if (suppliedItems.isEmpty()) {
             System.out.println("No items supplied by this supplier.");
-        }
-        else
-        {
+        } else {
             System.out.println("Supplied Items:");
-            for(String item : suppliedItems)
-            {
+            for (String item : suppliedItems) {
                 System.out.println(item);
             }
         }
-    
+
     }
 
-    public void createOrder(Scanner scanner)
-    {
+    public void createOrder(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(scanner.nextLine());
         System.out.println("Agreement ID:");
@@ -210,37 +190,30 @@ public class CLI
         System.out.println("Order Items (Item ID and Quantity seperated by ,):");
         List<int[]> items = new ArrayList<>();
         String cont = "Y";
-        while( cont == "Y")
-        {
+        while (cont == "Y") {
             String[] item = scanner.nextLine().split(", ");
-            if(item.length != 2)
-            {
+            if (item.length != 2) {
                 System.out.println("Invalid input. Please enter the Order Items in the format: Item ID, Quantity");
                 continue;
             }
-            items.add(new int[] {Integer.parseInt(item[0]), Integer.parseInt(item[1])});
+            items.add(new int[] { Integer.parseInt(item[0]), Integer.parseInt(item[1]) });
             System.out.println("Do you want to add another item? (Y/N):");
             cont = scanner.nextLine().toUpperCase();
         }
         of.createOrder(supplierID, destination, agreementID, items);
     }
 
-    public void getOrderDetails(Scanner scanner)
-    {
+    public void getOrderDetails(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nOrder ID:");
         int orderID = Integer.parseInt(scanner.nextLine());
-        try
-        {
+        try {
             System.out.println(of.getOrder(orderID));
-        }
-        catch(IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public void changeOrder(Scanner scanner)
-    {
+    public void changeOrder(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nOrder ID:");
         int orderID = Integer.parseInt(scanner.nextLine());
         System.out.println("New Destination:");
@@ -250,46 +223,38 @@ public class CLI
         System.out.println("New Order Items (Item ID and Quantity seperated by ,):");
         List<int[]> items = new ArrayList<>();
         String cont = "Y";
-        while( cont == "Y")
-        {
+        while (cont == "Y") {
             String[] item = scanner.nextLine().split(", ");
-            if(item.length != 2)
-            {
+            if (item.length != 2) {
                 System.out.println("Invalid input. Please enter the Order Items in the format: Item ID, Quantity");
                 continue;
             }
-            items.add(new int[] {Integer.parseInt(item[0]), Integer.parseInt(item[1])});
+            items.add(new int[] { Integer.parseInt(item[0]), Integer.parseInt(item[1]) });
             System.out.println("Do you want to add another item? (Y/N):");
             cont = scanner.nextLine().toUpperCase();
         }
         of.changeOrder(orderID, destination, agreementID, items);
     }
 
-    public void cancelOrder(Scanner scanner)
-    {
+    public void cancelOrder(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nOrder ID:");
         int orderID = Integer.parseInt(scanner.nextLine());
-        try{
+        try {
             of.cancelOrder(orderID);
-        }
-        catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
-        }  
+        }
     }
 
-    public void getOrderHistory(Scanner scanner){
+    public void getOrderHistory(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(scanner.nextLine());
         List<OrderDL> orderHistory = of.getOrderHistory(supplierID);
-        if(orderHistory.isEmpty())
-        {
+        if (orderHistory.isEmpty()) {
             System.out.println("No orders found for this supplier.");
-        }
-        else
-        {
+        } else {
             System.out.println("Order History:");
-            for(OrderDL order : orderHistory)
-            {
+            for (OrderDL order : orderHistory) {
                 System.out.println(order + "\n");
             }
         }

@@ -5,8 +5,7 @@ import java.util.List;
 
 import Utils.OrderStatus;
 
-public class OrderDL
-{
+public class OrderDL {
     private final int orderID;
     private final int supplierID;
     private int agreementID;
@@ -15,7 +14,7 @@ public class OrderDL
     private List<OrderItemDL> orderItems;
     private OrderStatus orderStatus;
 
-    public OrderDL(int orderID, int supplierID, int agreementID, String destination, List<OrderItemDL> orderItems){
+    public OrderDL(int orderID, int supplierID, int agreementID, String destination, List<OrderItemDL> orderItems) {
         this.orderID = orderID;
         this.supplierID = supplierID;
         this.agreementID = agreementID;
@@ -25,7 +24,8 @@ public class OrderDL
         this.orderStatus = OrderStatus.IN_PROGRESS;
     }
 
-    public OrderDL(int orderID, int supplierID, int agreementID, Date orderDate, String destination, List<OrderItemDL> orderItems, OrderStatus orderStatus){
+    public OrderDL(int orderID, int supplierID, int agreementID, Date orderDate, String destination,
+            List<OrderItemDL> orderItems, OrderStatus orderStatus) {
         this.orderID = orderID;
         this.supplierID = supplierID;
         this.agreementID = agreementID;
@@ -35,67 +35,70 @@ public class OrderDL
         this.orderStatus = orderStatus;
     }
 
-    public int getOrderID(){
+    public int getOrderID() {
         return orderID;
     }
 
-    public int getSupplierID(){
+    public int getSupplierID() {
         return supplierID;
     }
 
-    public int getAgreementID(){
+    public int getAgreementID() {
         return agreementID;
     }
 
-    public Date getOrderDate(){
+    public Date getOrderDate() {
         return orderDate;
     }
 
-    public String getDestination(){
+    public String getDestination() {
         return destination;
     }
 
-    public List<OrderItemDL> getOrderItems(){
+    public List<OrderItemDL> getOrderItems() {
         return orderItems;
     }
 
-    public OrderStatus getOrderStatus(){
+    public OrderStatus getOrderStatus() {
         return orderStatus;
     }
 
-    public void setAgreementID(int agreementID){
+    public void setAgreementID(int agreementID) {
         this.agreementID = agreementID;
     }
 
-    public void setDestination(String destination){
+    public void setDestination(String destination) {
         this.destination = destination;
     }
 
-    public void setOrderDate(Date orderDate){
+    public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
     }
-    
-    public void setOrderStatus(OrderStatus orderStatus){
+
+    public void setOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
     }
 
-    public void setOrderItems(List<OrderItemDL> orderItems){
+    public void setOrderItems(List<OrderItemDL> orderItems) {
         this.orderItems = orderItems;
     }
-    public void addOrderItem(OrderItemDL orderItem){
+
+    public void addOrderItem(OrderItemDL orderItem) {
         this.orderItems.add(orderItem);
     }
-    public void removeOrderItem(OrderItemDL orderItem){
+
+    public void removeOrderItem(OrderItemDL orderItem) {
         this.orderItems.remove(orderItem);
     }
-    public String toString(){
+
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Order ID: ").append(orderID).append("\n")
-          .append("Supplier ID: ").append(supplierID).append("\n")
-          .append("Order Date: ").append(orderDate).append("\n")
-          .append("Destination: ").append(destination).append("\n")
-          .append("Order Items: \n");
-        for(OrderItemDL item : orderItems){
+                .append("Supplier ID: ").append(supplierID).append("\n")
+                .append("Order Date: ").append(orderDate).append("\n")
+                .append("Destination: ").append(destination).append("\n")
+                .append("Order Items: \n");
+        for (OrderItemDL item : orderItems) {
             sb.append(item.toString()).append("\n");
         }
         sb.append("Order Status: ").append(orderStatus).append("\n");
