@@ -44,9 +44,12 @@ public class CLI {
             if (emp == null) {
                 System.out.println("Can't log in, please try again");
                 loginCLI();
-            } else if (emp instanceof EmployeeManager) {
+            } 
+            else if (emp instanceof EmployeeManager) 
                 EmployeeManager();
-            } else
+            else if(employeeFacade.isShiftManager(userId)) 
+                shiftManager();
+            else
                 shiftEmployee();
         //}
     }
@@ -387,14 +390,54 @@ public class CLI {
     //     EmployeeManager();
     // }
 
+    private void shiftManager() {
+        String[] actions = {"Set Preferences", "Remove Preferred Shift", "Show Employee's preferences",
+                            "Show Employee's shifts", "Show Shift Information" , "Show my Preferences",
+                            "Show my Shifts", "Logout"};
+        String option = selectFromList("Select Shift Manager Action:", actions);
+
+        switch (option) {
+            //case "Set Preferences" -> setPreferences();
+            case "Remove Preferred Shift" -> removePreferredShift(); 
+            case "Show Employee's preferences" -> getPrefEmployee();
+            case "Show Employee's shifts" -> getEmployeeShifts();
+            case "Show Shift Information" -> getShiftInfo();
+            //case "Show my Preferences" -> showMyPreferences();
+            //case "Show my Shifts" -> צפייה במשמרות שלי
+            case "Logout" -> logout(userId);
+            default -> {
+                System.out.println("This is not a valid Shift Manager action");
+                shiftManager();
+            }
+        }
+    }
+
+    private void getShiftInfo() { //for shift manager OR shift employee
+        LocalDate dateOfShift = chooseDate(); //choose date with helper method
+        if(dateOfShift == null) 
+            shiftManager(); // If date is invalid, return to EmployeeManager
+        ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
+        Shift shift = shiftFacade.getShift(dateOfShift, shiftType, userId);
+        if(shift == null) {
+            System.out.println("Shift not found OR you are not connected. please try again");
+            shiftManager();
+        }
+        String response = shiftFacade.getShiftInfo(userId, shift);
+        System.out.println(response);
+        shiftManager();
+    }
+
     private void shiftEmployee() {
-        String[] actions = {"Set Preferences", "Remove Preferred Shift", "Get Preferences", "Logout"};
+        String[] actions = {"Set Preferences", "Remove Preferred Shift", "Show Shift Information",
+                            "Get Preferences", "Logout"};
         String option = selectFromList("Select Shift Employee Action:", actions);
 
         switch (option) {
             //case "Set Preferences" -> setPreferences();
             case "Remove Preferred Shift" -> removePreferredShift();
-            //case "Show my Preferences" -> ; //צפייה בפרטי משמרות אליהן אני רשום
+            case "Show Shift Information" -> getShiftInfo();
+            //case "Show my Preferences" -> ; //צפייה בפרטי משמרות שרשמתי שאני מעדיף
+            //case "Show my Shifts" -> ; //צפייה במשמרות שלי
             case "Logout" -> logout(userId);
             default -> {
                 System.out.println("This is not a valid Shift Employee action");

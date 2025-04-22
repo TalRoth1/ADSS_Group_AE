@@ -1,7 +1,6 @@
 package DomainLayer;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -91,10 +90,9 @@ public class ShiftFacade { //shift related methods
         return shift.getEmployeesInfo();
     }
 
-    public String getShiftInfo(int shiftManagerId, Shift shift) {
-        if(!isLoggedIn(shiftManagerId))
+    public String getShiftInfo(int id, Shift shift) { //for shift manager OR shift employee
+        if(!isLoggedIn(id))
             return "You are not logged in";
-        ShiftEmployee shiftEmployee = shiftEmployees.get(shiftManagerId);
         return shift.toString();
     }
 

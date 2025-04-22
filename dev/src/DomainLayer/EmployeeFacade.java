@@ -24,6 +24,12 @@ public class EmployeeFacade { //employee related methods
     public boolean isEmployeeManager(int id) {
         return employeeManagers.containsKey(id);
     }
+
+    public boolean isShiftManager(int id) {
+        ShiftEmployee shiftEmployee = shiftEmployees.get(id);
+        return shiftEmployee.isShiftManager();
+    } 
+
     public String removeEmployee(int employeeId, int empManagerId) {
         if(!isEmployeeManager(employeeId))
             return "this action is allowed only for employee manager";
