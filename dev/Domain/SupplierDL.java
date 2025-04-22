@@ -4,7 +4,7 @@ import Utils.DeliveryMethod;
 import java.util.ArrayList;
 import java.util.List;
 
-class SupplierDL
+public class SupplierDL
 {
     private int supplierID;
     private int companyID;

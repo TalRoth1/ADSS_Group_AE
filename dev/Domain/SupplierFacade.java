@@ -6,7 +6,6 @@ import java.util.List;
 public class SupplierFacade
 {
     private List<SupplierDL> suppliers;
-    private List<AgreementDL> agreements;
     private int nextId;
     
     public SupplierFacade() 
@@ -46,16 +45,39 @@ public class SupplierFacade
         return null; // Supplier not found
     }
 
-    public void addAgreement(AgreementPL agreement) 
+    public void addAgreement(int supplierID, int agreementID, List<DiscountDL> billOfQuantities) 
     {
-        List<DiscountDL> discounts = new ArrayList<>();
-        for (DiscountPL discount : agreement.getBillOfQuantities()) 
+        SupplierDL supplier = getSupplier(supplierID);
+        if (supplier != null) 
         {
-            DiscountDL newDiscount = new DiscountDL(discount.getItemID(), discount.getMinimumQuantity(), discount.getDiscountPercentage());
-            discounts.add(newDiscount);
+            AgreementDL newAgreement = new AgreementDL(agreementID, billOfQuantities);
+            supplier.addAgreement(newAgreement);
         }
-        AgreementDL newAgreement = new AgreementDL(agreement.getAgreementID(), discounts);
-        agreements.add(newAgreement);
+    }
+
+    public void changeAgreement(int supplierID, int agreementID, AgreementDL newAgreement) 
+    {
+        SupplierDL supplier = getSupplier(supplierID);
+        if (supplier != null) 
+        {
+            for (AgreementDL agreement : supplier.getAgreements()) 
+            {
+                if (agreement.getAgreementID() == agreementID) 
+                {
+                    agreement.setBillOfQuantities(newAgreement.getBillOfQuantities());
+                    break;
+                }
+            }
+        }
+    }
+
+    public void removeAgreement(int supplierID, int agreementID) 
+    {
+        SupplierDL supplier = getSupplier(supplierID);
+        if (supplier != null) 
+        {
+            supplier.removeAgreement(agreementID);
+        }
     }
 
     public AgreementDL getAgreement(int supplierID,int agreementID) 
@@ -81,6 +103,6 @@ public class SupplierFacade
         {
             return supplier.getSuppliedItems();
         }
-        return null; // Supplier not found
+        return null;
     }
 }

@@ -37,4 +37,13 @@ public class Item
     {
         return price;
     }
+
+    public @Override String toString()
+    {
+        return "Item{" +
+                "itemID=" + itemID +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                '}';
+    }
 }

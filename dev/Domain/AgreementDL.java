@@ -2,7 +2,7 @@ package Domain;
 
 import java.util.List;
 
-class AgreementDL
+public class AgreementDL
 {
     private int agreementID;
     private List<DiscountDL> billOfQuantities;
