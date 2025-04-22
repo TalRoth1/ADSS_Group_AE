@@ -1,0 +1,219 @@
+package Presentation;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+import Domain.OrderFacade;
+import Domain.SupplierFacade;
+import Utils.DeliveryMethod;
+import Utils.PaymentMethod;
+
+public class CLI
+{
+    private SupplierFacade sf;
+    private OrderFacade of;
+
+    public CLI(SupplierFacade sf, OrderFacade of)
+    {
+        this.sf = sf;
+        this.of = of;
+    }
+    public void run()
+    {
+        boolean running = true;
+        Scanner Scanner = new Scanner(System.in);
+        while(running)
+        {
+            loadMenu();
+            String input = Scanner.nextLine();
+            switch(input)
+            {
+                case "1":
+                    addSupplier(Scanner);
+                    break;
+                case "2":
+                    addAgreement(Scanner);
+                    break;
+                case "3":
+                    changeAgreement(Scanner);
+                    break;
+                case "4":
+                    removeAgreement(Scanner);
+                    break;
+                case "5":
+                    getSuppliedItems(Scanner);
+                    break;
+                case "6":
+                    break;
+                case "7":
+                    break;
+                case "8":
+                    break;
+                case "9":
+                    break;
+                case "10":
+                    break;
+                case "11":
+                    break;
+                case "12":
+                    System.out.println("Exiting the program. Goodbye!");
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        Scanner.close();
+    }    
+
+    public void printRoleMenu()
+    {
+            System.out.println("1. Admin");
+            System.out.println("2. User");
+            System.out.println("3. Guest");
+            System.out.println("4. Exit");
+    }
+    
+    public void loadMenu()
+    {
+            System.out.println("1. Add Supplier");
+            System.out.println("2. Add Agreement");
+            System.out.println("3. Change Agreement");
+            System.out.println("4. Remove Agreement");
+            System.out.println("5. Get Supplied Items");
+            System.out.println("6. Create Order");
+            System.out.println("7. Get Order Details");
+            System.out.println("8. Change Order");
+            System.out.println("9. Cancel Order");
+            System.out.println("10. Get Order History");
+            System.out.println("11. Load Data");
+            System.out.println("12. Exit\n");
+            System.out.println("Please select an option:");
+    }
+
+    public void addSupplier(Scanner Scanner)
+    {
+        System.out.println("Please enter the Following Information:\nCompany ID:");
+        int companyID = Integer.parseInt(Scanner.nextLine());
+        System.out.println("Bank Account:");
+        int bankAccount = Integer.parseInt(Scanner.nextLine());
+        System.out.println("Payment Method (Cash or credit):");
+        PaymentMethod paymentMethod = PaymentMethod.getPaymentMethod(Scanner.nextLine());
+        while(paymentMethod == null)
+        {
+            System.out.println("Invalid payment method. Please enter 'Cash' or 'Credit':");
+            paymentMethod = PaymentMethod.getPaymentMethod(Scanner.nextLine());
+        }
+        System.out.println("Contact Mail:");
+        String contactEmail = Scanner.nextLine();
+        System.out.println("Contact Phone:");
+        String contactPhone = Scanner.nextLine();
+        System.out.println("Delivery Method (Scheduled, On Order or Pickup):");
+        DeliveryMethod deliveryMethod = DeliveryMethod.fromString(Scanner.nextLine());
+        while(deliveryMethod == null)
+        {
+            System.out.println("Invalid delivery method. Please enter 'Scheduled', 'On Order' or 'Pickup':");
+            deliveryMethod = DeliveryMethod.fromString(Scanner.nextLine());
+        }
+        sf.addSupplier(companyID, bankAccount, paymentMethod, contactEmail, contactPhone, deliveryMethod, null);
+    }
+
+    public void addAgreement(Scanner Scanner)
+    {
+        System.out.println("Please enter the Following Information:\nSupplier ID:");
+        int supplierID = Integer.parseInt(Scanner.nextLine());
+        System.out.println("Bill of Quantities (Item ID, Minimum quantity and Discount seperated by ,):");
+        List<String[]> billOfQuantities = new ArrayList<>();
+        String cont = "Y";
+        while( cont == "Y")
+        {
+            String[] discount = Scanner.nextLine().split(",");
+            if(discount.length != 3)
+            {
+                System.out.println("Invalid input. Please enter the Bill of Quantities in the format: Item ID, Minimum quantity, Discount");
+                continue;
+            }
+            billOfQuantities.add(discount);
+            System.out.println("Do you want to add another item? (Y/N):");
+            cont = Scanner.nextLine().toUpperCase();
+        }
+        sf.addAgreement(supplierID, billOfQuantities);
+    }
+
+    public void changeAgreement(Scanner scanner)
+    {
+        System.out.println("Please enter the Following Information:\nSupplier ID:");
+        int supplierID = Integer.parseInt(scanner.nextLine());
+        System.out.println("Agreement ID:");
+        int agreementID = Integer.parseInt(scanner.nextLine());
+        System.out.println("New Bill of Quantities (Item ID, Minimum quantity and Discount seperated by ,):");
+        List<String[]> billOfQuantities = new ArrayList<>();
+        String cont = "Y";
+        while( cont == "Y")
+        {
+            String[] discount = scanner.nextLine().split(",");
+            if(discount.length != 3)
+            {
+                System.out.println("Invalid input. Please enter the Bill of Quantities in the format: Item ID, Minimum quantity, Discount");
+                continue;
+            }
+            billOfQuantities.add(discount);
+            System.out.println("Do you want to add another item? (Y/N):");
+            cont = scanner.nextLine().toUpperCase();
+        }
+        sf.changeAgreement(supplierID, agreementID, billOfQuantities);
+    }
+
+    public void removeAgreement(Scanner scanner)
+    {
+        System.out.println("Please enter the Following Information:\nSupplier ID:");
+        int supplierID = Integer.parseInt(scanner.nextLine());
+        System.out.println("Agreement ID:");
+        int agreementID = Integer.parseInt(scanner.nextLine());
+        sf.removeAgreement(supplierID, agreementID);
+    }
+
+    public void getSuppliedItems(Scanner scanner)
+    {
+        System.out.println("Please enter the Following Information:\nSupplier ID:");
+        int supplierID = Integer.parseInt(scanner.nextLine());
+        List<String> suppliedItems = sf.getSuppliedItems(supplierID);
+        if(suppliedItems.isEmpty())
+        {
+            System.out.println("No items supplied by this supplier.");
+        }
+        else
+        {
+            System.out.println("Supplied Items:");
+            for(String item : suppliedItems)
+            {
+                System.out.println(item);
+            }
+        }
+    
+    }
+
+    public void createOrder(Scanner scanner)
+    {
+        System.out.println("Please enter the Following Information:\nSupplier ID:");
+        int supplierID = Integer.parseInt(scanner.nextLine());
+        System.out.println("Destination:");
+        String destination = scanner.nextLine();
+        System.out.println("Order Items (Item ID and Quantity seperated by ,):");
+        List<OrderItemDL> items = new ArrayList<>();
+        String cont = "Y";
+        while( cont == "Y")
+        {
+            String[] item = scanner.nextLine().split(",");
+            if(item.length != 2)
+            {
+                System.out.println("Invalid input. Please enter the Order Items in the format: Item ID, Quantity");
+                continue;
+            }
+            items.add(new OrderItemDL(Integer.parseInt(item[0]), Integer.parseInt(item[1])));
+            System.out.println("Do you want to add another item? (Y/N):");
+            cont = scanner.nextLine().toUpperCase();
+        }
+        of.createOrder(supplierID, destination, items);
+}

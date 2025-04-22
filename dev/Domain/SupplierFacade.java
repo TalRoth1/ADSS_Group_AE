@@ -1,6 +1,7 @@
 package Domain;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import Utils.DeliveryMethod;
 import Utils.PaymentMethod;
@@ -8,6 +9,7 @@ import Utils.PaymentMethod;
 public class SupplierFacade
 {
     private List<SupplierDL> suppliers;
+    private List<Item> items; // Will be saved in inventory after the merge
     private int nextId;
     
     public SupplierFacade() 
@@ -16,9 +18,9 @@ public class SupplierFacade
         this.nextId = 0;
     }
 
-    public void addSupplier(int companyID, int bankAccount, PaymentMethod paymentMethod, String contactEmail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems, List<AgreementDL> agreements)
+    public void addSupplier(int companyID, int bankAccount, PaymentMethod paymentMethod, String contactEmail, String contactPhone, DeliveryMethod deliveryMethod, List<AgreementDL> agreements)
     {
-        SupplierDL newSupplier = new SupplierDL(nextId++, companyID, bankAccount, paymentMethod, contactEmail, contactPhone, deliveryMethod, suppliedItems, agreements);
+        SupplierDL newSupplier = new SupplierDL(nextId++, companyID, bankAccount, paymentMethod, contactEmail, contactPhone, deliveryMethod, agreements);
         suppliers.add(newSupplier);
     }
 
@@ -34,18 +36,29 @@ public class SupplierFacade
         return null; // Supplier not found
     }
 
-    public void addAgreement(int supplierID, int agreementID, List<DiscountDL> billOfQuantities) 
+    public void addAgreement(int supplierID, List<String[]> billOfQuantities) 
     {
         SupplierDL supplier = getSupplier(supplierID);
+        int agreementID = supplier.getNextAgreementID();
+        List<DiscountDL> discounts = new ArrayList<>();
+        for (String[] item : billOfQuantities) 
+        {
+            int itemID = Integer.parseInt(item[0]);
+            int minimumQuantity = Integer.parseInt(item[1]);
+            int discountPercentage = Integer.parseInt(item[2]);
+            DiscountDL discount = new DiscountDL(itemID, minimumQuantity, discountPercentage);
+            discounts.add(discount);
+        }
         if (supplier != null) 
         {
-            AgreementDL newAgreement = new AgreementDL(agreementID, billOfQuantities);
+            AgreementDL newAgreement = new AgreementDL(agreementID, discounts);
             supplier.addAgreement(newAgreement);
         }
     }
 
-    public void changeAgreement(int supplierID, int agreementID, AgreementDL newAgreement) 
+    public void changeAgreement(int supplierID, int agreementID, List<String[]> newBill) 
     {
+        List<DiscountDL> newBoQ = new ArrayList<>();
         SupplierDL supplier = getSupplier(supplierID);
         if (supplier != null) 
         {
@@ -53,7 +66,15 @@ public class SupplierFacade
             {
                 if (agreement.getAgreementID() == agreementID) 
                 {
-                    agreement.setBillOfQuantities(newAgreement.getBillOfQuantities());
+                    for (String[] item : newBill) 
+                    {
+                        int itemID = Integer.parseInt(item[0]);
+                        int minimumQuantity = Integer.parseInt(item[1]);
+                        int discountPercentage = Integer.parseInt(item[2]);
+                        DiscountDL discount = new DiscountDL(itemID, minimumQuantity, discountPercentage);
+                        newBoQ.add(discount);
+                    }
+                    agreement.setBillOfQuantities(newBoQ);
                     break;
                 }
             }
@@ -85,13 +106,12 @@ public class SupplierFacade
         return null; // Agreement not found
     }
 
-    public List<Item> getSuppliedItems(int supplierID) 
+    public List<String> getSuppliedItems(int supplierID) 
     {
-        SupplierDL supplier = getSupplier(supplierID);
-        if (supplier != null) 
-        {
-            return supplier.getSuppliedItems();
-        }
-        return null;
+    }
+
+    public Map<Integer, Integer> getSuppliedCatlogItems()
+    {
+        
     }
 }

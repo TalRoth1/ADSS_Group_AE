@@ -35,7 +35,8 @@ public class SupplierService
     {
         try
         {
-            return sf.getSuppliedItems(supplierID);
+            // return sf.getSuppliedItems(supplierID);
+            return null; // Placeholder for actual implementation
         }
         catch (Exception e)
         {
@@ -44,7 +45,7 @@ public class SupplierService
         }
     }
 
-    public void addAgreement(int supplierID, int agreementID, List<DiscountSL> billOfQuantities)
+    public void addAgreement(int supplierID, List<DiscountSL> billOfQuantities)
     {
         try
         {
@@ -54,7 +55,7 @@ public class SupplierService
                 DiscountDL newDiscount = new DiscountDL(discount.getItemID(), discount.getMinimumQuantity(), discount.getDiscountPercentage());
                 discounts.add(newDiscount);
             }
-            sf.addAgreement(supplierID ,agreementID, discounts);
+            // sf.addAgreement(supplierID ,agreementID, discounts);
         }
         catch (Exception e)
         {
@@ -73,7 +74,7 @@ public class SupplierService
                 discounts.add(newDiscount);
             }
             AgreementDL newAgreement = new AgreementDL(agreement.getAgreementID(), discounts);
-            sf.changeAgreement(supplierID, agreementID, newAgreement);
+            // sf.changeAgreement(supplierID, agreementID, newAgreement);
         }
         catch (Exception e)
         {

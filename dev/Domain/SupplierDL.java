@@ -13,10 +13,10 @@ public class SupplierDL
     private String contactMail;
     private String contactPhone;
     private DeliveryMethod deliveryMethod;
-    private List<Item> suppliedItems;
     private List<AgreementDL> agreements;
+    private int nextAgreementID = 0; // Static variable to keep track of the next agreement ID
 
-    public SupplierDL(int supplierID, int companyID, int banckAccount, PaymentMethod paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems, List<AgreementDL> agreements)
+    public SupplierDL(int supplierID, int companyID, int banckAccount, PaymentMethod paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<AgreementDL> agreements)
     {
         this.supplierID = supplierID;
         this.companyID = companyID;
@@ -25,7 +25,6 @@ public class SupplierDL
         this.contactMail = contactMail;
         this.contactPhone = contactPhone;
         this.deliveryMethod = deliveryMethod;
-        this.suppliedItems = suppliedItems;
         this.agreements = agreements;
     }
 
@@ -94,26 +93,6 @@ public class SupplierDL
         return deliveryMethod;
     }
 
-    public void setSuppliedItems(List<Item> suppliedItems) 
-    {
-        this.suppliedItems = suppliedItems;
-    }
-
-    public List<Item> getSuppliedItems() 
-    {
-        return suppliedItems;
-    }
-
-    public void addSuppliedItem(Item item) 
-    {
-        this.suppliedItems.add(item);
-    }
-
-    public void removeSuppliedItem(Item item) 
-    {
-        this.suppliedItems.remove(item);
-    }
-
     public void addAgreement(AgreementDL agreement) 
     {
         this.agreements.add(agreement);
@@ -137,5 +116,10 @@ public class SupplierDL
     public List<AgreementDL> getAgreements() 
     {
         return agreements;
+    }
+
+    public int getNextAgreementID() 
+    {
+        return nextAgreementID++;
     }
 }

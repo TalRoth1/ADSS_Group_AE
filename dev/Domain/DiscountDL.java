@@ -2,20 +2,20 @@ package Domain;
 
 public class DiscountDL
 {
-    private int itemID;
+    private int catalogID;
     private int minimumQuantity;
     private int discountPercentage;
     
-    public DiscountDL(int itemID, int minimumQuantity, int discountPercentage)
+    public DiscountDL(int catalogID, int minimumQuantity, int discountPercentage)
     {
-        this.itemID = itemID;
+        this.catalogID = catalogID;
         this.minimumQuantity = minimumQuantity;
         this.discountPercentage = discountPercentage;
     }
 
-    public int getItemID()
+    public int getcatalogID()
     {
-        return itemID;
+        return catalogID;
     }
 
     public int getMinimumQuantity()

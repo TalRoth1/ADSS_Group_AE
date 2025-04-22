@@ -2,46 +2,39 @@ package Service;
 
 public class OrderItemSL
 {
-    private String name;
-    private int itemID;
+    private final int itemID;
     private int quantity;
-    private float price;
+    private final int catalogID;
+    private float totalPrice;
     
-    OrderItemSL(String name, int itemID, int quantity, float price)
-    {
-        this.name = name;
+    OrderItemSL(int itemID, int quantity, int catalogID, float totalPrice){
         this.itemID = itemID;
         this.quantity = quantity;
-        this.price = price;
+        this.catalogID = catalogID;
+        this.totalPrice = totalPrice;
     }
 
-    public String getName()
-    {
-        return name;
-    }
-
-    public int getItemID()
-    {
+    public int getItemID(){
         return itemID;
     }
 
-    public int getQuantity()
-    {
+    public int getQuantity(){
         return quantity;
     }
 
-    public float getPrice()
-    {
-        return price;
+    public int getCatalogID(){
+        return catalogID;
     }
 
-    public void setQuantity(int quantity)
-    {
+    public float getTotalPrice(){
+        return totalPrice;
+    }
+
+    public void setQuantity(int quantity){
         this.quantity = quantity;
     }
 
-    public void setPrice(float price)
-    {
-        this.price = price;
+    public void setTotalPrice(float totalPrice){
+        this.totalPrice = totalPrice;
     }
 }

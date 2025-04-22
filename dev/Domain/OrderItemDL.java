@@ -5,9 +5,9 @@ public class OrderItemDL
     private int itemID;
     private int quantity;
     private int catalogID;
-    private int totalPrice;
+    private float totalPrice;
     
-    public OrderItemDL(int orderID, int itemID, int quantity, int catalogID, int totalPrice)
+    public OrderItemDL(int itemID, int quantity, int catalogID, float totalPrice)
     {
         this.itemID = itemID;
         this.quantity = quantity;
@@ -40,12 +40,12 @@ public class OrderItemDL
         return catalogID;
     }
 
-    public void settotalPrice(int totalPrice)
+    public void setTotalPrice(int totalPrice)
     {
         this.totalPrice = totalPrice;
     }
 
-    public int gettotalPrice()
+    public float getTotalPrice()
     {
         return totalPrice;
     }    

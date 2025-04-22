@@ -1,10 +1,12 @@
 package Domain;
 
 import java.util.List;
+import java.util.Map;
 
 public class AgreementDL
 {
     private int agreementID;
+    private Map<Item, Integer> itemCatalog;
     private List<DiscountDL> billOfQuantities;
 
     public AgreementDL(int agreementID, List<DiscountDL> billOfQuantities)

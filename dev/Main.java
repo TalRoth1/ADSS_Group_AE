@@ -1,7 +1,11 @@
+import Domain.OrderFacade;
+import Domain.SupplierFacade;
+
 public class Main
 {
     public static void main(String[] args)
     {
-        System.out.println("Hello World!");
-    }    
+        SupplierFacade sf = new SupplierFacade();
+        OrderFacade of = new OrderFacade();
+    }
 }
