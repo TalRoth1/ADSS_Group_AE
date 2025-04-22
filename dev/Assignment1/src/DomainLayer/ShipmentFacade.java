@@ -40,7 +40,7 @@ public class ShipmentFacade {
         shipments.remove(shipment);
     }
 
-    public LocationDL AddLocation(String street, int streetNumber, String city, int contactNumber, String contactName, String zone) {
+    public LocationDL AddLocation(String street, int streetNumber, String city, String contactNumber, String contactName, String zone) {
         LocationDL location = new LocationDL(street, streetNumber, city, contactNumber, contactName, zone);
         locations.add(location);
         return location;

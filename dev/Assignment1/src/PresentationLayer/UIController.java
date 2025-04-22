@@ -234,7 +234,7 @@ public class UIController {
         System.out.println("Please enter the city: ");
         String city = scanner.nextLine();
         System.out.println("Please enter the contact number: ");
-        int contactNumber = Integer.parseInt(scanner.nextLine());
+        String contactNumber = scanner.nextLine();
         System.out.println("Please enter the contact name: ");
         String contactName = scanner.nextLine();
         System.out.println("Please enter the zone: ");
