@@ -1,16 +1,17 @@
 package DomainLayer;
+import java.util.List;
 
 public class DriverDL {
     public String Name;
-    public String LicenseType;
+    public List<String> LicenseType;
 
-    public DriverDL(String name, String licenseType) {
+    public DriverDL(String name, List<String> licenseType) {
         this.Name = name;
         this.LicenseType = licenseType;
     }
 
     public String toString() {
-        return "Driver Name: " + Name + ", License Type: " + LicenseType;
+        return Name + ", License: " + String.join(",", LicenseType);
     }
-    
+
 }

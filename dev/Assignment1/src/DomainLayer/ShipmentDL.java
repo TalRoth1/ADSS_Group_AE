@@ -5,18 +5,26 @@ import java.util.List;
 import java.util.Map;
 
 public class ShipmentDL {
-    public Date Date; // includes the hour and time zone
+    public Date DateCreated; // includes the hour and time zone
+    public Date DateSent;
     public TruckDL Truck;
     public DriverDL DriverName;
-    public LocationDL Origin;
     public List<LocationDL> Destinations;
     public ShipmentDocumentDL Document;
+    public ShipmentStatus Status = ShipmentStatus.PENDING;
+
 
     public Boolean DriverCheck(DriverDL driver) {
         TruckDL truck = this.Truck;
         String truckType = truck.GetType();
-        String driverLicense = driver.LicenseType;
-        return truckType.equals(driverLicense);
+        for(String type : driver.LicenseType)
+        {
+            if(type.equals(truckType))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Boolean EditDriver(DriverDL driver) {
@@ -26,7 +34,27 @@ public class ShipmentDL {
         this.DriverName = driver;
         return true;
     }
-    
+
+    public void ChangeStatus(String stat) {
+        switch (stat) {
+            case "PENDING":
+                this.Status = ShipmentStatus.PENDING;
+                break;
+            case "SENT":
+                this.Status = ShipmentStatus.SENT;
+                this.DateSent = new Date();
+                break;
+            case "PROBLEM":
+                this.Status = ShipmentStatus.PROBLEM;
+                break;
+            case "CANCELLED":
+                this.Status = ShipmentStatus.CANCELLED;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid status: " + stat);
+        }
+    }
+
     public Boolean WeightCheck(Map<String, Float> itemWeights)
     {
         //assuming all items in Document exists in itemWeight
@@ -48,9 +76,8 @@ public class ShipmentDL {
         return true;
     }
 
-    public Boolean EditOrigin(LocationDL origin) {
-        this.Origin = origin;
-        return true;
+    public Boolean EditOrigin(LocationDL origin, List<LocationDL> locations) {
+        return Document.EditOrigin(origin, Document.getLocations());
     }
 
     private void SetDestinations(List<LocationDL> dest)
@@ -66,10 +93,10 @@ public class ShipmentDL {
     public ShipmentDL(TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String,Integer>> items) {
         this.Truck = truck;
         this.DriverName = driver;
-        this.Origin = origin;
         this.Destinations = destinations;
         this.Document = new ShipmentDocumentDL(items);
-        this.Date = new Date();
+        this.DateCreated = new Date();
+        this.DateSent = null;
     }
 
     public Boolean EditDestinations(Map<LocationDL, Map<String, Integer>> items, Map<String,Float> itemWeights)
@@ -102,7 +129,7 @@ public class ShipmentDL {
         List<LocationDL> curr = new ArrayList<>(this.Destinations);
         curr.removeAll(destinations);
         SetDestinations(curr);
-        
+
     }
 
     private void UpdateDestinationsFromDoc()
@@ -122,12 +149,22 @@ public class ShipmentDL {
                 setTruck(truck);
                 if(WeightCheck(itemWeights) && DriverCheck(DriverName))
                 {
-                    return true; 
+                    return true;
                 }
                 setTruck(prev);
             }
         }
         return false;
+    }
+
+    public ShipmentStatus getStatus()
+    {
+        return Status;
+    }
+
+    public String toString()
+    {
+        return "Truck: " + Truck.GetNumber() + ", Driver: " + DriverName.Name + ", Origin: " + Document.getOrigin().toString() + ", Destinations: " + Document.getLocations().toString() + ", Date Created: " + DateCreated.toString() + ", Date Sent: " + DateSent.toString();
     }
 }
 

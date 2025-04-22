@@ -17,13 +17,15 @@ public class Main {
             System.out.println("4. Add a new driver");
             System.out.println("5. Add a new location");
             System.out.println("6. Add a new item");
-            System.out.println("7. Exit");
+            System.out.println("7. Change shipment status");
+            System.out.println("8. View a shipment document");
+            System.out.println("9. Exit");
             boolean flag = true;
             int choice = 0;
             while(flag) {
                 System.out.println("Please enter your choice (1-7): ");
                 String input = scanner.nextLine();
-                if (input.matches("[1-7]")) {
+                if (input.matches("[1-9]")) {
                     choice = Integer.parseInt(input);
                     flag = false;
                 } else {
@@ -51,8 +53,14 @@ public class Main {
                     uiController.AddItem();
                     break;
                 case 7:
-                    System.out.println("Exiting the program. Goodbye!");
+                    uiController.ChangeStatus();
+                    break;
+                case 8:
+                    uiController.ShowDocuments();
+                    break;
+                case 9:
                     exit = true;
+                    System.out.println("Exiting the program. Goodbye!");
                     break;
             }
         } 

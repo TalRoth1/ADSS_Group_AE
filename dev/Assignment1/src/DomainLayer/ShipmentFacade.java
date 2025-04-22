@@ -9,7 +9,7 @@ public class ShipmentFacade {
     public List<DriverDL> drivers = new ArrayList<>();
     public List<TruckDL> trucks = new ArrayList<>();
     public Map<String, Float> Items = Map.of("egg carton", 1.5f, "milk", 1f, "bread", 0.5f, "cheese", 1f, "butter", 0.25f, "yogurt", 0.6f, "juice", 0.75f, "soda", 0.75f, "water", 1f, "coffee", 0.5f);
-    
+
     public void CreateShipment(TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String,Integer>> items) throws Exception {
         ShipmentDL shipment = new ShipmentDL(truck, driver, origin, destinations, items);
         if(!shipment.DriverCheck(driver))
@@ -20,6 +20,19 @@ public class ShipmentFacade {
             throw new Exception("Truck is overweight");
         }
         shipments.add(shipment);
+    }
+    public void ChangeStatus(ShipmentDL shipment, String stat)  {
+        shipment.ChangeStatus(stat);
+    }
+
+    public List<ShipmentDL> GetStatusShipement(String status) {
+        List<ShipmentDL> ans = new ArrayList<>();
+        for (ShipmentDL shipment : shipments) {
+            if (shipment.Status.toString().toLowerCase().equals(status)) {
+                ans.add(shipment);
+            }
+        }
+        return ans;
     }
 
     public void RemoveShipment(ShipmentDL shipment)
@@ -33,7 +46,7 @@ public class ShipmentFacade {
         return location;
     }
 
-    public DriverDL AddDriver(String name, String licenseType) {
+    public DriverDL AddDriver(String name, List<String> licenseType) {
         DriverDL driver = new DriverDL(name, licenseType);
         drivers.add(driver);
         return driver;
@@ -84,7 +97,7 @@ public class ShipmentFacade {
             }
         }
         if(origin != null) {
-            shipmentToEdit.EditOrigin(origin);
+            shipmentToEdit.EditOrigin(origin, locations);
         }
         if(destinations != null) {
             Boolean check = shipmentToEdit.EditDestinations(items, Items);
@@ -100,5 +113,10 @@ public class ShipmentFacade {
                 throw new Exception("Truck cannot support the new weight");
             }
         }
+    }
+
+    public String GetDocumentString(ShipmentDL shipment)
+    {
+        return shipment.getDocument().toString() + "\n" + "Status: " + shipment.getStatus().toString();
     }
 }

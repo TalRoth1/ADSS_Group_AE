@@ -3,6 +3,7 @@ package DomainLayer;
 import java.util.*;
 
 public class ShipmentDocumentDL {
+    public LocationDL Origin;
     public Map<LocationDL, Map<String, Integer>> items;
     public float Weight;
 
@@ -35,7 +36,17 @@ public class ShipmentDocumentDL {
         return true;
 
     }
-    
+
+    public boolean EditOrigin(LocationDL newOrigin, List<LocationDL> locations)
+    {
+        if (locations.contains(newOrigin))
+        {
+            Origin = newOrigin;
+            return true;
+        }
+        return false;
+    }
+
     //checks for items with 0 or negative quantity
     private void CheckItems()
     {
@@ -101,5 +112,35 @@ public class ShipmentDocumentDL {
     public Map<LocationDL, Map<String, Integer>> getItemsMap()
     {
         return items;
+    }
+
+    public String toString()
+    {
+        StringBuilder ans = new StringBuilder("Shipment Document: \n");
+        String origin  = Origin.toString();
+        List<LocationDL> locations = getLocations();
+        for ( LocationDL loc : locations)
+        {
+            ans.append("origin: ").append(origin).append("\n");
+            ans.append("destination: ").append(loc.toString()).append("\n");
+            ans.append("items: ").append(getItemsString(items.get(loc))).append("\n");
+            origin = loc.toString();
+        }
+        return ans.toString();
+    }
+
+    private String getItemsString(Map<String, Integer> items)
+    {
+        StringBuilder ans = new StringBuilder();
+        for (String item : items.keySet())
+        {
+            ans.append(item).append(": ").append(items.get(item)).append(", ");
+        }
+        return ans.toString();
+    }
+
+    public LocationDL getOrigin()
+    {
+        return Origin;
     }
 }
