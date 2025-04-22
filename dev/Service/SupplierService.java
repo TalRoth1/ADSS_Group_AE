@@ -1,4 +1,4 @@
-package Presentation;
+package Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +18,12 @@ public class SupplierService
         sf = new SupplierFacade();
     }
 
-    public void addSupplier(int supplierID, int companyID, int bankAccount, int paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems, AgreementPL agreement)
+    public void addSupplier(int supplierID, int companyID, int bankAccount, int paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems, AgreementSL agreement)
     {
         try
         {
-            SupplierPL supplier = new SupplierPL(supplierID, companyID, bankAccount, paymentMethod, contactMail, contactPhone, deliveryMethod, suppliedItems, agreement);
-            sf.addSupplier(supplier);
+            // SupplierSL supplier = new SupplierSL(supplierID, companyID, bankAccount, paymentMethod, contactMail, contactPhone, deliveryMethod, suppliedItems, agreement);
+            // sf.addSupplier(supplier);
         }
         catch (Exception e)
         {
@@ -44,12 +44,12 @@ public class SupplierService
         }
     }
 
-    public void addAgreement(int supplierID, int agreementID, List<DiscountPL> billOfQuantities)
+    public void addAgreement(int supplierID, int agreementID, List<DiscountSL> billOfQuantities)
     {
         try
         {
             List<DiscountDL> discounts = new ArrayList<>();
-            for (DiscountPL discount : billOfQuantities)
+            for (DiscountSL discount : billOfQuantities)
             {
                 DiscountDL newDiscount = new DiscountDL(discount.getItemID(), discount.getMinimumQuantity(), discount.getDiscountPercentage());
                 discounts.add(newDiscount);
@@ -62,12 +62,12 @@ public class SupplierService
         }
     }
 
-    public void changeAgreement(int supplierID, int agreementID, AgreementPL agreement)
+    public void changeAgreement(int supplierID, int agreementID, AgreementSL agreement)
     {
         try
         {
             List<DiscountDL> discounts = new ArrayList<>();
-            for (DiscountPL discount : agreement.getBillOfQuantities())
+            for (DiscountSL discount : agreement.getBillOfQuantities())
             {
                 DiscountDL newDiscount = new DiscountDL(discount.getItemID(), discount.getMinimumQuantity(), discount.getDiscountPercentage());
                 discounts.add(newDiscount);

@@ -1,18 +1,18 @@
-package Presentation;
+package Service;
 
 import java.util.List;
 
 import Utils.OrderStatus;
 
-public class OrderPL
+public class OrderSL
 {
     private final int orderID;
     private final int supplierID;
-    private List<OrderItemPL> orderItems;
+    private List<OrderItemSL> orderItems;
     private OrderStatus orderStatus;
 
     
-    OrderPL(int orderID, int supplierID, List<OrderItemPL> orderItems)
+    OrderSL(int orderID, int supplierID, List<OrderItemSL> orderItems)
     {
         this.orderID = orderID;
         this.supplierID = supplierID;
@@ -30,7 +30,7 @@ public class OrderPL
         return supplierID;
     }
 
-    public List<OrderItemPL> getOrderItems()
+    public List<OrderItemSL> getOrderItems()
 {
         return orderItems;
     }
@@ -45,15 +45,15 @@ public class OrderPL
         this.orderStatus = orderStatus;
     }
 
-    public void setOrderItems(List<OrderItemPL> orderItems)
+    public void setOrderItems(List<OrderItemSL> orderItems)
     {
         this.orderItems = orderItems;
     }
-    public void addOrderItem(OrderItemPL orderItem)
+    public void addOrderItem(OrderItemSL orderItem)
     {
         this.orderItems.add(orderItem);
     }
-    public void removeOrderItem(OrderItemPL orderItem)
+    public void removeOrderItem(OrderItemSL orderItem)
     {
         this.orderItems.remove(orderItem);
     }

@@ -1,7 +1,9 @@
 package Domain;
-import Presentation.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import Utils.DeliveryMethod;
+import Utils.PaymentMethod;
 
 public class SupplierFacade
 {
@@ -14,22 +16,9 @@ public class SupplierFacade
         this.nextId = 0;
     }
 
-    public void addSupplier(SupplierPL supplier) 
+    public void addSupplier(int companyID, int bankAccount, PaymentMethod paymentMethod, String contactEmail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems, List<AgreementDL> agreements)
     {
-        SupplierDL newSupplier = new SupplierDL(nextId++, supplier.getCompanyID(), supplier.getBankAccount(), supplier.getPaymentMethod(), supplier.getContactMail(), supplier.getContactPhone(), supplier.getDeliveryMethod(), supplier.getSuppliedItems(), null);
-        List<AgreementDL> agreements = new ArrayList<>();
-        for (AgreementPL agreement : supplier.getAgreements()) 
-        {
-            List<DiscountDL> discounts = new ArrayList<>();
-            for (DiscountPL discount : agreement.getBillOfQuantities()) 
-            {
-                DiscountDL newDiscount = new DiscountDL(discount.getItemID(), discount.getMinimumQuantity(), discount.getDiscountPercentage());
-                discounts.add(newDiscount);
-            }
-            AgreementDL newAgreement = new AgreementDL(agreement.getAgreementID(), discounts);
-            agreements.add(newAgreement);
-        }
-        newSupplier.setAgreements(agreements);
+        SupplierDL newSupplier = new SupplierDL(nextId++, companyID, bankAccount, paymentMethod, contactEmail, contactPhone, deliveryMethod, suppliedItems, agreements);
         suppliers.add(newSupplier);
     }
 

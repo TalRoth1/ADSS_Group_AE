@@ -1,7 +1,7 @@
 package Domain;
 import Utils.DeliveryMethod;
+import Utils.PaymentMethod;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SupplierDL
@@ -9,14 +9,15 @@ public class SupplierDL
     private int supplierID;
     private int companyID;
     private int banckAccount;
-    private int paymentMethod;
+    private PaymentMethod paymentMethod;
     private String contactMail;
     private String contactPhone;
     private DeliveryMethod deliveryMethod;
     private List<Item> suppliedItems;
     private List<AgreementDL> agreements;
 
-    public SupplierDL(int supplierID, int companyID, int banckAccount, int paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems, AgreementDL agreement) {
+    public SupplierDL(int supplierID, int companyID, int banckAccount, PaymentMethod paymentMethod, String contactMail, String contactPhone, DeliveryMethod deliveryMethod, List<Item> suppliedItems, List<AgreementDL> agreements)
+    {
         this.supplierID = supplierID;
         this.companyID = companyID;
         this.banckAccount = banckAccount;
@@ -25,8 +26,7 @@ public class SupplierDL
         this.contactPhone = contactPhone;
         this.deliveryMethod = deliveryMethod;
         this.suppliedItems = suppliedItems;
-        this.agreements = new ArrayList<AgreementDL>();
-        this.agreements.add(agreement);
+        this.agreements = agreements;
     }
 
     public int getSupplierID() 
@@ -54,12 +54,12 @@ public class SupplierDL
         return banckAccount;
     }
 
-    public void setPaymentMethod(int paymentMethod) 
+    public void setPaymentMethod(PaymentMethod paymentMethod) 
     {
         this.paymentMethod = paymentMethod;
     }
 
-    public int getPaymentMethod() 
+    public PaymentMethod getPaymentMethod()
     {
         return paymentMethod;
     }

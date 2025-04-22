@@ -1,12 +1,12 @@
-package Presentation;
+package Service;
 
-public class DiscountPL
+public class DiscountSL
 {
     private int itemID;
     private int minimumQuantity;
     private int discountPercentage;
     
-    public DiscountPL(int itemID, int minimumQuantity, int discountPercentage)
+    public DiscountSL(int itemID, int minimumQuantity, int discountPercentage)
     {
         this.itemID = itemID;
         this.minimumQuantity = minimumQuantity;

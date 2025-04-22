@@ -1,4 +1,4 @@
-package Presentation;
+package Service;
 
 import java.util.List;
 
@@ -21,10 +21,10 @@ public class OrderService {
     public void cancelOrder(){
 
     }
-    public OrderPL getOrder(int orderID){
+    public OrderSL getOrder(int orderID){
         return null;
     }
-    public List<OrderPL> getOrderHistory(int supplierID){
+    public List<OrderSL> getOrderHistory(int supplierID){
         return null;
     }
 

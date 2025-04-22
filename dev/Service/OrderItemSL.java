@@ -1,13 +1,13 @@
-package Presentation;
+package Service;
 
-public class OrderItemPL
+public class OrderItemSL
 {
     private String name;
     private int itemID;
     private int quantity;
     private float price;
     
-    OrderItemPL(String name, int itemID, int quantity, float price)
+    OrderItemSL(String name, int itemID, int quantity, float price)
     {
         this.name = name;
         this.itemID = itemID;
