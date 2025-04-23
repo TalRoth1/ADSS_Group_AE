@@ -1,7 +1,10 @@
 package Domain;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import Utils.DeliveryMethod;
 import Utils.PaymentMethod;
@@ -106,12 +109,41 @@ public class SupplierFacade
         return null; // Agreement not found
     }
 
-    public List<String> getSuppliedItems(int supplierID) 
+    public Set<String> getSuppliedItems(int supplierID) 
     {
+        SupplierDL supplier = getSupplier(supplierID);
+        if (supplier != null) 
+        {
+            Set<String> suppliedItems = new HashSet<>();
+            for (AgreementDL agreement : supplier.getAgreements()) 
+            {
+                Map<Item, Integer> itemCatalog = agreement.getItemCatalog();
+                for (Item item : itemCatalog.keySet()) 
+                {
+                    suppliedItems.add(item.getName());
+                }
+            }
+            return suppliedItems;
+        }
+        return null; // Supplier not found
     }
 
-    public Map<Integer, Integer> getSuppliedCatlogItems()
+    public Map<Integer, Integer> getSuppliedCatlogItems(int supplierID)
     {
-        
+        SupplierDL supplier = getSupplier(supplierID);
+        if (supplier != null) 
+        {
+            Map<Integer, Integer> suppliedItems = new HashMap<>();
+            for (AgreementDL agreement : supplier.getAgreements()) 
+            {
+                Map<Item, Integer> itemCatalog = agreement.getItemCatalog();
+                for (Map.Entry<Item, Integer> entry : itemCatalog.entrySet()) 
+                {
+                    suppliedItems.put(entry.getKey().getItemID(), entry.getValue());
+                }
+            }
+            return suppliedItems;
+        }
+        return null; // Supplier not found
     }
 }

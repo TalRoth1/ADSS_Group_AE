@@ -2,7 +2,10 @@ package Presentation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+
 import Domain.OrderDL;
 import Domain.OrderFacade;
 import Domain.SupplierFacade;
@@ -39,25 +42,27 @@ public class CLI {
                     break;
                 case "5":
                     getSuppliedItems(Scanner);
-                    break;
                 case "6":
-                    createOrder(Scanner);
+                    getCatalogItems(Scanner);
                     break;
                 case "7":
-                    getOrderDetails(Scanner);
+                    createOrder(Scanner);
                     break;
                 case "8":
-                    changeOrder(Scanner);
+                    getOrderDetails(Scanner);
                     break;
                 case "9":
-                    cancelOrder(Scanner);
+                    changeOrder(Scanner);
                     break;
                 case "10":
-                    getOrderHistory(Scanner);
+                    cancelOrder(Scanner);
                     break;
                 case "11":
+                    getOrderHistory(Scanner);
                     break;
                 case "12":
+                    break;
+                case "13":
                     System.out.println("Exiting the program. Goodbye!");
                     running = false;
                     break;
@@ -81,13 +86,14 @@ public class CLI {
         System.out.println("3. Change Agreement");
         System.out.println("4. Remove Agreement");
         System.out.println("5. Get Supplied Items");
-        System.out.println("6. Create Order");
-        System.out.println("7. Get Order Details");
-        System.out.println("8. Change Order");
-        System.out.println("9. Cancel Order");
-        System.out.println("10. Get Order History");
-        System.out.println("11. Load Data");
-        System.out.println("12. Exit\n");
+        System.out.println("6. Get Cataloged Items");
+        System.out.println("7. Create Order");
+        System.out.println("8. Get Order Details");
+        System.out.println("9. Change Order");
+        System.out.println("10. Cancel Order");
+        System.out.println("11. Get Order History");
+        System.out.println("12. Load Data");
+        System.out.println("13. Exit\n");
         System.out.println("Please select an option:");
     }
 
@@ -168,7 +174,7 @@ public class CLI {
     public void getSuppliedItems(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(scanner.nextLine());
-        List<String> suppliedItems = sf.getSuppliedItems(supplierID);
+        Set<String> suppliedItems = sf.getSuppliedItems(supplierID);
         if (suppliedItems.isEmpty()) {
             System.out.println("No items supplied by this supplier.");
         } else {
@@ -178,6 +184,20 @@ public class CLI {
             }
         }
 
+    }
+
+    public void getCatalogItems(Scanner scanner) {
+        System.out.println("Please enter the Following Information:\nSupplier ID:");
+        int supplierID = Integer.parseInt(scanner.nextLine());
+        Map<Integer, Integer> catalogItems = sf.getSuppliedCatlogItems(supplierID);
+        if (catalogItems.isEmpty()) {
+            System.out.println("No items in the catalog for this supplier.");
+        } else {
+            System.out.println("Catalog Items:");
+            for (Map.Entry<Integer, Integer> item : catalogItems.entrySet()) {
+                System.out.println("Item ID: " + item.getKey() + ", Catalog ID: " + item.getValue());
+            }
+        }
     }
 
     public void createOrder(Scanner scanner) {

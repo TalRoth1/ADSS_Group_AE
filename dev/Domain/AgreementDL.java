@@ -51,4 +51,9 @@ public class AgreementDL {
         }
         return -1;
     }
+
+    public Map<Item, Integer> getItemCatalog()
+    {
+        return itemCatalog;
+    }
 }
