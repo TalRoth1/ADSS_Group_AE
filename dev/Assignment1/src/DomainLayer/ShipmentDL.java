@@ -90,13 +90,18 @@ public class ShipmentDL {
         this.Truck = newTruck;
     }
 
+    public void setWeight(Map<String, Float> Items)
+    {
+        this.Document.setWeight(Items);
+    }
+
     public ShipmentDL(TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String,Integer>> items) {
         this.Truck = truck;
         this.DriverName = driver;
         this.Destinations = destinations;
-        this.Document = new ShipmentDocumentDL(items);
+        this.Document = new ShipmentDocumentDL(items, origin);
         this.DateCreated = new Date();
-        this.DateSent = null;
+        this.DateSent = new Date();
     }
 
     public Boolean EditDestinations(Map<LocationDL, Map<String, Integer>> items, Map<String,Float> itemWeights)

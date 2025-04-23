@@ -23,7 +23,7 @@ public class Main {
             boolean flag = true;
             int choice = 0;
             while(flag) {
-                System.out.println("Please enter your choice (1-7): ");
+                System.out.println("Please enter your choice (1-9): ");
                 String input = scanner.nextLine();
                 if (input.matches("[1-9]")) {
                     choice = Integer.parseInt(input);

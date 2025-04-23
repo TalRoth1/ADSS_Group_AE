@@ -2,13 +2,14 @@ package DomainLayer;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ShipmentFacade {
     public List<ShipmentDL> shipments = new ArrayList<>();
     public List<LocationDL> locations = new ArrayList<>();
     public List<DriverDL> drivers = new ArrayList<>();
     public List<TruckDL> trucks = new ArrayList<>();
-    public Map<String, Float> Items = Map.of("egg carton", 1.5f, "milk", 1f, "bread", 0.5f, "cheese", 1f, "butter", 0.25f, "yogurt", 0.6f, "juice", 0.75f, "soda", 0.75f, "water", 1f, "coffee", 0.5f);
+    public Map<String, Float> Items = new HashMap<>(Map.of("egg carton", 1.5f, "milk", 1f, "bread", 0.5f, "cheese", 1f, "butter", 0.25f, "yogurt", 0.6f, "juice", 0.75f, "soda", 0.75f, "water", 1f, "coffee", 0.5f));
 
     public void CreateShipment(TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String,Integer>> items) throws Exception {
         ShipmentDL shipment = new ShipmentDL(truck, driver, origin, destinations, items);
@@ -19,6 +20,7 @@ public class ShipmentFacade {
         if (!shipment.WeightCheck(Items)) {
             throw new Exception("Truck is overweight");
         }
+        shipment.setWeight(Items);
         shipments.add(shipment);
     }
     public void ChangeStatus(ShipmentDL shipment, String stat)  {
@@ -28,7 +30,7 @@ public class ShipmentFacade {
     public List<ShipmentDL> GetStatusShipement(String status) {
         List<ShipmentDL> ans = new ArrayList<>();
         for (ShipmentDL shipment : shipments) {
-            if (shipment.Status.toString().toLowerCase().equals(status)) {
+            if (shipment.Status.toString().equalsIgnoreCase(status)) {
                 ans.add(shipment);
             }
         }

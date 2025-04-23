@@ -7,9 +7,23 @@ public class ShipmentDocumentDL {
     public Map<LocationDL, Map<String, Integer>> items;
     public float Weight;
 
-    public ShipmentDocumentDL(Map<LocationDL, Map<String, Integer>> items) {
+    public ShipmentDocumentDL(Map<LocationDL, Map<String, Integer>> items, LocationDL origin) {
         this.items = items;
-        this.Weight = 69;
+        this.Weight = 0;
+        this.Origin = origin;
+    }
+
+    public void setWeight(Map<String, Float> Items) {
+        float sum = 0;
+        for (LocationDL location : items.keySet()) {
+            Map<String, Integer> itemList = items.get(location);
+            for (String item : itemList.keySet()) {
+                if (Items.containsKey(item)) {
+                    sum += Items.get(item) * itemList.get(item);
+                }
+            }
+        }
+        this.Weight = sum;
     }
 
     /*

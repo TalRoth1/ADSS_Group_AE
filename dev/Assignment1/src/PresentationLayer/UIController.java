@@ -467,7 +467,6 @@ public class UIController {
             int choice = Integer.parseInt(scanner.nextLine());
             if (choice >= 0 && choice < shipments.size()) {
                 shipment = shipments.get(choice);
-                System.out.println(shipment.toString());
                 flag = false;
             } else {
                 System.out.println("Invalid choice. Please try again.");

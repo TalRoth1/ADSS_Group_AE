@@ -1,7 +1,9 @@
 package DomainLayer;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,8 +11,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class ShipmentFacadeTest {
     private static ShipmentFacade facade;
 
-    @BeforeAll
-    static void setUp() {
+
+    @BeforeEach
+    void clearFacade() {
         facade = new ShipmentFacade();
     }
 
@@ -32,8 +35,10 @@ class ShipmentFacadeTest {
         LocationDL origin = facade.AddLocation("Main St", 1, "Neverland", "039000000000", "John Doe", "Zone1");
         LocationDL destination = facade.AddLocation("Second St", 2, "Neverland", "123", "Jane Doe", "Zone2");
         Map<LocationDL, Map<String, Integer>> items = Map.of(destination, Map.of("egg carton", 1, "milk", 2));
-        ShipmentDL shipment = new ShipmentDL(truck, driver, origin, List.of(destination), items);
-        facade.shipments.add(shipment);
+        //ShipmentDL shipment = new ShipmentDL(truck, driver, origin, List.of(destination), items);
+        //facade.shipments.add(shipment);
+        facade.CreateShipment(truck, driver, origin, List.of(destination), items);
+        ShipmentDL shipment = facade.shipments.getFirst();
         shipment.ChangeStatus("SENT");
         assertEquals("SENT", shipment.Status.toString());
     }
@@ -46,11 +51,13 @@ class ShipmentFacadeTest {
         LocationDL origin = facade.AddLocation("Main St", 1, "Neverland", "039000000000", "John Doe", "Zone1");
         LocationDL destination = facade.AddLocation("Second St", 2, "Neverland", "123", "Jane Doe", "Zone2");
         Map<LocationDL, Map<String, Integer>> items = Map.of(destination, Map.of("egg carton", 1, "milk", 2));
-        ShipmentDL shipment = new ShipmentDL(truck, driver, origin, List.of(destination), items);
-        facade.shipments.add(shipment);
+        //ShipmentDL shipment = new ShipmentDL(truck, driver, origin, List.of(destination), items);
+        //facade.shipments.add(shipment);
+        facade.CreateShipment(truck, driver, origin, List.of(destination), items);
+        ShipmentDL shipment = facade.shipments.getFirst();
         DriverDL driver2 = facade.AddDriver("Bob A", List.of("TypeA"));
         facade.EditShipement(shipment,null, driver2, null, null, null);
-        assertEquals(driver, shipment.DriverName);
+        assertEquals(driver2, shipment.DriverName);
     }
 
     @Test
@@ -62,8 +69,10 @@ class ShipmentFacadeTest {
         LocationDL origin = facade.AddLocation("Main St", 1, "Neverland", "039000000000", "John Doe", "Zone1");
         LocationDL destination = facade.AddLocation("Second St", 2, "Neverland", "123", "Jane Doe", "Zone2");
         Map<LocationDL, Map<String, Integer>> items = Map.of(destination, Map.of("egg carton", 1, "milk", 2));
-        ShipmentDL shipment = new ShipmentDL(truck, driver, origin, List.of(destination), items);
-        facade.shipments.add(shipment);
+        //ShipmentDL shipment = new ShipmentDL(truck, driver, origin, List.of(destination), items);
+        //facade.shipments.add(shipment);
+        facade.CreateShipment(truck, driver, origin, List.of(destination), items);
+        ShipmentDL shipment = facade.shipments.getFirst();
         DriverDL driver2 = facade.AddDriver("Bob A", List.of("TypeB"));
         Exception exception = assertThrows(Exception.class, () -> {
             facade.EditShipement(shipment, null, driver2, null, null, null);
@@ -96,10 +105,12 @@ class ShipmentFacadeTest {
         DriverDL driver = facade.AddDriver("Joe Mama", List.of("TypeA"));
         LocationDL origin = facade.AddLocation("Main St", 1, "Neverland", "039000000000", "John Doe", "Zone1");
         LocationDL destination = facade.AddLocation("Second St", 2, "Neverland", "123", "Jane Doe", "Zone2");
-        Map<LocationDL, Map<String, Integer>> items = Map.of(destination, Map.of("egg carton", 1, "milk", 2));
-        ShipmentDL shipment = new ShipmentDL(truck, driver, origin, List.of(destination), items);
-        facade.shipments.add(shipment);
-        Map<LocationDL, Map<String, Integer>> newItems = Map.of(destination, Map.of("bread", 1));
+        Map<LocationDL, Map<String, Integer>> items = new HashMap<>(Map.of(destination, new HashMap<>(Map.of("egg carton", 1, "milk", 2))));
+        //ShipmentDL shipment = new ShipmentDL(truck, driver, origin, List.of(destination), items);
+        //facade.shipments.add(shipment);
+        facade.CreateShipment(truck, driver, origin, List.of(destination), items);
+        ShipmentDL shipment = facade.shipments.getFirst();
+        Map<LocationDL, Map<String, Integer>> newItems = new HashMap<>(Map.of(destination, new HashMap<>(Map.of("bread", 1))));
         facade.EditShipement(shipment, null, null, null, null, newItems);
         assertTrue(shipment.getDocument().getItemsMap().get(destination).containsKey("bread"));
     }
@@ -111,10 +122,12 @@ class ShipmentFacadeTest {
         DriverDL driver = facade.AddDriver("Joe Mama", List.of("TypeA"));
         LocationDL origin = facade.AddLocation("Main St", 1, "Neverland", "039000000000", "John Doe", "Zone1");
         LocationDL destination = facade.AddLocation("Second St", 2, "Neverland", "123", "Jane Doe", "Zone2");
-        Map<LocationDL, Map<String, Integer>> items = Map.of(destination, Map.of("egg carton", 1, "milk", 2));
-        ShipmentDL shipment = new ShipmentDL(truck, driver, origin, List.of(destination), items);
-        facade.shipments.add(shipment);
-        Map<LocationDL, Map<String, Integer>> newItems = Map.of(destination, Map.of("egg carton", 0));
+        Map<LocationDL, Map<String, Integer>> items = new HashMap<>(Map.of(destination, new HashMap<>(Map.of("egg carton", 1, "milk", 2))));
+        //ShipmentDL shipment = new ShipmentDL(truck, driver, origin, List.of(destination), items);
+        //facade.shipments.add(shipment);
+        facade.CreateShipment(truck, driver, origin, List.of(destination), items);
+        ShipmentDL shipment = facade.shipments.getFirst();
+        Map<LocationDL, Map<String, Integer>> newItems = new HashMap<>(Map.of(destination, new HashMap<>(Map.of("egg carton", 0))));
         facade.EditShipement(shipment, null, null, null, null, newItems);
         assertFalse(shipment.getDocument().getItemsMap().get(destination).containsKey("egg carton"));
     }
@@ -127,14 +140,16 @@ class ShipmentFacadeTest {
         DriverDL driver = facade.AddDriver("Joe Mama", List.of("TypeA"));
         LocationDL origin = facade.AddLocation("Main St", 1, "Neverland", "039000000000", "John Doe", "Zone1");
         LocationDL destination = facade.AddLocation("Second St", 2, "Neverland", "123", "Jane Doe", "Zone2");
-        Map<LocationDL, Map<String, Integer>> items = Map.of(destination, Map.of("egg carton", 1, "milk", 2));
-        ShipmentDL shipment = new ShipmentDL(truck, driver, origin, List.of(destination), items);
-        facade.shipments.add(shipment);
-        Map<LocationDL, Map<String, Integer>> newItems = Map.of(destination, Map.of("bread", 100));
+        Map<LocationDL, Map<String, Integer>> items = new HashMap<>(Map.of(destination, new HashMap<>(Map.of("egg carton", 1, "milk", 2))));
+        //ShipmentDL shipment = new ShipmentDL(truck, driver, origin, List.of(destination), items);
+        //facade.shipments.add(shipment);
+        facade.CreateShipment(truck, driver, origin, List.of(destination), items);
+        ShipmentDL shipment = facade.shipments.getFirst();
+        Map<LocationDL, Map<String, Integer>> newItems = new HashMap<>(Map.of(destination, new HashMap<>(Map.of("bread", 100))));
         Exception exception = assertThrows(Exception.class, () -> {
             facade.EditShipement(shipment, null, null, null, null, newItems);
         });
-        String expectedMessage = "Truck is overweight";
+        String expectedMessage = "Truck cannot support the new weight";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
     }
