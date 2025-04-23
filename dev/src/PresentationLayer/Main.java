@@ -1,13 +1,14 @@
 package PresentationLayer;
 
 import DomainLayer.*;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 public class Main {
     public static void main(String[] args) {
         LocalDate today = LocalDate.now();
         EmployeeFacade employeeFacade = new EmployeeFacade();
+        EmployeeRepository repo = new EmployeeRepository();
+        SystemInitializer.initializeSystem(repo);
         //EmployeeManager manager = new EmployeeManager(100, "keren","1", "111222", 7000, LocalDate.of(2025,04,10), 20, 5, 100, 100, "password");
         // if (today.getDayOfWeek() == DayOfWeek.SUNDAY) {
         //     manager.archiveWeeklyForAllEmployees();

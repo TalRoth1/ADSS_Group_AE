@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class ShiftFacade { //shift related methods
 
@@ -167,7 +166,7 @@ public class ShiftFacade { //shift related methods
         return shiftEmployee.isAvailable(shift);
     }
 
-    public void getAssignedEmployeesInfo(int managerId,int e Shift shift) {
+    public void getAssignedEmployeesInfo(int managerId,int e ,Shift shift) { //for shift manager OR shift employee
         ShiftEmployee shiftEmployee = shiftEmployees.get(managerId);
         shift.getEmployeesInfo();
     }
