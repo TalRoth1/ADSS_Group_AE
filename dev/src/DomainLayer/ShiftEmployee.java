@@ -1,15 +1,18 @@
 package DomainLayer;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ShiftEmployee extends Employee {
     private List<Shift> preferredShifts;
-    private List<Shift> assignedShifts; 
+    private Map<Shift, Role> assignedShifts; 
     private List<Role> roles;
     private Set<Shift> pastShifts = new HashSet<>();
 
@@ -20,10 +23,10 @@ public class ShiftEmployee extends Employee {
                 socialBenefits, password);
         this.preferredShifts = new ArrayList<>();
         this.roles = new ArrayList<>();
-        this.assignedShifts = new ArrayList<>();
+        this.assignedShifts = new HashMap<>();
         roles.add(role);
     }
-    public String getPreferredShiftsToString() {
+    public String getPreferredShiftsToString() { //employee or manager can see emp's preferred shifts
         String res="Preferred shifts: " + "\n";
         if(preferredShifts == null) {
             return "No preferred shifts.";
@@ -33,15 +36,24 @@ public class ShiftEmployee extends Employee {
         }
         return res;
     }
+
+    public String getAssignedShiftsToString() { //employee or manager can see emp's assigned shifts
+        String res="Assigned shifts: " + "\n";
+        if(assignedShifts == null) {
+            return "No assigned shifts.";
+        }
+        for(Shift shift : assignedShifts.keySet()) {
+            res += shift.toString() + "\n";
+        }
+        return res;
+    }
+
     public String getAssignedEmployeesInfo(Shift shift) {
         if(shift.getShiftManagerId() == this.getId()) {
             return shift.getEmployeesInfo();
         }
         return "You are not authorized to view assigned employees for this shift.";
     }
-
- 
-    // כשסיים לעבוד אסור לו לבחור משמרות ולהשתבץ!
 
     //methods
 
@@ -64,9 +76,6 @@ public class ShiftEmployee extends Employee {
         roles.remove(role);
         return null;
     }
-
-    
-    
 
     public String changeRole(Role oldRole, Role newRole) {
         if(oldRole == null || newRole == null) {
@@ -111,17 +120,23 @@ public class ShiftEmployee extends Employee {
         return null;
     }
 
-    public String addAssignedShift(Shift shift) {
+    public String addAssignedShift(Shift shift, Role role) {
+        if(role == null) {
+            return "Role cannot be null.";
+        }
+        if(!roles.contains(role)) {
+            return "Role does not exist in the list of roles.";
+        }
         if(isFinishWorking()) {
             return "Employee has finished working and cannot add assigned shifts.";
         }
-        if(assignedShifts.contains(shift)) {
+        if(assignedShifts.containsKey(shift)) {
             return "Shift already exists in the list of assigned shifts.";
         }
         if(shift == null) {
             return "Shift cannot be null.";
         }
-        assignedShifts.add(shift);
+        assignedShifts.put(shift, role); 
         return null;
     }
 
@@ -129,7 +144,7 @@ public class ShiftEmployee extends Employee {
         if(isFinishWorking()) {
             return "Employee has finished working and cannot remove assigned shifts.";
         }
-        if(!assignedShifts.contains(shift)) {
+        if(!assignedShifts.containsKey(shift)) {
             return "Shift doesnt exists in the list of assigned shifts.";
         }
         if(shift == null) {
@@ -150,18 +165,20 @@ public class ShiftEmployee extends Employee {
     }
 
     public void archiveOldShiftsWeekly(LocalDate today) {
-        // Find the start of this week (e.g., Monday)
-        LocalDate startOfThisWeek = today.with(java.time.DayOfWeek.SUNDAY);
-        Iterator<Shift> iterator = assignedShifts.iterator();
-        while (iterator.hasNext()) {
-            Shift shift = iterator.next();
-            if (shift.getDate().isBefore(startOfThisWeek)) {
+        // Find the start of this week (Sunday)
+        LocalDate startOfWeek = today.with(DayOfWeek.SUNDAY);
+        // Iterate through the assigned shifts and check if they are older than the start of the week
+        Iterator<Map.Entry<Shift, Role>> assignedIterator = assignedShifts.entrySet().iterator();
+        while (assignedIterator.hasNext()) {
+            Map.Entry<Shift, Role> entry = assignedIterator.next();
+            Shift shift = entry.getKey();
+            if (shift.getDate().isBefore(startOfWeek)) {
+                // If the shift is older than the start of the week, remove it from the assigned shifts
+                assignedIterator.remove();
+                // Add it to the past shifts
                 pastShifts.add(shift);
-                iterator.remove();
             }
-        }
-        //remove shifts older than 7 years
-        pastShifts.removeIf(shift -> shift.getDate().isBefore(today.minusYears(7)));
+        }      
     }
     
   //  public boolean isShiftManager(){
@@ -172,10 +189,10 @@ public class ShiftEmployee extends Employee {
         return roles.contains(Role.SHIFT_MANAGER);
     }
 
-    public List<Shift> getAssignedShifts() {
+    public Map<Shift, Role> getAssignedShifts() {
         return assignedShifts;
     }
-    public void setAssignedShifts(List<Shift> assignedShifts) {
+    public void setAssignedShifts(Map<Shift, Role> assignedShifts) {
         this.assignedShifts = assignedShifts;
     }
     public List<Shift> getPrefShifts() {
@@ -195,8 +212,4 @@ public class ShiftEmployee extends Employee {
     public List<Role> getRoles() {
         return roles;
     }
-
- 
-
-
 }

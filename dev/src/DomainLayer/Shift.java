@@ -58,14 +58,6 @@ public class Shift {
     public Map<Integer, Role> getAssignedEmployeesID() {
         return assignedEmployeesID;
     }
-    public String getAssignedEmployeesIDToString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Assigned Employees: \n");
-        for (Map.Entry<Integer, Role> entry : assignedEmployeesID.entrySet()) {
-            sb.append("Employee ID: ").append(entry.getKey()).append(", Role: ").append(entry.getValue()).append("\n");
-        }
-        return sb.toString();
-    }
 
     public LocalDate getDate() {
         return date;

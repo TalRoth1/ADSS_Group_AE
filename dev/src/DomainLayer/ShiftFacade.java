@@ -8,7 +8,6 @@ import java.util.Set;
 
 public class ShiftFacade { //shift related methods
 
-    private Map<Integer, Shift> shifts;
     private Map<Integer, EmployeeManager> employeeManagers;
     private Map<Integer, ShiftEmployee> shiftEmployees;
 
@@ -136,9 +135,9 @@ public class ShiftFacade { //shift related methods
         return shiftEmployee.removePreferredShift(shift);
     }
 
-    public String addAssignedShift(int id, Shift shift) {
+    public String addAssignedShift(int id, Shift shift, Role role) {
         ShiftEmployee shiftEmployee = shiftEmployees.get(id);
-        return shiftEmployee.addAssignedShift(shift);
+        return shiftEmployee.addAssignedShift(shift, role);
     }
 
     public String removeAssignedShift(int id, Shift shift) {

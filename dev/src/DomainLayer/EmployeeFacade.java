@@ -14,13 +14,21 @@ public class EmployeeFacade { //employee related methods
     }
     public Employee login(int id, String password) {
         Employee e = getEmployee(id);
-        if(e != null && e.login(password))
+        if(e != null && e.login(password)) {
             return e;
+        }
+        return null;
+    }
+
+    public String logout(int id) {
+        if(!isLoggedIn(id))
+            return "You are not logged in";
+        Employee e = getEmployee(id);
+        e.logout();
         return null;
     }
 
     //employee manager methods
-
     public boolean isEmployeeManager(int id) {
         return employeeManagers.containsKey(id);
     }
@@ -31,7 +39,7 @@ public class EmployeeFacade { //employee related methods
     } 
 
     public String removeEmployee(int employeeId, int empManagerId) {
-        if(!isEmployeeManager(employeeId))
+        if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
@@ -39,8 +47,20 @@ public class EmployeeFacade { //employee related methods
         return employeeManager.removeEmployee(employeeId);
     }
 
+    public String hireEmployee(int employeeId, int empManagerId, String branch,String employeeName, String bankAccount,int salary, LocalDate startDate, int vacationDays, int sickDays,double educationFund, double socialBenefits, String employeePassword, Role role) {
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
+        if(!isLoggedIn(empManagerId)) 
+            return "You are not logged in";
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        employeeManager.hireEmployee(employeeId, employeeName, branch, bankAccount,salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
+        ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
+        shiftEmployees.put(employeeId, shiftEmployee);
+        return null;     
+    }
+    
     public String fireEmployee(int employeeId, int empManagerId) {
-        if(!isEmployeeManager(employeeId))
+        if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
@@ -48,20 +68,8 @@ public class EmployeeFacade { //employee related methods
         return employeeManager.fireEmployee(employeeId);
     }
 
-    public String hireEmployee(int employeeId, int empManagerId, String branch,String employeeName, String bankAccount,int salary, LocalDate startDate, int vacationDays, int sickDays,double educationFund, double socialBenefits, String employeePassword, Role role) {
-        if(!isEmployeeManager(employeeId))
-            return "this action is allowed only for employee manager";
-        if(!isLoggedIn(empManagerId)) ////////nedd to check mikrey katze with date
-            return "You are not logged in";
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        employeeManager.hireEmployee(employeeId, employeeName, branch, bankAccount,salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
-        ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
-        addShiftEmployee(employeeId, shiftEmployee);
-        return null;     
-    }
-
     public String changeRoleToEmployee(int employeeId, int empManagerId, Role oldRole, Role newRole) {
-        if(!isEmployeeManager(employeeId))
+        if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
@@ -70,7 +78,7 @@ public class EmployeeFacade { //employee related methods
     }
 
     public String addRoleToEmployee(int employeeId, int empManagerId, Role newRole) {
-        if(!isEmployeeManager(employeeId))
+        if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
@@ -79,7 +87,7 @@ public class EmployeeFacade { //employee related methods
     }
 
     public String deleteRoleFromEmployee(int employeeId, int empManagerId, Role roleToDelete) {
-        if(!isEmployeeManager(employeeId))
+        if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
@@ -87,8 +95,9 @@ public class EmployeeFacade { //employee related methods
         return employeeManager.deleteRoleFromEmployee(employeeId, roleToDelete);
     }
 
+    //update methods
     public String updateSalary(int employeeId, int empManagerId, int salary) {
-        if(!isEmployeeManager(employeeId))
+        if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
@@ -97,7 +106,7 @@ public class EmployeeFacade { //employee related methods
     }
 
     public String updateBankAccount(int employeeId, int empManagerId, String bankAccount) {
-        if(!isEmployeeManager(employeeId))
+        if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
@@ -106,7 +115,7 @@ public class EmployeeFacade { //employee related methods
     }
 
     public String updateVacationDays(int employeeId, int empManagerId, int vacationDays) {
-        if(!isEmployeeManager(employeeId))
+        if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
@@ -115,7 +124,7 @@ public class EmployeeFacade { //employee related methods
     }
 
     public String updateSickDays(int employeeId, int empManagerId, int sickDays) {
-        if(!isEmployeeManager(employeeId))
+        if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
@@ -124,7 +133,7 @@ public class EmployeeFacade { //employee related methods
     }
 
     public String updateEducationFund(int employeeId, int empManagerId, double educationFund) {
-        if(!isEmployeeManager(employeeId))
+        if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
@@ -133,35 +142,12 @@ public class EmployeeFacade { //employee related methods
     }
 
     public String updateSocialBenefits(int employeeId, int empManagerId, double socialBenefits) {
-        if(!isEmployeeManager(employeeId))
+        if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.updateSocialBenefits(employeeId, socialBenefits);
-    }
-
-    public String getPrefAllEmployees(int empManagerId) {
-        if(!isEmployeeManager(empManagerId))
-            return "this action is allowed only for employee manager";
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.getPrefAllEmployees();
-    }
-
-    
-    public String getPrefEmployee(int employeeId, int empManagerId) {
-        if(!isEmployeeManager(empManagerId))
-            return "this action is allowed only for employee manager";
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.getPrefEmployee(employeeId);
-    }
-
-    private void addShiftEmployee(int employeeId, ShiftEmployee shiftEmployee) {
-        shiftEmployees.put(employeeId, shiftEmployee);
     }
 
     private Employee getEmployee(int id) {
@@ -192,31 +178,56 @@ public class EmployeeFacade { //employee related methods
         return employeeManager.removeTrainingFromEmployee(employeeId, training);
     } */
 
-
-    public String getAvailableEmployees(Shift shift, Role role) {
+    public String getAvailableEmployees(int empManagerId, Shift shift, Role role) { //get available employees for a shift with this role
         if(shift == null) {
             return "Shift is null";
         }
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(shift.getShiftManagerId());
         return employeeManager.getAvailableEmployees(shift, role);
     }
 
-    public String getEmployeeShifts(int employeeId, int empManagerId) {
+    // shift employee methods
+
+    public String getPrefAllEmployees(int empManagerId) { //get all employees' preferences
+    if(!isEmployeeManager(empManagerId))
+        return "this action is allowed only for employee manager";
+    if(!isLoggedIn(empManagerId))
+        return "You are not logged in";
+    EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+    return employeeManager.getPrefAllEmployees();
+    }
+
+    public String getPreferredShiftsEmployee(int empManagerId, int employeeId) { //employee's preferred shifts for shift employee only
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+        ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
+        return shiftEmployee.getPreferredShiftsToString();
+    }
+
+    public String getAssignedEmployeeShiftsEmployee(int employeeId, int empManagerId) { //employee's assigned shifts for shift employee only
+    if(!isEmployeeManager(empManagerId))
+        return "this action is allowed only for employee manager";
+    if(!isLoggedIn(empManagerId))
+        return "You are not logged in";
+    ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
+    return shiftEmployee.getAssignedShiftsToString();
+    }
+
+    public String getAssignedEmployeeShifts(int employeeId, int empManagerId) { //employee's assigned shifts for shift employee only
         if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.getEmployeeShifts(employeeId);
+        return employeeManager.getAssignedEmployeeShifts(employeeId);
     }
 
-
-    // shift employee methods
-
-    public String getPreferredShiftsToString(int employeeId) {
-        ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
-        return shiftEmployee.getPreferredShiftsToString();
-    }
 
     public String addRole(int id, Role role){
         ShiftEmployee shiftEmployee = shiftEmployees.get(id);
@@ -233,30 +244,5 @@ public class EmployeeFacade { //employee related methods
         return shiftEmployee.changeRole(oldRole, newRole);
     }
 
-    public String logout(int id) {
-        if(!isLoggedIn(id))
-            return "You are not logged in";
-        Employee e = getEmployee(id);
-        e.logout();
-        return null;
-    }
 
-   
-
-
-
-
-
-
-
-//    private Role convertStringToRole(String roleName) {
-//        if (roleName == null) {
-//            throw new IllegalArgumentException("Role name cannot be null");
-//        }
-//        try {
-//            return Role.valueOf(roleName.toUpperCase());
-//        } catch (IllegalArgumentException e) {
-//            throw new IllegalArgumentException("Invalid role name: " + roleName);
-//        }
-//    }
 }

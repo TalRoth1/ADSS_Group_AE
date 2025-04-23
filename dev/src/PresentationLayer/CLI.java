@@ -114,13 +114,13 @@ public class CLI {
         Shift shift = new Shift(dateOfShift, shiftType, -1);
 
         //choose shift manager
-        int shiftManagerId = selectEmployeeForRole(shift, Role.SHIFT_MANAGER);
+        int shiftManagerId = selectEmployeeForRole(userId, shift, Role.SHIFT_MANAGER);
         shiftFacade.setShiftManager(userId, shift, shiftManagerId);
 
         //choose number of employees for each role
         for (Role role : Role.values()) {
             if (role != Role.SHIFT_MANAGER) 
-                chooseNumOfEmployeesForShift(role, shift, userId);
+                chooseNumOfEmployeesForShift(role, shift);
         }
         EmployeeManager(); 
     }
@@ -188,6 +188,10 @@ public class CLI {
         String bankAccount = readString("Bank Account: ");
         int salary = readInt("Salary: ");
         LocalDate startDate = readDate("Start Date: ");
+        if(startDate == null || startDate.isBefore(now) || startDate.isAfter(now.plusDays(7))) {
+            System.out.println("Invalid date format. Please try again.");
+            hireEmployee();
+        }
         int vacationDays = readInt("Vacation Days");
         int sickDays = readInt("Sick Days");
         double educationFund = readDouble("Education fund: ");
@@ -304,7 +308,7 @@ public class CLI {
 
     private void getPrefEmployee() { 
         int employeeId = readInt("Please enter Employee's ID: ");
-        String response = employeeFacade.getPrefEmployee(employeeId, userId);
+        String response = employeeFacade.getPreferredShiftsEmployee(employeeId, userId);
         if (response != null) 
             System.out.println(response);
         EmployeeManager();  
@@ -312,7 +316,7 @@ public class CLI {
 
     private void getEmployeeShifts() {
         int employeeId = readInt("Please enter Employee's ID: ");
-        String response = employeeFacade.getEmployeeShifts(employeeId, userId);
+        String response = employeeFacade.getAssignedEmployeeShiftsEmployee(employeeId, userId);
         if (response != null) 
             System.out.println(response);
         EmployeeManager();  
@@ -469,15 +473,15 @@ public class CLI {
         System.out.println(employeeFacade.getPrefAllEmployees(userId));
     }
 
-    private void chooseNumOfEmployeesForShift(Role role, Shift shift, int empManagerId) {
+    private void chooseNumOfEmployeesForShift(Role role, Shift shift) {
         while (true) {
             int numOfEmployees = readInt("Please enter the number of employees for " + role + ": ");
-            String response = shiftFacade.setRequiredRoles(empManagerId, shift, role, numOfEmployees);
+            String response = shiftFacade.setRequiredRoles(userId, shift, role, numOfEmployees);
             if (response != null) {
                 System.out.println(response);
                 continue;
             }
-            addEmployeesWithSameRoleToShift(shift, role, empManagerId, numOfEmployees);
+            addEmployeesWithSameRoleToShift(shift, role, userId, numOfEmployees);
             break;
         }
     }
@@ -485,7 +489,7 @@ public class CLI {
     private void addEmployeesWithSameRoleToShift(Shift shift, Role role, int empManagerId, int numOfEmployees) {
         for (int i = 0; i < numOfEmployees; i++) {
             while (true) {
-                int employeeId = selectEmployeeForRole(shift, role);
+                int employeeId = selectEmployeeForRole(empManagerId,shift, role);
                 String res = shiftFacade.addEmployeeToShift(employeeId, shift, role, empManagerId);
                 if(res != null) {
                     System.out.println(res);
@@ -509,10 +513,10 @@ public class CLI {
         return employeeId; // available employee
     }
 
-    private int selectEmployeeForRole(Shift shift, Role role) { //method to setShifts()
+    private int selectEmployeeForRole(int empManagerId,Shift shift, Role role) { //method to setShifts()
     while (true) {
         System.out.println("Please choose " + role + " for the shift from the following available employees:");
-        System.out.println(employeeFacade.getAvailableEmployees(shift, role));
+        System.out.println(new String(employeeFacade.getAvailableEmployees(empManagerId, shift, role)));
         int employeeId = readInt("Please enter the ID of the employee: ");
 
         if (!shiftFacade.isAvailable(employeeId, shift)) {
