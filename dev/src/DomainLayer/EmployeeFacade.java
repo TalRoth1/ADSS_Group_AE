@@ -53,10 +53,10 @@ public class EmployeeFacade { //employee related methods
         if(!isLoggedIn(empManagerId)) 
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        employeeManager.hireEmployee(employeeId, employeeName, branch, bankAccount,salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
-        ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
+        ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName, branch, bankAccount,salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
+        //ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
         shiftEmployees.put(employeeId, shiftEmployee);
-        return null;     
+        return "Employee: " + employeeId + " hired successfully";    
     }
     
     public String fireEmployee(int employeeId, int empManagerId) {
@@ -152,8 +152,9 @@ public class EmployeeFacade { //employee related methods
 
     private Employee getEmployee(int id) {
         Employee employee = employeeManagers.get(id);
-        if(employee == null)
+        if(employee == null) {
             employee = shiftEmployees.get(id);
+        }
         return employee;
     }
 
@@ -244,5 +245,15 @@ public class EmployeeFacade { //employee related methods
         return shiftEmployee.changeRole(oldRole, newRole);
     }
 
-
+    //just for Main
+    public void addFirstEmployeeManager(int id, String name, String branch, String bankAccount, int salary,
+                                     LocalDate startDate, int vacationDays, int sickDays,
+                                     double educationFund, double socialBenefits, String password) {
+    EmployeeManager manager = new EmployeeManager(id, name, branch, bankAccount, salary, startDate,
+                                                  vacationDays, sickDays, educationFund, socialBenefits, password);
+    employeeManagers.put(id, manager);
+    }
 }
+
+
+

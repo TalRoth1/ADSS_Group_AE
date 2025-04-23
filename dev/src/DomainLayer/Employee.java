@@ -42,7 +42,7 @@ public class Employee {
 
 
     public boolean login(String password) {
-        if (this.password.equals(password)) {
+        if (this.password.equals(password) && !this.finishWorking) {
             this.isLoggedIn = true;
             return true;
         } else {
