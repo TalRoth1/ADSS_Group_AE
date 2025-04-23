@@ -219,13 +219,13 @@ public class EmployeeFacade { //employee related methods
     return shiftEmployee.getAssignedShiftsToString();
     }
 
-    public String getAssignedEmployeeShifts(int employeeId, int empManagerId) { //employee's assigned shifts for shift employee only
+    public String getAssignedEmployeeShiftsManager(int employeeId, int empManagerId) { //employee's assigned shifts for shift employee only
         if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.getAssignedEmployeeShifts(employeeId);
+        return employeeManager.getAssignedEmployeeShiftsManager(employeeId);
     }
 
 

@@ -336,7 +336,7 @@ public class EmployeeManager extends Employee{
   
 
     
-    public String getAssignedEmployeeShifts(int employeeID) { //all the assigned shifts of the employee
+    public String getAssignedEmployeeShiftsManager(int employeeID) { //all the assigned shifts of the employee
         if (!checkEmployee(employeeID)) {
             return "employee not exist";
         }
