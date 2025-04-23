@@ -7,8 +7,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
-//import java.util.regex.Matcher;
-//import java.util.regex.Pattern;
 import java.util.Set;
 
 public class CLI {
@@ -112,8 +110,8 @@ public class CLI {
         int startTime = shiftTimes[0];
         int endTime = shiftTimes[1];
     
-        shiftFacade.createShift(dateOfShift, shiftType, startTime, endTime, userId, -1);
-        Shift shift = new Shift(dateOfShift, shiftType, startTime, endTime, -1);
+        shiftFacade.createShift(dateOfShift, shiftType, userId, -1);
+        Shift shift = new Shift(dateOfShift, shiftType, -1);
 
         //choose shift manager
         int shiftManagerId = selectEmployeeForRole(shift, Role.SHIFT_MANAGER);

@@ -17,11 +17,11 @@ public class Shift {
     private Map<Integer, Role> assignedEmployeesID; 
     private Map<Integer, Role> availableEmployeesID;
 
-    public Shift(LocalDate date, ShiftType shiftType, int startTime,int endTime, int shiftManagerId) {
+    public Shift(LocalDate date, ShiftType shiftType, int shiftManagerId) {
         this.date = date;
         this.shiftType = shiftType;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.startTime = 600; // Default start time for morning shifts
+        this.endTime = 1400; // Default end time for morning shifts
         this.shiftManagerId = shiftManagerId;
         this.requiredRoles = new HashMap<>();
         this.availableEmployeesID = new HashMap<>();

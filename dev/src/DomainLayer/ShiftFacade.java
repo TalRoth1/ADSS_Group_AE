@@ -1,10 +1,10 @@
 package DomainLayer;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.Collections;
 
 public class ShiftFacade { //shift related methods
 
@@ -60,11 +60,11 @@ public class ShiftFacade { //shift related methods
         return employeeManager.shiftReplacement(shift, employeeId, newEmployeeId);
     }
 
-    public String createShift(LocalDate date, ShiftType shiftType, int start, int end,int empManagerId, int shiftManagerId) {
+    public String createShift(LocalDate date, ShiftType shiftType,int empManagerId, int shiftManagerId) {
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.createShift(date, shiftType, start, end, shiftManagerId);
+        return employeeManager.createShift(date, shiftType, shiftManagerId);
     }
 
     public String addEmployeeToShift(int employeeId, Shift shift,Role role,int empManagerId) {

@@ -218,7 +218,7 @@ public class EmployeeManager extends Employee{
            return null;
     }
 
-    public String createShift(LocalDate date, ShiftType shiftType, int start, int end, int shiftManagerId) {
+    public String createShift(LocalDate date, ShiftType shiftType, int shiftManagerId) {
         if (date == null || shiftType == null) {
             return "invalid date or shift type";
         }
@@ -228,19 +228,15 @@ public class EmployeeManager extends Employee{
         if (!allEmployees.get(shiftManagerId).getRoles().contains(Role.SHIFT_MANAGER)) {
             return "this employee can't be a shift manager";
         }
-        if (start < 0 || end < 0 || start >= end){
-            return "invalid start or end time";
-        }
+        
         if (shiftType == ShiftType.MORNING && morningShifts.containsKey(date)) {
             return "morning shift already exists for this date";
         } else if (shiftType == ShiftType.EVENING && eveningShifts.containsKey(date)) {
             return "evening shift already exists for this date";
         }
-        if((shiftType == ShiftType.MORNING && (end > 1400 || start < 600)) || shiftType == ShiftType.EVENING && (start < 1400 || end > 2200)) {
-            return "invalid start or end time for this shift type";
-        }
 
-        Shift shift = new Shift(date, shiftType,start, end, shiftManagerId);
+
+        Shift shift = new Shift(date, shiftType, shiftManagerId);
         if (shiftType == ShiftType.MORNING) {
             morningShifts.put(date, shift);
         } else if (shiftType == ShiftType.EVENING) {
@@ -288,6 +284,20 @@ public class EmployeeManager extends Employee{
     }
 
     //getters and setters
+    public String setShiftTimes(Shift shift, int start, int end) { //set start time and end time of the shift
+        if (start < 0 || end < 0 || start >= end){
+            return "invalid start or end time";
+        }
+        if(shift == null){
+            return "shift not exist";
+        }
+        if((shift.getShiftType() == ShiftType.MORNING && (end > 1400 || start < 600)) || shift.getShiftType() == ShiftType.EVENING && (start < 1400 || end > 2200)) {
+            return "invalid start or end time for this shift type";
+        }
+        shift.setStartTime(start);
+        return null;
+    }
+
     public void setRequiredRole(Shift shift, Role role, int numOfEmployees) {
         if(shift != null)
             shift.setRequiredRoles(role, numOfEmployees);
