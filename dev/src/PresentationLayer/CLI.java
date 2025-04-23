@@ -3,6 +3,7 @@ package PresentationLayer;
 import DomainLayer.*;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
@@ -10,6 +11,7 @@ import java.util.Scanner;
 //import java.util.regex.Matcher;
 //import java.util.regex.Pattern;
 import java.util.Set;
+import java.util.Map;
 
 public class CLI {
     public static Scanner scanner = new Scanner(System.in);
@@ -17,7 +19,7 @@ public class CLI {
     ShiftFacade shiftFacade;
     private int userId;
     private String password;
-    private LocalDate now;
+    private LocalDate nowDate;
     private static final Integer[] MORNING_SHIFT_START_TIMES = {
         500, 530, 600, 630, 700, 730, 800, 830, 900, 930, 1000};
     private static final Integer[] MORNING_SHIFT_END_TIMES = {
@@ -31,7 +33,7 @@ public class CLI {
         this.employeeFacade = employeeFacade;
         //employeeFacade = new EmployeeFacade();
         this.shiftFacade = new ShiftFacade();
-        now = LocalDate.now();
+        nowDate = LocalDate.now();
         loginCLI();
     }
 
@@ -110,9 +112,6 @@ public class CLI {
 
         //choose shift type and hours with helper method
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
-        int[] shiftTimes = getValidShiftTimes(shiftType);
-        //int startTime = shiftTimes[0];
-        //int endTime = shiftTimes[1];
     
         shiftFacade.createShift(dateOfShift, shiftType, userId, -1);
         Shift shift = new Shift(dateOfShift, shiftType, -1);
@@ -191,7 +190,7 @@ public class CLI {
         String name = readString("Name");
         String bankAccount = readString("Bank Account: ");
         int salary = readInt("Salary: ");
-        LocalDate startDate = readDate("Start Date: ");
+        LocalDate startDate = readStartDate("Start Date: ");
         int vacationDays = readInt("Vacation Days");
         int sickDays = readInt("Sick Days");
         double educationFund = readDouble("Education fund: ");
@@ -294,13 +293,14 @@ public class CLI {
     }
 
     private void getPastShifts() {
-        Set<Shift> shifts = shiftFacade.getPastShifts(userId);
+        Map<LocalDate, Shift> shifts = shiftFacade.getPastShifts(userId);
         if (shifts.isEmpty()) 
             System.out.println("No past shifts found or you are not logged in.");
         else {
             System.out.println("Past Shifts:");
-            for (Shift shift : shifts) 
-                System.out.println(shift.toString());
+            for (Map.Entry<LocalDate, Shift> entry : shifts.entrySet()) {
+                Shift shift = entry.getValue();
+                System.out.println(shift.toString());}
         }
         EmployeeManager();
     }
@@ -434,7 +434,7 @@ public class CLI {
         String option = selectFromList("Select Shift Employee Action:", actions);
 
         switch (option) {
-            //case "Set Preferences" -> setPreferences();
+            case "Set Preferences" -> setPreferences();
             case "Remove Preferred Shift" -> removePreferredShift();
             case "Show Shift Information" -> getShiftInfo();
             //case "Show my Preferences" -> ; //צפייה בפרטי משמרות שרשמתי שאני מעדיף
@@ -445,6 +445,19 @@ public class CLI {
                 shiftEmployee();
             }
         }
+    }
+
+    private void setPreferences() {
+        LocalDate dateOfShift = chooseDate(); //choose date with helper method
+        if(dateOfShift == null) 
+            shiftEmployee(); // If date is invalid, return to EmployeeManager
+        ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
+        Shift shift = shiftFacade.getShift(dateOfShift, shiftType, userId);
+        String response = shiftFacade.addPreferredShift(userId, shift);
+        if(response != null)
+            System.out.println(response);
+        //לשאול את העובד האם הוא ירצה להוסיף משמרת נוספת או לחזור לתפריט הראשי
+        shiftEmployee();
     }
    
     private void removePreferredShift() {
@@ -532,23 +545,28 @@ public class CLI {
         }
     }
 
-    private LocalDate chooseDate() {
-        LocalDate dateOfShift = readDate("Please enter the date of the shift ");
-        DayOfWeek today = now.getDayOfWeek();
+    private LocalDate chooseDate() { //for EmployeeManager
+        LocalDate dateOfShift = readStartDate("Please enter the date of the shift ");
+        LocalTime nowTime = LocalTime.now();
+        DayOfWeek today = nowDate.getDayOfWeek();
 
-        //check if it's Thursday/Friday/Saturday
-        if (today.getValue() < DayOfWeek.THURSDAY.getValue() || today.getValue() > DayOfWeek.SATURDAY.getValue()) {
-            System.out.println("You can only set shifts from Thursday to Saturday");
+        boolean isAllowedTime =
+        (today == DayOfWeek.THURSDAY && nowTime.isAfter(LocalTime.of(17, 30))) ||
+        (today == DayOfWeek.FRIDAY) ||
+        (today == DayOfWeek.SATURDAY);
+        if(!isAllowedTime) {
+            System.out.println("You can only set shifts from Thursday 17:30 and all day Friday and Saturday");
             return null; // Return null to indicate invalid date
         }
+
         //check if date is in the past
-        if(dateOfShift.isBefore(now)) {
+        if(dateOfShift.isBefore(nowDate)) {
             System.out.println("You can't set shifts to the past, choose again");
             return null; 
         }
          //allow shifts only for next week
         //now.with(DayOfWeek.SUNDAY) gets the most recent Sunday before/equal to today.
-        long weeksBetween = ChronoUnit.WEEKS.between(now.with(DayOfWeek.SUNDAY), dateOfShift.with(DayOfWeek.SUNDAY));
+        long weeksBetween = ChronoUnit.WEEKS.between(nowDate.with(DayOfWeek.SUNDAY), dateOfShift.with(DayOfWeek.SUNDAY));
         if (weeksBetween != 1) {
             System.out.println("You can only set shift for NEXT week.");
             return null;
@@ -662,7 +680,7 @@ public class CLI {
         return scanner.nextLine();
     }
 
-    private LocalDate readDate(String prompt) {
+    private LocalDate readStartDate(String prompt) { //for hireEmployee()
         String input = "";
         String pattern = "^(0[1-9]|[1-2][0-9]|3[01])-(0[1-9]|1[0-2])-(\\d{4})$";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -672,7 +690,14 @@ public class CLI {
             input = scanner.nextLine();
             if (input.matches(pattern)) {
                 try {
-                    return LocalDate.parse(input, formatter);
+                    LocalDate date = LocalDate.parse(input, formatter);
+
+                    if (date.isAfter(nowDate.plusMonths(1))) 
+                        System.out.println("Start date can't be more than 1 month in the future.");
+                    else if (date.isBefore(nowDate.minusMonths(1))) 
+                        System.out.println("Start date can't be more than 1 month in the past.");
+                    else 
+                        return date; 
                 } catch (DateTimeParseException e) {
                     // just in case regex filters didnt catch the error
                     System.out.println("Invalid date format. Please try again.");

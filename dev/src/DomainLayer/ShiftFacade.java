@@ -46,6 +46,8 @@ public class ShiftFacade { //shift related methods
     }
 
     public String changeShiftManager(Shift shift, int oldShiftManagerId, int newShiftManagerId, int empManagerId) {
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
@@ -53,6 +55,8 @@ public class ShiftFacade { //shift related methods
     }
 
     public String shiftReplacement(Shift shift, int employeeId, int empManagerId, int newEmployeeId) {
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
@@ -60,6 +64,8 @@ public class ShiftFacade { //shift related methods
     }
 
     public String createShift(LocalDate date, ShiftType shiftType,int empManagerId, int shiftManagerId) {
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
@@ -67,6 +73,8 @@ public class ShiftFacade { //shift related methods
     }
 
     public String addEmployeeToShift(int employeeId, Shift shift,Role role,int empManagerId) {
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
@@ -74,6 +82,8 @@ public class ShiftFacade { //shift related methods
     }
 
     public String removeEmployeeFromShift(int employeeId, Shift shift, int empManagerId) {
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
@@ -82,7 +92,7 @@ public class ShiftFacade { //shift related methods
 
 
     // shift methods
-    public String getEmployeeInfo(int shiftManagerId, Shift shift) {
+    public String getEmployeeInfo(int shiftManagerId, Shift shift) { //for shift manager OR shift employee
         if(!isLoggedIn(shiftManagerId))
             return "You are not logged in";
         ShiftEmployee shiftEmployee = shiftEmployees.get(shiftManagerId);
@@ -96,17 +106,23 @@ public class ShiftFacade { //shift related methods
     }
 
     public String addEmployee(int employeeId, Shift shift, int empManagerId, Role role) {
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         return shift.addEmployee(employeeId, role);
     }
 
     public String removeEmployee(int employeeId, Shift shift, int empManagerId) {
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         return shift.removeEmployee(employeeId);
     }
     public String setRequiredRoles(int empManagerId, Shift shift, Role role, int num) {
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         return shift.setRequiredRoles(role, num);
@@ -119,10 +135,11 @@ public class ShiftFacade { //shift related methods
     }
 
     public String setShiftManager(int empManagerId, Shift shift, int id){
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         return shift.setShiftManagerId(id);
-
     }
 
     public String addPreferredShift(int id, Shift shift) {
@@ -150,16 +167,20 @@ public class ShiftFacade { //shift related methods
         return shiftEmployee.isAvailable(shift);
     }
 
-    public void getAssignedEmployeesInfo(int managerId, Shift shift) {
+    public void getAssignedEmployeesInfo(int managerId,int e Shift shift) {
         ShiftEmployee shiftEmployee = shiftEmployees.get(managerId);
         shift.getEmployeesInfo();
     }
 
-    public Set<Shift> getPastShifts(int empManagerId) {
+    public Map<LocalDate, Shift> getPastShifts(int empManagerId) {
         if(!isLoggedIn(empManagerId))
-            return Collections.emptySet(); 
-        ShiftEmployee shiftEmployee = shiftEmployees.get(empManagerId);
-        return shiftEmployee.getPastShifts();
+            return Collections.emptyMap();
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.getPastShifts();
+    }
+
+    public boolean isEmployeeManager(int id) {
+        return employeeManagers.containsKey(id);
     }
 
 

@@ -12,6 +12,7 @@ public class EmployeeManager extends Employee{
     private Map<Integer, ShiftEmployee> allEmployees;
     private Map<LocalDate, Shift> morningShifts;
     private Map<LocalDate, Shift> eveningShifts;
+    private Map<LocalDate, Shift> pastShifts;
     
     public EmployeeManager(int id, String name,String branch, String bankAccount, int salary, LocalDate startDate,
                            int vacationDays, int sickDays, double educationFund, double socialBenefits,
@@ -21,6 +22,7 @@ public class EmployeeManager extends Employee{
         allEmployees = new HashMap<>();
         morningShifts = new HashMap<>();
         eveningShifts = new HashMap<>();
+        pastShifts = new HashMap<>();
     }
 
     //methods 
@@ -233,14 +235,13 @@ public class EmployeeManager extends Employee{
         } else if (shiftType == ShiftType.EVENING && eveningShifts.containsKey(date)) {
             return "evening shift already exists for this date";
         }
-
-
         Shift shift = new Shift(date, shiftType, shiftManagerId);
         if (shiftType == ShiftType.MORNING) {
             morningShifts.put(date, shift);
         } else if (shiftType == ShiftType.EVENING) {
             eveningShifts.put(date, shift);
         }
+        pastShifts.put(date, shift);
         return null;
     }
 
@@ -377,6 +378,10 @@ public class EmployeeManager extends Employee{
 
     public ShiftEmployee getEmployee(int id) {
         return allEmployees.get(id);
+    }
+
+    public Map<LocalDate, Shift> getPastShifts() {
+        return pastShifts;
     }
 
 }

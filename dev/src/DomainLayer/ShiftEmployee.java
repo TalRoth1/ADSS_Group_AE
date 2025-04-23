@@ -14,7 +14,6 @@ public class ShiftEmployee extends Employee {
     private List<Shift> preferredShifts;
     private Map<Shift, Role> assignedShifts; 
     private List<Role> roles;
-    private Set<Shift> pastShifts = new HashSet<>();
 
     public ShiftEmployee(int id, String name, String branch, String bankAccount, int salary, LocalDate startDate,
                          int vacationDays, int sickDays, double educationFund, double socialBenefits,
@@ -175,15 +174,9 @@ public class ShiftEmployee extends Employee {
             if (shift.getDate().isBefore(startOfWeek)) {
                 // If the shift is older than the start of the week, remove it from the assigned shifts
                 assignedIterator.remove();
-                // Add it to the past shifts
-                pastShifts.add(shift);
             }
         }      
     }
-    
-  //  public boolean isShiftManager(){
-   //     return this.trainings.contains(Training.TeamManagement)&&trainings.contains(Training.CancellationCard);
-  //  }
 
     public boolean isShiftManager() {
         return roles.contains(Role.SHIFT_MANAGER);
@@ -200,13 +193,6 @@ public class ShiftEmployee extends Employee {
     }
     public void setPrefShifts(List<Shift> preferredShifts) {
         this.preferredShifts = preferredShifts;
-    }
-
-    public Set<Shift> getPastShifts() {
-        return pastShifts;
-    }
-    public void setPastShifts(Set<Shift> pastShifts) {
-        this.pastShifts = pastShifts;
     }
 
     public List<Role> getRoles() {
