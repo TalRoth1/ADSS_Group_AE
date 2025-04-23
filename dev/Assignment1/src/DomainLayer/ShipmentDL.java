@@ -101,7 +101,7 @@ public class ShipmentDL {
         this.Destinations = destinations;
         this.Document = new ShipmentDocumentDL(items, origin);
         this.DateCreated = new Date();
-        this.DateSent = new Date();
+        this.DateSent = null;
     }
 
     public Boolean EditDestinations(Map<LocationDL, Map<String, Integer>> items, Map<String,Float> itemWeights)
@@ -169,7 +169,12 @@ public class ShipmentDL {
 
     public String toString()
     {
-        return "Truck: " + Truck.GetNumber() + ", Driver: " + DriverName.Name + ", Origin: " + Document.getOrigin().toString() + ", Destinations: " + Document.getLocations().toString() + ", Date Created: " + DateCreated.toString() + ", Date Sent: " + DateSent.toString();
+        return "Truck: " + Truck.GetNumber() +
+                ", Driver: " + DriverName.Name +
+                ", Origin: " + Document.getOrigin().toString() +
+                ", Destinations: " + Document.getLocations().toString() +
+                ", Date Created: " + DateCreated.toString() +
+                (DateSent != null ? ", Date Sent: " + DateSent.toString() : "");
     }
 }
 
