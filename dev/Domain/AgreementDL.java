@@ -8,8 +8,9 @@ public class AgreementDL {
     private Map<Item, Integer> itemCatalog;
     private List<DiscountDL> billOfQuantities;
 
-    public AgreementDL(int agreementID, List<DiscountDL> billOfQuantities) {
+    public AgreementDL(int agreementID,Map <Item, Integer> itemCatalog, List<DiscountDL> billOfQuantities) {
         this.agreementID = agreementID;
+        this.itemCatalog = itemCatalog;
         this.billOfQuantities = billOfQuantities;
     }
 

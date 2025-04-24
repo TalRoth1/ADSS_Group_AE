@@ -1,6 +1,7 @@
 package Presentation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -61,6 +62,7 @@ public class CLI {
                     getOrderHistory(Scanner);
                     break;
                 case "12":
+                    loadData();
                     break;
                 case "13":
                     System.out.println("Exiting the program. Goodbye!");
@@ -124,9 +126,23 @@ public class CLI {
     public void addAgreement(Scanner Scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(Scanner.nextLine());
-        System.out.println("Bill of Quantities (Item ID, Minimum quantity and Discount seperated by ,):");
         List<String[]> billOfQuantities = new ArrayList<>();
         String cont = "Y";
+        Map<Integer, Integer> itemCat = new HashMap<>();
+        System.out.println("Please enter the Item ID and Catalog ID seperated by ,:");
+        while (cont == "Y")
+        {
+            String[] item = Scanner.nextLine().split(",");
+            if (item.length != 2) {
+                System.out.println("Invalid input. Please enter the Item ID and Catalog ID in the format: Item ID, Catalog ID");
+                continue;
+            }
+            itemCat.put(Integer.parseInt(item[0]), Integer.parseInt(item[1]));
+            System.out.println("Do you want to add another item? (Y/N):");
+            cont = Scanner.nextLine().toUpperCase();
+        }
+        System.out.println("Bill of Quantities (Item ID, Minimum quantity and Discount seperated by ,):");
+        cont = "Y";
         while (cont == "Y") {
             String[] discount = Scanner.nextLine().split(",");
             if (discount.length != 3) {
@@ -138,7 +154,7 @@ public class CLI {
             System.out.println("Do you want to add another item? (Y/N):");
             cont = Scanner.nextLine().toUpperCase();
         }
-        sf.addAgreement(supplierID, billOfQuantities);
+        sf.addAgreement(supplierID, itemCat, billOfQuantities);
     }
 
     public void changeAgreement(Scanner scanner) {
@@ -278,5 +294,21 @@ public class CLI {
                 System.out.println(order + "\n");
             }
         }
+    }
+
+    public void loadData()
+    {
+        loadSuppliers();
+        loadOrders();
+    }
+
+    public void loadSuppliers()
+    {
+        sf.loadData();
+    }
+
+    public void loadOrders()
+    {
+        //ofri
     }
 }

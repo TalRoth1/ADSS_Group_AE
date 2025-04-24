@@ -13,12 +13,11 @@ public class SupplierFacade
 {
     private List<SupplierDL> suppliers;
     private List<Item> items; // Will be saved in inventory after the merge
-    private int nextId;
+    private int nextId = 0;
     
     public SupplierFacade() 
     {
         this.suppliers = new ArrayList<>();
-        this.nextId = 0;
     }
 
     public void addSupplier(int companyID, int bankAccount, PaymentMethod paymentMethod, String contactEmail, String contactPhone, DeliveryMethod deliveryMethod, List<AgreementDL> agreements)
@@ -39,7 +38,7 @@ public class SupplierFacade
         return null; // Supplier not found
     }
 
-    public void addAgreement(int supplierID, List<String[]> billOfQuantities) 
+    public void addAgreement(int supplierID, Map<Integer, Integer> itemCat ,List<String[]> billOfQuantities) 
     {
         SupplierDL supplier = getSupplier(supplierID);
         int agreementID = supplier.getNextAgreementID();
@@ -52,9 +51,21 @@ public class SupplierFacade
             DiscountDL discount = new DiscountDL(itemID, minimumQuantity, discountPercentage);
             discounts.add(discount);
         }
+        Map<Item, Integer> itemCatalog = new HashMap<>();
+        for (Map.Entry<Integer, Integer> entry : itemCat.entrySet()) 
+        {
+            for(Item item : items) 
+            {
+                if (item.getItemID() == entry.getKey()) 
+                {
+                    itemCatalog.put(item, entry.getValue());
+                    break;
+                }
+            }
+        }
         if (supplier != null) 
         {
-            AgreementDL newAgreement = new AgreementDL(agreementID, discounts);
+            AgreementDL newAgreement = new AgreementDL(agreementID, itemCatalog, discounts);
             supplier.addAgreement(newAgreement);
         }
     }
@@ -145,6 +156,59 @@ public class SupplierFacade
             return suppliedItems;
         }
         return null; // Supplier not found
+    }
+
+    public void loadData()
+    {
+        addSupplier(2001, 111222333, PaymentMethod.CASH, "contact@supplierone.com", "+1-555-1111", DeliveryMethod.SCHEDULED, new ArrayList<>());
+        Map<Integer, Integer> itemCat = new HashMap<>();
+        itemCat.put(1, 350);
+        itemCat.put(2, 280);
+        itemCat.put(3, 500);
+        List<String[]> billOfQuantities = new ArrayList<>();
+        billOfQuantities.add(new String[]{"350", "100", "10"});
+        billOfQuantities.add(new String[]{"280", "150", "15"});
+        addAgreement(1, itemCat, billOfQuantities);
+
+        addSupplier(2002, 444555666, PaymentMethod.CREDIT, "support@supplier2.com", "+1-555-2222", DeliveryMethod.ON_ORDER, null);
+        Map<Integer, Integer> itemCat2 = new HashMap<>();
+        itemCat.put(4, 100);
+        itemCat.put(5, 200);
+        itemCat.put(6, 300);
+        List<String[]> billOfQuantities2 = new ArrayList<>();
+        billOfQuantities.add(new String[]{"300", "200", "5"});
+        addAgreement(2, itemCat2, billOfQuantities2);
+
+        addSupplier(2003, 777888999, PaymentMethod.CREDIT, "hello@supplierthree.com", "+1-555-3333", DeliveryMethod.PICKUP, null);
+        Map<Integer, Integer> itemCat3 = new HashMap<>();
+        itemCat.put(7, 450);
+        itemCat.put(8, 520);
+        List<String[]> billOfQuantities3 = new ArrayList<>();
+        billOfQuantities.add(new String[]{"450", "120", "12"});
+        addAgreement(3, itemCat3, billOfQuantities3);
+        Map<Integer, Integer> itemCat4 = new HashMap<>();
+        itemCat.put(9, 250);
+        itemCat.put(10, 600);
+        List<String[]> billOfQuantities4 = new ArrayList<>();
+        billOfQuantities.add(new String[]{"600", "100", "8"});
+        addAgreement(3, itemCat4, billOfQuantities4);
+
+        items = new ArrayList<>();
+        items.add(new Item(1, "Milk", 3.70));
+        items.add(new Item(2, "Eggs", 3.00));
+        items.add(new Item(3, "Butter", 5.30));
+        items.add(new Item(4, "Tomato", 1.10));
+        items.add(new Item(5, "Cucumber", 2.10));
+        items.add(new Item(6, "Carrot", 3.10));
+        items.add(new Item(7, "Chicken", 4.70));
+        items.add(new Item(8, "Beef", 5.50));
+        items.add(new Item(9, "Rice", 2.60));
+        items.add(new Item(10, "Pasta", 6.20));
+        items.add(new Item(11, "Cheese", 4.00));
+        items.add(new Item(12, "Yogurt", 1.50));
+        items.add(new Item(13, "Juice", 2.80));
+        items.add(new Item(14, "Bread", 1.90));
+        items.add(new Item(15, "Salt", 0.70));
     }
     
 }
