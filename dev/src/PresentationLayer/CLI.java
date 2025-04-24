@@ -446,7 +446,7 @@ public class CLI {
     private void addPreferredShift(String type) {
         LocalDate dateOfShift = chooseDateForEmployee("please enter start date"); //choose date with helper method
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
-        Shift shift = employeeFacade.getShift(dateOfShift, shiftType, userId);
+        Shift shift = employeeFacade.getShiftForEmployee(dateOfShift, shiftType);
         String response = employeeFacade.addPreferredShift(userId, shift);
         if(response != null)
             System.out.println(response);

@@ -294,6 +294,16 @@ public class EmployeeFacade { //employee related methods
         return employeeManager.getShift(date, shiftType);
     }
 
+    public Shift getShiftForEmployee(LocalDate date, ShiftType shiftType) {
+        for (EmployeeManager manager : employeeManagers.values()) {
+            Shift shift = manager.getShift(date, shiftType);
+            if (shift != null) {
+                return shift;
+            }
+        }
+        return null;
+    }
+
     public String changeShiftManager(Shift shift, int oldShiftManagerId, int newShiftManagerId, int empManagerId) {
         if(!isEmployeeManager(empManagerId))
             return "this action is allowed only for employee manager";
