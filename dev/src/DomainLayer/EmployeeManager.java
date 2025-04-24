@@ -112,8 +112,8 @@ public class EmployeeManager extends Employee{
             shift.removeEmployee(id);
         }
         employee.setPrefShifts(null);
-        employee.setAssignedShifts(null);      
-        return null;
+        employee.setAssignedShifts(null);
+        return "Employee: " + id + " fired successfully";
     }
 
     public ShiftEmployee hireEmployee(int employeeId, String employeeName,String branch, String bankAccount, int salary,
@@ -129,7 +129,10 @@ public class EmployeeManager extends Employee{
     public String addRoleToEmployee(int employeeID, Role role){
         if (!checkEmployee(employeeID))
             return employeeID + " doesn't exist";
+
         ShiftEmployee employee = allEmployees.get(employeeID);
+        if (employee.isFinishWorking())
+            return "Employee is fired, you can't add him a role";
         return employee.addRole(role);
     }
 
@@ -137,6 +140,8 @@ public class EmployeeManager extends Employee{
         if (!checkEmployee(employeeID))
             return employeeID + " doesn't exist";
         ShiftEmployee employee = allEmployees.get(employeeID);
+        if (employee.isFinishWorking())
+            return "Employee is fired, you can't change him a role";
         return employee.changeRole(oldRole, newRole);
     }
 
@@ -144,6 +149,8 @@ public class EmployeeManager extends Employee{
         if (!checkEmployee(employeeID))
             return employeeID + " doesn't exist";
         ShiftEmployee employee = allEmployees.get(employeeID);
+        if (employee.isFinishWorking())
+            return "Employee is fired, you can't delete a role from him";
         return employee.removeRole(role);
     }
 

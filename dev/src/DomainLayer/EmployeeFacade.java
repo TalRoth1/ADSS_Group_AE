@@ -61,8 +61,12 @@ public class EmployeeFacade { //employee related methods
             return "You are not logged in";
         }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        if(employeeManager.checkEmployee(employeeId)) {
+            return "Employee: " + employeeId + " already hired";
+        }
         ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName, branch, bankAccount, salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
         //ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
+
         shiftEmployees.put(employeeId, shiftEmployee);
         return "Employee: " + employeeId + " hired successfully";
     }
@@ -216,7 +220,9 @@ public class EmployeeFacade { //employee related methods
         if (!isLoggedIn(empManagerId)) {
             return "You are not logged in";
         }
-        EmployeeManager employeeManager = getEmployeeManager(shift.getShiftManagerId());
+
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        //EmployeeManager employeeManager = getEmployeeManager(shift.getShiftManagerId());
         return employeeManager.getAvailableEmployees(shift, role);
     }
 
@@ -281,10 +287,10 @@ public class EmployeeFacade { //employee related methods
     }
 
     //shift methods
-    public Shift getShift(LocalDate date, ShiftType shiftType, int empManagerId) {
-        if(!isLoggedIn(empManagerId))
+    public Shift getShift(LocalDate date, ShiftType shiftType, int id) {
+        if(!isLoggedIn(id))
             return null;
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager(id);
         return employeeManager.getShift(date, shiftType);
     }
 
@@ -404,7 +410,8 @@ public class EmployeeFacade { //employee related methods
 
     public boolean isAvailable(int id, Shift shift) {
         ShiftEmployee shiftEmployee = shiftEmployees.get(id);
-        return shiftEmployee.isAvailable(shift);
+        return shiftEmployee != null && shiftEmployee.isAvailable(shift);
+
     }
 
     public void getAssignedEmployeesInfo(int managerId,int e ,Shift shift) { //for shift manager OR shift employee

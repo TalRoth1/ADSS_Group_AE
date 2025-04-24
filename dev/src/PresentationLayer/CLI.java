@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -101,10 +102,6 @@ public class CLI {
     private void setShifts() {
         ShowPrefAllEmployees();
         LocalDate dateOfShift = chooseDateForManager("please enter start date"); //choose date with helper method
-        if(dateOfShift == null)
-            employeeManager(); // If date is invalid, return to EmployeeManager
-
-        //choose shift type and hours with helper method
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
 
         employeeFacade.createShift(dateOfShift, shiftType, userId, -1);
@@ -173,8 +170,7 @@ public class CLI {
     private void fireEmployee() {
         int employeeId = readInt("Please enter Employee's ID to fire: ");
         String response = employeeFacade.fireEmployee(employeeId, userId);
-        if(response != null)
-            System.out.println(response);
+        System.out.println(response);
         employeeManager();
     }
 
@@ -386,13 +382,13 @@ public class CLI {
     // }
 
     private void shiftManager() {
-        String[] actions = {"Set Preferences", "Remove Preferred Shift", "Show Employee's preferences",
+        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift", "Show Employee's preferences",
                 "Show Employee's shifts", "Show Shift Information" , "Show my Preferences",
                 "Show my Shifts", "Logout"};
         String option = selectFromList("Select Shift Manager Action:", actions);
 
         switch (option) {
-            //case "Set Preferences" -> setPreferences();
+            case "Add Preferred Shift" -> addPreferredShift();
             case "Remove Preferred Shift" -> removePreferredShift();
             case "Show Employee's preferences" -> getPrefEmployee();
             case "Show Employee's shifts" -> getEmployeeShifts();
@@ -423,12 +419,12 @@ public class CLI {
     }
 
     private void shiftEmployee() {
-        String[] actions = {"Set Preferences", "Remove Preferred Shift", "Show Shift Information",
+        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift", "Show Shift Information",
                 "Get Preferences", "Logout"};
         String option = selectFromList("Select Shift Employee Action:", actions);
 
         switch (option) {
-            case "Set Preferences" -> setPreferences();
+            case "Add Preferred Shift" -> addPreferredShift();
             case "Remove Preferred Shift" -> removePreferredShift();
             case "Show Shift Information" -> getShiftInfo();
             //case "Show my Preferences" -> ; //צפייה בפרטי משמרות שרשמתי שאני מעדיף
@@ -441,11 +437,12 @@ public class CLI {
         }
     }
 
-    private void setPreferences() {
+    private void addPreferredShift() {
         LocalDate dateOfShift = chooseDateForEmployee("please enter start date"); //choose date with helper method
         if(dateOfShift == null)
             shiftEmployee(); // If date is invalid, return to EmployeeManager
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
+        System.out.println("userID is " + userId);
         Shift shift = employeeFacade.getShift(dateOfShift, shiftType, userId);
         String response = employeeFacade.addPreferredShift(userId, shift);
         if(response != null)
@@ -531,7 +528,6 @@ public class CLI {
                 if (choice == 1) {
                     return employeeId; // confirmed override
                 } else {
-                    System.out.println("Please choose another employee.");
                     continue;
                 }
             }
@@ -692,7 +688,7 @@ public class CLI {
         boolean isAllowedTime =
                 (today.getValue() >= DayOfWeek.SUNDAY.getValue() &&
                         today.getValue() <= DayOfWeek.WEDNESDAY.getValue()) ||
-                        (today == DayOfWeek.THURSDAY && nowTime.isBefore(LocalTime.of(17, 0)));
+                        (today == DayOfWeek.THURSDAY && nowTime.isBefore(LocalTime.of(20, 0)));
         if (!isAllowedTime) {
             System.out.println("You are only allowed to do this action from Sunday until Thursday 17:00.");
             System.out.println("Now, you will return to the main menu.");
@@ -701,10 +697,10 @@ public class CLI {
 
         //check if date is in the past OR SHABBAT
         if(!isValidDate(date))
-            return chooseDateForManager(prompt);
+            return chooseDateForEmployee(prompt);
 
         if(!isNextWeek(date))
-            return chooseDateForManager(prompt);
+            return chooseDateForEmployee(prompt);
 
         return date;
     }
@@ -740,7 +736,7 @@ public class CLI {
         }
 
         //don't allow shifts on SHABBAT
-        if(date.getDayOfWeek().getValue() == 7) {
+        if(date.getDayOfWeek().getValue() == 6) {
             System.out.println("Shabbat is rest day, please choose again");
             return false;
         }
@@ -748,9 +744,15 @@ public class CLI {
     }
 
     private boolean isNextWeek(LocalDate date) {
-        //allow shifts only for next week
-        //now.with(DayOfWeek.SUNDAY) gets the most recent Sunday before/equal to today.
-        long weeksBetween = ChronoUnit.WEEKS.between(nowDate.with(DayOfWeek.SUNDAY), date.with(DayOfWeek.SUNDAY));
+        // Get start of current week
+        LocalDate thisSunday = nowDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+        LocalDate nextWeekSunday = thisSunday.plusWeeks(1);
+
+        // Get the Sunday of the week the input date falls in
+        LocalDate inputWeekSunday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+
+        long weeksBetween = ChronoUnit.WEEKS.between(thisSunday, inputWeekSunday);
+
         if (weeksBetween != 1) {
             System.out.println("You can only choose shift for NEXT week.");
             return false;
