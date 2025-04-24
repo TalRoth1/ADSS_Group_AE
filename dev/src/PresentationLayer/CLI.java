@@ -54,7 +54,7 @@ public class CLI {
     }
 
     private void employeeManager() {
-        String[] actions = {"Set Shifts", "Add Employee to Exist Shift", "Remove Employee From Exist Shift",
+        String[] actions = {"Create Shifts", "Set Shifts", "Add Employee to Exist Shift", "Remove Employee From Exist Shift",
                 "Fire Employee", "Hire Employee", "Change Employee's Role",
                 "Add Role to Employee", "Change Shift Manager", "Replace Employee",
                 "Delete Employee's Role", "Change Employee's Data", "Show Past Shifts",
@@ -62,6 +62,7 @@ public class CLI {
         String option = selectFromList("Select Employee Manager Action (Enter the number)", actions);
 
         switch (option) {
+            case "Create Shifts" -> autoCreateShifts();
             case "Set Shifts" -> setShifts();
             case "Add Employee to Exist Shift" -> addEmployeeToExistingShift();
             case "Remove Employee From Exist Shift" -> removeEmployeeFromShift();
@@ -97,6 +98,14 @@ public class CLI {
 //    }
 
 
+    private void autoCreateShifts() {
+        String result = employeeFacade.autoCreateShiftsForNextWeek(userId);
+        if (result != null)
+            System.out.println(result);
+        else
+            System.out.println("Shifts for next week created successfully.");
+        employeeManager();
+    }
 
 
     private void setShifts() {
@@ -412,7 +421,7 @@ public class CLI {
         if(dateOfShift == null)
             shiftManager(); // If date is invalid, return to EmployeeManager
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
-        Shift shift = employeeFacade.getShift(dateOfShift, shiftType, userId);
+        Shift shift = employeeFacade.getShiftForEmployee(dateOfShift, shiftType);
         if(shift == null) {
             System.out.println("Shift not found OR you are not connected. please try again");
             shiftManager();
@@ -460,7 +469,7 @@ public class CLI {
         if(dateOfShift == null)
             shiftEmployee(); // If date is invalid, return to EmployeeManager
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
-        Shift shift = employeeFacade.getShift(dateOfShift, shiftType, userId);
+        Shift shift = employeeFacade.getShiftForEmployee(dateOfShift, shiftType);
         if(shift == null) {
             System.out.println("Shift not found OR you are not connected. please try again");
             shiftEmployee();

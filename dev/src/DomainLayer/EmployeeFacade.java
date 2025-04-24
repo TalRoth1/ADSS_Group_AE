@@ -1,6 +1,8 @@
 package DomainLayer;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -329,6 +331,27 @@ public class EmployeeFacade { //employee related methods
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.createShift(date, shiftType, shiftManagerId);
+    }
+
+    public String autoCreateShiftsForNextWeek(int empManagerId) {
+        if (!isEmployeeManager(empManagerId))
+            return "Only employee managers can create shifts.";
+        if (!isLoggedIn(empManagerId))
+            return "You must be logged in.";
+
+        EmployeeManager manager = getEmployeeManager(empManagerId);
+        LocalDate nextSunday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY));
+
+        for (int i = 0; i < 6; i++) {
+            LocalDate date = nextSunday.plusDays(i);
+            for (ShiftType type : ShiftType.values()) {
+                String res = manager.createDefaultShift(date, type);
+                if (res != null && !res.contains("already exists")) {
+                    System.out.println("Failed to create shift for " + date + " " + type + ": " + res);
+                }
+            }
+        }
+        return null;
     }
 
     public String addEmployeeToShift(int employeeId, Shift shift,Role role,int empManagerId) {

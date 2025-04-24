@@ -226,6 +226,24 @@ public class EmployeeManager extends Employee{
            return null;
     }
 
+    public String createDefaultShift(LocalDate date, ShiftType shiftType) {
+        if (date == null || shiftType == null) {
+            return "invalid date or shift type";
+        }
+        if (shiftType == ShiftType.MORNING && morningShifts.containsKey(date)) {
+            return "morning shift already exists for this date";
+        } else if (shiftType == ShiftType.EVENING && eveningShifts.containsKey(date)) {
+            return "evening shift already exists for this date";
+        }
+        Shift shift = new Shift(date, shiftType, -1);
+        if (shiftType == ShiftType.MORNING) {
+            morningShifts.put(date, shift);
+        } else if (shiftType == ShiftType.EVENING) {
+            eveningShifts.put(date, shift);
+        }
+        return null;
+    }
+
     public String createShift(LocalDate date, ShiftType shiftType, int shiftManagerId) { //create a new shift, definig the date, type and shift manager
         if (date == null || shiftType == null) {
             return "invalid date or shift type";
