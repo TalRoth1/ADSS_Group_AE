@@ -177,7 +177,7 @@ public class EmployeeFacade { //employee related methods
         return employeeManager.updateSocialBenefits(employeeId, socialBenefits);
     }
 
-    private Employee getEmployee(int id) {
+    public Employee getEmployee(int id) {
         Employee employee = employeeManagers.get(id);
         if (employee == null) {
             employee = shiftEmployees.get(id);
