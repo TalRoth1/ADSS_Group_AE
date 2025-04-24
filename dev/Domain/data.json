@@ -1,0 +1,253 @@
+{
+    "suppliers": [
+      {
+        "supplierID": 1,
+        "companyID": 2001,
+        "banckAccount": 111222333,
+        "paymentMethod": "CASH",
+        "contactMail": "contact@supplierone.com",
+        "contactPhone": "+1-555-1111",
+        "deliveryMethod": "SCHEDULED",
+        "agreements": [
+          {
+            "agreementID": 3001,
+            "itemCatalog": {
+              "1": 3.50,
+              "2": 2.80,
+              "3": 5.00
+            },
+            "billOfQuantities": [
+              {
+                "catalogID": 1,
+                "minimumQuantity": 100,
+                "discountPercentage": 10
+              },
+              {
+                "catalogID": 2,
+                "minimumQuantity": 150,
+                "discountPercentage": 15
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "supplierID": 2,
+        "companyID": 2002,
+        "banckAccount": 444555666,
+        "paymentMethod": "CREDIT",
+        "contactMail": "support@supplier2.com",
+        "contactPhone": "+1-555-2222",
+        "deliveryMethod": "ON_ORDER",
+        "agreements": [
+          {
+            "agreementID": 3002,
+            "itemCatalog": {
+              "4": 1.00,
+              "5": 2.00,
+              "6": 3.00
+            },
+            "billOfQuantities": [
+              {
+                "catalogID": 4,
+                "minimumQuantity": 200,
+                "discountPercentage": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "supplierID": 3,
+        "companyID": 2003,
+        "banckAccount": 777888999,
+        "paymentMethod": "CREDIT",
+        "contactMail": "hello@supplierthree.com",
+        "contactPhone": "+1-555-3333",
+        "deliveryMethod": "PICKUP",
+        "agreements": [
+          {
+            "agreementID": 3003,
+            "itemCatalog": {
+              "7": 4.50,
+              "8": 5.20
+            },
+            "billOfQuantities": [
+              {
+                "catalogID": 7,
+                "minimumQuantity": 120,
+                "discountPercentage": 12
+              }
+            ]
+          },
+          {
+            "agreementID": 3004,
+            "itemCatalog": {
+              "9": 2.50,
+              "10": 6.00
+            },
+            "billOfQuantities": [
+              {
+                "catalogID": 10,
+                "minimumQuantity": 100,
+                "discountPercentage": 8
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "items": [
+      { "itemID": 1, "name": "Milk", "price": 3.70 },
+      { "itemID": 2, "name": "Eggs", "price": 3.00 },
+      { "itemID": 3, "name": "Butter", "price": 5.30 },
+      { "itemID": 4, "name": "Tomato", "price": 1.10 },
+      { "itemID": 5, "name": "Cucumber", "price": 2.10 },
+      { "itemID": 6, "name": "Carrot", "price": 3.10 },
+      { "itemID": 7, "name": "Chicken", "price": 4.70 },
+      { "itemID": 8, "name": "Beef", "price": 5.50 },
+      { "itemID": 9, "name": "Rice", "price": 2.60 },
+      { "itemID": 10, "name": "Pasta", "price": 6.20 },
+      { "itemID": 11, "name": "Cheese", "price": 4.00 },
+      { "itemID": 12, "name": "Yogurt", "price": 1.50 },
+      { "itemID": 13, "name": "Juice", "price": 2.80 },
+      { "itemID": 14, "name": "Bread", "price": 1.90 },
+      { "itemID": 15, "name": "Salt", "price": 0.70 }
+    ],
+    "orders": [
+      {
+        "orderID": 4001,
+        "supplierID": 1,
+        "agreementID": 3001,
+        "orderDate": "2025-04-10",
+        "destination": "Central Warehouse",
+        "orderItems": [
+          { "itemID": 1, "quantity": 120, "catalogID": 1, "totalPrice": 378.00 },
+          { "itemID": 2, "quantity": 160, "catalogID": 2, "totalPrice": 380.80 }
+        ],
+        "orderStatus": "COMPLETED"
+      },
+      {
+        "orderID": 4002,
+        "supplierID": 1,
+        "agreementID": 3001,
+        "orderDate": "2025-04-15",
+        "destination": "Branch A",
+        "orderItems": [
+          { "itemID": 3, "quantity": 50, "catalogID": 3, "totalPrice": 250.00 }
+        ],
+        "orderStatus": "IN_PROGRESS"
+      },
+      {
+        "orderID": 4003,
+        "supplierID": 1,
+        "agreementID": 3001,
+        "orderDate": "2025-04-20",
+        "destination": "Branch B",
+        "orderItems": [
+          { "itemID": 1, "quantity": 90, "catalogID": 1, "totalPrice": 315.00 }
+        ],
+        "orderStatus": "COMPLETED"
+      },
+      {
+        "orderID": 4004,
+        "supplierID": 1,
+        "agreementID": 3001,
+        "orderDate": "2025-04-22",
+        "destination": "Branch C",
+        "orderItems": [
+          { "itemID": 2, "quantity": 80, "catalogID": 2, "totalPrice": 224.00 }
+        ],
+        "orderStatus": "CANCELLED"
+      },
+      {
+        "orderID": 4005,
+        "supplierID": 2,
+        "agreementID": 3002,
+        "orderDate": "2025-04-11",
+        "destination": "Central Warehouse",
+        "orderItems": [
+          { "itemID": 4, "quantity": 220, "catalogID": 4, "totalPrice": 209.00 }
+        ],
+        "orderStatus": "COMPLETED"
+      },
+      {
+        "orderID": 4006,
+        "supplierID": 2,
+        "agreementID": 3002,
+        "orderDate": "2025-04-16",
+        "destination": "Branch A",
+        "orderItems": [
+          { "itemID": 5, "quantity": 100, "catalogID": 5, "totalPrice": 200.00 }
+        ],
+        "orderStatus": "IN_PROGRESS"
+      },
+      {
+        "orderID": 4007,
+        "supplierID": 2,
+        "agreementID": 3002,
+        "orderDate": "2025-04-18",
+        "destination": "Branch B",
+        "orderItems": [
+          { "itemID": 6, "quantity": 80, "catalogID": 6, "totalPrice": 240.00 }
+        ],
+        "orderStatus": "COMPLETED"
+      },
+      {
+        "orderID": 4008,
+        "supplierID": 2,
+        "agreementID": 3002,
+        "orderDate": "2025-04-21",
+        "destination": "Branch C",
+        "orderItems": [
+          { "itemID": 4, "quantity": 90, "catalogID": 4, "totalPrice": 85.50 }
+        ],
+        "orderStatus": "CANCELLED"
+      },
+      {
+        "orderID": 4009,
+        "supplierID": 3,
+        "agreementID": 3003,
+        "orderDate": "2025-04-12",
+        "destination": "Central Warehouse",
+        "orderItems": [
+          { "itemID": 7, "quantity": 150, "catalogID": 7, "totalPrice": 594.00 }
+        ],
+        "orderStatus": "IN_PROGRESS"
+      },
+      {
+        "orderID": 4010,
+        "supplierID": 3,
+        "agreementID": 3004,
+        "orderDate": "2025-04-14",
+        "destination": "Branch A",
+        "orderItems": [
+          { "itemID": 9, "quantity": 100, "catalogID": 9, "totalPrice": 250.00 }
+        ],
+        "orderStatus": "COMPLETED"
+      },
+      {
+        "orderID": 4011,
+        "supplierID": 3,
+        "agreementID": 3004,
+        "orderDate": "2025-04-17",
+        "destination": "Branch B",
+        "orderItems": [
+          { "itemID": 10, "quantity": 120, "catalogID": 10, "totalPrice": 662.40 }
+        ],
+        "orderStatus": "COMPLETED"
+      },
+      {
+        "orderID": 4012,
+        "supplierID": 3,
+        "agreementID": 3003,
+        "orderDate": "2025-04-23",
+        "destination": "Branch C",
+        "orderItems": [
+          { "itemID": 8, "quantity": 100, "catalogID": 8, "totalPrice": 520.00 }
+        ],
+        "orderStatus": "CANCELLED"
+      }
+    ]
+  }
+  
