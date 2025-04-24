@@ -48,5 +48,11 @@ public class OrderItemDL
     public double getTotalPrice()
     {
         return totalPrice;
-    }    
+    }
+
+    public String toString()
+    {
+        return "{itemID=" + itemID + ", quantity=" + quantity + ", catalogID=" + catalogID + ", totalPrice="
+                + totalPrice + "}";
+    }
 }

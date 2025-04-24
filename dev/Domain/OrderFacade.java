@@ -1,6 +1,7 @@
 package Domain;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import Utils.OrderStatus;
@@ -16,7 +17,7 @@ public class OrderFacade {
         this.orders = new ArrayList<>();
     }
 
-    public void createOrder(int supplierID, String destination, int agreementID, List<int[]> Orders) {
+    public void createOrder(int supplierID, String destination, int agreementID, Date orderDate, List<int[]> Orders) {
         List<OrderItemDL> items = new ArrayList<>();
         for (int[] order : Orders) {
             int itemID = order[0];
@@ -26,7 +27,7 @@ public class OrderFacade {
             OrderItemDL item = new OrderItemDL(itemID, quantity, catalogID, totalPrice);
             items.add(item);
         }
-        OrderDL newOrder = new OrderDL(nextID++, supplierID, agreementID, destination, items);
+        OrderDL newOrder = new OrderDL(nextID++, supplierID, agreementID, orderDate, destination, items);
         orders.add(newOrder);
     }
 
@@ -96,18 +97,43 @@ public class OrderFacade {
         return sf.getAgreement(supplierID, agreementID).getItemCatalogID(itemID);
     }
 
-    public void loadData(){
-        orders.add(new OrderDL(4001, 1, 3001, java.sql.Date.valueOf("2025-04-10"), "Central Warehouse", List.of(new OrderItemDL(1, 120, 1, 378.00), new OrderItemDL(2, 160, 2, 380.80)), OrderStatus.COMPLETED));
-        orders.add(new OrderDL(4002, 1, 3001, java.sql.Date.valueOf("2025-04-15"), "Branch A", List.of(new OrderItemDL(3, 50, 3, 250.00)), OrderStatus.IN_PROGRESS));
-        orders.add(new OrderDL(4003, 1, 3001, java.sql.Date.valueOf("2025-04-20"), "Branch B", List.of(new OrderItemDL(1, 90, 1, 315.00), new OrderItemDL(2, 160, 2, 380.80)), OrderStatus.COMPLETED));
-        orders.add(new OrderDL(4004, 1, 3001, java.sql.Date.valueOf("2025-04-22"), "Branch C", List.of(new OrderItemDL(2, 80, 2, 224.00)), OrderStatus.CANCELLED));
-        orders.add(new OrderDL(4005, 2, 3002, java.sql.Date.valueOf("2025-04-11"), "Central Warehouse", List.of(new OrderItemDL(1, 120, 1, 378.00)), OrderStatus.IN_PROGRESS));
-        orders.add(new OrderDL(4006, 2, 3002, java.sql.Date.valueOf("2025-04-16"), "Branch A", List.of(new OrderItemDL(5, 100, 5, 200.00)), OrderStatus.IN_PROGRESS));
-        orders.add(new OrderDL(4007, 2, 3002, java.sql.Date.valueOf("2025-04-18"), "Branch B", List.of(new OrderItemDL(6, 80, 6, 240.00)), OrderStatus.COMPLETED));
-        orders.add(new OrderDL(4008, 2, 3002, java.sql.Date.valueOf("2025-04-21"), "Branch C", List.of(new OrderItemDL(4, 90, 4, 85.50)), OrderStatus.CANCELLED));
-        orders.add(new OrderDL(4009, 3, 3004, java.sql.Date.valueOf("2025-04-12"), "Central Warehouse", List.of(new OrderItemDL(7, 150, 7, 594.00)), OrderStatus.IN_PROGRESS));
-        orders.add(new OrderDL(4010, 3, 3003, java.sql.Date.valueOf("2025-04-14"), "Branch A", List.of(new OrderItemDL(9, 100, 9, 250.00)), OrderStatus.COMPLETED));
-        orders.add(new OrderDL(4011, 3, 3004, java.sql.Date.valueOf("2025-04-17"), "Branch B", List.of(new OrderItemDL(10, 120, 10, 662.40)), OrderStatus.COMPLETED));
-        orders.add(new OrderDL(4012, 3, 3003, java.sql.Date.valueOf("2025-04-23"), "Branch C", List.of(new OrderItemDL(8, 100, 8, 520.00)), OrderStatus.CANCELLED));
+    public void loadData() {
+        createOrder(1, "Central Warehouse", 1, java.sql.Date.valueOf("2025-04-10"), Arrays.asList(
+                new int[] { 1, 120 },
+                new int[] { 2, 160 }));
+
+        createOrder(1, "Branch A", 1, java.sql.Date.valueOf("2025-04-15"), Arrays.asList(
+                new int[] { 1, 50 }));
+
+        createOrder(1, "Branch B", 1, java.sql.Date.valueOf("2025-04-20"), Arrays.asList(
+                new int[] { 2, 90 }));
+
+        createOrder(1, "Branch C", 1, java.sql.Date.valueOf("2025-04-22"), Arrays.asList(
+                new int[] { 2, 80 }));
+
+        createOrder(2, "Central Warehouse", 1, java.sql.Date.valueOf("2025-04-11"), Arrays.asList(
+                new int[] { 6, 220 }));
+
+        createOrder(2, "Branch A", 1, java.sql.Date.valueOf("2025-04-16"), Arrays.asList(
+                new int[] { 6, 100 }));
+
+        createOrder(2, "Branch B", 1, java.sql.Date.valueOf("2025-04-18"), Arrays.asList(
+                new int[] { 6, 80 }));
+
+        createOrder(2, "Branch C", 1, java.sql.Date.valueOf("2025-04-21"), Arrays.asList(
+                new int[] { 6, 90 }));
+
+        createOrder(3, "Central Warehouse", 1, java.sql.Date.valueOf("2025-04-12"), Arrays.asList(
+                new int[] { 7, 150 }));
+
+        createOrder(3, "Branch A", 2, java.sql.Date.valueOf("2025-04-14"), Arrays.asList(
+                new int[] { 10, 100 }));
+
+        createOrder(3, "Branch B", 2, java.sql.Date.valueOf("2025-04-17"), Arrays.asList(
+                new int[] { 10, 120 }));
+
+        createOrder(3, "Branch C", 1, java.sql.Date.valueOf("2025-04-23"), Arrays.asList(
+                new int[] { 7, 100 }));
+
     }
 }

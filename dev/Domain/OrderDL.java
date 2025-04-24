@@ -14,11 +14,11 @@ public class OrderDL {
     private List<OrderItemDL> orderItems;
     private OrderStatus orderStatus;
 
-    public OrderDL(int orderID, int supplierID, int agreementID, String destination, List<OrderItemDL> orderItems) {
+    public OrderDL(int orderID, int supplierID, int agreementID, Date orderDate, String destination, List<OrderItemDL> orderItems) {
         this.orderID = orderID;
         this.supplierID = supplierID;
         this.agreementID = agreementID;
-        this.orderDate = new Date(); // Set the order date to the current date
+        this.orderDate = orderDate; // Set the order date to the current date
         this.destination = destination;
         this.orderItems = orderItems;
         this.orderStatus = OrderStatus.IN_PROGRESS;

@@ -1,5 +1,6 @@
 package Presentation;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,7 @@ public class CLI {
                     break;
                 case "5":
                     getSuppliedItems(Scanner);
+                    break;
                 case "6":
                     getCatalogItems(Scanner);
                     break;
@@ -221,6 +223,18 @@ public class CLI {
         int supplierID = Integer.parseInt(scanner.nextLine());
         System.out.println("Agreement ID:");
         int agreementID = Integer.parseInt(scanner.nextLine());
+        Date orderDate = null;
+        do{
+            System.out.println("Order Date (YYYY-MM-DD):");
+            String orderDateInput = scanner.nextLine();
+            try {
+                orderDate = Date.valueOf(orderDateInput);
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid date format. Please enter the date in the format YYYY-MM-DD:");
+            }
+        }
+        while (orderDate == null);
         System.out.println("Destination:");
         String destination = scanner.nextLine();
         System.out.println("Order Items (Item ID and Quantity seperated by ,):");
@@ -236,7 +250,7 @@ public class CLI {
             System.out.println("Do you want to add another item? (Y/N):");
             cont = scanner.nextLine().toUpperCase();
         }
-        of.createOrder(supplierID, destination, agreementID, items);
+        of.createOrder(supplierID, destination, agreementID, orderDate, items);
     }
 
     public void getOrderDetails(Scanner scanner) {
@@ -309,6 +323,6 @@ public class CLI {
 
     public void loadOrders()
     {
-        //ofri
+        of.loadData();
     }
 }

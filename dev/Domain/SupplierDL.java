@@ -14,7 +14,7 @@ public class SupplierDL {
     private String contactPhone;
     private DeliveryMethod deliveryMethod;
     private List<AgreementDL> agreements;
-    private int nextAgreementID = 0; // Static variable to keep track of the next agreement ID
+    private int nextAgreementID = 1; // Static variable to keep track of the next agreement ID
 
     public SupplierDL(int supplierID, int companyID, int banckAccount, PaymentMethod paymentMethod, String contactMail,
             String contactPhone, DeliveryMethod deliveryMethod, List<AgreementDL> agreements) {
