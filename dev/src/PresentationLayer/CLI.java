@@ -542,41 +542,6 @@ public class CLI {
         }
     }
 
-    private LocalDate chooseDateForManager() { //for EmployeeManager
-        LocalDate dateOfShift = chooseDate("Please enter the date of the shift ");
-        LocalTime nowTime = LocalTime.now();
-        DayOfWeek today = nowDate.getDayOfWeek();
-
-        boolean isAllowedTime =
-        (today == DayOfWeek.THURSDAY && nowTime.isAfter(LocalTime.of(17, 30))) ||
-        (today == DayOfWeek.FRIDAY) ||
-        (today == DayOfWeek.SATURDAY);
-        if(!isAllowedTime) {
-            System.out.println("You allow to do this action from Thursday 17:30 and all day Friday and Saturday");
-            return null; // Return null to indicate invalid date
-        }
-
-        //check if date is in the past
-        if(dateOfShift.isBefore(nowDate)) {
-            System.out.println("You can't choose a past date, please choose again");
-            return null; 
-        }
-         //allow shifts only for next week
-        //now.with(DayOfWeek.SUNDAY) gets the most recent Sunday before/equal to today.
-        long weeksBetween = ChronoUnit.WEEKS.between(nowDate.with(DayOfWeek.SUNDAY), dateOfShift.with(DayOfWeek.SUNDAY));
-        if (weeksBetween != 1) {
-            System.out.println("You can only choose shift for NEXT week.");
-            return null;
-        }
-
-        //don't allow shifts on SHABBAT
-        if(dateOfShift.getDayOfWeek().getValue() == 7) {
-            System.out.println("Shabbat is rest day, please choose again");
-            return null;
-        }
-        return dateOfShift;
-    }
-
     private int[] getValidShiftTimes(ShiftType shiftType) {
         Integer[] startTimeOptions = (shiftType == ShiftType.MORNING) ? MORNING_SHIFT_START_TIMES
             : EVENING_SHIFT_START_TIMES;
@@ -697,6 +662,41 @@ public class CLI {
         }
     }
 
+    private LocalDate chooseDateForManager(String prompt) { 
+        LocalDate date = chooseDate(prompt);
+        LocalTime nowTime = LocalTime.now();
+        DayOfWeek today = nowDate.getDayOfWeek();
+
+        boolean isAllowedTime =
+        (today == DayOfWeek.THURSDAY && nowTime.isAfter(LocalTime.of(17, 30))) ||
+        (today == DayOfWeek.FRIDAY) ||
+        (today == DayOfWeek.SATURDAY);
+        if(!isAllowedTime) {
+            System.out.println("You allow to do this action from Thursday 17:30 and all day Friday and Saturday");
+            return null; // Return null to indicate invalid date
+        }
+
+        //check if date is in the past
+        if(dateOfShift.isBefore(nowDate)) {
+            System.out.println("You can't choose a past date, please choose again");
+            return null; 
+        }
+         //allow shifts only for next week
+        //now.with(DayOfWeek.SUNDAY) gets the most recent Sunday before/equal to today.
+        long weeksBetween = ChronoUnit.WEEKS.between(nowDate.with(DayOfWeek.SUNDAY), dateOfShift.with(DayOfWeek.SUNDAY));
+        if (weeksBetween != 1) {
+            System.out.println("You can only choose shift for NEXT week.");
+            return null;
+        }
+
+        //don't allow shifts on SHABBAT
+        if(dateOfShift.getDayOfWeek().getValue() == 7) {
+            System.out.println("Shabbat is rest day, please choose again");
+            return null;
+        }
+        return dateOfShift;
+    }
+
     private LocalDate chooseDateForAddEmployee(String prompt) {
         LocalDate date = chooseDate(prompt);
         if(!isValidDate(date)) 
@@ -719,17 +719,28 @@ public class CLI {
         }
         return date;
     }
-
+ 
     private boolean isValidDate(LocalDate date) {
         //check if date is in the past
         if(date.isBefore(nowDate)) {
             System.out.println("You can't choose a past date, please choose again");
             return false; 
         }
-
+        
         //don't allow shifts on SHABBAT
         if(date.getDayOfWeek().getValue() == 7) {
             System.out.println("Shabbat is rest day, please choose again");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isNextWeek(LocalDate date) {
+         //allow shifts only for next week
+        //now.with(DayOfWeek.SUNDAY) gets the most recent Sunday before/equal to today.
+        long weeksBetween = ChronoUnit.WEEKS.between(nowDate.with(DayOfWeek.SUNDAY), date.with(DayOfWeek.SUNDAY));
+        if (weeksBetween != 1) {
+            System.out.println("You can only choose shift for NEXT week.");
             return false;
         }
         return true;
