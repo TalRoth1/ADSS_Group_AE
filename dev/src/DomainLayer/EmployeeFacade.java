@@ -77,7 +77,6 @@ public class EmployeeFacade { //employee related methods
         }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
-       // repository.removeEmployee(shiftEmployee);
         return employeeManager.removeEmployee(employeeId);
     }
 
@@ -96,7 +95,6 @@ public class EmployeeFacade { //employee related methods
         //ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
 
         shiftEmployees.put(employeeId, shiftEmployee);
-      //  repository.addEmployee(shiftEmployee);
         return "Employee: " + employeeId + " hired successfully";
     }
 

@@ -43,12 +43,9 @@ public class Employee {
 
     public boolean login(String password) {
         if (this.password.equals(password) && !this.finishWorking) {
-            System.out.println("hhhh");
             this.isLoggedIn = true;
             return true;
         } else {
-            System.out.println("hhhffffh");
-
             return false;
         }
     }
