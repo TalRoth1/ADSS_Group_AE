@@ -39,7 +39,49 @@ public class EmployeeFacade { //employee related methods
         shiftEmployees.put(Ofir.getId(), Ofir);
         shiftEmployees.put(Kiril.getId(), Kiril);
         shiftEmployees.put(Ofri.getId(), Ofri);
+
+        keren.addEmployee(Liat);
+        keren.addEmployee(Erez);
+        keren.addEmployee(Elad);
+        keren.addEmployee(Eylon);
+        keren.addEmployee(Tal);
+        keren.addEmployee(Ofir);
+        keren.addEmployee(Kiril);
+        keren.addEmployee(Ofri);
     }
+
+//    public void initExampleData() {
+//        EmployeeManager keren = new EmployeeManager(100, "Keren", "1", "111222", 7000,
+//                LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "123");
+//        employeeManagers.put(keren.getId(), keren);
+//
+//        ShiftEmployee Liat = new ShiftEmployee(101, "Liat", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.SHIFT_MANAGER);
+//        ShiftEmployee Erez = new ShiftEmployee(102, "Erez", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.CASHIER);
+//        ShiftEmployee Elad = new ShiftEmployee(103, "Elad", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.DRIVER);
+//        ShiftEmployee Eylon = new ShiftEmployee(104, "Eylon", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.DRIVER);
+//        ShiftEmployee Tal = new ShiftEmployee(105, "Tal", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.CASHIER);
+//        ShiftEmployee Ofir = new ShiftEmployee(106, "Ofir", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.STORE_KEEPER);
+//        ShiftEmployee Kiril = new ShiftEmployee(107, "Kiril", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.STORE_KEEPER);
+//        ShiftEmployee Ofri = new ShiftEmployee(108, "Ofri", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.SHIFT_MANAGER);
+//
+//        shiftEmployees.put(Liat.getId(), Liat);
+//        shiftEmployees.put(Erez.getId(), Erez);
+//        shiftEmployees.put(Elad.getId(), Elad);
+//        shiftEmployees.put(Eylon.getId(), Eylon);
+//        shiftEmployees.put(Tal.getId(), Tal);
+//        shiftEmployees.put(Ofir.getId(), Ofir);
+//        shiftEmployees.put(Kiril.getId(), Kiril);
+//        shiftEmployees.put(Ofri.getId(), Ofri);
+//
+//        keren.addEmployee(Liat);
+//        keren.addEmployee(Erez);
+//        keren.addEmployee(Elad);
+//        keren.addEmployee(Eylon);
+//        keren.addEmployee(Tal);
+//        keren.addEmployee(Ofir);
+//        keren.addEmployee(Kiril);
+//        keren.addEmployee(Ofri);
+//    }
 
     public Employee login(int id, String password) {
         Employee e = getEmployee(id);
@@ -462,7 +504,12 @@ public class EmployeeFacade { //employee related methods
             return "this action is allowed only for employee manager";
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
-        return shift.setShiftManagerId(id);
+        //return shift.setShiftManagerId(id);
+        String response = shift.setShiftManagerId(id);
+        if(response != null) {
+            return response;
+        }
+        return addAssignedShift(id, shift, Role.SHIFT_MANAGER);
     }
     public String addPreferredShift(int id, Shift shift) {
         ShiftEmployee shiftEmployee = shiftEmployees.get(id);

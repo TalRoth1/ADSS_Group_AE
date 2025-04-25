@@ -91,6 +91,7 @@ public class Shift {
             return "Shift manager ID is invalid. ";
         }
         this.shiftManagerId = shiftManagerId;
+        assignedEmployeesID.put(shiftManagerId, Role.SHIFT_MANAGER);
         return null;
     }
 

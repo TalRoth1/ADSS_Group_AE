@@ -214,13 +214,19 @@ public class EmployeeManager extends Employee{
         if(shift.getShiftManagerId() == empID || shift.getShiftManagerId() == replacementID) {
             return "shift manager cannot be replaced, there is a different option to change the shift manager";
         }
-        if(replacement.getRoles().contains(shift.getAssignedEmployeesID().get(empID))){
+        if(!replacement.getRoles().contains(shift.getAssignedEmployeesID().get(empID))){
             return "replacement employee does not have the same role as the original employee";
         }
            shift.removeEmployee(empID);
            employee.removeAssignedShift(shift);
            shift.addEmployee(replacementID, shift.getAssignedEmployeesID().get(empID));
            replacement.addAssignedShift(shift, role);
+
+        if (shift.getShiftType() == ShiftType.EVENING) {
+            eveningShifts.put(shift.getDate(), shift);
+        } else {
+            morningShifts.put(shift.getDate(), shift);
+        }
            return null;
     }
 
@@ -418,6 +424,10 @@ public class EmployeeManager extends Employee{
 
     public Map<LocalDate, Shift> getPastShifts() {
         return pastShifts;
+    }
+
+    public void addEmployee(ShiftEmployee employee) {
+        allEmployees.put(employee.getId(), employee);
     }
 
 }
