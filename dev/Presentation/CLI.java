@@ -15,8 +15,8 @@ import Utils.DeliveryMethod;
 import Utils.PaymentMethod;
 
 public class CLI {
-    private SupplierFacade sf;
-    private OrderFacade of;
+    private final SupplierFacade sf;
+    private final OrderFacade of;
 
     public CLI(SupplierFacade sf, OrderFacade of) {
         this.sf = sf;
@@ -132,7 +132,7 @@ public class CLI {
         String cont = "Y";
         Map<Integer, Integer> itemCat = new HashMap<>();
         System.out.println("Please enter the Item ID and Catalog ID seperated by ,:");
-        while (cont == "Y")
+        while (cont.equals("Y"))
         {
             String[] item = Scanner.nextLine().split(",");
             if (item.length != 2) {
@@ -145,7 +145,7 @@ public class CLI {
         }
         System.out.println("Bill of Quantities (Item ID, Minimum quantity and Discount seperated by ,):");
         cont = "Y";
-        while (cont == "Y") {
+        while (cont.equals("Y")) {
             String[] discount = Scanner.nextLine().split(",");
             if (discount.length != 3) {
                 System.out.println(
@@ -167,7 +167,7 @@ public class CLI {
         System.out.println("New Bill of Quantities (Item ID, Minimum quantity and Discount seperated by ,):");
         List<String[]> billOfQuantities = new ArrayList<>();
         String cont = "Y";
-        while (cont == "Y") {
+        while (cont.equals("Y")) {
             String[] discount = scanner.nextLine().split(",");
             if (discount.length != 3) {
                 System.out.println(
@@ -207,6 +207,7 @@ public class CLI {
     public void getCatalogItems(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(scanner.nextLine());
+
         Map<Integer, Integer> catalogItems = sf.getSuppliedCatlogItems(supplierID);
         if (catalogItems.isEmpty()) {
             System.out.println("No items in the catalog for this supplier.");
@@ -223,33 +224,11 @@ public class CLI {
         int supplierID = Integer.parseInt(scanner.nextLine());
         System.out.println("Agreement ID:");
         int agreementID = Integer.parseInt(scanner.nextLine());
-        Date orderDate = null;
-        do{
-            System.out.println("Order Date (YYYY-MM-DD):");
-            String orderDateInput = scanner.nextLine();
-            try {
-                orderDate = Date.valueOf(orderDateInput);
-                break;
-            } catch (IllegalArgumentException e) {
-                System.out.println("Invalid date format. Please enter the date in the format YYYY-MM-DD:");
-            }
-        }
-        while (orderDate == null);
+        Date orderDate = getOrderDate(scanner);
         System.out.println("Destination:");
         String destination = scanner.nextLine();
         System.out.println("Order Items (Item ID and Quantity seperated by ,):");
-        List<int[]> items = new ArrayList<>();
-        String cont = "Y";
-        while (cont == "Y") {
-            String[] item = scanner.nextLine().split(", ");
-            if (item.length != 2) {
-                System.out.println("Invalid input. Please enter the Order Items in the format: Item ID, Quantity");
-                continue;
-            }
-            items.add(new int[] { Integer.parseInt(item[0]), Integer.parseInt(item[1]) });
-            System.out.println("Do you want to add another item? (Y/N):");
-            cont = scanner.nextLine().toUpperCase();
-        }
+        List<int[]> items = getOrderItems(scanner);
         of.createOrder(supplierID, destination, agreementID, orderDate, items);
     }
 
@@ -268,22 +247,31 @@ public class CLI {
         int orderID = Integer.parseInt(scanner.nextLine());
         System.out.println("New Destination:");
         String destination = scanner.nextLine();
+        Date orderDate = getOrderDate(scanner);
         System.out.println("New Agreement ID:");
         int agreementID = Integer.parseInt(scanner.nextLine());
         System.out.println("New Order Items (Item ID and Quantity seperated by ,):");
-        List<int[]> items = new ArrayList<>();
-        String cont = "Y";
-        while (cont == "Y") {
-            String[] item = scanner.nextLine().split(", ");
-            if (item.length != 2) {
-                System.out.println("Invalid input. Please enter the Order Items in the format: Item ID, Quantity");
-                continue;
-            }
-            items.add(new int[] { Integer.parseInt(item[0]), Integer.parseInt(item[1]) });
-            System.out.println("Do you want to add another item? (Y/N):");
-            cont = scanner.nextLine().toUpperCase();
+        List<int[]> items = getOrderItems(scanner);
+        try {
+            of.changeOrder(orderID, destination, orderDate, agreementID, items);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
-        of.changeOrder(orderID, destination, agreementID, items);
+    }
+
+    private Date getOrderDate(Scanner scanner) {
+        Date orderDate = null;
+        do{
+            System.out.println("Order Date (YYYY-MM-DD):");
+            String orderDateInput = scanner.nextLine();
+            try {
+                orderDate = Date.valueOf(orderDateInput);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid date format. Please enter the date in the format YYYY-MM-DD:");
+            }
+        }
+        while (orderDate == null);
+        return orderDate;
     }
 
     public void cancelOrder(Scanner scanner) {
@@ -316,13 +304,29 @@ public class CLI {
         loadOrders();
     }
 
-    public void loadSuppliers()
+    private void loadSuppliers()
     {
         sf.loadData();
     }
 
-    public void loadOrders()
+    private void loadOrders()
     {
         of.loadData();
+    }
+
+    private List<int[]> getOrderItems(Scanner scanner) {
+        List<int[]> items = new ArrayList<>();
+        String cont = "Y";
+        while (cont.equals("Y")) {
+            String[] item = scanner.nextLine().split(", ");
+            if (item.length != 2) {
+                System.out.println("Invalid input. Please enter the Order Items in the format: Item ID, Quantity");
+                continue;
+            }
+            items.add(new int[] { Integer.parseInt(item[0]), Integer.parseInt(item[1]) });
+            System.out.println("Do you want to add another item? (Y/N):");
+            cont = scanner.nextLine().toUpperCase();
+        }
+        return items;
     }
 }

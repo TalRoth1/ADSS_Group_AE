@@ -1,4 +1,4 @@
-package Tests;
+package tests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,8 +62,8 @@ class SupplierTest {
 
     @Test
     void testChangeAgreement() {
-        supplierFacade.addSupplier(123, 456, PaymentMethod.CREDIT, "email@test.com", "1234567890", DeliveryMethod.STANDARD, new ArrayList<>());
-        supplierFacade.addAgreement(1, Map.of(1, 10), List.of(new String[]{"1", "5", "10"}));
+        supplierFacade.addSupplier(123, 456, PaymentMethod.CREDIT, "email@test.com", "1234567890", DeliveryMethod.ON_ORDER, new ArrayList<>());
+        supplierFacade.addAgreement(1, Map.of(1, 10), List.of(new String[][]{new String[]{"1", "5", "10"}}));
 
         supplierFacade.changeAgreement(1, 1, List.of(new String[][]{new String[]{"1", "10", "20"}}));
         AgreementDL agreement = supplierFacade.getAgreement(1, 1);
@@ -73,7 +73,7 @@ class SupplierTest {
 
     @Test
     void testRemoveAgreement() {
-        supplierFacade.addSupplier(123, 456, PaymentMethod.CREDIT, "email@test.com", "1234567890", DeliveryMethod.STANDARD, new ArrayList<>());
+        supplierFacade.addSupplier(123, 456, PaymentMethod.CREDIT, "email@test.com", "1234567890", DeliveryMethod.PICKUP, new ArrayList<>());
         supplierFacade.addAgreement(1, Map.of(1, 10), List.of(new String[][]{new String[]{"1", "5", "10"}}));
         supplierFacade.removeAgreement(1, 1);
 
@@ -82,7 +82,7 @@ class SupplierTest {
 
     @Test
     void testGetSuppliedItems() {
-        supplierFacade.addSupplier(123, 456, PaymentMethod.CREDIT, "email@test.com", "1234567890", DeliveryMethod.STANDARD, new ArrayList<>());
+        supplierFacade.addSupplier(123, 456, PaymentMethod.CREDIT, "email@test.com", "1234567890", DeliveryMethod.SCHEDULED, new ArrayList<>());
         supplierFacade.addAgreement(1, Map.of(1, 10), List.of(new String[][]{new String[]{"1", "5", "10"}}));
 
         Set<String> items = supplierFacade.getSuppliedItems(1);
@@ -91,7 +91,7 @@ class SupplierTest {
 
     @Test
     void testGetSuppliedCatalogItems() {
-        supplierFacade.addSupplier(123, 456, PaymentMethod.CREDIT, "email@test.com", "1234567890", DeliveryMethod.STANDARD, new ArrayList<>());
+        supplierFacade.addSupplier(123, 456, PaymentMethod.CREDIT, "email@test.com", "1234567890", DeliveryMethod.ON_ORDER, new ArrayList<>());
         supplierFacade.addAgreement(1, Map.of(1, 20), List.of(new String[][]{new String[]{"1", "5", "10"}}));
 
         Map<Integer, Integer> items = supplierFacade.getSuppliedCatlogItems(1);

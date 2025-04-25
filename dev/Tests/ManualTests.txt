@@ -1,0 +1,67 @@
+1. Main procedure: Adding a supplier
+When loading the system, there is a menu displayed in the terminal detailing the available options. Adding a supplier is option
+number 1, so we input 1 in the terminal. The CLI then asks one by one to insert the following details: (detail: our input)
+Company ID: 1
+Bank Account: 1000
+Payment Method: credit
+Contact Mail: supplier1@mail.com
+Contact Phone: 050-1234567
+Delivery Method: on order
+
+There are no expected outputs for this method, we only expect to have the supplier in the suppliers list in SupplierFacade.
+When tested, we got the expected outcome - the supplier was created successfully with the correct details and added to the suppliers
+list in SupplierFacade.
+
+2.Main procedure: Creating an order
+When loading the system, there is a menu displayed in the terminal detailing the available options. In order to create a new order
+we must have existing suppliers, so we input 12 to use the load data function to have suppliers available. Adding an order is option
+number 7, so we input 7 in the terminal. The CLI then asks one by one to insert the following details: (detail: our input)
+Supplier ID: 1
+Agreement ID: 1
+Order Date: 2025-04-25
+Destination: Central Warehouse
+Order items: 1, 100
+Do you want to add another item? (Y/N): N
+
+There are no expected outputs for this method, we only expect to have the order in the orders list in OrderFacade.
+When tested, we got the expected outcome - the order was created successfully with the correct details and added to the orders
+list in OrderFacade.
+
+3. Main procedure: Get order history
+When loading the system, there is a menu displayed in the terminal detailing the available options. In order to get the order
+history of a supplier, we must have existing suppliers, so we input 12 to use the load data function to have suppliers available.
+Getting a supplier's order history is option number 12, so we input 12 in the terminal. The CLI then asks one by one to insert
+the supplier's ID, and we inset 1.
+The expected outcome is a list of all the orders from that supplier, detailed as following:
+[
+Order ID: 0
+Supplier ID: 1
+Order Date: 2025-04-10
+Destination: Central Warehouse
+Order Items:
+{itemID=1, quantity=120, catalogID=1, totalPrice=399.6}
+{itemID=2, quantity=160, catalogID=2, totalPrice=408.0}
+Order Status: IN_PROGRESS
+, Order ID: 1
+Supplier ID: 1
+Order Date: 2025-04-15
+Destination: Branch A
+Order Items:
+{itemID=1, quantity=50, catalogID=1, totalPrice=185.0}
+Order Status: IN_PROGRESS
+, Order ID: 2
+Supplier ID: 1
+Order Date: 2025-04-20
+Destination: Branch B
+Order Items:
+{itemID=2, quantity=90, catalogID=2, totalPrice=270.0}
+Order Status: IN_PROGRESS
+, Order ID: 3
+Supplier ID: 1
+Order Date: 2025-04-22
+Destination: Branch C
+Order Items:
+{itemID=2, quantity=80, catalogID=2, totalPrice=240.0}
+Order Status: IN_PROGRESS
+]
+The result was as expected, all the orders from that supplier were printed, all contained the correct details.

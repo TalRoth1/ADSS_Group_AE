@@ -8,7 +8,7 @@ import java.util.List;
 public class SupplierDL {
     private int supplierID;
     private int companyID;
-    private int banckAccount;
+    private int bankAccount;
     private PaymentMethod paymentMethod;
     private String contactMail;
     private String contactPhone;
@@ -20,7 +20,7 @@ public class SupplierDL {
             String contactPhone, DeliveryMethod deliveryMethod, List<AgreementDL> agreements) {
         this.supplierID = supplierID;
         this.companyID = companyID;
-        this.banckAccount = banckAccount;
+        this.bankAccount = banckAccount;
         this.paymentMethod = paymentMethod;
         this.contactMail = contactMail;
         this.contactPhone = contactPhone;
@@ -40,12 +40,12 @@ public class SupplierDL {
         return companyID;
     }
 
-    public void setBanckAccount(int banckAccount) {
-        this.banckAccount = banckAccount;
+    public void setBankAccount(int bankAccount) {
+        this.bankAccount = bankAccount;
     }
 
-    public int getBanckAccount() {
-        return banckAccount;
+    public int getBankAccount() {
+        return bankAccount;
     }
 
     public void setPaymentMethod(PaymentMethod paymentMethod) {

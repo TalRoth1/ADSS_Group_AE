@@ -11,7 +11,7 @@ import Utils.DeliveryMethod;
 import Utils.PaymentMethod;
 
 public class SupplierFacade {
-    private List<SupplierDL> suppliers;
+    private final List<SupplierDL> suppliers;
     private List<Item> items; // Will be saved in inventory after the merge
     private int nextId = 1;
 

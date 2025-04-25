@@ -13,7 +13,7 @@ public class DiscountDL
         this.discountPercentage = discountPercentage;
     }
 
-    public int getcatalogID()
+    public int getCatalogID()
     {
         return catalogID;
     }

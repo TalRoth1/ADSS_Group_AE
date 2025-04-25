@@ -83,14 +83,6 @@ public class OrderDL {
         this.orderItems = orderItems;
     }
 
-    public void addOrderItem(OrderItemDL orderItem) {
-        this.orderItems.add(orderItem);
-    }
-
-    public void removeOrderItem(OrderItemDL orderItem) {
-        this.orderItems.remove(orderItem);
-    }
-
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Order ID: ").append(orderID).append("\n")

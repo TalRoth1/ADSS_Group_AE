@@ -1,0 +1,28 @@
+Important note: The project was compiled with java 21, so it needs to run on a machine with java 21 or higher.
+
+To start the system, double-click the jar file, a command line window should open.
+As soon as the system starts, there should appear a menu with all the available options:
+1. Add Supplier
+2. Add Agreement
+3. Change Agreement
+4. Remove Agreement
+5. Get Supplied Items
+6. Get Cataloged Items
+7. Create Order
+8. Get Order Details
+9. Change Order
+10. Cancel Order
+11. Get Order History
+12. Load Data
+13. Exit
+
+To choose an option, simply input the corresponding number in the terminal. For example,
+if we want to add a supplier, we will input 1 in the terminal.
+
+Some functions require initial data to exist, if you want dummy data for testing use the Load Data function (option 12).
+If an option requires further information from the user, for example Get Order requires the order ID,
+it will ask for the required data one field at a time. Some fields with more complicated formats like order date
+specify the required format, for example a date format is YYYY-MM-DD.
+
+Every time an option is chosen the options menu will reappear waiting for the next request.
+When you are done using the system, either choose option 13 to exit or simple close the terminal.

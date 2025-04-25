@@ -24,7 +24,7 @@ public class AgreementDL {
 
     public DiscountDL getDiscount(int itemID) {
         for (DiscountDL discount : billOfQuantities) {
-            if (discount.getcatalogID() == itemID) {
+            if (discount.getCatalogID() == itemID) {
                 return discount;
             }
         }
