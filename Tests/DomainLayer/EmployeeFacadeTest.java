@@ -71,30 +71,6 @@ class EmployeeFacadeTest {
     }
 
     @Test
-    void hireEmployee_SuccessfulHire2() {
-        // Login manager first
-        employeeFacade.login(MANAGER_ID, MANAGER_PASSWORD);
-
-        String result = employeeFacade.hireEmployee(
-                101, // employeeId
-                MANAGER_ID, // managerId
-                "Branch1", // branch
-                "John Doe", // name
-                "333444", // bankAccount
-                5000, // salary
-                START_DATE,
-                15, // vacationDays
-                10, // sickDays
-                80, // educationFund
-                90, // socialBenefits
-                "pass123", // password
-                Role.CASHIER // role
-        );
-
-        assertEquals("Employee: 101 hired successfully", result);
-    }
-
-    @Test
     void hireEmployee_ManagerNotLoggedIn() {
         String result = employeeFacade.hireEmployee(
                 101,

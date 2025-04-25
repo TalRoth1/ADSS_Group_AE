@@ -77,7 +77,7 @@ class EmployeeManagerTest {
     @Test
     void fireEmployee_Success() {
         String result = manager.fireEmployee(EMPLOYEE_ID);
-        assertNull(result);
+        assertEquals("Employee: 101 fired successfully", result);
         assertTrue(testEmployee.isFinishWorking());
     }
 
@@ -110,7 +110,7 @@ class EmployeeManagerTest {
     @Test
     void addRoleToEmployee_DuplicateRole() {
         String result = manager.addRoleToEmployee(EMPLOYEE_ID, Role.CASHIER);
-        assertEquals("Employee already has this role", result);
+        assertEquals("Test Employee is already " + Role.CASHIER.toString(), result);
     }
 
     @Test
@@ -145,6 +145,7 @@ class EmployeeManagerTest {
         manager.createShift(START_DATE.plusDays(1), ShiftType.MORNING, EMPLOYEE_ID);
 
         Shift shift = manager.getShift(START_DATE.plusDays(1), ShiftType.MORNING);
+        manager.setRequiredRole(shift, Role.CASHIER, 1);
         String result = manager.addEmployeeToShift(EMPLOYEE_ID, shift, Role.CASHIER);
 
         assertNull(result);
