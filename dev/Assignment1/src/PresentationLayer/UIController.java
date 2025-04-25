@@ -384,7 +384,8 @@ public class UIController {
         System.out.println("1. Send");
         System.out.println("2. Problem");
         System.out.println("3. Cancelled");
-        System.out.println("4. Dont Change");
+        System.out.println("4. Shipment Completed");
+        System.out.println("5. Dont Change");
         int choice = Integer.parseInt(scanner.nextLine());
         List<ShipmentDL> shipments  = new ArrayList<>();
         ShipmentDL shipment = null;
@@ -406,7 +407,17 @@ public class UIController {
                         System.out.println("Invalid choice. Please try again.");
                     }
                 }
-                shipmentFacade.ChangeStatus(shipment, "SENT");
+                try {
+                    shipmentFacade.ChangeStatus(shipment, "SENT");
+                }
+                catch (Exception e) {
+                    if(e.getMessage().equals("Driver is busy")) {
+                        System.out.println("The driver is busy, please wait for them to finish their current shipment, or change the driver.");
+                    }
+                    if(e.getMessage().equals("Truck is busy")) {
+                        System.out.println("The Truck is busy, please wait for it to finish its current shipment, or change the truck.");
+                    }
+                }
                 break;
             case 2:
                 shipments = shipmentFacade.GetStatusShipement("Sent");
@@ -424,7 +435,14 @@ public class UIController {
                         System.out.println("Invalid choice. Please try again.");
                     }
                 }
-                shipmentFacade.ChangeStatus(shipment, "PROBLEM");
+                try
+                {
+                    shipmentFacade.ChangeStatus(shipment, "PROBLEM");
+                }
+                catch(Exception e)
+                {
+                    System.out.println(e.getMessage());
+                }
                 break;
             case 3:
                 shipments = shipmentFacade.GetStatusShipement("Pending");
@@ -442,9 +460,41 @@ public class UIController {
                         System.out.println("Invalid choice. Please try again.");
                     }
                 }
-                shipmentFacade.ChangeStatus(shipment, "CANCELLED");
+                try
+                {
+                    shipmentFacade.ChangeStatus(shipment, "CANCELLED");
+                }
+                catch(Exception e)
+                {
+                    System.out.println(e.getMessage());
+                }
                 break;
             case 4:
+                shipments = shipmentFacade.GetStatusShipement("Sent");
+                System.out.println("Please choose a shipment from the list below: ");
+                flag = true;
+                while (flag) {
+                    for (int i = 0; i < shipments.size(); i++) {
+                        System.out.println(i + ": " + shipments.get(i).toString());
+                    }
+                    int choice2 = Integer.parseInt(scanner.nextLine());
+                    if (choice2 >= 0 && choice2 < shipments.size()) {
+                        shipment = shipments.get(choice2);
+                        flag = false;
+                    } else {
+                        System.out.println("Invalid choice. Please try again.");
+                    }
+                }
+                try
+                {
+                    shipmentFacade.ChangeStatus(shipment, "COMPLETED");
+                }
+                catch(Exception e)
+                {
+                    System.out.println(e.getMessage());
+                }
+                break;
+            case 5:
                 break;
             default:
                 System.out.println("Invalid choice. Please try again.");

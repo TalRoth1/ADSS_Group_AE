@@ -23,8 +23,24 @@ public class ShipmentFacade {
         shipment.setWeight(Items);
         shipments.add(shipment);
     }
-    public void ChangeStatus(ShipmentDL shipment, String stat)  {
+    public void ChangeStatus(ShipmentDL shipment, String stat) throws Exception {
+        if(stat.equals("SENT"))
+        {
+            if (shipment.DriverBusyCheck()) {
+                throw new Exception("Driver is busy");
+            }
+            if (shipment.TruckBusyCheck())
+            {
+                throw new Exception("Truck is busy");
+            }
+            shipment.ChangeAvailablity();
+        }
         shipment.ChangeStatus(stat);
+        //assuming both where busy beforehand
+        if(stat.equals("COMPLETED") || stat.equals("PROBLEM") || stat.equals("CANCELLED"))
+        {
+            shipment.ChangeAvailablity();
+        }
     }
 
     public List<ShipmentDL> GetStatusShipement(String status) {

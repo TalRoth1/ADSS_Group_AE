@@ -176,6 +176,22 @@ public class ShipmentDL {
                 ", Date Created: " + DateCreated.toString() +
                 (DateSent != null ? ", Date Sent: " + DateSent.toString() : "");
     }
+
+    public void ChangeAvailablity()
+    {
+        Truck.changeState();
+        DriverName.changeState();
+    }
+    
+    public boolean DriverBusyCheck()
+    {
+        return DriverName.isBusy;
+    }
+
+    public boolean TruckBusyCheck()
+    {
+        return Truck.IsBusy;
+    }
 }
 
 

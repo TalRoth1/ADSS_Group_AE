@@ -4,6 +4,7 @@ import java.util.List;
 public class DriverDL {
     public String Name;
     public List<String> LicenseType;
+    public boolean isBusy = false;
 
     public DriverDL(String name, List<String> licenseType) {
         this.Name = name;
@@ -12,6 +13,11 @@ public class DriverDL {
 
     public String toString() {
         return Name + ", License: " + String.join(",", LicenseType);
+    }
+
+    public void changeState()
+    {
+        isBusy = !isBusy;
     }
 
 }

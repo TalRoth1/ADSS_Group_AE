@@ -7,6 +7,7 @@ public class ShipmentDocumentDL {
     public Map<LocationDL, Map<String, Integer>> items;
     public float Weight;
 
+
     public ShipmentDocumentDL(Map<LocationDL, Map<String, Integer>> items, LocationDL origin) {
         this.items = items;
         this.Weight = 0;

@@ -8,6 +8,7 @@ public class LocationDL {
     public String ContactName;
     public String Zone;
 
+
     public LocationDL(String street, int streetNumber, String city, String contactNumber, String contactName, String zone) {
         this.Street = street;
         this.StreetNumber = streetNumber;

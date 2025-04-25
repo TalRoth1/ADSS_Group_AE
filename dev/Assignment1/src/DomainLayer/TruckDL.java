@@ -6,6 +6,7 @@ public class TruckDL {
     public String Type;
     public float Weight;
     public float MaxWeight;
+    public boolean IsBusy = false;
     
     public boolean CheckWeight(float weight) {
         return weight <= MaxWeight;
@@ -40,5 +41,10 @@ public class TruckDL {
     public float GetMaxWeight()
     {
         return MaxWeight;
+    }
+
+    public void changeState()
+    {
+        IsBusy = !IsBusy;
     }
 }
