@@ -118,8 +118,6 @@ public class EmployeeManager extends Employee{
 
     public ShiftEmployee hireEmployee(int employeeId, String employeeName,String branch, String bankAccount, int salary,
         LocalDate startDate, int vacationDays, int sickDays,double educationFund, double socialBenefits,String employeePassword, Role role){
-        // if(checkEmployee(employeeId))
-        //     return "Employee: " + employeeId + " already hired";
         ShiftEmployee shiftEmployee = new ShiftEmployee(employeeId, employeeName,branch, bankAccount, salary,
                 startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
         allEmployees.put(employeeId, shiftEmployee);

@@ -12,9 +12,33 @@ public class EmployeeFacade { //employee related methods
     private Map<Integer, EmployeeManager> employeeManagers;
     private Map<Integer, ShiftEmployee> shiftEmployees;
 
+    //initalize employees
+    EmployeeManager keren = new EmployeeManager(100, "Keren", "1", "111222", 7000,
+            LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "123");
+    ShiftEmployee Liat = new ShiftEmployee(101, "Liat", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.SHIFT_MANAGER);
+    ShiftEmployee Erez = new ShiftEmployee(102, "Erez", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.CASHIER);
+    ShiftEmployee Elad = new ShiftEmployee(103, "Elad", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.DRIVER);
+    ShiftEmployee Eylon = new ShiftEmployee(104, "Eylon", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.DRIVER);
+    ShiftEmployee Tal = new ShiftEmployee(105, "Tal", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.CASHIER);
+    ShiftEmployee Ofir = new ShiftEmployee(106, "Ofir", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.STORE_KEEPER);
+    ShiftEmployee Kiril = new ShiftEmployee(107, "Kiril", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.STORE_KEEPER);
+    ShiftEmployee Ofri = new ShiftEmployee(108, "Ofri", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.SHIFT_MANAGER);
+
     public EmployeeFacade() {
         this.employeeManagers = new HashMap<>();
         this.shiftEmployees = new HashMap<>();
+
+        // Add the employee manager
+        employeeManagers.put(keren.getId(), keren);
+        // Add shift employees
+        shiftEmployees.put(Liat.getId(), Liat);
+        shiftEmployees.put(Erez.getId(), Erez);
+        shiftEmployees.put(Elad.getId(), Elad);
+        shiftEmployees.put(Eylon.getId(), Eylon);
+        shiftEmployees.put(Tal.getId(), Tal);
+        shiftEmployees.put(Ofir.getId(), Ofir);
+        shiftEmployees.put(Kiril.getId(), Kiril);
+        shiftEmployees.put(Ofri.getId(), Ofri);
     }
 
     public Employee login(int id, String password) {
@@ -52,6 +76,7 @@ public class EmployeeFacade { //employee related methods
             return "You are not logged in";
         }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
         return employeeManager.removeEmployee(employeeId);
     }
 
@@ -485,5 +510,6 @@ public class EmployeeFacade { //employee related methods
         EmployeeManager manager = new EmployeeManager(id, name, branch, bankAccount, salary, startDate,
                 vacationDays, sickDays, educationFund, socialBenefits, password);
         employeeManagers.put(id, manager);
+      //  repository.addEmployee(manager);
     }
 }
