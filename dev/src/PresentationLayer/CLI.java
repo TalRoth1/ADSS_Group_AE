@@ -1,6 +1,8 @@
 package PresentationLayer;
 
 import DomainLayer.*;
+
+import javax.sound.midi.SysexMessage;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -58,7 +60,7 @@ public class CLI {
                 "Fire Employee", "Hire Employee", "Change Employee's Role",
                 "Add Role to Employee", "Change Shift Manager", "Replace Employee",
                 "Delete Employee's Role", "Change Employee's Data", "Show Past Shifts",
-                "Show Employee's preferences", "Show Employee's shifts", "Logout"};
+                "Show Employee's shifts", "Logout"};
         String option = selectFromList("Select Employee Manager Action (Enter the number)", actions);
 
         switch (option) {
@@ -75,8 +77,8 @@ public class CLI {
             case "Delete Employee's Role" -> deleteRoleFromEmployee();
             case "Change Employee's Data" -> changeEmployeeData();
             case "Show Past Shifts" -> getPastShifts();
-            case "Show Employee's preferences" -> getPrefEmployee("employee manager");
-            case "Show Employee's shifts" -> getEmployeeShifts("employee manager");
+            //case "Show Employee's preferences" -> getPrefEmployee("employee manager");
+            case "Show Employee's shifts" -> getEmployeeShiftsAsEmployeeManager();
             case "Logout" -> logout(userId);
             default -> {
                 System.out.println("This is not a valid Employee Manager action");
@@ -131,9 +133,6 @@ public class CLI {
     private void addEmployeeToExistingShift() {
         ShowPrefAllEmployees();
         LocalDate dateOfShift = chooseDateForAddEmployee("Please enter Date");
-        if(dateOfShift == null)
-            employeeManager(); // If date is invalid, return to EmployeeManager
-
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         Shift shift = employeeFacade.getShift(dateOfShift, shiftType, userId);
         if(shift == null) {
@@ -154,16 +153,13 @@ public class CLI {
         }
 
         String response = employeeFacade.addEmployeeToShift(newEmployeeId, shift, role, userId);
-        if(response != null)
-            System.out.println(response);
+        System.out.println(response);
         employeeManager();
     }
 
     private void removeEmployeeFromShift() {
         int employeeId = readInt("Please enter Employee's ID to remove: ");
         LocalDate dateOfShift = chooseDate("Please enter the date of the shift");
-        if(dateOfShift == null)
-            employeeManager(); // If date is invalid, return to EmployeeManager
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         Shift shift = employeeFacade.getShift(dateOfShift, shiftType, userId);
         if(shift == null) {
@@ -229,8 +225,6 @@ public class CLI {
     private void changeShiftManager() {
         int oldShiftManagerId = readInt("Please enter old shift manager ID: ");
         LocalDate dateOfShift = chooseDate("Please enter the date of the shift");
-        if(dateOfShift == null)
-            employeeManager(); // If date is invalid, return to EmployeeManager
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         Shift shift = employeeFacade.getShift(dateOfShift, shiftType, userId);
         if(shift == null) {
@@ -248,8 +242,6 @@ public class CLI {
         ShowPrefAllEmployees();
         int oldEmployeeId = readInt("Please enter the ID of the employee you want to replace: ");
         LocalDate dateOfShift = chooseDate("Please enter the date of the shift");
-        if(dateOfShift == null)
-            employeeManager(); // If date is invalid, return to EmployeeManager
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         Shift shift = employeeFacade.getShift(dateOfShift, shiftType, userId);
         if(shift == null) {
@@ -304,24 +296,22 @@ public class CLI {
         employeeManager();
     }
 
-    private void getPrefEmployee(String type) {
-        int employeeId = readInt("Please enter Employee's ID: ");
-        String response = employeeFacade.getPreferredShiftsEmployee(userId, employeeId);
-        if (response != null)
-            System.out.println(response);
-        if(type.equals("shift manager"))
-            shiftManager();
-        employeeManager();//it's Employee Manager so get back to his menu
-    }
+//    private void getPrefEmployee(String type) {
+//        int employeeId = readInt("Please enter Employee's ID: ");
+//        String response = employeeFacade.getPreferredShiftsEmployee(userId, employeeId);
+//        if (response != null)
+//            System.out.println(response);
+//        if(type.equals("shift manager"))
+//            shiftManager();
+//        employeeManager();//it's Employee Manager so get back to his menu
+//    }
 
-    private void getEmployeeShifts(String type) {
+    private void getEmployeeShiftsAsEmployeeManager() {
         int employeeId = readInt("Please enter Employee's ID: ");
         String response = employeeFacade.getAssignedEmployeeShiftsManager(employeeId, userId);
         if (response != null)
             System.out.println(response);
-        if(type.equals("shift manager"))
-            shiftManager();
-        employeeManager();//it's Employee Manager so get back to his menu
+        employeeManager();
     }
 
     private void logout(int id) {
@@ -395,19 +385,19 @@ public class CLI {
     // }
 
     private void shiftManager() {
-        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift", "Show Employee's preferences",
+        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift",
                 "Show Employee's shifts", "Show Shift Information" , "Show my Preferences",
-                "Show my Shifts", "Logout"};
+                "Show my Assigned Shifts", "Logout"};
         String option = selectFromList("Select Shift Manager Action:", actions);
 
         switch (option) {
             case "Add Preferred Shift" -> addPreferredShift("shift manager");
             case "Remove Preferred Shift" -> removePreferredShift("shift manager");
-            case "Show Employee's preferences" -> getPrefEmployee("shift manager");
-            case "Show Employee's shifts" -> getEmployeeShifts("shift manager");
+            //case "Show Employee's preferences" -> getPrefEmployee("shift manager");
+            case "Show Employee's shifts" -> getEmployeeShiftsAsShiftManager();
             case "Show Shift Information" -> getShiftInfo("shift manager");
-            //case "Show my Preferences" -> showMyPreferences();
-            //case "Show my Shifts" -> צפייה במשמרות שלי
+            case "Show my Preferences" -> getMyPreferences("shift manager");
+            case "Show my Assigned Shifts" -> getMyAssignedShifts("shift manager");
             case "Logout" -> logout(userId);
             default -> {
                 System.out.println("This is not a valid Shift Manager action");
@@ -416,10 +406,30 @@ public class CLI {
         }
     }
 
+    private void getEmployeeShiftsAsShiftManager() {
+        int employeeId = readInt("Please enter Employee's ID: ");
+        String response = employeeFacade.getAssignedEmployeeShiftsAsShiftManager(employeeId, userId);
+        if (response != null)
+            System.out.println(response);
+        shiftManager();
+    }
+
+    private void getMyAssignedShifts(String type) {
+        System.out.println(employeeFacade.getAssignedEmployeeShiftsEmployee(userId));
+        if(type.equals("shift manager"))
+            shiftManager();
+        shiftEmployee(); //it's shift Employee so get back to his menu
+    }
+
+    private void getMyPreferences(String type) {
+        System.out.println(employeeFacade.getPreferredShiftsEmployee(userId));
+        if(type.equals("shift manager"))
+            shiftManager();
+        shiftEmployee(); //it's shift Employee so get back to his menu
+    }
+
     private void getShiftInfo(String type) { //for shift manager OR shift employee
         LocalDate dateOfShift = chooseDate("Please enter the date of the shift");
-        if(dateOfShift == null)
-            shiftManager(); // If date is invalid, return to EmployeeManager
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         Shift shift = employeeFacade.getShiftForEmployee(dateOfShift, shiftType);
         if(shift == null) {
@@ -435,15 +445,15 @@ public class CLI {
 
     private void shiftEmployee() {
         String[] actions = {"Add Preferred Shift", "Remove Preferred Shift", "Show Shift Information",
-                "Get Preferences", "Logout"};
+                "Show my Preferences", "Show my Shifts", "Logout"};
         String option = selectFromList("Select Shift Employee Action:", actions);
 
         switch (option) {
             case "Add Preferred Shift" -> addPreferredShift("shift employee");
             case "Remove Preferred Shift" -> removePreferredShift("shift employee");
             case "Show Shift Information" -> getShiftInfo("shift employee");
-            //case "Show my Preferences" -> ; //צפייה בפרטי משמרות שרשמתי שאני מעדיף
-            //case "Show my Shifts" -> ; //צפייה במשמרות שלי
+            case "Show my Preferences" -> getMyPreferences("shift employee");
+            case "Show my Shifts" -> getMyAssignedShifts("shift employee");
             case "Logout" -> logout(userId);
             default -> {
                 System.out.println("This is not a valid Shift Employee action");
@@ -466,8 +476,6 @@ public class CLI {
 
     private void removePreferredShift(String type) {
         LocalDate dateOfShift = chooseDateForEmployee("please enter start date"); //choose date with helper method
-        if(dateOfShift == null)
-            shiftEmployee(); // If date is invalid, return to EmployeeManager
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         Shift shift = employeeFacade.getShiftForEmployee(dateOfShift, shiftType);
         if(shift == null) {
@@ -509,7 +517,7 @@ public class CLI {
             while (true) {
                 int employeeId = selectEmployeeForRole(shift, role);
                 String res = employeeFacade.addEmployeeToShift(employeeId, shift, role, empManagerId);
-                if(res != null) {
+                if(!res.equals("Employee added to shift successfully")) {
                     System.out.println(res);
                     continue; //ask for the employee again
                 }
@@ -700,11 +708,12 @@ public class CLI {
         LocalTime nowTime = LocalTime.now();
         DayOfWeek today = nowDate.getDayOfWeek();
 
-        //זמני עד חמישי ב23:59 כדי שנוכל להמשיך לעבוד היום, מחר אשנה את זה לשישי שבת ובסוף אחזיר לחמישי ב17:00
-        boolean isAllowedTime =
-                (today.getValue() >= DayOfWeek.SUNDAY.getValue() &&
-                        today.getValue() <= DayOfWeek.WEDNESDAY.getValue()) ||
-                        (today == DayOfWeek.THURSDAY && nowTime.isBefore(LocalTime.of(23, 59)));
+        //זמני כדי שנוכל להמשיך לעבוד היום, מחר אשנה את זה לשבת ובסוף אחזיר לחמישי ב17:00
+//        boolean isAllowedTime =
+//                (today.getValue() >= DayOfWeek.SUNDAY.getValue() &&
+//                        today.getValue() <= DayOfWeek.WEDNESDAY.getValue()) ||
+//                        (today == DayOfWeek.THURSDAY && nowTime.isBefore(LocalTime.of(17, 0)));
+        boolean isAllowedTime = today == DayOfWeek.FRIDAY;
         if (!isAllowedTime) {
             System.out.println("You are only allowed to do this action from Sunday until Thursday 17:00.");
             System.out.println("Now, you will return to the main menu.");

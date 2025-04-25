@@ -128,7 +128,6 @@ public class Shift {
 
     //methods
     public String addEmployee(int id, Role role) {
-
         if (assignedEmployeesID.containsKey(id)) {
             return "Employee already assigned to this shift.";
         }

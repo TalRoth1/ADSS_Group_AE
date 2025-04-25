@@ -287,8 +287,21 @@ public class EmployeeManager extends Employee{
         if (shift.getAssignedEmployeesID().containsKey(id)) {
             return "this employee is already assigned to this shift";
         }
-        shift.addEmployee(id, role);
-        employee.addAssignedShift(shift, role);
+        String response = shift.addEmployee(id, role);
+        if(response != null) {
+            return response;
+        }
+        //return employee.addAssignedShift(shift, role);
+        String res = employee.addAssignedShift(shift, role);
+        if(res != null) {
+            return res;
+        }
+        if(shift.getShiftType() == ShiftType.MORNING) {
+            morningShifts.put(shift.getDate(), shift);
+        }
+        else if(shift.getShiftType() == ShiftType.EVENING) {
+            eveningShifts.put(shift.getDate(), shift);
+        }
         return null;
     }
 

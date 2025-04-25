@@ -135,7 +135,7 @@ public class ShiftEmployee extends Employee {
         if(shift == null) {
             return "Shift cannot be null.";
         }
-        assignedShifts.put(shift, role); 
+        assignedShifts.put(shift, role);
         return null;
     }
 

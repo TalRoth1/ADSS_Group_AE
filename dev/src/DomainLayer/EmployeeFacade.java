@@ -229,7 +229,7 @@ public class EmployeeFacade { //employee related methods
     }
 
     // shift employee methods
-    public String getPrefAllEmployees(int empManagerId) { //get all employees' preferences
+    public String getPrefAllEmployees(int empManagerId) { //get all employees' preferences, for employee manager
         if (!isEmployeeManager(empManagerId)) {
             return "this action is allowed only for employee manager";
         }
@@ -240,22 +240,16 @@ public class EmployeeFacade { //employee related methods
         return employeeManager.getPrefAllEmployees();
     }
 
-    public String getPreferredShiftsEmployee(int empManagerId, int employeeId) { //employee's preferred shifts for shift employee only
-        if (!isEmployeeManager(empManagerId)) {
-            return "this action is allowed only for employee manager";
-        }
-        if (!isLoggedIn(empManagerId)) {
+    public String getPreferredShiftsEmployee(int employeeId) { //employee's preferred shifts for shift employee only
+        if (!isLoggedIn(employeeId)) {
             return "You are not logged in";
         }
         ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
         return shiftEmployee.getPreferredShiftsToString();
     }
 
-    public String getAssignedEmployeeShiftsEmployee(int employeeId, int empManagerId) { //employee's assigned shifts for shift employee only
-        if (!isEmployeeManager(empManagerId)) {
-            return "this action is allowed only for employee manager";
-        }
-        if (!isLoggedIn(empManagerId)) {
+    public String getAssignedEmployeeShiftsEmployee(int employeeId) { //employee's assigned shifts for shift employee only
+        if (!isLoggedIn(employeeId)) {
             return "You are not logged in";
         }
         ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
@@ -271,6 +265,25 @@ public class EmployeeFacade { //employee related methods
         }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.getAssignedEmployeeShiftsManager(employeeId);
+    }
+
+    public String getAssignedEmployeeShiftsAsShiftManager(int employeeId, int shiftManagerId) { //employee's assigned shifts for shift employee only
+        if (!isShiftManager(shiftManagerId)) {
+            return "this action is allowed only for shift manager";
+        }
+        if (!isLoggedIn(shiftManagerId)) {
+            return "You are not logged in";
+        }
+        EmployeeManager anyManager = getAnyEmployeeManager();
+        if (anyManager == null) {
+            return "No employee manager available to process request.";
+        }
+
+        return anyManager.getAssignedEmployeeShiftsManager(employeeId);
+    }
+
+    private EmployeeManager getAnyEmployeeManager() {
+        return employeeManagers.values().stream().findFirst().orElse(null);
     }
 
     public String addRole(int id, Role role) {
@@ -360,7 +373,12 @@ public class EmployeeFacade { //employee related methods
         if(!isLoggedIn(empManagerId))
             return "You are not logged in";
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        return employeeManager.addEmployeeToShift(employeeId, shift, role);
+        String response = employeeManager.addEmployeeToShift(employeeId, shift, role);
+        if(response != null) {
+            return response;
+        }
+        System.out.println("Employee " + employeeId + " added to shift successfully");
+        return "Employee added to shift successfully";
     }
 
     public String removeEmployeeFromShift(int employeeId, Shift shift, int empManagerId) {
