@@ -11,7 +11,7 @@ public class Shift {
     private int startTime; // 24-hour format: e.g. 9:00 AM = 900, 10:30 PM = 2230
     // Morning shifts: default start time is 600 (6:00 AM) and end time is 1400 (2:00 PM)
     // Evening shifts: default start time is 1400 (2:00 PM) and end time is 2200 (10:00 PM)
-    private int endTime; // 24-hour formatc like startTime
+    private int endTime; // 24-hour format like startTime
     private int shiftManagerId;
     private Map<Role, Integer> requiredRoles; // roles and number of employees required
     private Map<Integer, Role> assignedEmployeesID; 
@@ -20,8 +20,14 @@ public class Shift {
     public Shift(LocalDate date, ShiftType shiftType, int shiftManagerId) {
         this.date = date;
         this.shiftType = shiftType;
-        this.startTime = 600; // Default start time for morning shifts
-        this.endTime = 1400; // Default end time for morning shifts
+        if(shiftType == ShiftType.MORNING) {
+            this.startTime = 600; // Default start time for morning shifts
+            this.endTime = 1400; // Default end time for morning shifts
+        }
+        else  {
+            this.startTime = 1400; //Default start time for evening shifts
+            this.endTime = 2200; //Default end time for evening shifts
+        }
         this.shiftManagerId = shiftManagerId;
         this.requiredRoles = new HashMap<>();
         this.availableEmployeesID = new HashMap<>();

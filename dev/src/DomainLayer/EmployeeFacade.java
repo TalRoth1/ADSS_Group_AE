@@ -549,6 +549,16 @@ public class EmployeeFacade { //employee related methods
         return employeeManager.getPastShifts();
     }
 
+    public String setTimes(int empManagerId, Shift shift, int startTime, int endTime) {
+        if(!isEmployeeManager(empManagerId))
+            return "this action is allowed only for employee manager";
+        if(!isLoggedIn(empManagerId))
+            return "You are not logged in";
+
+        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        return employeeManager.setTimes(shift, startTime, endTime);
+    }
+
 
     //just for Main
     public void addFirstEmployeeManager(int id, String name, String branch, String bankAccount, int salary,

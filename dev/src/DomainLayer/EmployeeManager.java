@@ -326,7 +326,7 @@ public class EmployeeManager extends Employee{
     }
 
     //getters and setters
-    public String setStartTimes(Shift shift, int start, int end) { //set start time and end time of the shift
+    public String setTimes(Shift shift, int start, int end) { //set start time and end time of the shift
         if (start < 0 || end < 0 || start >= end){
             return "invalid start or end time";
         }
@@ -337,6 +337,8 @@ public class EmployeeManager extends Employee{
             return "invalid start or end time for this shift type";
         }
         shift.setStartTime(start);
+        shift.setEndTime(end);
+        //אולי צריך לשנות גם את השעה פה
         return null;
     }
 
