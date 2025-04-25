@@ -72,7 +72,7 @@ public class CLI {
             case "Hire Employee" -> hireEmployee();
             case "Change Employee's Role" -> changeRoleToEmployee();
             case "Add Role to Employee" -> addRoleToEmployee();
-            case "Change Shift Manager " -> changeShiftManager();
+            case "Change Shift Manager" -> changeShiftManager();
             case "Replace Employee" -> replaceEmployee();
             case "Delete Employee's Role" -> deleteRoleFromEmployee();
             case "Change Employee's Data" -> changeEmployeeData();
