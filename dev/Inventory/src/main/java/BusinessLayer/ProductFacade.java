@@ -126,10 +126,11 @@ public class ProductFacade {
         if (expirationDate.before(new Date()))
             throw new IllegalArgumentException("Cannot add item with expired date");
 
-        if (!product.hasBranch(branchID)) {
-            product.initializeBranch(branchID);
+        if (!BranchFacade.getInstance().isBranchExist(branchID)) {
+            throw new IllegalArgumentException("Cannot add item to non-existent branch.");
         }
 
+        product.initializeBranch(branchID);
         int itemID = nextItemID++;
         ItemBL item = new ItemBL(itemID, productID, name, isDef, expirationDate, branchID, location);
         product.addItemToBranch(branchID, item);
@@ -254,7 +255,6 @@ public class ProductFacade {
 
         return new ReportBL("Deficiency Report", body.toString());
     }
-
 
     public ReportBL expiredReport() {
         StringBuilder body = new StringBuilder();

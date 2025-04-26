@@ -73,11 +73,9 @@ public class ProductBL {
         return inventoryShelfItems.getOrDefault(branchID, new ArrayList<>()).size();
     }
 
-    public int getMinQuantity(int branchID)
-    {
+    public int getMinQuantity(int branchID) {
         return minQuantity.getOrDefault(branchID, 0);
     }
-
 
     public int getProfit(int branchID) {
         return profitAmount.getOrDefault(branchID, 0);
@@ -110,6 +108,12 @@ public class ProductBL {
     }
 
     public void setMinQuantity(int branchID, int minQuantity) {
+        if (minQuantity < 0) {
+            throw new IllegalArgumentException("Minimum quantity cannot be negative.");
+        }
+        if (!inventoryShelfItems.containsKey(branchID)) {
+            throw new IllegalArgumentException("Branch ID does not exist in the inventory.");
+        }
         minQuantity = Math.max(minQuantity, 0);
         this.minQuantity.put(branchID, minQuantity);
     }
