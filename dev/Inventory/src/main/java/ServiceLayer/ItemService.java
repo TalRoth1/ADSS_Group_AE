@@ -1,13 +1,13 @@
 package ServiceLayer;
 
-import BusinessLayer.ItemFacade;
+import BusinessLayer.*;
 import java.util.Date;
 
 public class ItemService {
-    private ItemFacade ifa;
+    private ProductFacade ifa;
 
     public ItemService() {
-        ifa = ItemFacade.getInstance();
+        ifa = ProductFacade.getInstance();
     }
 
     public Response AddItem(int productid, String name, boolean isDef, Date expirationDate,
