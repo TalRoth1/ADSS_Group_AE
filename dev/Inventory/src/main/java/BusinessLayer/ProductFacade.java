@@ -27,6 +27,21 @@ public class ProductFacade {
         return instance;
     }
 
+    public void deleteAllItemsForBranch(int branchID)
+    {
+        items.values().removeIf(item -> item.getBranchID() == branchID);
+
+        for (ProductBL product : products.values())
+        {
+            if (product.hasBranch(branchID))
+            {
+                product.getItemsInBranch(branchID).clear();
+                product.getProfits().remove(branchID);
+            }
+        }
+    }
+
+
     // ================== Product Management ==================
 
     public synchronized int addProduct(String name, double costPrice, double sellingPrice, int discount,

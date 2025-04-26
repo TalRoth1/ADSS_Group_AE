@@ -16,6 +16,15 @@ public class BranchFacade
         nextBranchID = 1;
     }
 
+    public boolean isBranchExists(int id)
+    {
+        synchronized (branches)
+        {
+            return branches.containsKey(id);
+        }
+    }
+
+
     public static BranchFacade getInstance()
     {
         if(instance == null) 
@@ -52,6 +61,7 @@ public class BranchFacade
         {
             if(branches.containsKey(branchID))
             {
+                ProductFacade.getInstance().deleteAllItemsForBranch(branchID);
                 branches.remove(branchID);
             }
             else
