@@ -78,8 +78,9 @@ public class ProductBL {
     }
 
     public int getProfit(int branchID) {
-        return profitAmount.get(branchID);
+        return profitAmount.getOrDefault(branchID, 0);
     }
+
 
     public HashMap<Integer, Integer> getProfits() {
         return profitAmount;
@@ -124,9 +125,12 @@ public class ProductBL {
         return inventoryShelfItems.getOrDefault(branchID, new ArrayList<>());
     }
 
-    public void addProfit(int branchID, double amount) {
+    public void addProfit(int branchID, double amount)
+    {
         int discountedAmount = (int) (amount * (100 - discount) / 100);
-        profitAmount.put(branchID, profitAmount.get(branchID) + discountedAmount);
+        int existingProfit = profitAmount.getOrDefault(branchID, 0);
+        profitAmount.put(branchID, existingProfit + discountedAmount);
     }
+
 
 }

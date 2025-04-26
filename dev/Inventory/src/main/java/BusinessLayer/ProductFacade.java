@@ -299,7 +299,10 @@ public class ProductFacade {
                 int profit = entry.getValue();
                 String productName = product.getName();
 
-                branchToProductProfits.computeIfAbsent(branchID, k -> new HashMap<>()).merge(productName, profit, Integer::sum);
+                Map<String, Integer> productProfitsForBranch = branchToProductProfits.computeIfAbsent(branchID, k -> new HashMap<>());
+
+                int existingProfit = productProfitsForBranch.getOrDefault(productName, 0);
+                productProfitsForBranch.put(productName, existingProfit + profit);
             }
         }
 
@@ -320,17 +323,19 @@ public class ProductFacade {
                 Map<String, Integer> productProfits = branchToProductProfits.get(branchID);
                 List<Map.Entry<String, Integer>> sortedProducts = new ArrayList<>(productProfits.entrySet());
 
-                sortedProducts.sort((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()));
+                sortedProducts.sort((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()));
 
                 for (Map.Entry<String, Integer> productEntry : sortedProducts)
                 {
-                    body.append("  Product: ").append(productEntry.getKey()).append(", Total Profit: ").append(productEntry.getValue()).append("\n");
+                    body.append("  Product: ").append(productEntry.getKey())
+                            .append(", Total Profit: ").append(productEntry.getValue()).append("\n");
                 }
             }
         }
 
         return new ReportBL("Sales Report", body.toString());
     }
+
 
 
 }
