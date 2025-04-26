@@ -112,9 +112,6 @@ public class Shift {
         if (!requiredRoles.containsKey(role)) {
             return "Role not required for this shift";
         }
-        if (requiredRoles.get(role) == num) {
-            return "Number of employees required is already set to this value";
-        }
         if (num < 0 ) {
             return "Number of employees cannot be negative";
         }

@@ -219,7 +219,7 @@ public class EmployeeManager extends Employee{
         }
            shift.removeEmployee(empID);
            employee.removeAssignedShift(shift);
-           shift.addEmployee(replacementID, shift.getAssignedEmployeesID().get(empID));
+           shift.addEmployee(replacementID, role);
            replacement.addAssignedShift(shift, role);
 
         if (shift.getShiftType() == ShiftType.EVENING) {
