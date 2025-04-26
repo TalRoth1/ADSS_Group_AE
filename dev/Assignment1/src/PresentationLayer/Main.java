@@ -29,7 +29,7 @@ public class Main {
                     choice = Integer.parseInt(input);
                     flag = false;
                 } else {
-                    System.out.println("Invalid input. Please enter a number between 1 and 5.");
+                    System.out.println("Invalid input. Please enter a number between 1 and 9.");
                 }
             }
 

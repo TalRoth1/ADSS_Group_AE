@@ -50,6 +50,9 @@ public class ShipmentDL {
             case "CANCELLED":
                 this.Status = ShipmentStatus.CANCELLED;
                 break;
+                case "COMPLETED":
+                this.Status = ShipmentStatus.COMPLETED;
+                break;
             default:
                 throw new IllegalArgumentException("Invalid status: " + stat);
         }

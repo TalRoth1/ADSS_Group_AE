@@ -25,6 +25,10 @@ public class UIController {
     public LocationDL ChooseStart() {
         boolean flag = true;
         List<LocationDL> locations = shipmentFacade.locations;
+        if (locations.size() == 0) {
+            System.out.println("No locations available. Please add a location first.");
+            return null;
+        }
         LocationDL startLocation = null;
         while (flag) {
             System.out.println("Please choose a location from the list below: ");
@@ -53,8 +57,10 @@ public class UIController {
             String zone = scanner.nextLine();
             List<LocationDL> locationsByZone = shipmentFacade.LocationByZone(zone);
             if (locationsByZone.size() == 0) {
-                System.out.println("No locations found in this zone. Please try again.");
-            } else {
+                System.out.println("No locations found in this zone. Please add a location first.");
+                return null;
+            }
+            else{
                 locations = locationsByZone;
                 flag = false;
             }
@@ -85,6 +91,10 @@ public class UIController {
     public TruckDL ChooseTruck() {
         boolean flag = true;
         List<TruckDL> trucks = shipmentFacade.trucks;
+        if (trucks.size() == 0) {
+            System.out.println("No trucks available. Please add a truck first.");
+            return null;
+        }
         TruckDL truck = null;
         while (flag) {
             System.out.println("Please choose a truck from the list below: ");
@@ -107,6 +117,10 @@ public class UIController {
     public DriverDL ChooseDriver() {
         boolean flag = true;
         List<DriverDL> drivers = shipmentFacade.drivers;
+        if (drivers.size() == 0) {
+            System.out.println("No drivers available. Please add a driver first.");
+            return null;
+        }
         DriverDL driver = null;
         while (flag) {
             System.out.println("Please choose a driver from the list below: ");
@@ -180,9 +194,21 @@ public class UIController {
 
     public void CreateShipment() {
         LocationDL startLocation = ChooseStart();
+        if (startLocation == null) {
+            return;
+        }
         List<LocationDL> locations = ChooseLocations();
+        if (locations == null) {
+            return;
+        }
         TruckDL truck = ChooseTruck();
+        if (truck == null) {
+            return;
+        }
         DriverDL driver = ChooseDriver();
+        if (driver == null) {
+            return;
+        }
         Map<LocationDL, Map<String, Integer>> items = ChooseItems(locations);
         boolean flag = true;
         while (flag) {
@@ -327,6 +353,10 @@ public class UIController {
 
     public void EditShipement() {
         List<ShipmentDL> shipments = shipmentFacade.GetStatusShipement("Pending");
+        if(shipments.size() == 0) {
+            System.out.println("There are no shipments to edit.");
+            return;
+        }
         ShipmentDL shipment = null;
         System.out.println("Please choose a shipment from the list below: ");
         for (int i = 0; i < shipments.size(); i++) {
@@ -393,6 +423,10 @@ public class UIController {
         switch (choice) {
             case 1:
                 shipments = shipmentFacade.GetStatusShipement("Pending");
+                if(shipments.size() == 0) {
+                    System.out.println("There are no shipments to send.");
+                    return;
+                }
                 System.out.println("Please choose a shipment from the list below: ");
                 flag = true;
                 while (flag) {
@@ -421,6 +455,10 @@ public class UIController {
                 break;
             case 2:
                 shipments = shipmentFacade.GetStatusShipement("Sent");
+                if(shipments.size() == 0) {
+                    System.out.println("There are no shipments to report a problem to.");
+                    return;
+                }
                 System.out.println("Please choose a shipment from the list below: ");
                 flag = true;
                 while (flag) {
@@ -446,6 +484,10 @@ public class UIController {
                 break;
             case 3:
                 shipments = shipmentFacade.GetStatusShipement("Pending");
+                if(shipments.size() == 0) {
+                    System.out.println("There are no shipments to cancel.");
+                    return;
+                }
                 System.out.println("Please choose a shipment from the list below: ");
                 flag = true;
                 while (flag) {
@@ -471,6 +513,10 @@ public class UIController {
                 break;
             case 4:
                 shipments = shipmentFacade.GetStatusShipement("Sent");
+                if(shipments.size() == 0) {
+                    System.out.println("No shipments are able to be completed.");
+                    return;
+                }
                 System.out.println("Please choose a shipment from the list below: ");
                 flag = true;
                 while (flag) {
@@ -507,6 +553,11 @@ public class UIController {
         shipments.addAll(shipmentFacade.GetStatusShipement("Sent"));
         shipments.addAll(shipmentFacade.GetStatusShipement("Problem"));
         shipments.addAll(shipmentFacade.GetStatusShipement("Cancelled"));
+        shipments.addAll(shipmentFacade.GetStatusShipement("Completed"));
+        if (shipments.size() == 0) {
+            System.out.println("There are no shipments to show.");
+            return;
+        }
         System.out.println("Please choose a shipment from the list below: ");
         boolean flag = true;
         ShipmentDL shipment = null;
