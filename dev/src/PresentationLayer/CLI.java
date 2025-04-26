@@ -19,6 +19,7 @@ public class CLI {
     private int userId;
     private String password;
     private LocalDate nowDate;
+
     private static final Integer[] MORNING_SHIFT_START_TIMES = {
            600, 630, 700, 730, 800, 830, 900, 930, 1000};
     private static final Integer[] MORNING_SHIFT_END_TIMES = {
