@@ -102,5 +102,22 @@ public class ProductBL {
     public void setCategories(String[] newCategories) {
         this.categories = newCategories;
     }
+    // ================== Additional ==================
+
+    public void addItemToBranch(int branchID, ItemBL item) {
+        inventoryShelfItems.putIfAbsent(branchID, new ArrayList<>());
+        inventoryShelfItems.get(branchID).add(item);
+    }
+
+    public void removeItemFromBranch(int branchID, int itemID) {
+        List<ItemBL> items = inventoryShelfItems.get(branchID);
+        if (items != null) {
+            items.removeIf(item -> item.getItemID() == itemID);
+        }
+    }
     
+    public List<ItemBL> getItemsInBranch(int branchID) {
+        return inventoryShelfItems.getOrDefault(branchID, new ArrayList<>());
+    }
+
 }
