@@ -1,6 +1,6 @@
 Important note: The project was compiled with java 21, so it needs to run on a machine with java 21 or higher.
 
-To start the system, double-click the jar file, a command line window should open.
+To start the system, open the command terminal in the release folder and write: "java -jar adss2025_v01.jar" and hit enter.
 As soon as the system starts, there should appear a menu with all the available options:
 1. Add Supplier
 2. Add Agreement
