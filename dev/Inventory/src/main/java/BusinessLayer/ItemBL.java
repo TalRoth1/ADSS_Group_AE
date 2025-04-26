@@ -26,73 +26,73 @@ public class ItemBL {
 
     // ========== Getters ==========
 
-    public int getItemID() {
+    protected int getItemID() {
         return itemID;
     }
 
-    public int getProductID() {
+    protected int getProductID() {
         return productID;
     }
 
-    public String getName() {
+    protected String getName() {
         return name;
     }
 
-    public boolean isDef() {
+    protected boolean isDef() {
         return isDef;
     }
 
-    public boolean isExpired() {
+    protected boolean isExpired() {
         return isExpired;
     }
 
-    public Date getExpirationDate() {
+    protected Date getExpirationDate() {
         return expirationDate;
     }
 
-    public int getBranchID() {
+    protected int getBranchID() {
         return branchID;
     }
 
-    public String[] getLocation() {
+    protected String[] getLocation() {
         return location;
     }
 
     // ========== Setters ==========
 
-    public void setName(String name) {
+    protected void setName(String name) {
         this.name = name;
     }
 
-    public void setDef(boolean def) {
+    protected void setDef(boolean def) {
         isDef = def;
     }
 
-    public void setExpired(boolean expired) {
+    protected void setExpired(boolean expired) {
         isExpired = expired;
     }
 
-    public void setBranchID(int branchID) {
+    protected void setBranchID(int branchID) {
         this.branchID = branchID;
     }
 
-    public void setLocation(String[] location) {
+    protected void setLocation(String[] location) {
         this.location = location;
     }
 
     // ========== Utility Methods ==========
 
-    public boolean checkIfExpired() {
+    protected boolean checkIfExpired() {
         Date today = new Date();
         this.isExpired = expirationDate.before(today);
         return this.isExpired;
     }
 
-    public void markAsDefected() {
+    protected void markAsDefected() {
         this.isDef = true;
     }
 
-    public void updateLocation(String[] newLocation) {
+    protected void updateLocation(String[] newLocation) {
         this.location = newLocation;
     }
 }
