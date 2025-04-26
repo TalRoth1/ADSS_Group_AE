@@ -1,7 +1,7 @@
 import PresentationLayer.CLI;
 import ServiceLayer.ServiceFactory;
 
-public class main
+public class Main
 {
     public static void main(String[] args)
     {

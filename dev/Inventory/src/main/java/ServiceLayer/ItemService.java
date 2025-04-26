@@ -38,7 +38,7 @@ public class ItemService {
         }
     }
 
-    public Response UpdateItem(int itemID, String name, boolean isDef, long branchID, String[] location) {
+    public Response UpdateItem(int itemID, String name, boolean isDef, int branchID, String[] location) {
         try {
             ifa.updateItem(itemID, name, isDef, branchID, location);
             return new Response("Item updated successfully", null);
