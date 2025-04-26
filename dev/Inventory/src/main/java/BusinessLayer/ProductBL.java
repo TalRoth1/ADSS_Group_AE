@@ -73,9 +73,11 @@ public class ProductBL {
         return inventoryShelfItems.getOrDefault(branchID, new ArrayList<>()).size();
     }
 
-    public int getMinQuantity(int branchID) {
-        return minQuantity.get(branchID);
+    public int getMinQuantity(int branchID)
+    {
+        return minQuantity.getOrDefault(branchID, 0);
     }
+
 
     public int getProfit(int branchID) {
         return profitAmount.getOrDefault(branchID, 0);
