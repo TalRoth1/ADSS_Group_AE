@@ -118,6 +118,9 @@ public class ProductFacade {
         if (expirationDate.before(new Date()))
             throw new IllegalArgumentException("Cannot add item with expired date");
 
+        if (!product.hasBranch(branchID))
+            throw new IllegalArgumentException("Branch not found for this product");
+
         int itemID = nextItemID++;
         ItemBL item = new ItemBL(itemID, productID, name, isDef, expirationDate, branchID, location);
         product.addItemToBranch(branchID, item);
