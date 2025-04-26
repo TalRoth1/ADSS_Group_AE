@@ -20,7 +20,7 @@ public class ProductBL {
     private final Object nameLock = new Object();
     private final Object priceLock = new Object();
 
-    public ProductBL(int productID, String name, double costPrice, double sellingPrice, int discount,
+    protected ProductBL(int productID, String name, double costPrice, double sellingPrice, int discount,
                      int producerID, String[] categories) {
         this.productID = productID;
         this.name = name;
@@ -37,86 +37,86 @@ public class ProductBL {
 
     // ================== Getters ==================
 
-    public int getProductID() {
+    protected int getProductID() {
         return productID;
     }
 
-    public String getName() {
+    protected String getName() {
         synchronized (nameLock) {
             return name;
         }
     }
 
-    public double getCostPrice() {
+    protected double getCostPrice() {
         return costPrice;
     }
 
-    public double getSellingPrice() {
+    protected double getSellingPrice() {
         synchronized (priceLock) {
             return sellingPrice;
         }
     }
 
-    public int getDiscount() {
+    protected int getDiscount() {
         return discount;
     }
 
-    public int getProducerID() {
+    protected int getProducerID() {
         return producerID;
     }
 
-    public String[] getCategories() {
+    protected String[] getCategories() {
         return categories;
     }
 
-    public int getInventoryQuantity(int branchID) {
+    protected int getInventoryQuantity(int branchID) {
         return inventoryShelfItems.getOrDefault(branchID, new ArrayList<>()).size();
     }
 
-    public long getMinQuantity(int branchID) {
+    protected long getMinQuantity(int branchID) {
         return minQuantity.get(branchID);
     }
 
-    public long getProfit(int branchID) {
+    protected long getProfit(int branchID) {
         return profitAmount.get(branchID);
     }
 
     // ================== Setters ==================
 
-    public void setName(String newName) {
+    protected void setName(String newName) {
         synchronized (nameLock) {
             this.name = newName;
         }
     }
 
-    public void setSellingPrice(double newPrice) {
+    protected void setSellingPrice(double newPrice) {
         synchronized (priceLock) {
             this.sellingPrice = newPrice;
         }
     }
 
-    public void setDiscount(int newDiscount) {
+    protected void setDiscount(int newDiscount) {
         this.discount = newDiscount;
     }
 
-    public void setCategories(String[] newCategories) {
+    protected void setCategories(String[] newCategories) {
         this.categories = newCategories;
     }
     // ================== Additional ==================
 
-    public void addItemToBranch(int branchID, ItemBL item) {
+    protected void addItemToBranch(int branchID, ItemBL item) {
         inventoryShelfItems.putIfAbsent(branchID, new ArrayList<>());
         inventoryShelfItems.get(branchID).add(item);
     }
 
-    public void removeItemFromBranch(int branchID, int itemID) {
+    protected void removeItemFromBranch(int branchID, int itemID) {
         List<ItemBL> items = inventoryShelfItems.get(branchID);
         if (items != null) {
             items.removeIf(item -> item.getItemID() == itemID);
         }
     }
-    
-    public List<ItemBL> getItemsInBranch(int branchID) {
+
+    protected List<ItemBL> getItemsInBranch(int branchID) {
         return inventoryShelfItems.getOrDefault(branchID, new ArrayList<>());
     }
 
