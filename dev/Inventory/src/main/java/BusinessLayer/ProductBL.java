@@ -1,6 +1,8 @@
 package BusinessLayer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ProductBL {
     private int productID;
@@ -11,9 +13,9 @@ public class ProductBL {
     private int producerID;
     private String[] categories;
 
-    private final HashMap<Integer, Integer> inventoryShelfQuantity; // branchID -> quantity
-    private final HashMap<Integer, Long> minQuantity;               // branchID -> min quantity
-    private final HashMap<Integer, Long> profitAmount;              // branchID -> profit
+    private HashMap<Integer, List<ItemBL>> inventoryShelfItems; // branchID -> list of ItemBL
+    private HashMap<Integer, Long> minQuantity;                 // branchID -> minQuantity
+    private HashMap<Integer, Long> profitAmount;                // branchID -> profitAmount
 
     private final Object nameLock = new Object();
     private final Object priceLock = new Object();
@@ -28,7 +30,7 @@ public class ProductBL {
         this.producerID = producerID;
         this.categories = categories;
 
-        this.inventoryShelfQuantity = new HashMap<>();
+        this.inventoryShelfItems = new HashMap<>();
         this.minQuantity = new HashMap<>();
         this.profitAmount = new HashMap<>();
     }
@@ -68,7 +70,7 @@ public class ProductBL {
     }
 
     public int getInventoryQuantity(int branchID) {
-        return inventoryShelfQuantity.get(branchID);
+        return inventoryShelfItems.getOrDefault(branchID, new ArrayList<>()).size();
     }
 
     public long getMinQuantity(int branchID) {
@@ -100,5 +102,5 @@ public class ProductBL {
     public void setCategories(String[] newCategories) {
         this.categories = newCategories;
     }
-
+    
 }
