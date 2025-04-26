@@ -1,6 +1,7 @@
 import PresentationLayer.CLI;
 import ServiceLayer.ServiceFactory;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class Main
@@ -23,6 +24,10 @@ public class Main
             int product5 = Integer.parseInt(SF.getProductService().AddProduct("Water", 4, 6, 0, 5, new String[]{"Drinks"}).getResponseValue());
 
             Date now = new Date();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(now);
+            cal.add(Calendar.MONTH, 6); // Add 6 months
+            now = cal.getTime();
 
             //Fake items for system presentation only!
             // Add items for product1 (Milk)
@@ -46,6 +51,7 @@ public class Main
             SF.getItemService().AddItem(product5, "Water Bottle 2", false, now, branch3, new String[]{"Shelf E2"});
         }
         catch (Exception IGNORE){}
+
 
         //Start command line interface
         CLI commandLine = new CLI(SF);
