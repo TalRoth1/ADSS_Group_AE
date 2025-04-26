@@ -82,7 +82,8 @@ public class ItemBL {
 
     // ========== Utility Methods ==========
 
-    protected boolean checkIfExpired() {
+    protected boolean checkIfExpired()
+    {
         Date today = new Date();
         this.isExpired = expirationDate.before(today);
         return this.isExpired;

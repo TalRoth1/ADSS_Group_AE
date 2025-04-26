@@ -2,6 +2,8 @@ package BusinessLayer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 public class BranchFacade 
 {
@@ -159,6 +161,14 @@ public class BranchFacade
         synchronized (branches)
         {
             return branches.size();
+        }
+    }
+
+    public Set<Integer> getAllBranchIDs()
+    {
+        synchronized (branches)
+        {
+            return new HashSet<>(branches.keySet());
         }
     }
 

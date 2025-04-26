@@ -1,4 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PropertiesComponent">{}</component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3357415d-694d-48e0-93e0-ee6bce1a7852" name="Changes" comment="ReportSL implementation added, ReportBL bug fixes. CLI report menu added.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/BranchFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/BranchFacade.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ItemBL.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ItemBL.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductBL.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductBL.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductFacade.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/Inventory/src/test/java/BusinessLayer/ProductFacadeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/test/java/BusinessLayer/ProductFacadeTest.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "git-widget-placeholder": "323920769__342662319",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="ReportSL implementation added, ReportBL bug fixes. CLI report menu added." />
+    <option name="LAST_COMMIT_MESSAGE" value="ReportSL implementation added, ReportBL bug fixes. CLI report menu added." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductBL.java</url>
+          <line>80</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
 </project>

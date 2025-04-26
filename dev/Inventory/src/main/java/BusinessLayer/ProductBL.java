@@ -14,8 +14,8 @@ public class ProductBL {
     private String[] categories;
 
     private HashMap<Integer, List<ItemBL>> inventoryShelfItems; // branchID -> list of ItemBL
-    private HashMap<Integer, Long> minQuantity;                 // branchID -> minQuantity
-    private HashMap<Integer, Long> profitAmount;                // branchID -> profitAmount
+    private HashMap<Integer, Integer> minQuantity;                 // branchID -> minQuantity
+    private HashMap<Integer, Integer> profitAmount;                // branchID -> profitAmount
 
     private final Object nameLock = new Object();
     private final Object priceLock = new Object();
@@ -73,13 +73,18 @@ public class ProductBL {
         return inventoryShelfItems.getOrDefault(branchID, new ArrayList<>()).size();
     }
 
-    protected long getMinQuantity(int branchID) {
+    protected int getMinQuantity(int branchID) {
         return minQuantity.get(branchID);
     }
 
-    protected long getProfit(int branchID) {
+    protected int getProfit(int branchID) {
         return profitAmount.get(branchID);
     }
+
+    protected HashMap<Integer, Integer> getProfits() {
+        return profitAmount;
+    }
+
 
     // ================== Setters ==================
 
