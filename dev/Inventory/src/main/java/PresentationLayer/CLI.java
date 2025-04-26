@@ -7,29 +7,24 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-
 import java.util.Date;
 import java.util.Scanner;
 
-public class CLI
-{
+public class CLI {
 
     private ServiceFactory sf;
 
     private Scanner scanner;
 
-    public CLI(ServiceFactory sf)
-    {
+    public CLI(ServiceFactory sf) {
         this.sf = sf;
         this.scanner = new Scanner(System.in);
     }
 
-    public void openInterface()
-    {
+    public void openInterface() {
         boolean isInterrupted = false;
         System.out.println("Welcome to inventory management system!");
-        while(!isInterrupted)
-        {
+        while (!isInterrupted) {
             printMainMenu();
             displayControlButtons();
             String choice = getTextFromUser();
@@ -61,8 +56,7 @@ public class CLI
         }
     }
 
-    private void printMainMenu()
-    {
+    private void printMainMenu() {
         System.out.println("1. Manage Branches.");
         System.out.println("2. Manage Products.");
         System.out.println("3. Manage Items.");
@@ -70,33 +64,27 @@ public class CLI
         System.out.println("0. Exit.");
     }
 
-    private void displayControlButtons()
-    {
+    private void displayControlButtons() {
         System.out.println("Press number to choose option");
     }
 
-    private void display(String s)
-    {
+    private void display(String s) {
         System.out.println(s);
     }
 
-    private String getTextFromUser()
-    {
+    private String getTextFromUser() {
         return scanner.nextLine();
     }
 
-    private void openBranchesInterface()
-    {
+    private void openBranchesInterface() {
         BranchService BS = sf.getBranchService();
 
         boolean backToMainMenu = false;
-        while (!backToMainMenu)
-        {
+        while (!backToMainMenu) {
             printBranchesMenu();
             displayControlButtons();
             String choice = getTextFromUser();
-            switch (choice)
-            {
+            switch (choice) {
                 case "0":
                     clearScreen();
                     backToMainMenu = true;
@@ -110,12 +98,9 @@ public class CLI
                     String address = getTextFromUser();
 
                     Response response1 = BS.AddBranch(name, address);
-                    if (response1.getErrorMessage() == null)
-                    {
+                    if (response1.getErrorMessage() == null) {
                         display("Branch added successfully. ID: " + response1.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + response1.getErrorMessage());
                     }
                     break;
@@ -126,12 +111,9 @@ public class CLI
                     int removeId = getValidIntegerFromUser();
 
                     Response response2 = BS.RemoveBranch(removeId);
-                    if (response2.getErrorMessage() == null)
-                    {
+                    if (response2.getErrorMessage() == null) {
                         display(response2.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + response2.getErrorMessage());
                     }
                     break;
@@ -144,12 +126,9 @@ public class CLI
                     String newName = getTextFromUser();
 
                     Response response3 = BS.ChangeBranchName(newName, renameId);
-                    if (response3.getErrorMessage() == null)
-                    {
+                    if (response3.getErrorMessage() == null) {
                         display(response3.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + response3.getErrorMessage());
                     }
                     break;
@@ -162,12 +141,9 @@ public class CLI
                     String newAddress = getTextFromUser();
 
                     Response response4 = BS.ChangeBranchAddress(newAddress, addressId);
-                    if (response4.getErrorMessage() == null)
-                    {
+                    if (response4.getErrorMessage() == null) {
                         display(response4.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + response4.getErrorMessage());
                     }
                     break;
@@ -175,13 +151,10 @@ public class CLI
                 case "5":
                     clearScreen();
                     Response response5 = BS.GetAllBranches();
-                    if (response5.getErrorMessage() == null)
-                    {
+                    if (response5.getErrorMessage() == null) {
                         display("Branch list:");
                         display(response5.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + response5.getErrorMessage());
                     }
                     break;
@@ -193,8 +166,7 @@ public class CLI
         }
     }
 
-    private void printBranchesMenu()
-    {
+    private void printBranchesMenu() {
         System.out.println("1. Add new Branch.");
         System.out.println("2. Remove Branch.");
         System.out.println("3. Change Branch Name.");
@@ -203,18 +175,15 @@ public class CLI
         System.out.println("0. Return to main menu.");
     }
 
-    private void openProductsInterface()
-    {
+    private void openProductsInterface() {
         ProductService PS = sf.getProductService();
 
         boolean backToMainMenu = false;
-        while (!backToMainMenu)
-        {
+        while (!backToMainMenu) {
             printProductsMenu();
             displayControlButtons();
             String choice = getTextFromUser();
-            switch (choice)
-            {
+            switch (choice) {
                 case "0":
                     clearScreen();
                     backToMainMenu = true;
@@ -240,13 +209,11 @@ public class CLI
                     System.out.print("Enter categories (comma-separated): ");
                     String[] categories = getTextFromUser().split(",");
 
-                    Response addResponse = PS.AddProduct(name, costPrice, sellingPrice, discount, producerID, categories);
-                    if (addResponse.getErrorMessage() == null)
-                    {
+                    Response addResponse = PS.AddProduct(name, costPrice, sellingPrice, discount, producerID,
+                            categories);
+                    if (addResponse.getErrorMessage() == null) {
                         display("Product added successfully. ID: " + addResponse.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + addResponse.getErrorMessage());
                     }
                     break;
@@ -257,12 +224,9 @@ public class CLI
                     int removeID = getValidIntegerFromUser();
 
                     Response removeResponse = PS.RemoveProduct(removeID);
-                    if (removeResponse.getErrorMessage() == null)
-                    {
+                    if (removeResponse.getErrorMessage() == null) {
                         display(removeResponse.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + removeResponse.getErrorMessage());
                     }
                     break;
@@ -290,17 +254,24 @@ public class CLI
                     System.out.print("Enter new categories (comma-separated): ");
                     String[] newCategories = getTextFromUser().split(",");
 
-                    Response updateResponse = PS.UpdateProduct(productID, newName, newCost, newSelling, newDiscount, newProducer, newCategories);
-                    if (updateResponse.getErrorMessage() == null)
-                    {
+                    Response updateResponse = PS.UpdateProduct(productID, newName, newCost, newSelling, newDiscount,
+                            newProducer, newCategories);
+                    if (updateResponse.getErrorMessage() == null) {
                         display(updateResponse.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + updateResponse.getErrorMessage());
                     }
                     break;
-
+                case "4":
+                    clearScreen();
+                    Response allProductsResponse = PS.GetAllProducts();
+                    if (allProductsResponse.getErrorMessage() == null) {
+                        display("Product list:");
+                        display(allProductsResponse.getResponseValue());
+                    } else {
+                        display("Error: " + allProductsResponse.getErrorMessage());
+                    }
+                    break;
                 default:
                     display("Invalid choice. Please try again.");
             }
@@ -308,27 +279,24 @@ public class CLI
         }
     }
 
-    private void printProductsMenu()
-    {
+    private void printProductsMenu() {
         System.out.println("1. Add new Product.");
         System.out.println("2. Remove Product.");
         System.out.println("3. Update Product.");
+        System.out.println("4. Show All Products.");
         System.out.println("0. Return to main menu.");
     }
 
-    private void openItemsInterface()
-    {
+    private void openItemsInterface() {
         ItemService IS = sf.getItemService();
         boolean backToMainMenu = false;
 
-        while (!backToMainMenu)
-        {
+        while (!backToMainMenu) {
             printItemsMenu();
             displayControlButtons();
             String choice = getTextFromUser();
 
-            switch (choice)
-            {
+            switch (choice) {
                 case "0":
                     clearScreen();
                     backToMainMenu = true;
@@ -347,22 +315,17 @@ public class CLI
 
                     System.out.print("Enter expiration date (yyyy-MM-dd): ");
                     Date expirationDate;
-                    while (true)
-                    {
-                        try
-                        {
+                    while (true) {
+                        try {
                             String dateInput = getTextFromUser();
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                             sdf.setLenient(false);
                             expirationDate = sdf.parse(dateInput);
                             break;
-                        }
-                        catch (Exception e)
-                        {
+                        } catch (Exception e) {
                             display("Invalid format. Please use yyyy-MM-dd.");
                         }
                     }
-
 
                     System.out.print("Enter branch ID: ");
                     int branchID = getValidIntegerFromUser();
@@ -371,12 +334,9 @@ public class CLI
                     String[] location = getTextFromUser().split(",");
 
                     Response addResponse = IS.AddItem(productID, name, isDef, expirationDate, branchID, location);
-                    if (addResponse.getErrorMessage() == null)
-                    {
+                    if (addResponse.getErrorMessage() == null) {
                         display("Item added successfully. ID: " + addResponse.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + addResponse.getErrorMessage());
                     }
                     break;
@@ -387,12 +347,9 @@ public class CLI
                     int removeID = getValidIntegerFromUser();
 
                     Response removeResponse = IS.RemoveItem(removeID);
-                    if (removeResponse.getErrorMessage() == null)
-                    {
+                    if (removeResponse.getErrorMessage() == null) {
                         display(removeResponse.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + removeResponse.getErrorMessage());
                     }
                     break;
@@ -403,12 +360,9 @@ public class CLI
                     int purchaseID = getValidIntegerFromUser();
 
                     Response purchaseResponse = IS.PurchaseItem(purchaseID);
-                    if (purchaseResponse.getErrorMessage() == null)
-                    {
+                    if (purchaseResponse.getErrorMessage() == null) {
                         display(purchaseResponse.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + purchaseResponse.getErrorMessage());
                     }
                     break;
@@ -431,16 +385,22 @@ public class CLI
                     String[] newLocation = getTextFromUser().split(",");
 
                     Response updateResponse = IS.UpdateItem(itemID, newName, newIsDef, newBranchID, newLocation);
-                    if (updateResponse.getErrorMessage() == null)
-                    {
+                    if (updateResponse.getErrorMessage() == null) {
                         display(updateResponse.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + updateResponse.getErrorMessage());
                     }
                     break;
-
+                case "5":
+                    clearScreen();
+                    Response allItemsResponse = IS.GetAllItems();
+                    if (allItemsResponse.getErrorMessage() == null) {
+                        display("Item list:");
+                        display(allItemsResponse.getResponseValue());
+                    } else {
+                        display("Error: " + allItemsResponse.getErrorMessage());
+                    }
+                    break;
                 default:
                     display("Invalid choice. Please try again.");
             }
@@ -449,28 +409,25 @@ public class CLI
         }
     }
 
-    private void printItemsMenu()
-    {
+    private void printItemsMenu() {
         System.out.println("1. Add new Item.");
         System.out.println("2. Remove Item.");
         System.out.println("3. Purchase Item.");
         System.out.println("4. Update Item.");
+        System.out.println("5. Show All Items.");
         System.out.println("0. Return to main menu.");
     }
 
-    private void openReportsInterface()
-    {
+    private void openReportsInterface() {
         ReportService RS = sf.getReportService();
         boolean backToMainMenu = false;
 
-        while (!backToMainMenu)
-        {
+        while (!backToMainMenu) {
             printReportsMenu();
             displayControlButtons();
             String choice = getTextFromUser();
 
-            switch (choice)
-            {
+            switch (choice) {
                 case "0":
                     clearScreen();
                     backToMainMenu = true;
@@ -479,12 +436,9 @@ public class CLI
                 case "1":
                     clearScreen();
                     Response deficiency = RS.DeficiencyReport();
-                    if (deficiency.getErrorMessage() == null)
-                    {
+                    if (deficiency.getErrorMessage() == null) {
                         display("Deficiency Report:\n" + deficiency.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + deficiency.getErrorMessage());
                     }
                     break;
@@ -492,12 +446,9 @@ public class CLI
                 case "2":
                     clearScreen();
                     Response sales = RS.SalesReport();
-                    if (sales.getErrorMessage() == null)
-                    {
+                    if (sales.getErrorMessage() == null) {
                         display("Sales Report:\n" + sales.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + sales.getErrorMessage());
                     }
                     break;
@@ -505,12 +456,9 @@ public class CLI
                 case "3":
                     clearScreen();
                     Response defected = RS.DefectedReport();
-                    if (defected.getErrorMessage() == null)
-                    {
+                    if (defected.getErrorMessage() == null) {
                         display("Defected Items Report:\n" + defected.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + defected.getErrorMessage());
                     }
                     break;
@@ -518,12 +466,9 @@ public class CLI
                 case "4":
                     clearScreen();
                     Response expired = RS.ExpiredReport();
-                    if (expired.getErrorMessage() == null)
-                    {
+                    if (expired.getErrorMessage() == null) {
                         display("Expired Items Report:\n" + expired.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + expired.getErrorMessage());
                     }
                     break;
@@ -544,48 +489,35 @@ public class CLI
         System.out.println("0. Return to main menu.");
     }
 
-    public void clearScreen()
-    {
-        for (int i = 0; i < 200; i++)
-        {
+    public void clearScreen() {
+        for (int i = 0; i < 200; i++) {
             System.out.println();
         }
     }
 
-    private int getValidIntegerFromUser()
-    {
-        while (true)
-        {
+    private int getValidIntegerFromUser() {
+        while (true) {
             String input = getTextFromUser();
-            try
-            {
+            try {
                 return Integer.parseInt(input);
-            }
-            catch (NumberFormatException e)
-            {
+            } catch (NumberFormatException e) {
                 display("Invalid input. Please enter a valid number.");
             }
         }
     }
 
-    private double getValidDoubleFromUser()
-    {
-        while (true)
-        {
+    private double getValidDoubleFromUser() {
+        while (true) {
             String input = getTextFromUser();
-            try
-            {
+            try {
                 return Double.parseDouble(input);
-            }
-            catch (NumberFormatException e)
-            {
+            } catch (NumberFormatException e) {
                 display("Invalid input. Please enter a valid decimal number.");
             }
         }
     }
 
-    private void waitForUser()
-    {
+    private void waitForUser() {
         display("Press any key to continue.");
         getTextFromUser();
         clearScreen();

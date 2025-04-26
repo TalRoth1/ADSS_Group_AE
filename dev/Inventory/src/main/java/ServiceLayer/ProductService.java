@@ -10,7 +10,7 @@ public class ProductService {
     }
 
     public Response AddProduct(String name, double costPrice, double sellingPrice, int discount,
-                               int producerID, String[] categories) {
+            int producerID, String[] categories) {
         try {
             int productID = pf.addProduct(name, costPrice, sellingPrice, discount, producerID, categories);
             return new Response(String.valueOf(productID), null);
@@ -29,7 +29,7 @@ public class ProductService {
     }
 
     public Response UpdateProduct(int productID, String name, double costPrice, double sellingPrice, int discount,
-                                  int producerID, String[] categories) {
+            int producerID, String[] categories) {
         try {
             pf.updateProduct(productID, name, costPrice, sellingPrice, discount, producerID, categories);
             return new Response("Product updated successfully", null);
@@ -37,4 +37,14 @@ public class ProductService {
             return new Response(null, e.getMessage());
         }
     }
+
+    public Response GetAllProducts() {
+        try {
+            String productsList = ProductFacade.getInstance().getListOfAllProducts();
+            return new Response(productsList, null);
+        } catch (Exception e) {
+            return new Response(null, e.getMessage());
+        }
+    }
+
 }

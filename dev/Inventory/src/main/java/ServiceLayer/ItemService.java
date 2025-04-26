@@ -11,7 +11,7 @@ public class ItemService {
     }
 
     public Response AddItem(int productid, String name, boolean isDef, Date expirationDate,
-                            int branchID, String[] location) {
+            int branchID, String[] location) {
         try {
             int itemID = ifa.addItem(productid, name, isDef, expirationDate, branchID, location);
             return new Response(String.valueOf(itemID), null);
@@ -46,4 +46,14 @@ public class ItemService {
             return new Response(null, e.getMessage());
         }
     }
+
+    public Response GetAllItems() {
+        try {
+            String itemsList = ifa.getInstance().getListOfAllItems();
+            return new Response(itemsList, null);
+        } catch (Exception e) {
+            return new Response(null, e.getMessage());
+        }
+    }
+
 }
