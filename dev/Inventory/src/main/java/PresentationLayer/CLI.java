@@ -254,7 +254,7 @@ public class CLI
                 case "2":
                     clearScreen();
                     System.out.print("Enter product ID to remove: ");
-                    long removeID = getValidIntegerFromUser();
+                    int removeID = getValidIntegerFromUser();
 
                     Response removeResponse = PS.RemoveProduct(removeID);
                     if (removeResponse.getErrorMessage() == null)
