@@ -106,6 +106,12 @@ public class ProductBL {
     public void setCategories(String[] newCategories) {
         this.categories = newCategories;
     }
+
+    public void setMinQuantity(int branchID, int minQuantity) {
+        minQuantity = Math.max(minQuantity, 0);
+        this.minQuantity.put(branchID, minQuantity);
+    }
+
     // ================== Additional ==================
 
     public void addItemToBranch(int branchID, ItemBL item) {
@@ -132,6 +138,12 @@ public class ProductBL {
 
     public boolean hasBranch(int branchID) {
         return inventoryShelfItems.containsKey(branchID);
+    }
+
+    public void initializeBranch(int branchID) {
+        inventoryShelfItems.putIfAbsent(branchID, new ArrayList<>());
+        minQuantity.putIfAbsent(branchID, 0);
+        profitAmount.putIfAbsent(branchID, 0);
     }
 
 }

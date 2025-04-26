@@ -107,6 +107,14 @@ public class ProductFacade {
         return sb.toString();
     }
 
+    public void setMinQuantity(int productID, int branchID, int minQuantity) {
+        ProductBL product = products.get(productID);
+        if (product == null) {
+            throw new IllegalArgumentException("Product not found");
+        }
+        product.setMinQuantity(branchID, minQuantity);
+    }
+
     // ================== Item Management ==================
 
     public int addItem(int productID, String name, boolean isDef,
@@ -118,8 +126,9 @@ public class ProductFacade {
         if (expirationDate.before(new Date()))
             throw new IllegalArgumentException("Cannot add item with expired date");
 
-        if (!product.hasBranch(branchID))
-            throw new IllegalArgumentException("Branch not found for this product");
+        if (!product.hasBranch(branchID)) {
+            product.initializeBranch(branchID);
+        }
 
         int itemID = nextItemID++;
         ItemBL item = new ItemBL(itemID, productID, name, isDef, expirationDate, branchID, location);
