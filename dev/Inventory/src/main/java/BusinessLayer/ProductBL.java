@@ -83,7 +83,6 @@ public class ProductBL {
         return profitAmount.getOrDefault(branchID, 0);
     }
 
-
     public HashMap<Integer, Integer> getProfits() {
         return profitAmount;
     }
@@ -127,12 +126,14 @@ public class ProductBL {
         return inventoryShelfItems.getOrDefault(branchID, new ArrayList<>());
     }
 
-    public void addProfit(int branchID, double amount)
-    {
+    public void addProfit(int branchID, double amount) {
         int discountedAmount = (int) (amount * (100 - discount) / 100);
         int existingProfit = profitAmount.getOrDefault(branchID, 0);
         profitAmount.put(branchID, existingProfit + discountedAmount);
     }
 
+    public boolean hasBranch(int branchID) {
+        return inventoryShelfItems.containsKey(branchID);
+    }
 
 }
