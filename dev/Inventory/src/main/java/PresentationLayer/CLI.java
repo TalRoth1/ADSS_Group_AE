@@ -293,7 +293,7 @@ public class CLI {
                     {
                         display("Oops, something went wrong and cake is a lie. Error: " + updateQuantityResponse.getErrorMessage());
                     }
-
+                    break;
                 default:
                     display("Invalid choice. Please try again.");
             }
