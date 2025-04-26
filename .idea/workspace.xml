@@ -4,34 +4,51 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3357415d-694d-48e0-93e0-ee6bce1a7852" name="Changes" comment="bug fixes in Product">
+    <list default="true" id="3357415d-694d-48e0-93e0-ee6bce1a7852" name="Changes" comment="Fake branches, products and items added for system presentation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/Inventory/src/test/java/BusinessLayer/ProductFacadeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/test/java/BusinessLayer/ProductFacadeTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductBL.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductBL.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductFacade.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/dev/Inventory/src/test/java/BusinessLayer/ProductFacadeTest.java" root0="FORCE_HIGHLIGHTING" />
   </component>
-  <component name="KubernetesApiProvider"><![CDATA[{
-  "isMigrated": true
-}]]></component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
+  <component name="ProjectId" id="2wHAImtFwlHf0D5cGM35WRvcEEZ" />
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.Main.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "323920769__342662319",
+    "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)"
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task id="LOCAL-00001" summary="Reports added to ProductFacade. Functions names fix in product facade test. Bug fix in ItemBL, ProductBL, BranchFacade">
       <option name="closed" value="true" />
@@ -105,8 +122,35 @@
       <option name="project" value="LOCAL" />
       <updated>1745681078946</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="bug fixes in test (incorrect test fixed)">
+      <option name="closed" value="true" />
+      <created>1745681391650</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1745681391650</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Fake branches, products and items added for system presentation">
+      <option name="closed" value="true" />
+      <created>1745682979942</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1745682979942</updated>
+    </task>
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3357415d-694d-48e0-93e0-ee6bce1a7852" name="Changes" comment="Fake branches, products and items added for system presentation" />
+      <created>1745688049702</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1745688049702</updated>
+      <workItem from="1745688050844" duration="840000" />
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="ReportSL implementation added, ReportBL bug fixes. CLI report menu added." />
@@ -115,6 +159,8 @@
     <MESSAGE value="bug fixes" />
     <MESSAGE value="bug fixes in CLI" />
     <MESSAGE value="bug fixes in Product" />
-    <option name="LAST_COMMIT_MESSAGE" value="bug fixes in Product" />
+    <MESSAGE value="bug fixes in test (incorrect test fixed)" />
+    <MESSAGE value="Fake branches, products and items added for system presentation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fake branches, products and items added for system presentation" />
   </component>
 </project>

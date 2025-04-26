@@ -222,8 +222,14 @@ public class ProductFacade {
             boolean hasDeficiency = false;
 
             for (ProductBL product : products.values()) {
+                Integer minimalQuantityObj = product.getMinQuantity(branchID);
+                if (minimalQuantityObj == null) {
+                    // No minimal quantity defined for this branch and product
+                    continue;
+                }
+
+                int minimalQuantity = minimalQuantityObj; // safe, because minimalQuantityObj is not null
                 int currentQuantity = product.getInventoryQuantity(branchID);
-                int minimalQuantity = product.getMinQuantity(branchID);
 
                 if (currentQuantity <= minimalQuantity) {
                     if (!hasDeficiency) {
@@ -231,20 +237,24 @@ public class ProductFacade {
                                 .append(" (ID: ").append(branchID).append(")\n");
                         hasDeficiency = true;
                     }
-                    body.append("  Product: ").append(product.getName()).append(" (Product ID: ")
-                            .append(product.getProductID()).append(") ").append("Current Quantity: ")
-                            .append(currentQuantity).append(", Minimal Required: ").append(minimalQuantity)
+                    body.append("  Product: ").append(product.getName())
+                            .append(" (Product ID: ").append(product.getProductID()).append(") ")
+                            .append("Current Quantity: ").append(currentQuantity)
+                            .append(", Minimal Required: ").append(minimalQuantity)
                             .append("\n");
                 }
             }
+
             if (!hasDeficiency) {
-                body.append("Branch: ").append(branchName).append(" (ID: ").append(branchID)
+                body.append("Branch: ").append(branchName)
+                        .append(" (ID: ").append(branchID)
                         .append(") - No deficiencies.\n");
             }
         }
 
         return new ReportBL("Deficiency Report", body.toString());
     }
+
 
     public ReportBL expiredReport() {
         StringBuilder body = new StringBuilder();
