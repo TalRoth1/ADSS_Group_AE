@@ -54,8 +54,9 @@ public class ItemBL {
         return branchID;
     }
 
-    protected String[] getLocation() {
-        return location;
+    protected String getLocation()
+    {
+        return String.join(", ", location);
     }
 
     // ========== Setters ==========

@@ -27,28 +27,28 @@ public class Main
             Calendar cal = Calendar.getInstance();
             cal.setTime(now);
             cal.add(Calendar.MONTH, 6); // Add 6 months
-            now = cal.getTime();
+            Date sixMonthFromNow = cal.getTime();
 
             //Fake items for system presentation only!
             // Add items for product1 (Milk)
             SF.getItemService().AddItem(product1, "Milk Bottle 1", false, now, branch1, new String[]{"Shelf A1"});
-            SF.getItemService().AddItem(product1, "Milk Bottle 2", false, now, branch2, new String[]{"Shelf A2"});
+            SF.getItemService().AddItem(product1, "Milk Bottle 2", false, sixMonthFromNow, branch2, new String[]{"Shelf A2"});
 
             // Add items for product2 (Chocolate)
-            SF.getItemService().AddItem(product2, "Chocolate Bar 1", false, now, branch1, new String[]{"Shelf B1"});
+            SF.getItemService().AddItem(product2, "Chocolate Bar 1", false, sixMonthFromNow, branch1, new String[]{"Shelf B1"});
             SF.getItemService().AddItem(product2, "Chocolate Bar 2", false, now, branch3, new String[]{"Shelf B2"});
 
             // Add items for product3 (Cheese)
             SF.getItemService().AddItem(product3, "Cheese Slice 1", false, now, branch2, new String[]{"Shelf C1"});
-            SF.getItemService().AddItem(product3, "Cheese Slice 2", false, now, branch3, new String[]{"Warehouse C2"});
+            SF.getItemService().AddItem(product3, "Cheese Slice 2", false, sixMonthFromNow, branch3, new String[]{"Warehouse C2"});
 
             // Add items for product4 (Cake)
-            SF.getItemService().AddItem(product4, "Cake Piece 1", false, now, branch1, new String[]{"Warehouse D1"});
+            SF.getItemService().AddItem(product4, "Cake Piece 1", false, sixMonthFromNow, branch1, new String[]{"Warehouse D1"});
             SF.getItemService().AddItem(product4, "Cake Piece 2", false, now, branch2, new String[]{"Shelf D2"});
 
             // Add items for product5 (Water)
             SF.getItemService().AddItem(product5, "Water Bottle 1", false, now, branch1, new String[]{"Warehouse E1"});
-            SF.getItemService().AddItem(product5, "Water Bottle 2", false, now, branch3, new String[]{"Shelf E2"});
+            SF.getItemService().AddItem(product5, "Water Bottle 2", false, sixMonthFromNow, branch3, new String[]{"Shelf E2"});
         }
         catch (Exception IGNORE){}
 

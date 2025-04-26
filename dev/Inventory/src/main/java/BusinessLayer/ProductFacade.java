@@ -138,9 +138,6 @@ public class ProductFacade {
         if (product == null)
             throw new IllegalArgumentException("Product not found");
 
-        if (expirationDate.before(new Date()))
-            throw new IllegalArgumentException("Cannot add item with expired date");
-
         if (!BranchFacade.getInstance().isBranchExists(branchID)) {
             throw new IllegalArgumentException("Cannot add item to non-existent branch.");
         }
