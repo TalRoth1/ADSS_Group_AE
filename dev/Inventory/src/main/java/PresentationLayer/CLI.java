@@ -254,11 +254,12 @@ public class CLI {
                     System.out.print("Enter new categories (comma-separated): ");
                     String[] newCategories = getTextFromUser().split(",");
 
-                    Response updateResponse = PS.UpdateProduct(productID, newName, newCost, newSelling, newDiscount,
-                            newProducer, newCategories);
+                    Response updateResponse = PS.UpdateProduct(productID, newName, newCost, newSelling, newDiscount, newProducer, newCategories);
                     if (updateResponse.getErrorMessage() == null) {
                         display(updateResponse.getResponseValue());
-                    } else {
+                    }
+                    else
+                    {
                         display("Error: " + updateResponse.getErrorMessage());
                     }
                     break;
@@ -272,6 +273,27 @@ public class CLI {
                         display("Error: " + allProductsResponse.getErrorMessage());
                     }
                     break;
+                case "5":
+                    clearScreen();
+                    System.out.print("Enter product ID to update minimal quantity: ");
+                    int productID2 = getValidIntegerFromUser();
+
+                    System.out.print("Enter branch to change minimal quantity: ");
+                    int branchid2 = getValidIntegerFromUser();
+
+                    System.out.print("Enter new minimal quantity: ");
+                    int minQuantity = getValidIntegerFromUser();
+
+                    Response updateQuantityResponse = PS.setMinQuantity(productID2, branchid2, minQuantity);
+                    if (updateQuantityResponse.getErrorMessage() == null)
+                    {
+                        display(updateQuantityResponse.getResponseValue());
+                    }
+                    else
+                    {
+                        display("Oops, something went wrong and cake is a lie. Error: " + updateQuantityResponse.getErrorMessage());
+                    }
+
                 default:
                     display("Invalid choice. Please try again.");
             }
@@ -284,6 +306,7 @@ public class CLI {
         System.out.println("2. Remove Product.");
         System.out.println("3. Update Product.");
         System.out.println("4. Show All Products.");
+        System.out.println("5. Update minimal quantity for Product");
         System.out.println("0. Return to main menu.");
     }
 
