@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3357415d-694d-48e0-93e0-ee6bce1a7852" name="Changes" comment="bug fixes in CLI">
+    <list default="true" id="3357415d-694d-48e0-93e0-ee6bce1a7852" name="Changes" comment="bug fixes in Product">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductBL.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductBL.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductFacade.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/Inventory/src/test/java/BusinessLayer/ProductFacadeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/test/java/BusinessLayer/ProductFacadeTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +97,15 @@
       <option name="project" value="LOCAL" />
       <updated>1745678146575</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="bug fixes in Product">
+      <option name="closed" value="true" />
+      <created>1745681078946</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1745681078946</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -107,6 +114,7 @@
     <MESSAGE value="ReportSevice implementation added according to class diagram." />
     <MESSAGE value="bug fixes" />
     <MESSAGE value="bug fixes in CLI" />
-    <option name="LAST_COMMIT_MESSAGE" value="bug fixes in CLI" />
+    <MESSAGE value="bug fixes in Product" />
+    <option name="LAST_COMMIT_MESSAGE" value="bug fixes in Product" />
   </component>
 </project>

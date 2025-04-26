@@ -36,10 +36,11 @@ public class ProductFacadeTest {
     }
 
     @Test
-    public void testAddProductToInvalidBranchFails()
+    public void testAddItemToNonExistentBranchFails()
     {
         int invalidBranchId = 9999;
-        assertThrows(RuntimeException.class, () -> productFacade.addProduct("Fake product", 1.0, 1.5, 0, 999, new String[]{"Fake"}));
+        int productId = productFacade.addProduct("Tnuva Milk", 1.0, 1.5, 0, 1, new String[]{"Milk"});
+        assertThrows(RuntimeException.class, () -> productFacade.addItem(productId, "Milk Bottle", false, new Date(), invalidBranchId, new String[]{"Shelf A1"}));
     }
 
     @Test
