@@ -1,14 +1,14 @@
 package PresentationLayer;
 
-import ServiceLayer.BranchService;
-import ServiceLayer.ReportService;
-import ServiceLayer.Response;
-import ServiceLayer.ServiceFactory;
+import ServiceLayer.*;
+
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 
+import java.util.Date;
 import java.util.Scanner;
 
 public class CLI
@@ -346,14 +346,15 @@ public class CLI
                     boolean isDef = Boolean.parseBoolean(getTextFromUser());
 
                     System.out.print("Enter expiration date (yyyy-MM-dd): ");
-                    LocalDateTime expirationDate;
+                    Date expirationDate;
                     while (true)
                     {
                         try
                         {
                             String dateInput = getTextFromUser();
-                            LocalDate date = LocalDate.parse(dateInput);
-                            expirationDate = date.atTime(23, 59);
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            sdf.setLenient(false);
+                            expirationDate = sdf.parse(dateInput);
                             break;
                         }
                         catch (Exception e)
@@ -361,6 +362,7 @@ public class CLI
                             display("Invalid format. Please use yyyy-MM-dd.");
                         }
                     }
+
 
                     System.out.print("Enter branch ID: ");
                     int branchID = getValidIntegerFromUser();
