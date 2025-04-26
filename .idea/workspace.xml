@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3357415d-694d-48e0-93e0-ee6bce1a7852" name="Changes" comment="Fake branches, products and items added for system presentation">
+    <list default="true" id="3357415d-694d-48e0-93e0-ee6bce1a7852" name="Changes" comment="bug fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductBL.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductBL.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/BranchFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/BranchFacade.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/dev/Inventory/src/main/java/BusinessLayer/ProductFacade.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -144,9 +144,25 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1745688049702</updated>
-      <workItem from="1745688050844" duration="840000" />
+      <workItem from="1745688050844" duration="2880000" />
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="bug fix">
+      <option name="closed" value="true" />
+      <created>1745688958022</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1745688958022</updated>
+    </task>
+    <task id="LOCAL-00013" summary="bug fix">
+      <option name="closed" value="true" />
+      <created>1745690504576</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1745690504576</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -161,6 +177,7 @@
     <MESSAGE value="bug fixes in Product" />
     <MESSAGE value="bug fixes in test (incorrect test fixed)" />
     <MESSAGE value="Fake branches, products and items added for system presentation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fake branches, products and items added for system presentation" />
+    <MESSAGE value="bug fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="bug fix" />
   </component>
 </project>
