@@ -18,7 +18,7 @@ public class ProductFacade {
         this.nextItemID = 1;
     }
 
-    public static ProductFacade getInstance() {
+    protected static ProductFacade getInstance() {
         if (instance == null) {
             synchronized (ProductFacade.class) {
                 if (instance == null) {
@@ -31,7 +31,7 @@ public class ProductFacade {
 
     // ================== Product Management ==================
 
-    public synchronized int addProduct(String name, double costPrice, double sellingPrice, int discount,
+    protected synchronized int addProduct(String name, double costPrice, double sellingPrice, int discount,
                                        int producerID, String[] categories) {
         if (name == null)
             throw new IllegalArgumentException("Product name cannot be null");
@@ -55,7 +55,7 @@ public class ProductFacade {
     }
 
 
-    public void removeProduct(int productID) {
+    protected void removeProduct(int productID) {
         ProductBL product = products.get(productID);
         if (product == null)
             throw new IllegalArgumentException("Product not found");
@@ -65,7 +65,7 @@ public class ProductFacade {
     }
 
 
-    public void updateProduct(int productID, String name, double costPrice, double sellingPrice, int discount,
+    protected void updateProduct(int productID, String name, double costPrice, double sellingPrice, int discount,
                               int producerID, String[] categories) {
         ProductBL product = products.get(productID);
         if (product == null)
@@ -94,7 +94,7 @@ public class ProductFacade {
 
     // ================== Item Management ==================
 
-    public long addItem(int productID, String name, boolean isDef,
+    protected long addItem(int productID, String name, boolean isDef,
                         Date expirationDate, int branchID, String[] location) {
         ProductBL product = products.get(productID);
         if (product == null)
@@ -110,7 +110,7 @@ public class ProductFacade {
         return itemID;
     }
 
-    public void removeItem(int itemID) {
+    protected void removeItem(int itemID) {
         ItemBL item = items.get(itemID);
         if (item == null)
             throw new IllegalArgumentException("Item not found");
@@ -123,7 +123,7 @@ public class ProductFacade {
         items.remove(itemID);
     }
 
-    public void purchaseItem(int itemID) {
+    protected void purchaseItem(int itemID) {
         ItemBL item = items.get(itemID);
         if (item == null)
             throw new IllegalArgumentException("Item not found");
@@ -136,7 +136,7 @@ public class ProductFacade {
         removeItem(itemID);
     }
 
-    public void updateItem(int itemID, String name, boolean isDef,
+    protected void updateItem(int itemID, String name, boolean isDef,
                            int newBranchID, String[] location) {
         ItemBL item = items.get(itemID);
         if (item == null)
@@ -163,22 +163,22 @@ public class ProductFacade {
 
     // ================== Reports ==================
 
-    public ReportBL deficiencyReport() {
+    protected ReportBL deficiencyReport() {
         // TODO: implement deficiencyReport
         return null;
     }
 
-    public ReportBL salesReport() {
+    protected ReportBL salesReport() {
         // TODO: implement salesReport
         return null;
     }
 
-    public ReportBL defectedReport() {
+    protected ReportBL defectedReport() {
         // TODO: implement defectedReport
         return null;
     }
 
-    public ReportBL expiredReport() {
+    protected ReportBL expiredReport() {
         // TODO: implement expiredReport
         return null;
     }
