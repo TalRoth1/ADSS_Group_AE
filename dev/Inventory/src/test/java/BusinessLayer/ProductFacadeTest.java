@@ -24,14 +24,14 @@ public class ProductFacadeTest {
     @Test
     public void testRemoveNonExistentProduct()
     {
-        long invalidId = 999;
+        int invalidId = 999;
         assertThrows(RuntimeException.class, () -> productFacade.removeProduct(invalidId));
     }
 
     @Test
     public void testAddAndRemoveProductSuccessfully()
     {
-        long productId = productFacade.addProduct("Tnuva Milk", 1.0, 1.5, 0, 1, new String[]{"Milk"});
+        int productId = productFacade.addProduct("Tnuva Milk", 1.0, 1.5, 0, 1, new String[]{"Milk"});
         assertDoesNotThrow(() -> productFacade.removeProduct(productId));
     }
 
@@ -45,22 +45,22 @@ public class ProductFacadeTest {
     @Test
     public void testRemoveProductBeforeAndAfterAdding()
     {
-        long productId = 12345;
+        int productId = 12345;
         assertThrows(RuntimeException.class, () -> productFacade.removeProduct(productId));
-        long addedId = productFacade.addProduct("Banana", 0.5, 0.8, 0, 31, new String[]{"Fruit"});
+        int addedId = productFacade.addProduct("Banana", 0.5, 0.8, 0, 31, new String[]{"Fruit"});
         assertDoesNotThrow(() -> productFacade.removeProduct(addedId));
     }
 
     @Test
     public void testUpdateNonExistentProduct()
     {
-        assertThrows(RuntimeException.class, () -> productFacade.updateProduct("Fake product", 0.0, 0.0, 0, 123, new String[]{"Fake"}));
+        assertThrows(RuntimeException.class, () -> productFacade.updateProduct(0,"Fake product", 0.0, 0.0, 0, 123, new String[]{"Fake"}));
     }
 
     @Test
     public void testUpdateNonExistentItem()
     {
-        assertThrows(RuntimeException.class, () -> productFacade.updateItem("Fake product", false, 9999, new String[]{"Somewhere"}));
+        assertThrows(RuntimeException.class, () -> productFacade.updateItem(0,"Fake product", false, 9999, new String[]{"Somewhere"}));
     }
 
     @Test
@@ -72,24 +72,24 @@ public class ProductFacadeTest {
     @Test
     public void testAddProductAndItemAndUpdateItem()
     {
-        long productId = productFacade.addProduct("Tnuva milk", 0.7, 1.0, 0, 1, new String[]{"Milk"});
-        long itemId = productFacade.addItem(productId, "Milk bottle", false, new Date(), validBranchId, new String[]{"Shelf A1"});
-        assertDoesNotThrow(() -> productFacade.updateItem(null,null, itemId, new String[]{"Shelf B5"}));
+        int productId = productFacade.addProduct("Tnuva milk", 0.7, 1.0, 0, 1, new String[]{"Milk"});
+        int itemId = productFacade.addItem(productId, "Milk bottle", false, new Date(), validBranchId, new String[]{"Shelf A1"});
+        assertDoesNotThrow(() -> productFacade.updateItem(itemId,null, false, validBranchId, new String[]{"Shelf B5"}));
     }
 
     @Test
     public void testAddProductAndItemAndUpdateItem2()
     {
-        long productId = productFacade.addProduct("Milk", 2.0, 2.5, 0, 3, new String[]{"Dairy"});
-        long itemId = productFacade.addItem(productId, "Milk Bottle", false, new Date(), validBranchId, new String[]{"C1"});
-        assertDoesNotThrow(() -> productFacade.updateItem("Milk Bottle Large", true, itemId, new String[]{"C2"}));
+        int productId = productFacade.addProduct("Milk", 2.0, 2.5, 0, 3, new String[]{"Dairy"});
+        int itemId = productFacade.addItem(productId, "Milk Bottle", false, new Date(), validBranchId, new String[]{"C1"});
+        assertDoesNotThrow(() -> productFacade.updateItem(itemId, "Milk Bottle Large", true,validBranchId , new String[]{"C2"}));
     }
 
     @Test
     public void testSalesReportIsNotNull()
     {
-        long productId = productFacade.addProduct("Milk", 2.0, 2.5, 0, 3, new String[]{"Dairy"});
-        long itemId = productFacade.addItem(productId, "Milk Bottle", false, new Date(), validBranchId, new String[]{"C1"});
+        int productId = productFacade.addProduct("Milk", 2.0, 2.5, 0, 3, new String[]{"Dairy"});
+        int itemId = productFacade.addItem(productId, "Milk Bottle", false, new Date(), validBranchId, new String[]{"C1"});
         productFacade.purchaseItem(itemId);
         ReportBL report = productFacade.salesReport();
         assertNotNull(report);
@@ -99,9 +99,9 @@ public class ProductFacadeTest {
     @Test
     public void testDefectedReportIsNotNull()
     {
-        long productId = productFacade.addProduct("Milk", 2.0, 2.5, 0, 3, new String[]{"Dairy"});
-        long itemId = productFacade.addItem(productId, "Milk Bottle", false, new Date(), validBranchId, new String[]{"C1"});
-        productFacade.updateItem(null, true, itemId, null);
+        int productId = productFacade.addProduct("Milk", 2.0, 2.5, 0, 3, new String[]{"Dairy"});
+        int itemId = productFacade.addItem(productId, "Milk Bottle", false, new Date(), validBranchId, new String[]{"C1"});
+        productFacade.updateItem(itemId, null, false , validBranchId, null);
         ReportBL report = productFacade.defectedReport();
         assertNotNull(report);
     }
@@ -109,9 +109,8 @@ public class ProductFacadeTest {
     @Test
     public void testExpiredReportIsNotNull()
     {
-        //TODO
-        long productId = productFacade.addProduct("Milk", 2.0, 2.5, 0, 3, new String[]{"Dairy"});
-        long itemId = productFacade.addItem(productId, "Milk Bottle", false, new Date(), validBranchId, new String[]{"C1"});
+        int productId = productFacade.addProduct("Milk", 2.0, 2.5, 0, 3, new String[]{"Dairy"});
+        int itemId = productFacade.addItem(productId, "Milk Bottle", false, new Date(), validBranchId, new String[]{"C1"});
         ReportBL report = productFacade.expiredReport();
         assertNotNull(report);
     }

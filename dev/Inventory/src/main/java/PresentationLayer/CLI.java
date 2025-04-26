@@ -476,7 +476,7 @@ public class CLI
 
                 case "1":
                     clearScreen();
-                    Response deficiency = RS.DeficencyReport();
+                    Response deficiency = RS.DeficiencyReport();
                     if (deficiency.getErrorMessage() == null)
                     {
                         display("Deficiency Report:\n" + deficiency.getResponseValue());

@@ -92,7 +92,7 @@ public class ProductFacade {
 
     // ================== Item Management ==================
 
-    protected long addItem(int productID, String name, boolean isDef,
+    protected int addItem(int productID, String name, boolean isDef,
                            Date expirationDate, int branchID, String[] location) {
         ProductBL product = products.get(productID);
         if (product == null)
