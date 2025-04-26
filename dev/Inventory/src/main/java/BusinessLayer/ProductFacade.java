@@ -7,11 +7,15 @@ import java.util.Map;
 public class ProductFacade {
     private static ProductFacade instance = null;
     private Map<Integer, ProductBL> products;
+    private Map<Integer, ItemBL> items;
     private int nextProductID;
+    private int nextItemID;
 
     private ProductFacade() {
         this.products = new HashMap<>();
+        this.items = new HashMap<>();
         this.nextProductID = 1;
+        this.nextItemID = 1;
     }
 
     public static ProductFacade getInstance() {
@@ -24,6 +28,8 @@ public class ProductFacade {
         }
         return instance;
     }
+
+    // ================== Product Management ==================
 
     public synchronized int addProduct(String name, double costPrice, double sellingPrice, int discount,
                                        int producerID, String[] categories) {
@@ -50,11 +56,14 @@ public class ProductFacade {
 
 
     public void removeProduct(int productID) {
-        if (!products.containsKey(productID))
+        ProductBL product = products.get(productID);
+        if (product == null)
             throw new IllegalArgumentException("Product not found");
 
+        items.values().removeIf(item -> item.getProductID() == productID);
         products.remove(productID);
     }
+
 
     public void updateProduct(int productID, String name, double costPrice, double sellingPrice, int discount,
                               int producerID, String[] categories) {
@@ -83,29 +92,76 @@ public class ProductFacade {
         product.setCategories(categories);
     }
 
+    // ================== Item Management ==================
 
-    // ================================
-    // Items & Reports
-    // ================================
-
-    public long addItem(int productID, int itemID, String name, boolean isDef,
+    public long addItem(int productID, String name, boolean isDef,
                         Date expirationDate, int branchID, String[] location) {
-        // TODO: implement addItem
-        return 0;
+        ProductBL product = products.get(productID);
+        if (product == null)
+            throw new IllegalArgumentException("Product not found");
+
+        if (expirationDate.before(new Date()))
+            throw new IllegalArgumentException("Cannot add item with expired date");
+
+        int itemID = nextItemID++;
+        ItemBL item = new ItemBL(itemID, productID, name, isDef, expirationDate, branchID, location);
+        product.addItemToBranch(branchID, item);
+        items.put(itemID, item);
+        return itemID;
     }
 
     public void removeItem(int itemID) {
-        // TODO: implement removeItem
+        ItemBL item = items.get(itemID);
+        if (item == null)
+            throw new IllegalArgumentException("Item not found");
+
+        ProductBL product = products.get(item.getProductID());
+        if (product == null)
+            throw new IllegalArgumentException("Product not found for item");
+
+        product.removeItemFromBranch(item.getBranchID(), itemID);
+        items.remove(itemID);
     }
 
     public void purchaseItem(int itemID) {
-        // TODO: implement purchaseItem
+        ItemBL item = items.get(itemID);
+        if (item == null)
+            throw new IllegalArgumentException("Item not found");
+
+        ProductBL product = products.get(item.getProductID());
+        if (product == null)
+            throw new IllegalArgumentException("Product not found for item");
+
+        product.addProfit(item.getBranchID(), (long) product.getSellingPrice());
+        removeItem(itemID);
     }
 
     public void updateItem(int itemID, String name, boolean isDef,
-                           long branchID, String[] location) {
-        // TODO: implement updateItem
+                           int newBranchID, String[] location) {
+        ItemBL item = items.get(itemID);
+        if (item == null)
+            throw new IllegalArgumentException("Item not found");
+
+        ProductBL product = products.get(item.getProductID());
+        if (product == null)
+            throw new IllegalArgumentException("Product not found for item");
+
+        int oldBranchID = item.getBranchID();
+
+        if (oldBranchID != newBranchID) {
+            product.removeItemFromBranch(oldBranchID, itemID);
+            item.setBranchID(newBranchID);
+            product.addItemToBranch(newBranchID, item);
+        }
+
+        item.setName(name);
+        item.setDef(isDef);
+        item.setLocation(location);
     }
+
+
+
+    // ================== Reports ==================
 
     public ReportBL deficiencyReport() {
         // TODO: implement deficiencyReport
