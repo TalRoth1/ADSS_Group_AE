@@ -14,14 +14,14 @@ public class ProductBL {
     private String[] categories;
 
     private HashMap<Integer, List<ItemBL>> inventoryShelfItems; // branchID -> list of ItemBL
-    private HashMap<Integer, Integer> minQuantity;                 // branchID -> minQuantity
-    private HashMap<Integer, Integer> profitAmount;                // branchID -> profitAmount
+    private HashMap<Integer, Integer> minQuantity; // branchID -> minQuantity
+    private HashMap<Integer, Integer> profitAmount; // branchID -> profitAmount
 
     private final Object nameLock = new Object();
     private final Object priceLock = new Object();
 
-    protected ProductBL(int productID, String name, double costPrice, double sellingPrice, int discount,
-                     int producerID, String[] categories) {
+    public ProductBL(int productID, String name, double costPrice, double sellingPrice, int discount,
+            int producerID, String[] categories) {
         this.productID = productID;
         this.name = name;
         this.costPrice = costPrice;
@@ -37,92 +37,96 @@ public class ProductBL {
 
     // ================== Getters ==================
 
-    protected int getProductID() {
+    public int getProductID() {
         return productID;
     }
 
-    protected String getName() {
+    public String getName() {
         synchronized (nameLock) {
             return name;
         }
     }
 
-    protected double getCostPrice() {
+    public double getCostPrice() {
         return costPrice;
     }
 
-    protected double getSellingPrice() {
+    public double getSellingPrice() {
         synchronized (priceLock) {
             return sellingPrice;
         }
     }
 
-    protected int getDiscount() {
+    public int getDiscount() {
         return discount;
     }
 
-    protected int getProducerID() {
+    public int getProducerID() {
         return producerID;
     }
 
-    protected String[] getCategories() {
+    public String[] getCategories() {
         return categories;
     }
 
-    protected int getInventoryQuantity(int branchID) {
+    public int getInventoryQuantity(int branchID) {
         return inventoryShelfItems.getOrDefault(branchID, new ArrayList<>()).size();
     }
 
-    protected int getMinQuantity(int branchID) {
+    public int getMinQuantity(int branchID) {
         return minQuantity.get(branchID);
     }
 
-    protected int getProfit(int branchID) {
+    public int getProfit(int branchID) {
         return profitAmount.get(branchID);
     }
 
-    protected HashMap<Integer, Integer> getProfits() {
+    public HashMap<Integer, Integer> getProfits() {
         return profitAmount;
     }
 
-
     // ================== Setters ==================
 
-    protected void setName(String newName) {
+    public void setName(String newName) {
         synchronized (nameLock) {
             this.name = newName;
         }
     }
 
-    protected void setSellingPrice(double newPrice) {
+    public void setSellingPrice(double newPrice) {
         synchronized (priceLock) {
             this.sellingPrice = newPrice;
         }
     }
 
-    protected void setDiscount(int newDiscount) {
+    public void setDiscount(int newDiscount) {
         this.discount = newDiscount;
     }
 
-    protected void setCategories(String[] newCategories) {
+    public void setCategories(String[] newCategories) {
         this.categories = newCategories;
     }
     // ================== Additional ==================
 
-    protected void addItemToBranch(int branchID, ItemBL item) {
+    public void addItemToBranch(int branchID, ItemBL item) {
         inventoryShelfItems.putIfAbsent(branchID, new ArrayList<>());
         inventoryShelfItems.get(branchID).add(item);
     }
 
-    protected void removeItemFromBranch(int branchID, int itemID) {
+    public void removeItemFromBranch(int branchID, int itemID) {
         List<ItemBL> items = inventoryShelfItems.get(branchID);
         if (items != null) {
             items.removeIf(item -> item.getItemID() == itemID);
         }
     }
 
-    protected List<ItemBL> getItemsInBranch(int branchID) {
+    public List<ItemBL> getItemsInBranch(int branchID) {
         return inventoryShelfItems.getOrDefault(branchID, new ArrayList<>());
+    }
+
+    public void addProfit(int branchID, double amount) {
+        int discountedAmount = (int) (amount * (100 - discount) / 100);
+        profitAmount.put(branchID, profitAmount.get(branchID) + discountedAmount);
     }
 
 }
