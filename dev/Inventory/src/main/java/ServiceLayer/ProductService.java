@@ -47,4 +47,13 @@ public class ProductService {
         }
     }
 
+    public Response setMinQuantity(int productID, int branchID, int minQuantity) {
+        try {
+            pf.setMinQuantity(productID, branchID, minQuantity);
+            return new Response("Minimal quantity set successfully.", null);
+        } catch (Exception e) {
+            return new Response(null, e.getMessage());
+        }
+    }
+
 }
