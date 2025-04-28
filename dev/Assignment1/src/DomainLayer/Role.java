@@ -5,4 +5,5 @@ public enum Role {
     CASHIER,
     DRIVER,
     STORE_KEEPER
+    SHIPMENT_MANAGER,
 }

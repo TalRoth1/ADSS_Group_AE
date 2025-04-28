@@ -6,6 +6,9 @@ public class Main {
     public static void main(String[] args) {
         UIController uiController = new UIController();
         Scanner scanner = new Scanner(System.in);
+        LocalDate today = LocalDate.now();
+        EmployeeFacade employeeFacade = new EmployeeFacade();
+        CLI cli = new CLI(employeeFacade);
 
         System.out.println("Welcome to the Delivery Management System!");
         boolean exit = false;
