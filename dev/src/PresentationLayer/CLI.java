@@ -19,6 +19,7 @@ public class CLI {
     private int userId;
     private String password;
     private LocalDate nowDate;
+
     private static final Integer[] MORNING_SHIFT_START_TIMES = {
            600, 630, 700, 730, 800, 830, 900, 930, 1000};
     private static final Integer[] MORNING_SHIFT_END_TIMES = {
@@ -507,6 +508,13 @@ public class CLI {
         LocalDate dateOfShift = chooseDateForEmployee("please enter start date"); //choose date with helper method
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         Shift shift = employeeFacade.getShiftForEmployee(dateOfShift, shiftType);
+        if(shift == null) {
+            System.out.println("Shift not found. please try again");
+            if(type.equals("shiftManager"))
+                shiftManager();
+            shiftEmployee(); //it's shift Employee so get back to his menu
+        }
+
         System.out.println("Shift from " + shift.getStartTime() + " until " + shift.getEndTime());
 
         String response = employeeFacade.addPreferredShift(userId, shift);
@@ -728,8 +736,8 @@ public class CLI {
 
 
         //the next few lines are in comments just for the tests by the staff.
-        //in the "Real time", whose lines will not be in comment
-        //because we want to make sure the Emploeey manager do it only
+        //in the "Real time", those lines will not be in comment
+        //because we want to make sure the Employee manager do it only
         //from Thursday 17:30 and all day Friday and Saturday
 
 //        boolean isAllowedTime =
@@ -757,19 +765,18 @@ public class CLI {
         LocalTime nowTime = LocalTime.now();
         DayOfWeek today = nowDate.getDayOfWeek();
 
-        //זמני כדי שנוכל להמשיך לעבוד היום, מחר אשנה את זה לשבת ובסוף אחזיר לחמישי ב17:00
-//        boolean isAllowedTime =
-//                (today.getValue() >= DayOfWeek.SUNDAY.getValue() &&
-//                        today.getValue() <= DayOfWeek.WEDNESDAY.getValue()) ||
-//                        (today == DayOfWeek.THURSDAY && nowTime.isBefore(LocalTime.of(17, 0)));
-        boolean isAllowedTime = today == DayOfWeek.SATURDAY;
+
+        boolean isAllowedTime =
+                (today.getValue() >= DayOfWeek.SUNDAY.getValue() &&
+                        today.getValue() <= DayOfWeek.WEDNESDAY.getValue()) ||
+                        (today == DayOfWeek.THURSDAY && nowTime.isBefore(LocalTime.of(17, 0)));
         if (!isAllowedTime) {
             System.out.println("You are only allowed to do this action from Sunday until Thursday 17:00.");
             System.out.println("Now, you will return to the main menu.");
             shiftEmployee();
         }
 
-        //check if date is in the past OR SHABBAT
+        //check if date is in the past
         if(!isValidDate(date))
             return chooseDateForEmployee(prompt);
 
