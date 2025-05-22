@@ -173,7 +173,7 @@ public class ShipmentDL {
     public String toString()
     {
         return "Truck: " + Truck.GetNumber() +
-                ", Driver: " + DriverName.Name +
+                ", Driver: " + DriverName.getName() +
                 ", Origin: " + Document.getOrigin().toString() +
                 ", Destinations: " + Document.getLocations().toString() +
                 ", Date Created: " + DateCreated.toString() +
@@ -194,6 +194,16 @@ public class ShipmentDL {
     public boolean TruckBusyCheck()
     {
         return Truck.IsBusy;
+    }
+
+    public int getTruckNumber()
+    {
+        return Truck.GetNumber();
+    }
+
+    public int getDriverId()
+    {
+        return DriverName.getId();
     }
 }
 
