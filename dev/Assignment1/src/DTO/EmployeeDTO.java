@@ -1,6 +1,7 @@
 package DTO;
 
 public class EmployeeDTO {
+
     private int id;
     private String name;
     private String branch;
@@ -12,10 +13,11 @@ public class EmployeeDTO {
     private double educationFund;
     private double socialBenefits;
     private String password;
+    private boolean isFinishedWorking;
 
     public EmployeeDTO(int id, String name, String branch, String bankAccount, int salary, String startDate,
-                       int vacationDays, int sickDays, double educationFund, double socialBenefits,
-                       String password) {
+            int vacationDays, int sickDays, double educationFund, double socialBenefits,
+            String password) {
         this.id = id;
         this.name = name;
         this.branch = branch;
