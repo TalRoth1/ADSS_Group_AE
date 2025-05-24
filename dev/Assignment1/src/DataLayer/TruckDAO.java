@@ -1,89 +1,75 @@
 package DataLayer;
 import java.sql.*;
-import DomainLayer.TruckDL;
+
 
 public class TruckDAO {
     Connection connection;
-    /*public int Number;
-    public String Model;
-    public String Type;
-    public float Weight;
-    public float MaxWeight;
-    public boolean IsBusy = false;
-     */
-
     public TruckDAO(Connection connection) {
         this.connection = connection;
     }
 
-    public void addTruck(int number, String model, String type, float weight, float maxWeight) {
-        Boolean isBusy = false;
-        String sql = "INSERT INTO trucks (number, model, type, weight, maxWeight, isBusy) VALUES (?, ?, ?, ?, ?, ?)";
+    public void addTruck(int id, String licensePlate, double weight) throws SQLException {
+        String sql = "INSERT INTO trucks (id, license_plate, weight) VALUES (?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, number);
-            pstmt.setString(2, model);
-            pstmt.setString(3, type);
-            pstmt.setFloat(4, weight);
-            pstmt.setFloat(5, maxWeight);
-            pstmt.setBoolean(6, isBusy);
+            pstmt.setInt(1, id);
+            pstmt.setString(2, licensePlate);
+            pstmt.setDouble(3, weight);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding truck: " + e.getMessage());
+            throw e; 
         }
     }
 
-    public void updateTruck(int number, String model, String type, float weight, float maxWeight) {
-        String sql = "UPDATE trucks SET model = ?, type = ?, weight = ?, maxWeight = ? WHERE number = ?";
+    public void updateTruck(int id, String licensePlate, double weight) throws SQLException {
+        String sql = "UPDATE trucks SET license_plate = ?, weight = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, model);
-            pstmt.setString(2, type);
-            pstmt.setFloat(3, weight);
-            pstmt.setFloat(4, maxWeight);
-            pstmt.setInt(5, number);
+            pstmt.setString(1, licensePlate);
+            pstmt.setDouble(2, weight);
+            pstmt.setInt(3, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error updating truck: " + e.getMessage());
+            throw e; 
+        }
+    }
+    public void updateTruckField(int id, String fieldName, String newValue) throws SQLException {
+        String sql = "UPDATE trucks SET " + fieldName + " = ? WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, newValue);
+            pstmt.setInt(2, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error updating truck field: " + e.getMessage());
+            throw e; 
         }
     }
 
-    public void deleteTruck(int number) {
-        String sql = "DELETE FROM trucks WHERE number = ?";
+    public void deleteTruck(int id) throws SQLException {
+        String sql = "DELETE FROM trucks WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, number);
+            pstmt.setInt(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error deleting truck: " + e.getMessage());
+            throw e; 
         }
     }
 
-    public TruckDL getTruck(int number) {
-        String sql = "SELECT * FROM trucks WHERE number = ?";
+    public ResultSet getTruck(int id) throws SQLException {
+        String sql = "SELECT * FROM trucks WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, number);
-            ResultSet rs = pstmt.executeQuery();
-            TruckDL truck = null;
-            if (rs.next()) {
-                truck = new TruckDL(
-                    rs.getInt("number"),
-                    rs.getString("model"),
-                    rs.getString("type"),
-                    rs.getFloat("weight"),
-                    rs.getFloat("maxWeight")
-                );
-            } 
-            return truck;
+            pstmt.setInt(1, id);
+            return pstmt.executeQuery();
         } catch (SQLException e) {
-            System.out.println("Error retrieving truck: " + e.getMessage());
+            System.out.println("Error getting truck: " + e.getMessage());
+            throw e; 
         }
     }
 
-    public ResultSet getAllTrucks() {
+    public ResultSet getAllTrucks() throws SQLException {
         String sql = "SELECT * FROM trucks";
-        try (Statement stmt = connection.createStatement()) {
-            return stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println("Error retrieving all trucks: " + e.getMessage());
-            return null;
-        }
+        Statement stmt = connection.createStatement();
+        return stmt.executeQuery(sql);
     }
 }

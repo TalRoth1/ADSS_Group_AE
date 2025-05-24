@@ -1,7 +1,5 @@
 package DataLayer;
-import DomainLayer.LocationDL;
 import java.sql.*;
-import java.util.ArrayList;
 
 public class LocationDAO {
     private Connection connection;
@@ -95,65 +93,41 @@ public class LocationDAO {
             throw e; 
         }
     }
-    public LocationDL getLocation(String street, int streetNumber, String city) throws SQLException {
+    public ResultSet getLocation(String street, int streetNumber, String city) throws SQLException {
         String sql = "SELECT * FROM locations WHERE street = ? AND street_number = ? AND city = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, street);
             pstmt.setInt(2, streetNumber);
             pstmt.setString(3, city);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                String contactNumber = rs.getString("contact_number");
-                String contactName = rs.getString("contact_name");
-                String zone = rs.getString("zone");
-                return new LocationDL(street, streetNumber, city, contactNumber, contactName, zone);
-            } else {
-                System.out.println("Location not found.");
-                return null;
-            }
+            return pstmt.executeQuery(); 
         } catch (SQLException e) {
             System.out.println("Error retrieving location: " + e.getMessage());
             throw e;
         }
     }
 
-    public LocationDL getLocation(int id) throws SQLException {
+    public ResultSet getLocation(int id) throws SQLException {
         String sql = "SELECT * FROM locations WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                String street = rs.getString("street");
-                int streetNumber = rs.getInt("street_number");
-                String city = rs.getString("city");
-                String contactNumber = rs.getString("contact_number");
-                String contactName = rs.getString("contact_name");
-                String zone = rs.getString("zone");
-                return new LocationDL(street, streetNumber, city, contactNumber, contactName, zone);
-            } else {
-                System.out.println("Location not found.");
-                return null;
-            }
+            return pstmt.executeQuery();
         } catch (SQLException e) {
             System.out.println("Error retrieving location: " + e.getMessage());
             throw e; 
         }
     }
+
+        
+
     //also return id for each location?
-    public ArrayList<LocationDL> getAllLocations() throws SQLException {
+    public ResultSet getAllLocations() throws SQLException {
         String sql = "SELECT * FROM locations";
-        Statement stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(sql);
-        ArrayList<LocationDL> locations = new ArrayList<>();
-        while (rs.next()) {
-            String street = rs.getString("street");
-            int streetNumber = rs.getInt("street_number");
-            String city = rs.getString("city");
-            String contactNumber = rs.getString("contact_number");
-            String contactName = rs.getString("contact_name");
-            String zone = rs.getString("zone");
-            locations.add(new LocationDL(street, streetNumber, city, contactNumber, contactName, zone));
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            return pstmt.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error retrieving all locations: " + e.getMessage());
+            throw e; 
         }
-        return locations;
+        
     }
 }

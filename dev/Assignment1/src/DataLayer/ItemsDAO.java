@@ -9,26 +9,24 @@ public class ItemsDAO {
     }
 
 
-    public void addItem(int id, String name, int quantity, double weight) throws SQLException {
-        String sql = "INSERT INTO items (id ,name, quantity, weight) VALUES (?, ?, ?, ?)";
+    public void addItem(int id, String name, double weight) throws SQLException {
+        String sql = "INSERT INTO items (id ,name, weight) VALUES (?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.setString(2, name);
-            pstmt.setInt(3, quantity);
-            pstmt.setDouble(4, weight);
+            pstmt.setDouble(3, weight);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding item: " + e.getMessage());
             throw e; 
         }
     }
-    public void updateItem(int id, String name, int quantity, double weight) throws SQLException {
-        String sql = "UPDATE items SET name = ?, quantity = ?, weight = ? WHERE id = ?";
+    public void updateItem(int id, String name, double weight) throws SQLException {
+        String sql = "UPDATE items SET name = ?, weight = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, name);
-            pstmt.setInt(2, quantity);
-            pstmt.setDouble(3, weight);
-            pstmt.setInt(4, id);
+            pstmt.setDouble(2, weight);
+            pstmt.setInt(3, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error updating item: " + e.getMessage());
@@ -36,12 +34,11 @@ public class ItemsDAO {
         }
     }
 
-    public void updateItem(String name, int quantity, double weight) throws SQLException {
-        String sql = "UPDATE items SET name = ?, quantity = ?, weight = ? ? WHERE name = ?";
+    public void updateItem(String name, double weight) throws SQLException {
+        String sql = "UPDATE items SET name = ?, weight = ? ? WHERE name = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, name);
-            pstmt.setInt(2, quantity);
-            pstmt.setDouble(3, weight);
+            pstmt.setDouble(2, weight);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error updating item: " + e.getMessage());

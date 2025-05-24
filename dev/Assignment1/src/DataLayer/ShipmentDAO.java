@@ -3,6 +3,7 @@ import java.sql.*;
 import DomainLayer.ShipmentDL;
 import java.util.ArrayList;
 import java.util.List;
+import DTO.ShipmentDTO;
 
 
 public class ShipmentDAO {

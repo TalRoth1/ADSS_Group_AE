@@ -1,6 +1,7 @@
 package DataLayer;
+import DTO.ItemDTO;
 import java.sql.*;
-import DomainLayer.ItemsDL;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ItemsController {
@@ -18,30 +19,40 @@ public class ItemsController {
         return idGenerator.getAndIncrement();
     }
 
-    public void addItem(String name, int quantity, double weight) throws SQLException {
-        itemCheck(name, quantity, weight);
-        itemsDAO.addItem(generateId() ,name, quantity, weight);
+    public void addItem(ItemDTO item) throws SQLException {
+        itemCheck(item.getName(), item.getWeight());
+        itemsDAO.addItem(generateId(), item.getName(), item.getWeight());
     }
 
-    public void updateItem(int id, String name, int quantity, double weight) throws SQLException {
-        itemCheck(name, quantity, weight);
-        itemsDAO.updateItem(id ,name, quantity, weight);
+    public void updateItem(ItemDTO item) throws SQLException {
+        itemCheck(item.getName(), item.getWeight());
+        itemsDAO.updateItem(item.getId(), item.getName(), item.getWeight());
     }
 
-    public void deleteItem(int id) throws SQLException {
-        itemsDAO.deleteItem(id);
+    public void deleteItem(ItemDTO item) throws SQLException {
+        itemsDAO.deleteItem(item.getId());
     }
 
-    public ResultSet getItem(int id) throws SQLException {
-        return itemsDAO.getItem(id);
+    public ItemDTO getItem(int id) throws SQLException {
+        ResultSet rst =  itemsDAO.getItem(id);
+        if (rst.next()) {
+            return new ItemDTO(rst.getInt("id"), rst.getString("name"), rst.getDouble("weight"));
+        } else {
+            throw new SQLException("Item not found with id: " + id);
+        }
     }
 
-    public ResultSet getAllItems() throws SQLException {
-        return itemsDAO.getAllItems();
+    public ArrayList<ItemDTO> getAllItems() throws SQLException {
+        ArrayList<ItemDTO> items = new ArrayList<>();
+        ResultSet rst = itemsDAO.getAllItems();
+        while (rst.next()) {
+            items.add(new ItemDTO(rst.getInt("id"), rst.getString("name"), rst.getDouble("weight")));
+        }
+        return items;
     }
 
-    private void itemCheck(String name, int quantity, double weight) {
-        if (name == null || quantity <= 0 || weight <= 0) {
+    private void itemCheck(String name, double weight) {
+        if (name == null || weight <= 0) {
             throw new IllegalArgumentException("Invalid item data provided.");
         }
     }

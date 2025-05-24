@@ -1,5 +1,5 @@
 package DataLayer;
-import DataLayer.ShipmentDAO;
+import DataLayer.ShipmentDTO;
 import java.sql.*;
 import DomainLayer.ShipmentDL;
 
@@ -33,7 +33,7 @@ public class ShipmentController {
         shipmentDAO.deleteShipment(shipment);
     }
 
-    public ShipmentDL getShipment(int id) throws SQLException {
+    public ShipmentDTO getShipment(int id) throws SQLException {
         return shipmentDAO.getShipment(id);
     }
 
