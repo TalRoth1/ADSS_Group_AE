@@ -23,8 +23,8 @@ public class EmployeeManager extends Employee {
         pastShifts = new HashMap<>();
     }
 
-    //methods 
-    public void removeEmployee(int id) { //delete employee from the system, currently not used
+    // methods
+    public void removeEmployee(int id) { // delete employee from the system, currently not used
         allEmployees.remove(id);
     }
 
@@ -39,128 +39,145 @@ public class EmployeeManager extends Employee {
         return allEmployees.containsKey(id);
     }
 
-    //update methods
-    public void updateBankAccountEmployee(int employeeId, String bankAccount) {
+    // update methods
+    public void updateBankAccountEmployee(int employeeId, String bankAccount) throws Exception {
         if (!checkEmployee(employeeId)) {
-            throw new IllegalArgumentException(employeeId + " not exist");
+            throw new Exception(employeeId + " not exist");
         }
         ShiftEmployee employee = allEmployees.get(employeeId);
         employee.setBankAccount(bankAccount);
     }
 
-    public void updateSalaryEmployee(int employeeId, int salary) {
+    public void updateSalaryEmployee(int employeeId, int salary) throws Exception {
         if (!checkEmployee(employeeId)) {
-            throw new IllegalArgumentException(employeeId + " not exist");
+            throw new Exception(employeeId + " not exist");
         }
         if (salary < 0) {
-            throw new IllegalArgumentException("invalid salary");
+            throw new Exception("invalid salary");
         }
         ShiftEmployee employee = allEmployees.get(employeeId);
         employee.setSalary(salary);
     }
 
-    public void updateVacationDaysEmployee(int employeeId, int vacationDays) {
+    public void updateVacationDaysEmployee(int employeeId, int vacationDays) throws Exception {
         if (!checkEmployee(employeeId)) {
-            throw new IllegalArgumentException(employeeId + " not exist");
+            throw new Exception(employeeId + " not exist");
         }
         if (vacationDays < 0) {
-            throw new IllegalArgumentException("invalid vacationDays");
+            throw new Exception("invalid vacationDays");
         }
         ShiftEmployee employee = allEmployees.get(employeeId);
         employee.setVacationDays(vacationDays);
     }
 
-    public void updateSickDaysEmployee(int employeeId, int sickDays) {
+    public void updateSickDaysEmployee(int employeeId, int sickDays) throws Exception {
         if (!checkEmployee(employeeId)) {
-            throw new IllegalArgumentException(employeeId + " not exist");
+            throw new Exception(employeeId + " not exist");
         }
         if (sickDays < 0) {
-            throw new IllegalArgumentException("invalid sickDays");
+            throw new Exception("invalid sickDays");
         }
         ShiftEmployee employee = allEmployees.get(employeeId);
         employee.setSickDays(sickDays);
     }
 
-    public void updateEducationFund(int employeeId, double educationFund) {
+    public void updateEducationFund(int employeeId, double educationFund) throws Exception {
         if (!checkEmployee(employeeId)) {
-            throw new IllegalArgumentException(employeeId + " not exist");
+            throw new Exception(employeeId + " not exist");
         }
         if (educationFund < 0) {
-            throw new IllegalArgumentException("invalid educationFund");
+            throw new Exception("invalid educationFund");
         }
         ShiftEmployee employee = allEmployees.get(employeeId);
         employee.setEducationFund(educationFund);
     }
 
-    public void updateSocialBenefits(int employeeId, double socialBenefits) {
+    public void updateSocialBenefits(int employeeId, double socialBenefits) throws Exception {
         if (!checkEmployee(employeeId)) {
-            throw new IllegalArgumentException(employeeId + " not exist");
+            throw new Exception(employeeId + " not exist");
         }
         if (socialBenefits < 0) {
-            throw new IllegalArgumentException("invalid socialBenefits");
+            throw new Exception("invalid socialBenefits");
         }
         ShiftEmployee employee = allEmployees.get(employeeId);
         employee.setSocialBenefits(socialBenefits);
     }
 
-    //methods for employees
-    public void fireEmployee(int id) {
+    // methods for employees
+    public void fireEmployee(int id) throws Exception {
         if (!checkEmployee(id)) {
-            throw new IllegalArgumentException(id + " doesn't exist");
+            throw new Exception(id + " doesn't exist");
         }
         ShiftEmployee employee = allEmployees.get(id);
         if (employee.isFinishWorking()) {
-            throw new IllegalArgumentException("Employee is already fired");
+            throw new Exception("Employee is already fired");
         }
         employee.setFinishWorking(true);
         for (Shift shift : employee.getAssignedShifts().keySet()) {
-            shift.removeEmployee(id);
+            try {
+                shift.removeEmployee(id);
+            } catch (Exception e) {
+                throw new Exception("Error removing employee from shift: " + e.getMessage());
+            }
         }
         employee.setPrefShifts(null);
         employee.setAssignedShifts(null);
         System.out.println("employee " + id + " is fired");
     }
 
-    public ShiftEmployee hireEmployee(int employeeId, String employeeName, String branch, String bankAccount, int salary,
-            LocalDate startDate, int vacationDays, int sickDays, double educationFund, double socialBenefits, String employeePassword, Role role) {
+    public ShiftEmployee hireEmployee(int employeeId, String employeeName, String branch, String bankAccount,
+            int salary,
+            LocalDate startDate, int vacationDays, int sickDays, double educationFund, double socialBenefits,
+            String employeePassword, Role role) {
         ShiftEmployee shiftEmployee = new ShiftEmployee(employeeId, employeeName, branch, bankAccount, salary,
                 startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
         allEmployees.put(employeeId, shiftEmployee);
         return shiftEmployee;
     }
 
-    public void addRoleToEmployee(int employeeID, Role role) {
+    public void addRoleToEmployee(int employeeID, Role role) throws Exception {
         if (!checkEmployee(employeeID)) {
-            throw new IllegalArgumentException(employeeID + " doesn't exist");
+            throw new Exception(employeeID + " doesn't exist");
         }
-
         ShiftEmployee employee = allEmployees.get(employeeID);
         if (employee.isFinishWorking()) {
-            throw new IllegalArgumentException("Employee is fired, you can't add a role to him");
+            throw new Exception("Employee is fired, you can't add a role to him");
         }
-        employee.addRole(role);
+        try {
+            employee.addRole(role);
+        } catch (Exception e) {
+            throw new Exception("Error adding role: " + e.getMessage());
+        }
     }
 
-    public void changeRoleToEmployee(int employeeID, Role oldRole, Role newRole) {
+    public void changeRoleToEmployee(int employeeID, Role oldRole, Role newRole) throws Exception {
         if (!checkEmployee(employeeID)) {
-            throw new IllegalArgumentException(employeeID + " doesn't exist");
+            throw new Exception(employeeID + " doesn't exist");
         }
         ShiftEmployee employee = allEmployees.get(employeeID);
         if (employee.isFinishWorking()) {
-            throw new IllegalArgumentException("Employee is fired, you can't change a role to him");
+            throw new Exception("Employee is fired, you can't change a role to him");
         }
-        employee.changeRole(oldRole, newRole);
+        try {
+            employee.changeRole(oldRole, newRole);
+        } catch (Exception e) {
+            throw new Exception("Error removing old role: " + e.getMessage());
+        }
     }
 
-    public void deleteRoleFromEmployee(int employeeID, Role role) {
+    public void deleteRoleFromEmployee(int employeeID, Role role) throws Exception {
         if (!checkEmployee(employeeID)) {
-            throw new IllegalArgumentException(employeeID + " doesn't exist");
+            throw new Exception(employeeID + " doesn't exist");
         }
         ShiftEmployee employee = allEmployees.get(employeeID);
         if (employee.isFinishWorking()) {
-            throw new IllegalArgumentException("Employee is fired, you can't delete a role from him");
+            throw new Exception("Employee is fired, you can't delete a role from him");
         }
-        employee.removeRole(role);
+        try {
+            employee.removeRole(role);
+        } catch (Exception e) {
+            throw new Exception("Error removing role: " + e.getMessage());
+        }
     }
 
     public String addTrainingToEmployee(int employeeID, Training training) {
@@ -179,70 +196,83 @@ public class EmployeeManager extends Employee {
         return employee.removeTraining(training);
     }
 
-    public void changeShiftManager(Shift shift, int oldManager, int newManager) { //switch the shift manager to another employee
+    public void changeShiftManager(Shift shift, int oldManager, int newManager) throws Exception { // switch the
+                                                                                                   // shiftmanager to
+                                                                                                   // another employee
         ShiftEmployee oldManagerE = allEmployees.get(oldManager);
         ShiftEmployee newManagerE = allEmployees.get(newManager);
         if (!checkEmployee(newManager) || !checkEmployee(oldManager)) {
-            throw new IllegalArgumentException("employee not found in the system");
+            throw new Exception("employee not found in the system");
         }
         if (!newManagerE.getRoles().contains(Role.SHIFT_MANAGER)) {
-            throw new IllegalArgumentException("new manager does not have the role of shift manager");
+            throw new Exception("new manager does not have the role of shift manager");
         }
         if (shift.getAssignedEmployeesID().containsKey(newManager)) {
-            throw new IllegalArgumentException("new manager is already assigned to this shift");
+            throw new Exception("new manager is already assigned to this shift");
         }
         if (!shift.getAssignedEmployeesID().containsKey(oldManager)) {
-            throw new IllegalArgumentException("old manager is not assigned to this shift");
+            throw new Exception("old manager is not assigned to this shift");
         }
         if (shift.getShiftManagerId() != oldManager) {
-            throw new IllegalArgumentException("old manager is not the shift manager of this shift");
+            throw new Exception("old manager is not the shift manager of this shift");
         }
         shift.setShiftManagerId(newManager);
-        oldManagerE.removeAssignedShift(shift);
-        newManagerE.addAssignedShift(shift, Role.SHIFT_MANAGER);
-        shift.removeEmployee(oldManager);
-        shift.addEmployee(newManager, Role.SHIFT_MANAGER);
+        try {
+            oldManagerE.removeAssignedShift(shift);
+            newManagerE.addAssignedShift(shift, Role.SHIFT_MANAGER);
+            shift.removeEmployee(oldManager);
+            shift.addEmployee(newManager, Role.SHIFT_MANAGER);
+        } catch (Exception e) {
+            throw new Exception("Error changing shift manager: " + e.getMessage());
+        }
     }
 
-    public String shiftReplacement(Shift shift, int empID, int replacementID) { //replace employee in the shift with another employee
+    public void shiftReplacement(Shift shift, int empID, int replacementID) throws Exception { // replace employee in
+                                                                                               // the shift with another
+                                                                                               // employee
         if (!checkEmployee(empID) || !checkEmployee(replacementID)) {
-            return "employee not found in the system";
+            throw new Exception("employee not found in the system");
         }
         if (replacementID == empID) {
-            return "replacement employee cannot be the same as the original employee";
+            throw new Exception("replacement employee cannot be the same as the original employee");
         }
         if (!shift.getAssignedEmployeesID().containsKey(empID)) {
-            return "original employee not assigned to this shift";
+            throw new Exception("original employee not assigned to this shift");
         }
         if (shift.getAssignedEmployeesID().containsKey(replacementID)) {
-            return "replacement employee already assigned to this shift";
+            throw new Exception("replacement employee already assigned to this shift");
         }
         ShiftEmployee employee = allEmployees.get(empID);
         ShiftEmployee replacement = allEmployees.get(replacementID);
         Role role = shift.getAssignedEmployeesID().get(empID);
         if (employee.isFinishWorking() || replacement.isFinishWorking()) {
-            return "this employee is fired";
+            throw new Exception("one of the employees is fired, you can't replace him");
         }
         if (shift.getShiftManagerId() == empID || shift.getShiftManagerId() == replacementID) {
-            return "shift manager cannot be replaced, there is a different option to change the shift manager";
+            throw new Exception(
+                    "shift manager cannot be replaced, there is a different option to change the shift manager");
         }
         if (!replacement.getRoles().contains(shift.getAssignedEmployeesID().get(empID))) {
-            return "replacement employee does not have the same role as the original employee";
+            throw new Exception("replacement employee does not have the same role as the original employee");
         }
-        shift.removeEmployee(empID);
-        employee.removeAssignedShift(shift);
-        shift.addEmployee(replacementID, role);
-        replacement.addAssignedShift(shift, role);
+        try {
+            shift.removeEmployee(empID);
+            employee.removeAssignedShift(shift);
+            shift.addEmployee(replacementID, role);
+            replacement.addAssignedShift(shift, role);
 
-        if (shift.getShiftType() == ShiftType.EVENING) {
-            eveningShifts.put(shift.getDate(), shift);
-        } else {
-            morningShifts.put(shift.getDate(), shift);
+            if (shift.getShiftType() == ShiftType.EVENING) {
+                eveningShifts.put(shift.getDate(), shift);
+            } else {
+                morningShifts.put(shift.getDate(), shift);
+            }
+        } catch (Exception e) {
+            throw new Exception("Error replacing employee in shift: " + e.getMessage());
         }
-        return null;
     }
 
-    public void createDefaultShift(LocalDate date, ShiftType shiftType) throws Exception { //create a default shift, used for testing
+    public void createDefaultShift(LocalDate date, ShiftType shiftType) throws Exception { // create a default shift,
+                                                                                           // used for testing
         if (date == null || shiftType == null) {
             throw new Exception("invalid date or shift type");
         }
@@ -259,21 +289,21 @@ public class EmployeeManager extends Employee {
         }
     }
 
-    public void createShift(LocalDate date, ShiftType shiftType, int shiftManagerId) { //create a new shift, definig the date, type and shift manager
+    public void createShift(LocalDate date, ShiftType shiftType, int shiftManagerId) throws Exception { // create a new shift, definig the date, type and shiftmanager
         if (date == null || shiftType == null) {
-            throw new IllegalArgumentException("invalid date or shift type");
+            throw new Exception("invalid date or shift type");
         }
         if (!checkEmployee(shiftManagerId)) {
-            throw new IllegalArgumentException("shift manager does not exist");
+            throw new Exception("shift manager does not exist");
         }
         if (!allEmployees.get(shiftManagerId).getRoles().contains(Role.SHIFT_MANAGER)) {
-            throw new IllegalArgumentException("shift manager does not have the role of shift manager");
+            throw new Exception("shift manager does not have the role of shift manager");
         }
 
         if (shiftType == ShiftType.MORNING && morningShifts.containsKey(date)) {
-            throw new IllegalArgumentException("morning shift already exists for this date");
-        } else if (shiftType == ShiftType.EVENING && eveningShifts.containsKey(date)) {
-            throw new IllegalArgumentException("evening shift already exists for this date");
+            throw new Exception("morning shift already exists for this date");
+        } if (shiftType == ShiftType.EVENING && eveningShifts.containsKey(date)) {
+            throw new Exception("evening shift already exists for this date");
         }
         Shift shift = new Shift(date, shiftType, shiftManagerId);
         if (shiftType == ShiftType.MORNING) {
@@ -284,76 +314,84 @@ public class EmployeeManager extends Employee {
         pastShifts.put(date, shift);
     }
 
-    public String addEmployeeToShift(int id, Shift shift, Role role) {
+    public void addEmployeeToShift(int id, Shift shift, Role role) throws Exception { // add employee to shift
         if (!checkEmployee(id)) {
-            return "employee not exist.";
+            throw new Exception("employee not exist");
         }
         ShiftEmployee employee = allEmployees.get(id);
         if (employee.isFinishWorking()) {
-            return "this employee is fired.";
+            throw new Exception("this employee is fired");
         }
         if (!employee.getRoles().contains(role)) {
-            return "this employee does not have this role.";
+            throw new Exception("this employee does not have the role " + role);
         }
         // if (!employee.isAvailable(shift)) {
-        //     return "this employee is not available for this shift";
+        // return "this employee is not available for this shift";
         // }
         if (shift.getAssignedEmployeesID().containsKey(id)) {
-            return "this employee is already assigned to this shift.";
+            throw new Exception("this employee is already assigned to this shift");
         }
-        String response = shift.addEmployee(id, role);
-        if (!response.equals("employee added successfully.")) {
-            return response;
+        try {
+            shift.addEmployee(id, role);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
-        //return employee.addAssignedShift(shift, role);
         employee.addAssignedShift(shift, role);
         if (shift.getShiftType() == ShiftType.MORNING) {
             morningShifts.put(shift.getDate(), shift);
         } else if (shift.getShiftType() == ShiftType.EVENING) {
             eveningShifts.put(shift.getDate(), shift);
         }
-        return null;
     }
 
-    public void removeEmployeeFromShift(int id, Shift shift) {
+    public void removeEmployeeFromShift(int id, Shift shift) throws Exception {
         if (!checkEmployee(id)) {
-            throw new IllegalArgumentException("employee not exist");
+            throw new Exception("employee not exist");
         }
         ShiftEmployee employee = allEmployees.get(id);
         if (employee.isFinishWorking()) {
-            throw new IllegalArgumentException("this employee is fired");
+            throw new Exception("this employee is fired");
         }
         if (!shift.getAssignedEmployeesID().containsKey(id)) {
-            throw new IllegalArgumentException("this employee is not assigned to this shift");
+            throw new Exception("this employee is not assigned to this shift");
         }
-        shift.removeEmployee(id);
-        employee.removeAssignedShift(shift);
+        try {
+            shift.removeEmployee(id);
+            employee.removeAssignedShift(shift);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
 
-    //getters and setters
-    public String setTimes(Shift shift, int start, int end) { //set start time and end time of the shift
+    // getters and setters
+    public void setTimes(Shift shift, int start, int end) throws Exception{ // set start time and end time of the shift
         if (start < 0 || end < 0 || start >= end) {
-            return "invalid start or end time";
+            throw new Exception("invalid start or end time");
         }
         if (shift == null) {
-            return "shift not exist";
+            throw new Exception("shift not exist");
         }
-        if ((shift.getShiftType() == ShiftType.MORNING && (end > 1400 || start < 600)) || shift.getShiftType() == ShiftType.EVENING && (start < 1400 || end > 2200)) {
-            return "invalid start or end time for this shift type";
+        if ((shift.getShiftType() == ShiftType.MORNING && (end > 1400 || start < 600))
+                || shift.getShiftType() == ShiftType.EVENING && (start < 1400 || end > 2200)) {
+            throw new Exception("invalid start or end time for this shift type");
         }
         shift.setStartTime(start);
         shift.setEndTime(end);
-        return null;
     }
 
-    public void setRequiredRole(Shift shift, Role role, int numOfEmployees) { //set the amount of employess of this specific role for the shift
+    public void setRequiredRole(Shift shift, Role role, int numOfEmployees) throws Exception { // set the amount of employess of thisspecific role for the shift
         if (shift.isShipmentShift() && role == role.DRIVER && numOfEmployees < 1) {
-            throw new IllegalArgumentException("For shipment shifts, you must have at least one driver.");
-        } else if (shift.isShipmentShift() && role == role.STORE_KEEPER && numOfEmployees < 1) {
-            throw new IllegalArgumentException("For shipment shifts, you must have at least one store keeper.");
+            throw new Exception("For shipment shifts, you must have at least one driver.");
+        } 
+        if (shift.isShipmentShift() && role == role.STORE_KEEPER && numOfEmployees < 1) {
+            throw new Exception("For shipment shifts, you must have at least one store keeper.");
         }
         if (shift != null) {
-            shift.setRequiredRoles(role, numOfEmployees);
+            try {
+                shift.setRequiredRoles(role, numOfEmployees);
+            } catch (Exception e) {
+                throw new Exception("Error setting required roles: " + e.getMessage());
+            }
         }
     }
 
@@ -377,7 +415,7 @@ public class EmployeeManager extends Employee {
         return null;
     }
 
-    public String getPrefAllEmployees() { //all the shifts of all employees
+    public String getPrefAllEmployees() { // all the shifts of all employees
         StringBuilder sb = new StringBuilder();
         for (ShiftEmployee e : allEmployees.values()) {
             if (!e.isFinishWorking()) {
@@ -388,9 +426,9 @@ public class EmployeeManager extends Employee {
         return sb.toString();
     }
 
-    public String getAssignedEmployeeShiftsManager(int employeeID) { //all the assigned shifts of the employee
+    public void getAssignedEmployeeShiftsManager(int employeeID) throws Exception { // all the assigned shifts of the employee
         if (!checkEmployee(employeeID)) {
-            return "employee not exist";
+            throw new Exception("employee not exist");
         }
         ShiftEmployee employee = allEmployees.get(employeeID);
         String morning = "Morning Shifts:\n";
@@ -407,17 +445,17 @@ public class EmployeeManager extends Employee {
                 evening += s.getDate() + ", " + "Role: " + s.getRole(employeeID) + "\n";
             }
         }
-        return "Employee: " + employee.getName() + " " + employeeID + "\n" + morning + "\n" + evening;
+        System.out.println("Employee: " + employee.getName() + " " + employeeID + "\n" + morning + "\n" + evening);
     }
 
-    public String getAvailableEmployees(Shift shift, Role role) { //all the employees that can work in this shift and have this role
+    public void getAvailableEmployees(Shift shift, Role role) { // all the employees that can work in this shift and have this role
         String res = "Available employees for this shift and role: " + role.toString() + "\n";
         for (ShiftEmployee employee : allEmployees.values()) {
             if (employee.getRoles().contains(role) && employee.isAvailable(shift)) {
                 res += employee.getName() + " " + employee.getId() + "\n";
             }
         }
-        return res;
+        System.out.println(res);
     }
 
     public void archiveWeeklyForAllEmployees() {

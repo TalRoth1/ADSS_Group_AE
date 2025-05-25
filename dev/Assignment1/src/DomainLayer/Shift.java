@@ -49,7 +49,7 @@ public class Shift {
                 + '}';
     }
 
-    public String getRole(int id) {
+    public String getRole(int id) throws Exception {
         if (shiftManagerId == id) {
             return "Shift Manager";
         }
@@ -57,7 +57,7 @@ public class Shift {
             return assignedEmployeesID.get(id).toString();
         }
         if (id <= 0) {
-            throw new IllegalArgumentException("ID is invalid. ");
+            throw new Exception("ID is invalid. ");
         }
         return null;
     }
@@ -120,12 +120,11 @@ public class Shift {
         return date.toString() + " " + shiftType.toString();
     }
 
-    public boolean setRequiredRoles(Role role, int num) {
+    public void setRequiredRoles(Role role, int num) throws Exception {
         if (!requiredRoles.containsKey(role)) {
-            return false;
+            throw new Exception("Role not required for this shift.");
         }
         requiredRoles.put(role, num);
-        return true;
     }
 
     public String getEmployeesInfo() {
@@ -139,23 +138,22 @@ public class Shift {
     }
 
     //methods
-    public String addEmployee(int id, Role role) {
+    public void addEmployee(int id, Role role) throws Exception {
         if (assignedEmployeesID.containsKey(id)) {
-            return "this employee is already assigned to this shift.";
+            throw new Exception("This employee is already assigned to this shift.");
         }
         if (!requiredRoles.containsKey(role)) {
-            return "Role not required for this shift.";
+            throw new Exception("Role not required for this shift.");
         }
         if (requiredRoles.get(role) <= 0) {
-            return "No more employees required for this role.";
+            throw new Exception("No more employees required for this role.");
         }
         assignedEmployeesID.put(id, role);
         requiredRoles.put(role, this.requiredRoles.get(role) - 1);
-
-        return "employee added successfully.";
+        System.out.println("Employee with ID " + id + " added to shift on " + date + " as " + role);
     }
 
-    public void removeEmployee(int id) {
+    public void removeEmployee(int id) throws Exception {
         if (!assignedEmployeesID.containsKey(id)) {
             throw new IllegalArgumentException("Employee not assigned to this shift.");
         }

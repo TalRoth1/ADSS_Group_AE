@@ -25,26 +25,26 @@ public class ShiftEmployee extends Employee {
         roles.add(role);
     }
 
-    public String getPreferredShiftsToString() { //employee or manager can see emp's preferred shifts
+    public void getPreferredShiftsToString() throws Exception { //employee or manager can see emp's preferred shifts
         String res = "Preferred shifts: " + "\n";
         if (preferredShifts == null) {
-            return "No preferred shifts.";
+            throw new Exception("No preferred shifts.");
         }
         for (Shift shift : preferredShifts) {
             res += shift.toString() + "\n";
         }
-        return res;
+        System.out.println(res);
     }
 
-    public String getAssignedShiftsToString() { //employee or manager can see emp's assigned shifts
+    public void getAssignedShiftsToString() throws Exception { //employee or manager can see emp's assigned shifts
         String res = "Assigned shifts: " + "\n";
         if (assignedShifts == null) {
-            return "No assigned shifts.";
+            throw new Exception("No assigned shifts.");
         }
         for (Shift shift : assignedShifts.keySet()) {
             res += shift.toString() + "\n";
         }
-        return res;
+        System.out.println(res);
     }
 
     public String getAssignedEmployeesInfo(Shift shift) {
@@ -55,100 +55,100 @@ public class ShiftEmployee extends Employee {
     }
 
     //methods
-    public void addRole(Role role) {
+    public void addRole(Role role) throws Exception {
         if (role == null) {
-            throw new IllegalArgumentException("Role cannot be null.");
+            throw new Exception("Role cannot be null.");
         }
         if (roles.contains(role)) {
-            throw new IllegalArgumentException("Role already exists in the list of roles.");
+            throw new Exception("Role already exists in the list of roles.");
         }
         roles.add(role);
     }
 
-    public void removeRole(Role role) {
+    public void removeRole(Role role) throws Exception {
         if (role == null) {
-            throw new IllegalArgumentException("Role cannot be null.");
+            throw new Exception("Role cannot be null.");
         }
         if (!roles.contains(role)) {
-            throw new IllegalArgumentException("Role does not exist in the list of roles.");
+            throw new Exception("Role does not exist in the list of roles.");
         }
         roles.remove(role);
     }
 
-    public void changeRole(Role oldRole, Role newRole) {
+    public void changeRole(Role oldRole, Role newRole) throws Exception {
         if (oldRole == null || newRole == null) {
-            throw new IllegalArgumentException("Roles cannot be null.");
+            throw new Exception("Roles cannot be null.");
         }
         if (!roles.contains(oldRole)) {
-            throw new IllegalArgumentException("Old role does not exist in the list of roles.");
+            throw new Exception("Old role does not exist in the list of roles.");
         }
         if (roles.contains(newRole)) {
-            throw new IllegalArgumentException("New role already exists in the list of roles.");
+            throw new Exception("New role already exists in the list of roles.");
         }
         roles.remove(oldRole);
         roles.add(newRole);
     }
 
-    public void addPreferredShift(Shift shift) {
+    public void addPreferredShift(Shift shift) throws Exception {
         if (isFinishWorking()) {
-            throw new IllegalStateException("Employee has finished working and cannot add preferred shifts.");
+            throw new Exception("Employee has finished working and cannot add preferred shifts.");
         }
         if (preferredShifts.contains(shift)) {
-            throw new IllegalArgumentException("Shift already exists in the list of preferred shifts.");
+            throw new Exception("Shift already exists in the list of preferred shifts.");
         }
         if (shift == null) {
-            throw new IllegalArgumentException("Shift cannot be null.");
+            throw new Exception("Shift cannot be null.");
         }
         preferredShifts.add(shift);
     }
 
-    public void removePreferredShift(Shift shift) {
+    public void removePreferredShift(Shift shift) throws Exception {
         if (isFinishWorking()) {
-            throw new IllegalStateException("Employee has finished working and cannot remove preferred shifts.");
+            throw new Exception("Employee has finished working and cannot remove preferred shifts.");
         }
         if (!preferredShifts.contains(shift)) {
-            throw new IllegalArgumentException("Shift does not exist in the list of preferred shifts.");
+            throw new Exception("Shift does not exist in the list of preferred shifts.");
         }
         if (shift == null) {
-            throw new IllegalArgumentException("Shift cannot be null.");
+            throw new Exception("Shift cannot be null.");
         }
         preferredShifts.remove(shift);
     }
 
-    public void addAssignedShift(Shift shift, Role role) {
+    public void addAssignedShift(Shift shift, Role role) throws Exception {
 
         if (!roles.contains(role)) {
-            throw new IllegalArgumentException("Role is not in the list of roles.");
+            throw new Exception("Role is not in the list of roles.");
         }
         if (isFinishWorking()) {
-            throw new IllegalStateException("Employee has finished working and cannot add assigned shifts.");
+            throw new Exception("Employee has finished working and cannot add assigned shifts.");
         }
         if (assignedShifts.containsKey(shift)) {
-            throw new IllegalArgumentException("Shift already exists in the list of assigned shifts.");
+            throw new Exception("Shift already exists in the list of assigned shifts.");
         }
         assignedShifts.put(shift, role);
         System.out.println("shift added successfully to assigned shifts.");
     }
 
-    public void removeAssignedShift(Shift shift) {
+    public void removeAssignedShift(Shift shift) throws Exception {
         if (isFinishWorking()) {
-            throw new IllegalStateException("Employee has finished working and cannot remove assigned shifts.");
+            throw new Exception("Employee has finished working and cannot remove assigned shifts.");
         }
         if (!assignedShifts.containsKey(shift)) {
-            return;
+            throw new Exception("Shift does not exist in the list of assigned shifts.");
         }
         if (shift == null) {
-            throw new IllegalArgumentException("Shift cannot be null.");
+            throw new Exception("Shift cannot be null.");
         }
         assignedShifts.remove(shift);
     }
 
-    public boolean isAvailable(Shift shift) {
+    public boolean isAvailable(Shift shift) throws Exception {
         if (isFinishWorking() || preferredShifts == null) {
-            return false;
+            throw new Exception("Employee has finished working or has no preferred shifts.");
         }
         if (shift == null) {
-            throw new IllegalArgumentException("Shift cannot be null.");
+            throw new Exception("Shift cannot be null.");
         }
         return preferredShifts.contains(shift);
     }

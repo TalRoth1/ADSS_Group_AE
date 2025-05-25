@@ -41,16 +41,17 @@ public class Employee {
     }
 
 
-    public boolean login(String password) {
+    public void login(String password) throws Exception {
         if (this.password.equals(password) && !this.finishWorking) {
             this.isLoggedIn = true;
-            return true;
         } else {
-            return false;
+            this.isLoggedIn = false;
+            throw new Exception("Login failed: Incorrect password or employee has finished working.");
         }
     }
 
-    public void logout() { this.isLoggedIn = false;
+    public void logout() {
+        this.isLoggedIn = false;
     }
 
     public String updatePassword(String oldPassword, String newPassword) {
