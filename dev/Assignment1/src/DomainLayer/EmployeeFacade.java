@@ -15,14 +15,14 @@ public class EmployeeFacade { //employee related methods
     //initalize employees
     EmployeeManager keren = new EmployeeManager(100, "Keren", "1", "111222", 7000,
             LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "123");
-    ShiftEmployee Liat = new ShiftEmployee(101, "Liat", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.SHIFT_MANAGER);
-    ShiftEmployee Erez = new ShiftEmployee(102, "Erez", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.CASHIER);
-    ShiftEmployee Elad = new ShiftEmployee(103, "Elad", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.DRIVER);
-    ShiftEmployee Eylon = new ShiftEmployee(104, "Eylon", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.DRIVER);
-    ShiftEmployee Tal = new ShiftEmployee(105, "Tal", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.CASHIER);
-    ShiftEmployee Ofir = new ShiftEmployee(106, "Ofir", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.STORE_KEEPER);
-    ShiftEmployee Kiril = new ShiftEmployee(107, "Kiril", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.STORE_KEEPER);
-    ShiftEmployee Ofri = new ShiftEmployee(108, "Ofri", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.SHIFT_MANAGER);
+    ShiftEmployee Liat = new ShiftEmployee(101, "Liat", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.SHIFT_MANAGER);
+    ShiftEmployee Erez = new ShiftEmployee(102, "Erez", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.CASHIER);
+    ShiftEmployee Elad = new ShiftEmployee(103, "Elad", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.DRIVER);
+    ShiftEmployee Eylon = new ShiftEmployee(104, "Eylon", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.DRIVER);
+    ShiftEmployee Tal = new ShiftEmployee(105, "Tal", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.CASHIER);
+    ShiftEmployee Ofir = new ShiftEmployee(106, "Ofir", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.STORE_KEEPER);
+    ShiftEmployee Kiril = new ShiftEmployee(107, "Kiril", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.STORE_KEEPER);
+    ShiftEmployee Ofri = new ShiftEmployee(108, "Ofri", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.SHIFT_MANAGER);
 
     public EmployeeFacade() {
         this.employeeManagers = new HashMap<>();
@@ -50,45 +50,15 @@ public class EmployeeFacade { //employee related methods
         keren.addEmployee(Ofri);
     }
 
-//    public void initExampleData() {
-//        EmployeeManager keren = new EmployeeManager(100, "Keren", "1", "111222", 7000,
-//                LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "123");
-//        employeeManagers.put(keren.getId(), keren);
-//
-//        ShiftEmployee Liat = new ShiftEmployee(101, "Liat", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.SHIFT_MANAGER);
-//        ShiftEmployee Erez = new ShiftEmployee(102, "Erez", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.CASHIER);
-//        ShiftEmployee Elad = new ShiftEmployee(103, "Elad", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.DRIVER);
-//        ShiftEmployee Eylon = new ShiftEmployee(104, "Eylon", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.DRIVER);
-//        ShiftEmployee Tal = new ShiftEmployee(105, "Tal", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.CASHIER);
-//        ShiftEmployee Ofir = new ShiftEmployee(106, "Ofir", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.STORE_KEEPER);
-//        ShiftEmployee Kiril = new ShiftEmployee(107, "Kiril", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.STORE_KEEPER);
-//        ShiftEmployee Ofri = new ShiftEmployee(108, "Ofri", "1", "111222", 7000,LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "password", Role.SHIFT_MANAGER);
-//
-//        shiftEmployees.put(Liat.getId(), Liat);
-//        shiftEmployees.put(Erez.getId(), Erez);
-//        shiftEmployees.put(Elad.getId(), Elad);
-//        shiftEmployees.put(Eylon.getId(), Eylon);
-//        shiftEmployees.put(Tal.getId(), Tal);
-//        shiftEmployees.put(Ofir.getId(), Ofir);
-//        shiftEmployees.put(Kiril.getId(), Kiril);
-//        shiftEmployees.put(Ofri.getId(), Ofri);
-//
-//        keren.addEmployee(Liat);
-//        keren.addEmployee(Erez);
-//        keren.addEmployee(Elad);
-//        keren.addEmployee(Eylon);
-//        keren.addEmployee(Tal);
-//        keren.addEmployee(Ofir);
-//        keren.addEmployee(Kiril);
-//        keren.addEmployee(Ofri);
-//    }
-
-    public Employee login(int id, String password) {
+    public Employee login(int id, String password) throws Exception {
         Employee e = getEmployee(id);
-        if (e != null && e.login(password)) {
-            return e;
+        if (e == null) {
+            throw new Exception("Employee not found.");
         }
-        return null;
+        if (!e.login(password)) {
+            throw new Exception("Invalid password or employee cannot log in.");
+        }
+        return e;
     }
 
     public String logout(int id) {
@@ -130,7 +100,7 @@ public class EmployeeFacade { //employee related methods
             return "You are not logged in";
         }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
-        if(employeeManager.checkEmployee(employeeId)) {
+        if (employeeManager.checkEmployee(employeeId)) {
             return "Employee: " + employeeId + " already hired";
         }
         ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName, branch, bankAccount, salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
@@ -296,12 +266,12 @@ public class EmployeeFacade { //employee related methods
     }
 
     // shift employee methods
-    public String getPrefAllEmployees(int empManagerId) { //get all employees' preferences, for employee manager
+    public String getPrefAllEmployees(int empManagerId) throws Exception { //get all employees' preferences, for employee manager
         if (!isEmployeeManager(empManagerId)) {
-            return "this action is allowed only for employee manager";
+            throw new Exception("This action is allowed only for employee managers.");
         }
         if (!isLoggedIn(empManagerId)) {
-            return "You are not logged in";
+            throw new Exception("You are not logged in.");
         }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.getPrefAllEmployees();
@@ -369,9 +339,10 @@ public class EmployeeFacade { //employee related methods
     }
 
     //shift methods
-    public Shift getShift(LocalDate date, ShiftType shiftType, int id) {
-        if(!isLoggedIn(id))
-            return null;
+    public Shift getShift(LocalDate date, ShiftType shiftType, int id) throws Exception {
+        if (!isLoggedIn(id)) {
+            throw new Exception("You must be logged in.");
+        }
         EmployeeManager employeeManager = getEmployeeManager(id);
         return employeeManager.getShift(date, shiftType);
     }
@@ -387,37 +358,45 @@ public class EmployeeFacade { //employee related methods
     }
 
     public String changeShiftManager(Shift shift, int oldShiftManagerId, int newShiftManagerId, int empManagerId) {
-        if(!isEmployeeManager(empManagerId))
+        if (!isEmployeeManager(empManagerId)) {
             return "this action is allowed only for employee manager";
-        if(!isLoggedIn(empManagerId))
+        }
+        if (!isLoggedIn(empManagerId)) {
             return "You are not logged in";
+        }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.changeShiftManager(shift, oldShiftManagerId, newShiftManagerId);
     }
 
     public String shiftReplacement(Shift shift, int employeeId, int empManagerId, int newEmployeeId) {
-        if(!isEmployeeManager(empManagerId))
+        if (!isEmployeeManager(empManagerId)) {
             return "this action is allowed only for employee manager";
-        if(!isLoggedIn(empManagerId))
+        }
+        if (!isLoggedIn(empManagerId)) {
             return "You are not logged in";
+        }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.shiftReplacement(shift, employeeId, newEmployeeId);
     }
 
-    public String createShift(LocalDate date, ShiftType shiftType,int empManagerId, int shiftManagerId) {
-        if(!isEmployeeManager(empManagerId))
+    public String createShift(LocalDate date, ShiftType shiftType, int empManagerId, int shiftManagerId) {
+        if (!isEmployeeManager(empManagerId)) {
             return "this action is allowed only for employee manager";
-        if(!isLoggedIn(empManagerId))
+        }
+        if (!isLoggedIn(empManagerId)) {
             return "You are not logged in";
+        }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.createShift(date, shiftType, shiftManagerId);
     }
 
-    public String autoCreateShiftsForNextWeek(int empManagerId) {
-        if (!isEmployeeManager(empManagerId))
-            return "Only employee managers can create shifts.";
-        if (!isLoggedIn(empManagerId))
-            return "You must be logged in.";
+    public void autoCreateShiftsForNextWeek(int empManagerId) throws Exception {
+        if (!isEmployeeManager(empManagerId)) {
+            throw new Exception("Only employee managers can create shifts.");
+        }
+        if (!isLoggedIn(empManagerId)) {
+            throw new Exception("You must be logged in.");
+        }
 
         EmployeeManager manager = getEmployeeManager(empManagerId);
         LocalDate nextSunday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY));
@@ -425,92 +404,131 @@ public class EmployeeFacade { //employee related methods
         for (int i = 0; i < 6; i++) {
             LocalDate date = nextSunday.plusDays(i);
             for (ShiftType type : ShiftType.values()) {
-                String res = manager.createDefaultShift(date, type);
-                if (res != null && !res.contains("already exists")) {
-                    System.out.println("Failed to create shift for " + date + " " + type + ": " + res);
+                try {
+                    manager.createDefaultShift(date, type);
+                } catch (Exception e) {
+                    if (!e.getMessage().contains("already exists")) {
+                        System.out.println("Failed to create shift for " + date + " " + type + ": " + e.getMessage());
+                    }
                 }
             }
         }
-        return null;
     }
 
-    public String addEmployeeToShift(int employeeId, Shift shift,Role role,int empManagerId) {
-        if(!isEmployeeManager(empManagerId))
-            return "this action is allowed only for employee manager";
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
+    public void addEmployeeToShift(int employeeId, Shift shift, Role role, int empManagerId) throws Exception {
+        if (!isEmployeeManager(empManagerId)) {
+            throw new Exception("This action is allowed only for employee managers.");
+        }
+        if (!isLoggedIn(empManagerId)) {
+            throw new Exception("You must be logged in.");
+        }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         String response = employeeManager.addEmployeeToShift(employeeId, shift, role);
-        if(response != null) {
-            return response;
+        if (response.equals("employee not exist.")) {
+            throw new Exception("Failed to add employee to shift: Employee does not exist.");
         }
-        System.out.println("Employee " + employeeId + " added to shift successfully");
-        return "Employee added to shift successfully";
+        if (response.equals("this employee is fired.")) {
+            throw new Exception("Failed to add employee to shift: Employee is fired and cannot be added.");
+        }
+        if (response.equals("this employee does not have this role.")) {
+            throw new Exception("Failed to add employee to shift: Employee does not have the required role.");
+        }
+        if (response.equals("this employee is already assigned to this shift.")) {
+            throw new Exception("Failed to add employee to shift: Employee already has this shift assigned.");
+        }
+        if (response.equals("Role not required for this shift.")) {
+            throw new Exception("Failed to add employee to shift: Role not required for this shift.");
+        }
+        if (response.equals("No more employees required for this role.")) {
+            throw new Exception("Failed to add employee to shift: No more employees required for this role.");
+        }
     }
 
     public String removeEmployeeFromShift(int employeeId, Shift shift, int empManagerId) {
-        if(!isEmployeeManager(empManagerId))
+        if (!isEmployeeManager(empManagerId)) {
             return "this action is allowed only for employee manager";
-        if(!isLoggedIn(empManagerId))
+        }
+        if (!isLoggedIn(empManagerId)) {
             return "You are not logged in";
+        }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.removeEmployeeFromShift(employeeId, shift);
     }
 
     public String getEmployeeInfo(int shiftManagerId, Shift shift) { //for shift manager OR shift employee
-        if(!isLoggedIn(shiftManagerId))
+        if (!isLoggedIn(shiftManagerId)) {
             return "You are not logged in";
+        }
         ShiftEmployee shiftEmployee = shiftEmployees.get(shiftManagerId);
         return shift.getEmployeesInfo();
     }
 
     public String getShiftInfo(int id, Shift shift) { //for shift manager OR shift employee
-        if(!isLoggedIn(id))
+        if (!isLoggedIn(id)) {
             return "You are not logged in";
+        }
         return shift.toString();
     }
 
     public String addEmployee(int employeeId, Shift shift, int empManagerId, Role role) {
-        if(!isEmployeeManager(empManagerId))
+        if (!isEmployeeManager(empManagerId)) {
             return "this action is allowed only for employee manager";
-        if(!isLoggedIn(empManagerId))
+        }
+        if (!isLoggedIn(empManagerId)) {
             return "You are not logged in";
+        }
         return shift.addEmployee(employeeId, role);
     }
 
     public String removeEmployee(int employeeId, Shift shift, int empManagerId) {
-        if(!isEmployeeManager(empManagerId))
+        if (!isEmployeeManager(empManagerId)) {
             return "this action is allowed only for employee manager";
-        if(!isLoggedIn(empManagerId))
+        }
+        if (!isLoggedIn(empManagerId)) {
             return "You are not logged in";
+        }
         return shift.removeEmployee(employeeId);
     }
-    public String setRequiredRoles(int empManagerId, Shift shift, Role role, int num) {
-        if(!isEmployeeManager(empManagerId))
-            return "this action is allowed only for employee manager";
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        return shift.setRequiredRoles(role, num);
+
+    public void setRequiredRoles(int empManagerId, Shift shift, Role role, int num) throws Exception {
+        if (!isEmployeeManager(empManagerId)) {
+            throw new Exception("This action is allowed only for employee managers.");
+        }
+        if (!isLoggedIn(empManagerId)) {
+            throw new Exception("You must be logged in.");
+        }
+        if (num < 0) {
+            throw new Exception("Number of employees cannot be negative.");
+        }
+        if (!shift.setRequiredRoles(role, num)) {
+            throw new Exception("Role not required for this shift.");
+        }
     }
 
     public String getShiftString(int empManagerId, Shift shift) {
-        if(!isLoggedIn(empManagerId))
+        if (!isLoggedIn(empManagerId)) {
             return "You are not logged in";
+        }
         return shift.getShiftString();
     }
 
-    public String setShiftManager(int empManagerId, Shift shift, int id){
-        if(!isEmployeeManager(empManagerId))
-            return "this action is allowed only for employee manager";
-        if(!isLoggedIn(empManagerId))
-            return "You are not logged in";
-        //return shift.setShiftManagerId(id);
-        String response = shift.setShiftManagerId(id);
-        if(response != null) {
-            return response;
+    public void setShiftManager(int empManagerId, Shift shift, int id) throws Exception {
+        if (!isEmployeeManager(empManagerId)) {
+            throw new Exception("This action is allowed only for employee managers.");
         }
-        return addAssignedShift(id, shift, Role.SHIFT_MANAGER);
+        if (!isLoggedIn(empManagerId)) {
+            throw new Exception("You must be logged in.");
+        }
+        if (!shift.setShiftManagerId(id)) {
+            throw new Exception("Shift Manager ID is invalid. ");
+        }
+        try {
+            addAssignedShift(id, shift, Role.SHIFT_MANAGER);
+        } catch (Exception e) {
+            throw new Exception("Failed to set shift manager: " + e.getMessage());
+        }
     }
+
     public String addPreferredShift(int id, Shift shift) {
         ShiftEmployee shiftEmployee = shiftEmployees.get(id);
         return shiftEmployee.addPreferredShift(shift);
@@ -521,9 +539,24 @@ public class EmployeeFacade { //employee related methods
         return shiftEmployee.removePreferredShift(shift);
     }
 
-    public String addAssignedShift(int id, Shift shift, Role role) {
+    public void addAssignedShift(int id, Shift shift, Role role) throws Exception {
+        if (role == null) {
+            throw new Exception("Role cannot be null.");
+        }
+        if (shift == null) {
+            throw new Exception("Shift cannot be null.");
+        }
         ShiftEmployee shiftEmployee = shiftEmployees.get(id);
-        return shiftEmployee.addAssignedShift(shift, role);
+        String res = shiftEmployee.addAssignedShift(shift, role);
+        if (res.equals("role not found")) {
+            throw new Exception("Failed to add assigned shift: " + "Role does not exist in the list of roles.");
+        }
+        if (res.equals("finish working")) {
+            throw new Exception("Failed to add assigned shift: " + "Employee has finished working and cannot add assigned shifts.");
+        }
+        if (res.equals("shift already assigned")) {
+            throw new Exception("Failed to add assigned shift: " + "Shift already exists in the list of assigned shifts.");
+        }
     }
 
     public String removeAssignedShift(int id, Shift shift) {
@@ -537,28 +570,30 @@ public class EmployeeFacade { //employee related methods
 
     }
 
-    public void getAssignedEmployeesInfo(int managerId,int e ,Shift shift) { //for shift manager OR shift employee
+    public void getAssignedEmployeesInfo(int managerId, int e, Shift shift) { //for shift manager OR shift employee
         ShiftEmployee shiftEmployee = shiftEmployees.get(managerId);
         shift.getEmployeesInfo();
     }
 
     public Map<LocalDate, Shift> getPastShifts(int empManagerId) {
-        if(!isLoggedIn(empManagerId))
+        if (!isLoggedIn(empManagerId)) {
             return Collections.emptyMap();
+        }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.getPastShifts();
     }
 
     public String setTimes(int empManagerId, Shift shift, int startTime, int endTime) {
-        if(!isEmployeeManager(empManagerId))
+        if (!isEmployeeManager(empManagerId)) {
             return "this action is allowed only for employee manager";
-        if(!isLoggedIn(empManagerId))
+        }
+        if (!isLoggedIn(empManagerId)) {
             return "You are not logged in";
+        }
 
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         return employeeManager.setTimes(shift, startTime, endTime);
     }
-
 
     //just for Main
     public void addFirstEmployeeManager(int id, String name, String branch, String bankAccount, int salary,
@@ -567,6 +602,6 @@ public class EmployeeFacade { //employee related methods
         EmployeeManager manager = new EmployeeManager(id, name, branch, bankAccount, salary, startDate,
                 vacationDays, sickDays, educationFund, socialBenefits, password);
         employeeManagers.put(id, manager);
-      //  repository.addEmployee(manager);
+        //  repository.addEmployee(manager);
     }
 }

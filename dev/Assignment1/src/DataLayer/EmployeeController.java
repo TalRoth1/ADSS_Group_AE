@@ -2,6 +2,7 @@ package DataLayer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public class EmployeeController {
 
@@ -36,7 +37,7 @@ public class EmployeeController {
         }
     }
 
-    public ResultSet getEmployee(int employeeId) {
+    public EmployeeDTO getEmployee(int employeeId) {
         try {
             return employeeDAO.getEmployee(employeeId);
         } catch (SQLException e) {
@@ -109,40 +110,7 @@ public class EmployeeController {
         }
     }
 
-    public void addRole(int employeeId, String role) {
-        try {
-            employeeDAO.addRole(employeeId, role);
-        } catch (SQLException e) {
-            System.out.println("Error adding role: " + e.getMessage());
-        }
-    }
-
-    public void removeRole(int employeeId, String role) {
-        try {
-            employeeDAO.removeRole(employeeId, role);
-        } catch (SQLException e) {
-            System.out.println("Error removing role: " + e.getMessage());
-        }
-    }
-
-    public void changeRole(int employeeId, String oldRole, String newRole) {
-        try {
-            employeeDAO.changeRole(employeeId, oldRole, newRole);
-        } catch (SQLException e) {
-            System.out.println("Error changing role: " + e.getMessage());
-        }
-    }
-
-    public ResultSet getRoles(int employeeId) {
-        try {
-            return employeeDAO.getRoles(employeeId);
-        } catch (SQLException e) {
-            System.out.println("Error getting roles: " + e.getMessage());
-            return null;
-        }
-    }
-
-    public ResultSet getAllEmployees() {
+    public List<EmployeeDTO> getAllEmployees() {
         try {
             return employeeDAO.getAllEmployees();
         } catch (SQLException e) {

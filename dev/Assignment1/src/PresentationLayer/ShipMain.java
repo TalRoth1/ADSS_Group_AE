@@ -4,9 +4,10 @@ import DomainLayer.EmployeeFacade;
 import java.time.LocalDate;
 import java.util.Scanner;
 
-public class Main {
+public class ShipMain {
+
     public static void main(String[] args) {
-        UIController uiController = new UIController();
+        ShipmentCLI shipCli = new ShipmentCLI();
         Scanner scanner = new Scanner(System.in);
         LocalDate today = LocalDate.now();
         EmployeeFacade employeeFacade = new EmployeeFacade();
@@ -27,7 +28,7 @@ public class Main {
             System.out.println("9. Exit");
             boolean flag = true;
             int choice = 0;
-            while(flag) {
+            while (flag) {
                 System.out.println("Please enter your choice (1-9): ");
                 String input = scanner.nextLine();
                 if (input.matches("[1-9]")) {
@@ -40,34 +41,34 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    uiController.CreateShipment();
+                    shipCli.CreateShipment();
                     break;
                 case 2:
-                    uiController.EditShipement();
+                    shipCli.EditShipement();
                     break;
                 case 3:
-                    uiController.AddTruck();
+                    shipCli.AddTruck();
                     break;
                 case 4:
-                    uiController.AddDriver();
+                    shipCli.AddDriver();
                     break;
                 case 5:
-                    uiController.AddLocation();
+                    shipCli.AddLocation();
                     break;
                 case 6:
-                    uiController.AddItem();
+                    shipCli.AddItem();
                     break;
                 case 7:
-                    uiController.ChangeStatus();
+                    shipCli.ChangeStatus();
                     break;
                 case 8:
-                    uiController.ShowDocuments();
+                    shipCli.ShowDocuments();
                     break;
                 case 9:
                     exit = true;
                     System.out.println("Exiting the program. Goodbye!");
                     break;
             }
-        } 
-    }  
+        }
+    }
 }

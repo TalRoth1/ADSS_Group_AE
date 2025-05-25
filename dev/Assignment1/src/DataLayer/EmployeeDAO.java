@@ -1,6 +1,8 @@
 package DataLayer;
 
 import java.sql.*;
+import DTO.EmployeeDTO;
+import java.util.ArrayList;
 
 public class EmployeeDAO {
 
@@ -49,11 +51,31 @@ public class EmployeeDAO {
         }
     }
 
-    public ResultSet getEmployee(int employeeId) throws SQLException {
+    public EmployeeDTO getEmployee(int employeeId) throws SQLException {
         String sql = "SELECT * FROM employees WHERE id=?";
-        PreparedStatement pstmt = connection.prepareStatement(sql);
-        pstmt.setInt(1, employeeId);
-        return pstmt.executeQuery();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, employeeId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return new EmployeeDTO(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("branch"),
+                        rs.getString("bankAccount"),
+                        rs.getInt("salary"),
+                        rs.getString("startDate"),
+                        rs.getInt("vacationDays"),
+                        rs.getInt("sickDays"),
+                        rs.getDouble("educationFund"),
+                        rs.getDouble("socialBenefits"),
+                        rs.getString("password"),
+                        rs.getBoolean("isFinishedWorking"),
+                        rs.getBoolean("isLoggedIn")
+                );
+            } else {
+                return null; // or throw an exception if preferred
+            }
+        }
     }
 
     public void updateBranch(int employeeId, String newBranch) throws SQLException {
@@ -128,45 +150,29 @@ public class EmployeeDAO {
         }
     }
 
-    public void addRole(int employeeId, String role) throws SQLException {
-        String sql = "INSERT INTO employee_roles (employeeId, role) VALUES (?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            pstmt.setString(2, role);
-            pstmt.executeUpdate();
-        }
-    }
-
-    public void removeRole(int employeeId, String role) throws SQLException {
-        String sql = "DELETE FROM employee_roles WHERE employeeId=? AND role=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            pstmt.setString(2, role);
-            pstmt.executeUpdate();
-        }
-    }
-
-    public void changeRole(int employeeId, String oldRole, String newRole) throws SQLException {
-        String sql = "UPDATE employee_roles SET role=? WHERE employeeId=? AND role=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, newRole);
-            pstmt.setInt(2, employeeId);
-            pstmt.setString(3, oldRole);
-            pstmt.executeUpdate();
-        }
-    }
-
-    public ResultSet getRoles(int employeeId) throws SQLException {
-        String sql = "SELECT role FROM employee_roles WHERE employeeId=?";
-        PreparedStatement pstmt = connection.prepareStatement(sql);
-        pstmt.setInt(1, employeeId);
-        return pstmt.executeQuery();
-    }
-
-    public ResultSet getAllEmployees() throws SQLException {
+    public List<EmployeeDTO> getAllEmployees() throws SQLException {
         String sql = "SELECT * FROM employees";
-        Statement stmt = connection.createStatement();
-        return stmt.executeQuery(sql);
+        List<EmployeeDTO> employees = new ArrayList<>();
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                employees.add(new EmployeeDTO(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("branch"),
+                        rs.getString("bankAccount"),
+                        rs.getInt("salary"),
+                        rs.getString("startDate"),
+                        rs.getInt("vacationDays"),
+                        rs.getInt("sickDays"),
+                        rs.getDouble("educationFund"),
+                        rs.getDouble("socialBenefits"),
+                        rs.getString("password"),
+                        rs.getBoolean("isFinishedWorking"),
+                        rs.getBoolean("isLoggedIn")
+                ));
+            }
+        }
+        return employees;
     }
 
     public void checkEmployee(int employeeId) throws SQLException { //needed?

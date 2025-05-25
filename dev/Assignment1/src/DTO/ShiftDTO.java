@@ -1,7 +1,5 @@
 package DTO;
 
-import java.util.Map;
-
 public class ShiftDTO {
 
     private String date;
@@ -9,22 +7,25 @@ public class ShiftDTO {
     private int startTime;
     private int endTime;
     private int shiftManagerId;
-    private Map<String, Integer> requiredRoles; // role name -> number required
-    private Map<Integer, String> assignedEmployeesID; // employee id -> role name
-    private Map<Integer, String> availableEmployeesID; // employee id -> role name
+    private int numOfRequiredcashiers;
+    private int numOfRequireddrivers;
+    private int numOfRequiredstoreKeepers;
+    private int numOfRequiredshipmentManagers;
+    private boolean isShipmentShift;
 
     public ShiftDTO(String date, String shiftType, int startTime, int endTime, int shiftManagerId,
-            Map<String, Integer> requiredRoles,
-            Map<Integer, String> assignedEmployeesID,
-            Map<Integer, String> availableEmployeesID) {
+            int numOfRequiredcashiers, int numOfRequireddrivers, int numOfRequiredstoreKeepers,
+            int numOfRequiredshipmentManagers, boolean isShipmentShift) {
         this.date = date;
         this.shiftType = shiftType;
         this.startTime = startTime;
         this.endTime = endTime;
         this.shiftManagerId = shiftManagerId;
-        this.requiredRoles = requiredRoles;
-        this.assignedEmployeesID = assignedEmployeesID;
-        this.availableEmployeesID = availableEmployeesID;
+        this.numOfRequiredcashiers = numOfRequiredcashiers;
+        this.numOfRequireddrivers = numOfRequireddrivers;
+        this.numOfRequiredstoreKeepers = numOfRequiredstoreKeepers;
+        this.numOfRequiredshipmentManagers = numOfRequiredshipmentManagers;
+        this.isShipmentShift = isShipmentShift;
     }
 
     public String getDate() {
@@ -47,15 +48,56 @@ public class ShiftDTO {
         return shiftManagerId;
     }
 
-    public Map<String, Integer> getRequiredRoles() {
-        return requiredRoles;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public Map<Integer, String> getAssignedEmployeesID() {
-        return assignedEmployeesID;
+    public void setShiftType(String shiftType) {
+        this.shiftType = shiftType;
     }
 
-    public Map<Integer, String> getAvailableEmployeesID() {
-        return availableEmployeesID;
+    public void setStartTime(int startTime) {
+        this.startTime = startTime;
     }
+
+    public void setEndTime(int endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setShiftManagerId(int shiftManagerId) {
+        this.shiftManagerId = shiftManagerId;
+    }
+
+    public int getNumOfRequiredcashiers() {
+        return numOfRequiredcashiers;
+    }
+
+    public int getNumOfRequireddrivers() {
+        return numOfRequireddrivers;
+    }
+
+    public int getNumOfRequiredstoreKeepers() {
+        return numOfRequiredstoreKeepers;
+    }
+
+    public int getNumOfRequiredshipmentManagers() {
+        return numOfRequiredshipmentManagers;
+    }
+
+    public void setNumOfRequiredcashiers(int numOfRequiredcashiers) {
+        this.numOfRequiredcashiers = numOfRequiredcashiers;
+    }
+
+    public void setNumOfRequireddrivers(int numOfRequireddrivers) {
+        this.numOfRequireddrivers = numOfRequireddrivers;
+    }
+
+    public void setNumOfRequiredstoreKeepers(int numOfRequiredstoreKeepers) {
+        this.numOfRequiredstoreKeepers = numOfRequiredstoreKeepers;
+    }
+
+    public void setNumOfRequiredshipmentManagers(int numOfRequiredshipmentManagers) {
+        this.numOfRequiredshipmentManagers = numOfRequiredshipmentManagers;
+    }
+
 }

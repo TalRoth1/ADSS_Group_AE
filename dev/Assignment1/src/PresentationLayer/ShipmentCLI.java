@@ -1,24 +1,22 @@
 package PresentationLayer;
 
-import DomainLayer.ShipmentFacade;
-import DomainLayer.TruckDL;
-
-import java.net.StandardSocketOptions;
-import java.util.List;
-
 import DomainLayer.DriverDL;
 import DomainLayer.LocationDL;
+import DomainLayer.ShipmentDL;
+import DomainLayer.ShipmentFacade;
+import DomainLayer.TruckDL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.HashMap;
-import DomainLayer.ShipmentDL;
 
-public class UIController {
+public class ShipmentCLI {
+
     public ShipmentFacade shipmentFacade;
     Scanner scanner = new Scanner(System.in);
 
-    public UIController() {
+    public ShipmentCLI() {
         shipmentFacade = new ShipmentFacade();
     }
 
@@ -48,7 +46,6 @@ public class UIController {
         return startLocation;
     }
 
-
     public List<LocationDL> ChooseLocations() {
         boolean flag = true;
         List<LocationDL> locations = new ArrayList<>();
@@ -59,8 +56,7 @@ public class UIController {
             if (locationsByZone.size() == 0) {
                 System.out.println("No locations found in this zone. Please add a location first.");
                 return null;
-            }
-            else{
+            } else {
                 locations = locationsByZone;
                 flag = false;
             }
@@ -79,9 +75,9 @@ public class UIController {
             int choice = Integer.parseInt(scanner.nextLine());
             if (choice >= 0 && choice < locations.size()) {
                 selectedLocations.add(locations.get(choice));
-            } else if (choice == locations.size())
+            } else if (choice == locations.size()) {
                 flag = false;
-            else {
+            } else {
                 System.out.println("Invalid choice. Please try again.");
             }
         }
@@ -179,13 +175,14 @@ public class UIController {
                     }
                     System.out.println("Do you want to add more items? (y/n)");
                     String answer = scanner.nextLine();
-                    if (answer.equalsIgnoreCase("n"))
+                    if (answer.equalsIgnoreCase("n")) {
                         flag2 = false;
+                    }
                 }
                 items.put(location, itemList);
-            } else if (choice == locations.size())
+            } else if (choice == locations.size()) {
                 flag = false;
-            else {
+            } else {
                 System.out.println("Invalid choice. Please try again.");
             }
         }
@@ -276,10 +273,11 @@ public class UIController {
         while (flag) {
             System.out.println("Please enter the driver license types or finish to end: ");
             String licenseType = scanner.nextLine();
-            if (licenseType.equalsIgnoreCase("Finish"))
+            if (licenseType.equalsIgnoreCase("Finish")) {
                 flag = false;
-            else
+            } else {
                 licenses.add(licenseType);
+            }
         }
         shipmentFacade.AddDriver(name, licenses);
     }
@@ -353,7 +351,7 @@ public class UIController {
 
     public void EditShipement() {
         List<ShipmentDL> shipments = shipmentFacade.GetStatusShipement("Pending");
-        if(shipments.size() == 0) {
+        if (shipments.size() == 0) {
             System.out.println("There are no shipments to edit.");
             return;
         }
@@ -417,13 +415,13 @@ public class UIController {
         System.out.println("4. Shipment Completed");
         System.out.println("5. Dont Change");
         int choice = Integer.parseInt(scanner.nextLine());
-        List<ShipmentDL> shipments  = new ArrayList<>();
+        List<ShipmentDL> shipments = new ArrayList<>();
         ShipmentDL shipment = null;
         boolean flag;
         switch (choice) {
             case 1:
                 shipments = shipmentFacade.GetStatusShipement("Pending");
-                if(shipments.size() == 0) {
+                if (shipments.size() == 0) {
                     System.out.println("There are no shipments to send.");
                     return;
                 }
@@ -443,19 +441,18 @@ public class UIController {
                 }
                 try {
                     shipmentFacade.ChangeStatus(shipment, "SENT");
-                }
-                catch (Exception e) {
-                    if(e.getMessage().equals("Driver is busy")) {
+                } catch (Exception e) {
+                    if (e.getMessage().equals("Driver is busy")) {
                         System.out.println("The driver is busy, please wait for them to finish their current shipment, or change the driver.");
                     }
-                    if(e.getMessage().equals("Truck is busy")) {
+                    if (e.getMessage().equals("Truck is busy")) {
                         System.out.println("The Truck is busy, please wait for it to finish its current shipment, or change the truck.");
                     }
                 }
                 break;
             case 2:
                 shipments = shipmentFacade.GetStatusShipement("Sent");
-                if(shipments.size() == 0) {
+                if (shipments.size() == 0) {
                     System.out.println("There are no shipments to report a problem to.");
                     return;
                 }
@@ -473,18 +470,15 @@ public class UIController {
                         System.out.println("Invalid choice. Please try again.");
                     }
                 }
-                try
-                {
+                try {
                     shipmentFacade.ChangeStatus(shipment, "PROBLEM");
-                }
-                catch(Exception e)
-                {
+                } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
                 break;
             case 3:
                 shipments = shipmentFacade.GetStatusShipement("Pending");
-                if(shipments.size() == 0) {
+                if (shipments.size() == 0) {
                     System.out.println("There are no shipments to cancel.");
                     return;
                 }
@@ -502,18 +496,15 @@ public class UIController {
                         System.out.println("Invalid choice. Please try again.");
                     }
                 }
-                try
-                {
+                try {
                     shipmentFacade.ChangeStatus(shipment, "CANCELLED");
-                }
-                catch(Exception e)
-                {
+                } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
                 break;
             case 4:
                 shipments = shipmentFacade.GetStatusShipement("Sent");
-                if(shipments.size() == 0) {
+                if (shipments.size() == 0) {
                     System.out.println("No shipments are able to be completed.");
                     return;
                 }
@@ -531,12 +522,9 @@ public class UIController {
                         System.out.println("Invalid choice. Please try again.");
                     }
                 }
-                try
-                {
+                try {
                     shipmentFacade.ChangeStatus(shipment, "COMPLETED");
-                }
-                catch(Exception e)
-                {
+                } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
                 break;
@@ -547,8 +535,7 @@ public class UIController {
         }
     }
 
-    public void ShowDocuments()
-    {
+    public void ShowDocuments() {
         List<ShipmentDL> shipments = shipmentFacade.GetStatusShipement("Pending");
         shipments.addAll(shipmentFacade.GetStatusShipement("Sent"));
         shipments.addAll(shipmentFacade.GetStatusShipement("Problem"));

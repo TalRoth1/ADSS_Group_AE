@@ -1,6 +1,8 @@
 package DataLayer;
 
 import java.sql.*;
+import java.util.ArrayList;
+import DTO.ShiftDTO;
 
 public class ShiftDAO {
 
@@ -50,14 +52,25 @@ public class ShiftDAO {
         }
     }
 
-    public ResultSet getAllShifts() throws SQLException {
+    public ArrayList<ShiftDTO> getAllShifts() throws SQLException {
         String sql = "SELECT * FROM shifts";
-        try (Statement stmt = connection.createStatement()) {
-            return stmt.executeQuery(sql);
+        ArrayList<ShiftDTO> shifts = new ArrayList<>();
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                ShiftDTO shift = new ShiftDTO(
+                        rs.getString("date"),
+                        rs.getString("shiftType"),
+                        rs.getInt("startTime"),
+                        rs.getInt("endTime"),
+                        rs.getInt("shiftManagerId")
+                );
+                shifts.add(shift);
+            }
         } catch (SQLException e) {
             System.out.println("Error getting all shifts: " + e.getMessage());
             throw e;
         }
+        return shifts;
     }
 
     public void getRole(String date, String shiftType, int employeeId) throws SQLException {

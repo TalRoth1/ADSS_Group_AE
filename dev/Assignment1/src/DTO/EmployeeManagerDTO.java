@@ -1,6 +1,6 @@
 package DTO;
 
-public class EmployeeDTO {
+public class EmployeeManagerDTO {
 
     private int id;
     private String name;
@@ -16,7 +16,7 @@ public class EmployeeDTO {
     private boolean isFinishedWorking;
     private boolean isLoggedIn;
 
-    public EmployeeDTO(int id, String name, String branch, String bankAccount, int salary, String startDate,
+    public EmployeeManagerDTO(int id, String name, String branch, String bankAccount, int salary, String startDate,
             int vacationDays, int sickDays, double educationFund, double socialBenefits,
             String password) {
         this.id = id;
@@ -82,16 +82,16 @@ public class EmployeeDTO {
         return isFinishedWorking;
     }
 
-    public void setFinishedWorking() {
-        isFinishedWorking = true;
+    public void setFinishedWorking(boolean isFinishedWorking) {
+        this.isFinishedWorking = isFinishedWorking;
     }
 
     public boolean isLoggedIn() {
         return isLoggedIn;
     }
 
-    public void setLoggedIn() {
-        isLoggedIn = true;
+    public void setLoggedIn(boolean isLoggedIn) {
+        this.isLoggedIn = isLoggedIn;
     }
 
 }

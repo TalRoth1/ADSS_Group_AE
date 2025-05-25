@@ -1,6 +1,9 @@
 package DataLayer;
 
 import java.sql.ResultSet;
+import DTO.ShiftDTO;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class ShiftController {
 
@@ -26,18 +29,30 @@ public class ShiftController {
         }
     }
 
-    public ResultSet getShift(String date, String shiftType) {
+    public ShiftDTO getShift(String date, String shiftType) {
         try {
-            return shiftDAO.getShift(date, shiftType);
+            ResultSet rs = shiftDAO.getShift(date, shiftType);
+            if (rs.next()) {
+                return new ShiftDTO(rs.getString("date"), rs.getString("shiftType"),
+                        rs.getInt("startTime"), rs.getInt("endTime"), rs.getInt("shiftManagerId"));
+            } else {
+                return null; // No shift found
+            }
         } catch (Exception e) {
             System.out.println("Error getting shift: " + e.getMessage());
             return null;
         }
     }
 
-    public ResultSet getAllShifts() {
+    public ArrayList<ShiftDTO> getAllShifts() {
         try {
-            return shiftDAO.getAllShifts();
+            ResultSet rs = shiftDAO.getAllShifts();
+            ArrayList<ShiftDTO> shifts = new ArrayList<>();
+            while (rs.next()) {
+                shifts.add(new ShiftDTO(rs.getString("date"), rs.getString("shiftType"),
+                        rs.getInt("startTime"), rs.getInt("endTime"), rs.getInt("shiftManagerId")));
+            }
+            return shifts;
         } catch (Exception e) {
             System.out.println("Error getting all shifts: " + e.getMessage());
             return null;

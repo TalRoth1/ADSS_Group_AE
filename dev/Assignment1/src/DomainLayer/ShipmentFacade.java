@@ -1,20 +1,22 @@
 package DomainLayer;
-import java.util.List;
-import java.util.Map;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ShipmentFacade {
+
     public List<ShipmentDL> shipments = new ArrayList<>();
     public List<LocationDL> locations = new ArrayList<>();
     public List<DriverDL> drivers = new ArrayList<>();
     public List<TruckDL> trucks = new ArrayList<>();
     public Map<String, Float> Items = new HashMap<>(Map.of("egg carton", 1.5f, "milk", 1f, "bread", 0.5f, "cheese", 1f, "butter", 0.25f, "yogurt", 0.6f, "juice", 0.75f, "soda", 0.75f, "water", 1f, "coffee", 0.5f));
 
-    public void CreateShipment(TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String,Integer>> items) throws Exception {
+    public void CreateShipment(TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items) throws Exception {
         ShipmentDL shipment = new ShipmentDL(truck, driver, origin, destinations, items);
-        if(!shipment.DriverCheck(driver))
-        {
+        if (!shipment.DriverCheck(driver)) {
             throw new Exception("Driver does not have the right license for this truck");
         }
         if (!shipment.WeightCheck(Items)) {
@@ -23,22 +25,20 @@ public class ShipmentFacade {
         shipment.setWeight(Items);
         shipments.add(shipment);
     }
+
     public void ChangeStatus(ShipmentDL shipment, String stat) throws Exception {
-        if(stat.equals("SENT"))
-        {
+        if (stat.equals("SENT")) {
             if (shipment.DriverBusyCheck()) {
                 throw new Exception("Driver is busy");
             }
-            if (shipment.TruckBusyCheck())
-            {
+            if (shipment.TruckBusyCheck()) {
                 throw new Exception("Truck is busy");
             }
             shipment.ChangeAvailablity();
         }
         shipment.ChangeStatus(stat);
         //assuming both where busy beforehand
-        if(stat.equals("COMPLETED") || stat.equals("PROBLEM") || stat.equals("CANCELLED"))
-        {
+        if (stat.equals("COMPLETED") || stat.equals("PROBLEM") || stat.equals("CANCELLED")) {
             shipment.ChangeAvailablity();
         }
     }
@@ -53,8 +53,7 @@ public class ShipmentFacade {
         return ans;
     }
 
-    public void RemoveShipment(ShipmentDL shipment)
-    {
+    public void RemoveShipment(ShipmentDL shipment) {
         shipments.remove(shipment);
     }
 
@@ -64,8 +63,11 @@ public class ShipmentFacade {
         return location;
     }
 
-    public DriverDL AddDriver(String name, List<String> licenseType) {
-        DriverDL driver = new DriverDL(name, licenseType);
+    public DriverDL AddDriver(int id, String name, String branch, String bankAccount, int salary, LocalDate startDate,
+            int vacationDays, int sickDays, double educationFund, double socialBenefits,
+            String password, List<String> licenseType) {
+        DriverDL driver = new DriverDL(id, name, branch, bankAccount, salary, startDate,
+                vacationDays, sickDays, educationFund, socialBenefits, password, licenseType);
         drivers.add(driver);
         return driver;
     }
@@ -88,53 +90,49 @@ public class ShipmentFacade {
         return itemList;
     }
 
-    public List<LocationDL> LocationByZone(String zone)
-    {
+    public List<LocationDL> LocationByZone(String zone) {
         List<LocationDL> ans = new ArrayList<>();
-        for(LocationDL loc : locations)
-        {
-            if(loc.getZone().equals(zone))
+        for (LocationDL loc : locations) {
+            if (loc.getZone().equals(zone)) {
                 ans.add(loc);
+            }
         }
         return ans;
     }
 
-    public void EditShipement(ShipmentDL shipment, TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String,Integer>> items) throws Exception {
+    public void EditShipement(ShipmentDL shipment, TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items) throws Exception {
         //assuming that the shipment exists in the list
         int index = shipments.indexOf(shipment);
         ShipmentDL shipmentToEdit = shipments.get(index);
-        if(truck != null) {
-            if(shipmentToEdit.EditTruck(truck.GetNumber(), trucks, Items)) {
+        if (truck != null) {
+            if (shipmentToEdit.EditTruck(truck.GetNumber(), trucks, Items)) {
                 throw new Exception("Truck is overweight or the driver does not have the right license for this truck");
             }
         }
-        if(driver != null) {
+        if (driver != null) {
             Boolean check = shipmentToEdit.EditDriver(driver);
-            if(!check) {
+            if (!check) {
                 throw new Exception("Driver does not have the right license for this truck");
             }
         }
-        if(origin != null) {
+        if (origin != null) {
             shipmentToEdit.EditOrigin(origin, locations);
         }
-        if(destinations != null) {
+        if (destinations != null) {
             Boolean check = shipmentToEdit.EditDestinations(items, Items);
-            if(!check)
-            {
+            if (!check) {
                 throw new Exception("Truck cannot support the new weight");
             }
         }
-        if(items != null) {
+        if (items != null) {
             Boolean check = shipmentToEdit.EditDestinations(items, Items);
-            if(!check)
-            {
+            if (!check) {
                 throw new Exception("Truck cannot support the new weight");
             }
         }
     }
 
-    public String GetDocumentString(ShipmentDL shipment)
-    {
+    public String GetDocumentString(ShipmentDL shipment) {
         return shipment.getDocument().toString() + "\n" + "Status: " + shipment.getStatus().toString();
     }
 }
