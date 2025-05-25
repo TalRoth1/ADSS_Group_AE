@@ -3,11 +3,11 @@ package tests;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import Domain.AgreementDL;
+import Domain.ContractDL;
+import Domain.DeliveryMethod;
 import Domain.Item;
 import Domain.SupplierDL;
 import Domain.SupplierFacade;
-import Utils.DeliveryMethod;
 import Utils.PaymentMethod;
 
 import java.util.*;
@@ -54,7 +54,7 @@ class SupplierTest {
         List<String[]> boq = List.of(new String[][]{new String[]{"1", "5", "10"}});
         supplierFacade.addAgreement(1, itemCat, boq);
 
-        AgreementDL agreement = supplierFacade.getAgreement(1, 1);
+        ContractDL agreement = supplierFacade.getAgreement(1, 1);
         assertNotNull(agreement);
         assertEquals(1, agreement.getAgreementID());
         assertEquals(1, agreement.getBillOfQuantities().size());
@@ -66,7 +66,7 @@ class SupplierTest {
         supplierFacade.addAgreement(1, Map.of(1, 10), List.of(new String[][]{new String[]{"1", "5", "10"}}));
 
         supplierFacade.changeAgreement(1, 1, List.of(new String[][]{new String[]{"1", "10", "20"}}));
-        AgreementDL agreement = supplierFacade.getAgreement(1, 1);
+        ContractDL agreement = supplierFacade.getAgreement(1, 1);
         assertNotNull(agreement);
         assertEquals(10, agreement.getBillOfQuantities().get(0).getMinimumQuantity());
     }

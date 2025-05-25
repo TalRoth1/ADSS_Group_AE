@@ -8,10 +8,13 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
+import Domain.DeliveryMethod;
+import Domain.OnOrderDelivery;
 import Domain.OrderDL;
 import Domain.OrderFacade;
+import Domain.PeriodicDelivery;
+import Domain.PickupDelivery;
 import Domain.SupplierFacade;
-import Utils.DeliveryMethod;
 import Utils.PaymentMethod;
 
 public class CLI {
@@ -116,13 +119,7 @@ public class CLI {
         String contactEmail = Scanner.nextLine();
         System.out.println("Contact Phone:");
         String contactPhone = Scanner.nextLine();
-        System.out.println("Delivery Method (Scheduled, On Order or Pickup):");
-        DeliveryMethod deliveryMethod = DeliveryMethod.fromString(Scanner.nextLine());
-        while (deliveryMethod == null) {
-            System.out.println("Invalid delivery method. Please enter 'Scheduled', 'On Order' or 'Pickup':");
-            deliveryMethod = DeliveryMethod.fromString(Scanner.nextLine());
-        }
-        sf.addSupplier(companyID, bankAccount, paymentMethod, contactEmail, contactPhone, deliveryMethod, null);
+        sf.addSupplier(companyID, bankAccount, paymentMethod, contactEmail, contactPhone, null);
     }
 
     public void addAgreement(Scanner Scanner) {
@@ -156,7 +153,9 @@ public class CLI {
             System.out.println("Do you want to add another item? (Y/N):");
             cont = Scanner.nextLine().toUpperCase();
         }
-        sf.addAgreement(supplierID, itemCat, billOfQuantities);
+        System.out.println("Delivery Method (periodic, on order or pickup):");
+        DeliveryMethod deliveryMethod = parseDeliveryMethod(Scanner);
+        sf.addAgreement(supplierID, itemCat, billOfQuantities, deliveryMethod);
     }
 
     public void changeAgreement(Scanner scanner) {
@@ -178,6 +177,8 @@ public class CLI {
             System.out.println("Do you want to add another item? (Y/N):");
             cont = scanner.nextLine().toUpperCase();
         }
+        System.out.println("New Delivery Method (periodic, on order or pickup):");
+        DeliveryMethod deliveryMethod = parseDeliveryMethod(scanner);
         sf.changeAgreement(supplierID, agreementID, billOfQuantities);
     }
 
@@ -224,7 +225,7 @@ public class CLI {
         int supplierID = Integer.parseInt(scanner.nextLine());
         System.out.println("Agreement ID:");
         int agreementID = Integer.parseInt(scanner.nextLine());
-        Date orderDate = getOrderDate(scanner);
+        Date orderDate = parseOrderDate(scanner);
         System.out.println("Destination:");
         String destination = scanner.nextLine();
         System.out.println("Order Items (Item ID and Quantity seperated by ,):");
@@ -247,19 +248,51 @@ public class CLI {
         int orderID = Integer.parseInt(scanner.nextLine());
         System.out.println("New Destination:");
         String destination = scanner.nextLine();
-        Date orderDate = getOrderDate(scanner);
-        System.out.println("New Agreement ID:");
-        int agreementID = Integer.parseInt(scanner.nextLine());
+        Date orderDate = parseOrderDate(scanner);
         System.out.println("New Order Items (Item ID and Quantity seperated by ,):");
         List<int[]> items = getOrderItems(scanner);
         try {
-            of.changeOrder(orderID, destination, orderDate, agreementID, items);
+            of.changeOrder(orderID, destination, orderDate, items);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private Date getOrderDate(Scanner scanner) {
+    private DeliveryMethod parseDeliveryMethod(Scanner scanner) {
+        String input = scanner.nextLine();
+        DeliveryMethod deliveryMethod = null;
+        while (deliveryMethod == null) {
+            switch (input.toLowerCase()) {
+                case "periodic":{
+                    System.err.println("Please enter the delivery interval in days:");
+                    int interval = Integer.parseInt(scanner.nextLine());
+                    while (interval <= 0) {
+                        System.out.println("Invalid interval. Please enter a positive number:");
+                        interval = Integer.parseInt(scanner.nextLine());
+                    }
+                    // Uncomment the following lines if you want to add order items for periodic delivery creation
+                    // System.out.println("Order Items (Item ID and Quantity seperated by ,):");
+                    // List<int[]> items = getOrderItems(scanner);
+                    deliveryMethod = new PeriodicDelivery(interval, null);
+                }
+                    break;
+                case "on order":
+                    deliveryMethod = new OnOrderDelivery();
+                    break;
+                case "pickup":
+                    deliveryMethod = new PickupDelivery();
+                    break;
+                default:
+                    System.out.println("Invalid delivery method. Please enter 'Scheduled', 'On Order' or 'Pickup':");
+                    input = scanner.nextLine();
+            }
+            System.out.println("Invalid delivery method. Please enter 'Scheduled', 'On Order' or 'Pickup':");
+            input = scanner.nextLine();
+        }
+        return deliveryMethod;
+    }
+
+    private Date parseOrderDate(Scanner scanner) {
         Date orderDate = null;
         do{
             System.out.println("Order Date (YYYY-MM-DD):");

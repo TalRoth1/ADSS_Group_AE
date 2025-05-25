@@ -55,4 +55,12 @@ public class OrderItemDL
         return "{itemID=" + itemID + ", quantity=" + quantity + ", catalogID=" + catalogID + ", totalPrice="
                 + totalPrice + "}";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof OrderItemDL)) return false;
+        OrderItemDL other = (OrderItemDL) obj;
+        return itemID == other.itemID && quantity == other.quantity && catalogID == other.catalogID && Double.compare(other.totalPrice, totalPrice) == 0;
+    }
 }

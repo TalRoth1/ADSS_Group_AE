@@ -8,7 +8,7 @@ import Utils.OrderStatus;
 public class OrderDL {
     private final int orderID;
     private final int supplierID;
-    private int agreementID;
+    private final int agreementID;
     private Date orderDate;
     private String destination;
     private List<OrderItemDL> orderItems;
@@ -61,10 +61,6 @@ public class OrderDL {
 
     public OrderStatus getOrderStatus() {
         return orderStatus;
-    }
-
-    public void setAgreementID(int agreementID) {
-        this.agreementID = agreementID;
     }
 
     public void setDestination(String destination) {

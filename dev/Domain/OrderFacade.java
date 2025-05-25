@@ -39,23 +39,58 @@ public class OrderFacade {
         orders.add(newOrder);
     }
 
-    public void changeOrder(int orderID, String destination, Date orderDate, int agreementID, List<int[]> newItems)
-            throws IllegalArgumentException {
-        try {
+    public void changeOrder(int orderID, String destination, Date newDate, List<int[]> newItems) throws IllegalArgumentException {
+        try{
             OrderDL order = getOrder(orderID);
+            if(order.getOrderStatus() != OrderStatus.CANCELLED) {
+                throw new IllegalArgumentException("Cannot change items of a " + order.getOrderStatus().toString().toLowerCase() + "order.");
+            }
+            if (!order.getDestination().equals(destination)) {
+                changeOrderDestination(orderID, destination);
+            }
+            if (!order.getOrderDate().equals(newDate)) {
+                changeOrderDate(orderID, newDate);
+            }
             List<OrderItemDL> items = new ArrayList<>();
             for (int[] item : newItems) {
                 int itemID = item[0];
                 int quantity = item[1];
-                int catalogID = getCatalogID(itemID, order.getSupplierID(), agreementID);
-                double totalPrice = calculateTotalPrice(quantity, catalogID, order.getSupplierID(), agreementID);
+                int catalogID = getCatalogID(itemID, order.getSupplierID(), order.getAgreementID());
+                double totalPrice = calculateTotalPrice(quantity, catalogID, order.getSupplierID(), order.getAgreementID());
                 OrderItemDL newItem = new OrderItemDL(itemID, quantity, catalogID, totalPrice);
                 items.add(newItem);
             }
-            order.setOrderItems(items);
-            order.setAgreementID(agreementID);
+            if (!order.getOrderItems().equals(items)){
+                changeOrderItems(orderID, items);
+            }
+        }
+        catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Order not found: " + orderID);
+        }
+    }
+
+    private void changeOrderDestination(int orderID, String destination) throws IllegalArgumentException {
+        try {
+            OrderDL order = getOrder(orderID);
             order.setDestination(destination);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Order not found: " + orderID);
+        }
+    }
+
+    private void changeOrderDate(int orderID, Date orderDate) throws IllegalArgumentException {
+        try {
+            OrderDL order = getOrder(orderID);
             order.setOrderDate(orderDate);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Order not found: " + orderID);
+        }
+    }
+
+    private void changeOrderItems(int orderID, List<OrderItemDL> newItems) throws IllegalArgumentException {
+        try {
+            OrderDL order = getOrder(orderID);
+            order.setOrderItems(newItems);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Order not found: " + orderID);
         }
@@ -89,6 +124,33 @@ public class OrderFacade {
         }
         return orderHistory;
     }
+
+    
+    // public void updateScheduledDeliveryItems(int supplierID, int agreementID, List<int[]> newItems) throws IllegalArgumentException {
+    //     SupplierDL supplier = sf.getSupplier(supplierID);
+    //     if (supplier == null) {
+    //         throw new IllegalArgumentException("Supplier not found: " + supplierID);
+    //     }
+    //     AgreementDL agreement = supplier.getAgreement(agreementID);
+    //     if (agreement == null) {
+    //         throw new IllegalArgumentException("Agreement not found: " + agreementID);
+    //     }
+    //     List<OrderItemDL> items = new ArrayList<>();
+    //     try{
+    //         for (int[] item : newItems) {
+    //             int itemID = item[0];
+    //             int quantity = item[1];
+    //             int catalogID = getCatalogID(itemID, supplierID, agreementID);
+    //             double totalPrice = calculateTotalPrice(quantity, catalogID, supplierID, agreementID);
+    //             OrderItemDL newItem = new OrderItemDL(itemID, quantity, catalogID, totalPrice);
+    //             items.add(newItem);
+    //         }
+    //         agreement.getDeliveryMethod().setItems(items);
+    //     } catch (IllegalArgumentException e) {
+    //         throw new IllegalArgumentException("Error updating scheduled delivery items: " + e.getMessage());
+    //     }
+        
+    // }
 
     private boolean verifySupplier(int supplierID){
         return sf.getSupplier(supplierID) != null;

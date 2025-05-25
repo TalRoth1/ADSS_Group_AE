@@ -1,9 +1,10 @@
 package Domain;
 
-import Utils.DeliveryMethod;
 import Utils.PaymentMethod;
 
 import java.util.List;
+
+import DTOs.SupplierDTO;
 
 public class SupplierDL {
     private int supplierID;
@@ -12,19 +13,17 @@ public class SupplierDL {
     private PaymentMethod paymentMethod;
     private String contactMail;
     private String contactPhone;
-    private DeliveryMethod deliveryMethod;
-    private List<AgreementDL> agreements;
+    private List<ContractDL> agreements;
     private int nextAgreementID = 1; // Static variable to keep track of the next agreement ID
 
     public SupplierDL(int supplierID, int companyID, int banckAccount, PaymentMethod paymentMethod, String contactMail,
-            String contactPhone, DeliveryMethod deliveryMethod, List<AgreementDL> agreements) {
+            String contactPhone, List<ContractDL> agreements) {
         this.supplierID = supplierID;
         this.companyID = companyID;
         this.bankAccount = banckAccount;
         this.paymentMethod = paymentMethod;
         this.contactMail = contactMail;
         this.contactPhone = contactPhone;
-        this.deliveryMethod = deliveryMethod;
         this.agreements = agreements;
     }
 
@@ -72,20 +71,12 @@ public class SupplierDL {
         return contactPhone;
     }
 
-    public void setDeliveryMethod(DeliveryMethod deliveryMethod) {
-        this.deliveryMethod = deliveryMethod;
-    }
-
-    public DeliveryMethod getDeliveryMethod() {
-        return deliveryMethod;
-    }
-
-    public void addAgreement(AgreementDL agreement) {
+    public void addAgreement(ContractDL agreement) {
         this.agreements.add(agreement);
     }
 
     public void removeAgreement(int agreementID) {
-        for (AgreementDL agreement : this.agreements) {
+        for (ContractDL agreement : this.agreements) {
             if (agreement.getAgreementID() == agreementID) {
                 this.agreements.remove(agreement);
                 break;
@@ -93,15 +84,28 @@ public class SupplierDL {
         }
     }
 
-    public void setAgreements(List<AgreementDL> agreements) {
+    public void setAgreements(List<ContractDL> agreements) {
         this.agreements = agreements;
     }
 
-    public List<AgreementDL> getAgreements() {
+    public List<ContractDL> getAgreements() {
         return agreements;
+    }
+
+    public ContractDL getAgreement(int agreementID) {
+        for (ContractDL agreement : agreements) {
+            if (agreement.getAgreementID() == agreementID) {
+                return agreement;
+            }
+        }
+        return null; // Agreement not found
     }
 
     public int getNextAgreementID() {
         return nextAgreementID++;
+    }
+
+    public SupplierDTO toDTO() {
+        return new SupplierDTO(supplierID, companyID, bankAccount, paymentMethod, contactMail, contactPhone, agreements);
     }
 }

@@ -3,15 +3,17 @@ package Domain;
 import java.util.List;
 import java.util.Map;
 
-public class AgreementDL {
+public class ContractDL {
     private int agreementID;
     private Map<Item, Integer> itemCatalog;
     private List<DiscountDL> billOfQuantities;
+    private DeliveryMethod deliveryMethod;
 
-    public AgreementDL(int agreementID,Map <Item, Integer> itemCatalog, List<DiscountDL> billOfQuantities) {
+    public ContractDL(int agreementID,Map <Item, Integer> itemCatalog, List<DiscountDL> billOfQuantities ,DeliveryMethod deliveryMethod) {
         this.agreementID = agreementID;
         this.itemCatalog = itemCatalog;
         this.billOfQuantities = billOfQuantities;
+        this.deliveryMethod = deliveryMethod;
     }
 
     public int getAgreementID() {
@@ -33,6 +35,13 @@ public class AgreementDL {
 
     public void setBillOfQuantities(List<DiscountDL> billOfQuantities) {
         this.billOfQuantities = billOfQuantities;
+    }
+    public DeliveryMethod getDeliveryMethod() {
+        return deliveryMethod;
+    }
+
+    public void setDeliveryMethod(DeliveryMethod deliveryMethod) {
+        this.deliveryMethod = deliveryMethod;
     }
 
     public Item getItem(int itemID) {
