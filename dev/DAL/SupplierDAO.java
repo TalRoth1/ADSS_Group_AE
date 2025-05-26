@@ -2,7 +2,7 @@ package DAL;
 
 public class SupplierDAO 
 {
-    private boolean isPersistant = false;
+    private boolean isPersisted = false;
     private int id;
     private int companyID;
     private int bankAccount;
@@ -34,7 +34,7 @@ public class SupplierDAO
 
     public void setBankAccount(int bankAccount) 
     {
-        if(isPersistant)
+        if(isPersisted)
         {
             this.bankAccount = bankAccount;
             supplierController.Update(id, "bankAccount", String.valueOf(bankAccount));
@@ -43,7 +43,7 @@ public class SupplierDAO
 
     public void persist()
     {
-        isPersistant = true;
+        isPersisted = true;
         supplierController.insert(this);
     }
 }
