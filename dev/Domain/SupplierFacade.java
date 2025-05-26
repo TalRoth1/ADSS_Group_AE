@@ -19,9 +19,9 @@ public class SupplierFacade {
     }
 
     public void addSupplier(int companyID, int bankAccount, PaymentMethod paymentMethod, String contactEmail,
-            String contactPhone, List<ContractDL> agreements) {
+            String contactPhone, List<ContractDL> contracts) {
         SupplierDL newSupplier = new SupplierDL(nextId++, companyID, bankAccount, paymentMethod, contactEmail,
-                contactPhone, agreements);
+                contactPhone, contracts);
         suppliers.add(newSupplier);
     }
 
@@ -34,10 +34,10 @@ public class SupplierFacade {
         return null; // Supplier not found
     }
 
-    public void addAgreement(int supplierID, Map<Integer, Integer> itemCat, List<String[]> billOfQuantities, 
+    public void addContract(int supplierID, Map<Integer, Integer> itemCat, List<String[]> billOfQuantities, 
             DeliveryMethod deliveryMethod) {
         SupplierDL supplier = getSupplier(supplierID);
-        int agreementID = supplier.getNextAgreementID();
+        int contractID = supplier.getNextContractID();
         List<DiscountDL> discounts = new ArrayList<>();
         for (String[] item : billOfQuantities) {
             int itemID = Integer.parseInt(item[0]);
@@ -56,17 +56,17 @@ public class SupplierFacade {
             }
         }
         if (supplier != null) {
-            ContractDL newAgreement = new ContractDL(agreementID, itemCatalog, discounts, deliveryMethod);
-            supplier.addAgreement(newAgreement);
+            ContractDL newContract = new ContractDL(contractID, itemCatalog, discounts, deliveryMethod);
+            supplier.addContract(newContract);
         }
     }
 
-    public void changeAgreement(int supplierID, int agreementID, List<String[]> newBill) {
+    public void changeContract(int supplierID, int contractID, List<String[]> newBill) {
         List<DiscountDL> newBoQ = new ArrayList<>();
         SupplierDL supplier = getSupplier(supplierID);
         if (supplier != null) {
-            for (ContractDL agreement : supplier.getAgreements()) {
-                if (agreement.getAgreementID() == agreementID) {
+            for (ContractDL contract : supplier.getContracts()) {
+                if (contract.getContractID() == contractID) {
                     for (String[] item : newBill) {
                         int itemID = Integer.parseInt(item[0]);
                         int minimumQuantity = Integer.parseInt(item[1]);
@@ -74,38 +74,38 @@ public class SupplierFacade {
                         DiscountDL discount = new DiscountDL(itemID, minimumQuantity, discountPercentage);
                         newBoQ.add(discount);
                     }
-                    agreement.setBillOfQuantities(newBoQ);
+                    contract.setBillOfQuantities(newBoQ);
                     break;
                 }
             }
         }
     }
 
-    public void removeAgreement(int supplierID, int agreementID) {
+    public void removeContract(int supplierID, int contractID) {
         SupplierDL supplier = getSupplier(supplierID);
         if (supplier != null) {
-            supplier.removeAgreement(agreementID);
+            supplier.removeContract(contractID);
         }
     }
 
-    public ContractDL getAgreement(int supplierID, int agreementID) {
+    public ContractDL getContract(int supplierID, int contractID) {
         SupplierDL supplier = getSupplier(supplierID);
         if (supplier != null) {
-            for (ContractDL agreement : supplier.getAgreements()) {
-                if (agreement.getAgreementID() == agreementID) {
-                    return agreement;
+            for (ContractDL contract : supplier.getContracts()) {
+                if (contract.getContractID() == contractID) {
+                    return contract;
                 }
             }
         }
-        return null; // Agreement not found
+        return null; // contract not found
     }
 
     public Set<String> getSuppliedItems(int supplierID) {
         SupplierDL supplier = getSupplier(supplierID);
         if (supplier != null) {
             Set<String> suppliedItems = new HashSet<>();
-            for (ContractDL agreement : supplier.getAgreements()) {
-                Map<Item, Integer> itemCatalog = agreement.getItemCatalog();
+            for (ContractDL contract : supplier.getContracts()) {
+                Map<Item, Integer> itemCatalog = contract.getItemCatalog();
                 for (Item item : itemCatalog.keySet()) {
                     suppliedItems.add(item.getName());
                 }
@@ -119,8 +119,8 @@ public class SupplierFacade {
         SupplierDL supplier = getSupplier(supplierID);
         if (supplier != null) {
             Map<Integer, Integer> suppliedItems = new HashMap<>();
-            for (ContractDL agreement : supplier.getAgreements()) {
-                Map<Item, Integer> itemCatalog = agreement.getItemCatalog();
+            for (ContractDL contract : supplier.getContracts()) {
+                Map<Item, Integer> itemCatalog = contract.getItemCatalog();
                 for (Map.Entry<Item, Integer> entry : itemCatalog.entrySet()) {
                     suppliedItems.put(entry.getKey().getItemID(), entry.getValue());
                 }
@@ -157,7 +157,7 @@ public class SupplierFacade {
         List<String[]> billOfQuantities = new ArrayList<>();
         billOfQuantities.add(new String[] { "1", "100", "10" });
         billOfQuantities.add(new String[] { "2", "150", "15" });
-        addAgreement(1, itemCat, billOfQuantities, new PeriodicDelivery(nextId, new ArrayList<>()));
+        addContract(1, itemCat, billOfQuantities, new PeriodicDelivery(nextId, new ArrayList<>()));
 
         addSupplier(2002, 444555666, PaymentMethod.CREDIT, "support@supplier2.com", "+1-555-2222", new ArrayList<>());
         Map<Integer, Integer> itemCat2 = new HashMap<>();
@@ -166,7 +166,7 @@ public class SupplierFacade {
         itemCat2.put(6, 6);
         List<String[]> billOfQuantities2 = new ArrayList<>();
         billOfQuantities.add(new String[] { "6", "200", "5" });
-        addAgreement(2, itemCat2, billOfQuantities2, new OnOrderDelivery());
+        addContract(2, itemCat2, billOfQuantities2, new OnOrderDelivery());
 
         addSupplier(2003, 777888999, PaymentMethod.CREDIT, "hello@supplierthree.com", "+1-555-3333", new ArrayList<>());
         Map<Integer, Integer> itemCat3 = new HashMap<>();
@@ -174,13 +174,13 @@ public class SupplierFacade {
         itemCat3.put(8, 8);
         List<String[]> billOfQuantities3 = new ArrayList<>();
         billOfQuantities.add(new String[] { "7", "120", "12" });
-        addAgreement(3, itemCat3, billOfQuantities3, new PickupDelivery());
+        addContract(3, itemCat3, billOfQuantities3, new PickupDelivery());
         Map<Integer, Integer> itemCat4 = new HashMap<>();
         itemCat4.put(9, 9);
         itemCat4.put(10, 10);
         List<String[]> billOfQuantities4 = new ArrayList<>();
         billOfQuantities.add(new String[] { "10", "100", "8" });
-        addAgreement(3, itemCat4, billOfQuantities4, new PickupDelivery());
+        addContract(3, itemCat4, billOfQuantities4, new PickupDelivery());
     }
 
 }

@@ -13,18 +13,18 @@ public class SupplierDL {
     private PaymentMethod paymentMethod;
     private String contactMail;
     private String contactPhone;
-    private List<ContractDL> agreements;
-    private int nextAgreementID = 1; // Static variable to keep track of the next agreement ID
+    private List<ContractDL> contracts;
+    private int nextcontractID = 1; // Static variable to keep track of the next contract ID
 
     public SupplierDL(int supplierID, int companyID, int banckAccount, PaymentMethod paymentMethod, String contactMail,
-            String contactPhone, List<ContractDL> agreements) {
+            String contactPhone, List<ContractDL> contracts) {
         this.supplierID = supplierID;
         this.companyID = companyID;
         this.bankAccount = banckAccount;
         this.paymentMethod = paymentMethod;
         this.contactMail = contactMail;
         this.contactPhone = contactPhone;
-        this.agreements = agreements;
+        this.contracts = contracts;
     }
 
     public int getSupplierID() {
@@ -71,41 +71,41 @@ public class SupplierDL {
         return contactPhone;
     }
 
-    public void addAgreement(ContractDL agreement) {
-        this.agreements.add(agreement);
+    public void addContract(ContractDL contract) {
+        this.contracts.add(contract);
     }
 
-    public void removeAgreement(int agreementID) {
-        for (ContractDL agreement : this.agreements) {
-            if (agreement.getAgreementID() == agreementID) {
-                this.agreements.remove(agreement);
+    public void removeContract(int contractID) {
+        for (ContractDL contract : this.contracts) {
+            if (contract.getContractID() == contractID) {
+                this.contracts.remove(contract);
                 break;
             }
         }
     }
 
-    public void setAgreements(List<ContractDL> agreements) {
-        this.agreements = agreements;
+    public void setContracts(List<ContractDL> contracts) {
+        this.contracts = contracts;
     }
 
-    public List<ContractDL> getAgreements() {
-        return agreements;
+    public List<ContractDL> getContracts() {
+        return contracts;
     }
 
-    public ContractDL getAgreement(int agreementID) {
-        for (ContractDL agreement : agreements) {
-            if (agreement.getAgreementID() == agreementID) {
-                return agreement;
+    public ContractDL getContract(int contractID) {
+        for (ContractDL contract : contracts) {
+            if (contract.getContractID() == contractID) {
+                return contract;
             }
         }
-        return null; // Agreement not found
+        return null; // contract not found
     }
 
-    public int getNextAgreementID() {
-        return nextAgreementID++;
+    public int getNextContractID() {
+        return nextcontractID++;
     }
 
     public SupplierDTO toDTO() {
-        return new SupplierDTO(supplierID, companyID, bankAccount, paymentMethod, contactMail, contactPhone, agreements);
+        return new SupplierDTO(supplierID, companyID, bankAccount, paymentMethod, contactMail, contactPhone, contracts);
     }
 }

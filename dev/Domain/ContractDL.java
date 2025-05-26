@@ -4,20 +4,20 @@ import java.util.List;
 import java.util.Map;
 
 public class ContractDL {
-    private int agreementID;
+    private int contractID;
     private Map<Item, Integer> itemCatalog;
     private List<DiscountDL> billOfQuantities;
     private DeliveryMethod deliveryMethod;
 
-    public ContractDL(int agreementID,Map <Item, Integer> itemCatalog, List<DiscountDL> billOfQuantities ,DeliveryMethod deliveryMethod) {
-        this.agreementID = agreementID;
+    public ContractDL(int contractID,Map <Item, Integer> itemCatalog, List<DiscountDL> billOfQuantities ,DeliveryMethod deliveryMethod) {
+        this.contractID = contractID;
         this.itemCatalog = itemCatalog;
         this.billOfQuantities = billOfQuantities;
         this.deliveryMethod = deliveryMethod;
     }
 
-    public int getAgreementID() {
-        return agreementID;
+    public int getContractID() {
+        return contractID;
     }
 
     public List<DiscountDL> getBillOfQuantities() {
