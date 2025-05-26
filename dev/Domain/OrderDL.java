@@ -8,27 +8,27 @@ import Utils.OrderStatus;
 public class OrderDL {
     private final int orderID;
     private final int supplierID;
-    private final int agreementID;
+    private final int contractID;
     private Date orderDate;
     private String destination;
     private List<OrderItemDL> orderItems;
     private OrderStatus orderStatus;
 
-    public OrderDL(int orderID, int supplierID, int agreementID, Date orderDate, String destination, List<OrderItemDL> orderItems) {
+    public OrderDL(int orderID, int supplierID, int contractID, Date orderDate, String destination, List<OrderItemDL> orderItems) {
         this.orderID = orderID;
         this.supplierID = supplierID;
-        this.agreementID = agreementID;
-        this.orderDate = orderDate; // Set the order date to the current date
+        this.contractID = contractID;
+        this.orderDate = orderDate;
         this.destination = destination;
         this.orderItems = orderItems;
         this.orderStatus = OrderStatus.IN_PROGRESS;
     }
 
-    public OrderDL(int orderID, int supplierID, int agreementID, Date orderDate, String destination,
+    public OrderDL(int orderID, int supplierID, int contractID, Date orderDate, String destination,
             List<OrderItemDL> orderItems, OrderStatus orderStatus) {
         this.orderID = orderID;
         this.supplierID = supplierID;
-        this.agreementID = agreementID;
+        this.contractID = contractID;
         this.orderDate = orderDate;
         this.destination = destination;
         this.orderItems = orderItems;
@@ -43,8 +43,8 @@ public class OrderDL {
         return supplierID;
     }
 
-    public int getAgreementID() {
-        return agreementID;
+    public int getContractID() {
+        return contractID;
     }
 
     public Date getOrderDate() {

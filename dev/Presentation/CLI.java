@@ -37,13 +37,13 @@ public class CLI {
                     addSupplier(Scanner);
                     break;
                 case "2":
-                    addAgreement(Scanner);
+                    addContract(Scanner);
                     break;
                 case "3":
-                    changeAgreement(Scanner);
+                    changeContract(Scanner);
                     break;
                 case "4":
-                    removeAgreement(Scanner);
+                    removeContract(Scanner);
                     break;
                 case "5":
                     getSuppliedItems(Scanner);
@@ -89,9 +89,9 @@ public class CLI {
 
     public void loadMenu() {
         System.out.println("1. Add Supplier");
-        System.out.println("2. Add Agreement");
-        System.out.println("3. Change Agreement");
-        System.out.println("4. Remove Agreement");
+        System.out.println("2. Add Contract");
+        System.out.println("3. Change Contract");
+        System.out.println("4. Remove Contract");
         System.out.println("5. Get Supplied Items");
         System.out.println("6. Get Cataloged Items");
         System.out.println("7. Create Order");
@@ -122,7 +122,7 @@ public class CLI {
         sf.addSupplier(companyID, bankAccount, paymentMethod, contactEmail, contactPhone, null);
     }
 
-    public void addAgreement(Scanner Scanner) {
+    public void addContract(Scanner Scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(Scanner.nextLine());
         List<String[]> billOfQuantities = new ArrayList<>();
@@ -155,14 +155,14 @@ public class CLI {
         }
         System.out.println("Delivery Method (periodic, on order or pickup):");
         DeliveryMethod deliveryMethod = parseDeliveryMethod(Scanner);
-        sf.addAgreement(supplierID, itemCat, billOfQuantities, deliveryMethod);
+        sf.addContract(supplierID, itemCat, billOfQuantities, deliveryMethod);
     }
 
-    public void changeAgreement(Scanner scanner) {
+    public void changeContract(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(scanner.nextLine());
-        System.out.println("Agreement ID:");
-        int agreementID = Integer.parseInt(scanner.nextLine());
+        System.out.println("contract ID:");
+        int contractID = Integer.parseInt(scanner.nextLine());
         System.out.println("New Bill of Quantities (Item ID, Minimum quantity and Discount seperated by ,):");
         List<String[]> billOfQuantities = new ArrayList<>();
         String cont = "Y";
@@ -177,16 +177,15 @@ public class CLI {
             System.out.println("Do you want to add another item? (Y/N):");
             cont = scanner.nextLine().toUpperCase();
         }
-        System.out.println("New Delivery Method (periodic, on order or pickup):");
-        sf.changeAgreement(supplierID, agreementID, billOfQuantities);
+        sf.changeContract(supplierID, contractID, billOfQuantities);
     }
 
-    public void removeAgreement(Scanner scanner) {
+    public void removeContract(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(scanner.nextLine());
-        System.out.println("Agreement ID:");
-        int agreementID = Integer.parseInt(scanner.nextLine());
-        sf.removeAgreement(supplierID, agreementID);
+        System.out.println("Contract ID:");
+        int contractID = Integer.parseInt(scanner.nextLine());
+        sf.removeContract(supplierID, contractID);
     }
 
     public void getSuppliedItems(Scanner scanner) {
@@ -222,14 +221,14 @@ public class CLI {
     public void createOrder(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(scanner.nextLine());
-        System.out.println("Agreement ID:");
-        int agreementID = Integer.parseInt(scanner.nextLine());
+        System.out.println("Contract ID:");
+        int contractID = Integer.parseInt(scanner.nextLine());
         Date orderDate = parseOrderDate(scanner);
         System.out.println("Destination:");
         String destination = scanner.nextLine();
         System.out.println("Order Items (Item ID and Quantity seperated by ,):");
         List<int[]> items = getOrderItems(scanner);
-        of.createOrder(supplierID, destination, agreementID, orderDate, items);
+        of.createOrder(supplierID, destination, contractID, orderDate, items);
     }
 
     public void getOrderDetails(Scanner scanner) {

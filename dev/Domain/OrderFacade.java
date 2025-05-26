@@ -17,25 +17,25 @@ public class OrderFacade {
         this.orders = new ArrayList<>();
     }
 
-    public void createOrder(int supplierID, String destination, int agreementID, Date orderDate, List<int[]> Orders) {
+    public void createOrder(int supplierID, String destination, int contractID, Date orderDate, List<int[]> Orders) {
         List<OrderItemDL> items = new ArrayList<>();
         if(!verifySupplier(supplierID)) {
             System.out.println("Can't create order, supplier not found");
             return;
         }
-        if(!verifyAgreement(supplierID, agreementID)) {
-            System.out.println("Can't create order, agreement not found");
+        if(!verifycontract(supplierID, contractID)) {
+            System.out.println("Can't create order, contract not found");
             return;
         }
         for (int[] order : Orders) {
             int itemID = order[0];
             int quantity = order[1];
-            int catalogID = getCatalogID(itemID, supplierID, agreementID);
-            double totalPrice = calculateTotalPrice(quantity, catalogID, supplierID, agreementID);
+            int catalogID = getCatalogID(itemID, supplierID, contractID);
+            double totalPrice = calculateTotalPrice(quantity, catalogID, supplierID, contractID);
             OrderItemDL item = new OrderItemDL(itemID, quantity, catalogID, totalPrice);
             items.add(item);
         }
-        OrderDL newOrder = new OrderDL(nextID++, supplierID, agreementID, orderDate, destination, items);
+        OrderDL newOrder = new OrderDL(nextID++, supplierID, contractID, orderDate, destination, items);
         orders.add(newOrder);
     }
 
@@ -55,8 +55,8 @@ public class OrderFacade {
             for (int[] item : newItems) {
                 int itemID = item[0];
                 int quantity = item[1];
-                int catalogID = getCatalogID(itemID, order.getSupplierID(), order.getAgreementID());
-                double totalPrice = calculateTotalPrice(quantity, catalogID, order.getSupplierID(), order.getAgreementID());
+                int catalogID = getCatalogID(itemID, order.getSupplierID(), order.getContractID());
+                double totalPrice = calculateTotalPrice(quantity, catalogID, order.getSupplierID(), order.getContractID());
                 OrderItemDL newItem = new OrderItemDL(itemID, quantity, catalogID, totalPrice);
                 items.add(newItem);
             }
@@ -126,26 +126,26 @@ public class OrderFacade {
     }
 
     
-    // public void updateScheduledDeliveryItems(int supplierID, int agreementID, List<int[]> newItems) throws IllegalArgumentException {
+    // public void updateScheduledDeliveryItems(int supplierID, int contractID, List<int[]> newItems) throws IllegalArgumentException {
     //     SupplierDL supplier = sf.getSupplier(supplierID);
     //     if (supplier == null) {
     //         throw new IllegalArgumentException("Supplier not found: " + supplierID);
     //     }
-    //     AgreementDL agreement = supplier.getAgreement(agreementID);
-    //     if (agreement == null) {
-    //         throw new IllegalArgumentException("Agreement not found: " + agreementID);
+    //     contractDL contract = supplier.getcontract(contractID);
+    //     if (contract == null) {
+    //         throw new IllegalArgumentException("contract not found: " + contractID);
     //     }
     //     List<OrderItemDL> items = new ArrayList<>();
     //     try{
     //         for (int[] item : newItems) {
     //             int itemID = item[0];
     //             int quantity = item[1];
-    //             int catalogID = getCatalogID(itemID, supplierID, agreementID);
-    //             double totalPrice = calculateTotalPrice(quantity, catalogID, supplierID, agreementID);
+    //             int catalogID = getCatalogID(itemID, supplierID, contractID);
+    //             double totalPrice = calculateTotalPrice(quantity, catalogID, supplierID, contractID);
     //             OrderItemDL newItem = new OrderItemDL(itemID, quantity, catalogID, totalPrice);
     //             items.add(newItem);
     //         }
-    //         agreement.getDeliveryMethod().setItems(items);
+    //         contract.getDeliveryMethod().setItems(items);
     //     } catch (IllegalArgumentException e) {
     //         throw new IllegalArgumentException("Error updating scheduled delivery items: " + e.getMessage());
     //     }
@@ -156,13 +156,13 @@ public class OrderFacade {
         return sf.getSupplier(supplierID) != null;
     }
 
-    private boolean verifyAgreement(int supplierID, int agreementID){
-        return sf.getAgreement(supplierID, agreementID) != null;
+    private boolean verifycontract(int supplierID, int contractID){
+        return sf.getContract(supplierID, contractID) != null;
     }
 
-    private double calculateTotalPrice(int quantity, int catalogID, int supplierID, int agreementID) {
-        double price = quantity * sf.getAgreement(supplierID, agreementID).getItem(catalogID).getPrice();
-        DiscountDL discount = sf.getAgreement(supplierID, agreementID).getDiscount(catalogID);
+    private double calculateTotalPrice(int quantity, int catalogID, int supplierID, int contractID) {
+        double price = quantity * sf.getContract(supplierID, contractID).getItem(catalogID).getPrice();
+        DiscountDL discount = sf.getContract(supplierID, contractID).getDiscount(catalogID);
         if (discount != null) {
             if (discount.getMinimumQuantity() <= quantity) {
                 price -= price * discount.getDiscountPercentage() / 100;
@@ -171,8 +171,8 @@ public class OrderFacade {
         return price;
     }
 
-    private int getCatalogID(int itemID, int supplierID, int agreementID) {
-        return sf.getAgreement(supplierID, agreementID).getItemCatalogID(itemID);
+    private int getCatalogID(int itemID, int supplierID, int contractID) {
+        return sf.getContract(supplierID, contractID).getItemCatalogID(itemID);
     }
 
     public void loadData() {
