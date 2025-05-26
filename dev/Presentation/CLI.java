@@ -178,7 +178,6 @@ public class CLI {
             cont = scanner.nextLine().toUpperCase();
         }
         System.out.println("New Delivery Method (periodic, on order or pickup):");
-        DeliveryMethod deliveryMethod = parseDeliveryMethod(scanner);
         sf.changeAgreement(supplierID, agreementID, billOfQuantities);
     }
 

@@ -1,4 +1,3 @@
 package Domain;
 
-public interface DeliveryMethod{
-}
+public interface DeliveryMethod{}
