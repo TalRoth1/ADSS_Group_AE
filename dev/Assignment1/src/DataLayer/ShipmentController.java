@@ -1,5 +1,5 @@
 package DataLayer;
-import DataLayer.ShipmentDTO;
+import DTO.ShipmentDTO;
 import java.sql.*;
 import DomainLayer.ShipmentDL;
 

@@ -21,7 +21,7 @@ public class Employee {
     private String branch;
 
 
-
+    // for hiring a new employee
     public Employee(int id, String name,String branch, String bankAccount, int salary, LocalDate startDate,
                     int vacationDays, int sickDays, double educationFund, double socialBenefits,
                     String password) {
@@ -39,6 +39,14 @@ public class Employee {
         this.isLoggedIn = false;
         this.branch = branch; 
     }
+    
+    //for loading an existing employee
+    public Employee(int id, String name, String branch, String bankAccount, int salary, LocalDate startDate,
+                    int vacationDays, int sickDays, double educationFund, double socialBenefits,
+                    String password, boolean finishWorking) {
+        this(id, name, branch, bankAccount, salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, password);
+        this.finishWorking = finishWorking;
+    }
 
 
     public void login(String password) throws Exception {
@@ -54,12 +62,11 @@ public class Employee {
         this.isLoggedIn = false;
     }
 
-    public String updatePassword(String oldPassword, String newPassword) {
+    public void updatePassword(String oldPassword, String newPassword) throws Exception {
         if (this.password.equals(oldPassword)) {
             this.password = newPassword;
-            return null;
         } else {
-            return "Old password is incorrect.";
+            throw new Exception("Old password is incorrect.");
         }
     }
 

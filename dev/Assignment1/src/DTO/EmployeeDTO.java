@@ -18,7 +18,7 @@ public class EmployeeDTO {
 
     public EmployeeDTO(int id, String name, String branch, String bankAccount, int salary, String startDate,
             int vacationDays, int sickDays, double educationFund, double socialBenefits,
-            String password) {
+            String password, boolean isFinishedWorking) {
         this.id = id;
         this.name = name;
         this.branch = branch;
@@ -30,7 +30,7 @@ public class EmployeeDTO {
         this.educationFund = educationFund;
         this.socialBenefits = socialBenefits;
         this.password = password;
-        this.isFinishedWorking = false;
+        this.isFinishedWorking = isFinishedWorking;
         this.isLoggedIn = false;
     }
 

@@ -69,8 +69,7 @@ public class EmployeeDAO {
                         rs.getDouble("educationFund"),
                         rs.getDouble("socialBenefits"),
                         rs.getString("password"),
-                        rs.getBoolean("isFinishedWorking"),
-                        rs.getBoolean("isLoggedIn")
+                        rs.getBoolean("isFinishedWorking")
                 );
             } else {
                 return null; // or throw an exception if preferred
@@ -150,9 +149,9 @@ public class EmployeeDAO {
         }
     }
 
-    public List<EmployeeDTO> getAllEmployees() throws SQLException {
+    public ArrayList<EmployeeDTO> getAllEmployees() throws SQLException {
         String sql = "SELECT * FROM employees";
-        List<EmployeeDTO> employees = new ArrayList<>();
+        ArrayList<EmployeeDTO> employees = new ArrayList<>();
         try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 employees.add(new EmployeeDTO(
@@ -167,8 +166,7 @@ public class EmployeeDAO {
                         rs.getDouble("educationFund"),
                         rs.getDouble("socialBenefits"),
                         rs.getString("password"),
-                        rs.getBoolean("isFinishedWorking"),
-                        rs.getBoolean("isLoggedIn")
+                        rs.getBoolean("isFinishedWorking")
                 ));
             }
         }

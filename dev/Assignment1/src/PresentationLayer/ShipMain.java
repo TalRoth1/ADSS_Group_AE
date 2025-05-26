@@ -11,7 +11,8 @@ public class ShipMain {
         Scanner scanner = new Scanner(System.in);
         LocalDate today = LocalDate.now();
         EmployeeFacade employeeFacade = new EmployeeFacade();
-        CLI cli = new CLI(employeeFacade);
+        shipCli.SetEmployeeFacade(employeeFacade);
+        EmployeeCLI cli = new EmployeeCLI(employeeFacade);
 
         System.out.println("Welcome to the Delivery Management System!");
         boolean exit = false;
@@ -20,7 +21,7 @@ public class ShipMain {
             System.out.println("1. Create a new shipment");
             System.out.println("2. Edit an existing shipment");
             System.out.println("3. Add a new truck");
-            System.out.println("4. Add a new driver");
+            //System.out.println("4. Add a new driver");
             System.out.println("5. Add a new location");
             System.out.println("6. Add a new item");
             System.out.println("7. Change shipment status");
@@ -50,7 +51,7 @@ public class ShipMain {
                     shipCli.AddTruck();
                     break;
                 case 4:
-                    shipCli.AddDriver();
+                    //shipCli.AddDriver();
                     break;
                 case 5:
                     shipCli.AddLocation();

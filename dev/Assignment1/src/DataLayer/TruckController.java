@@ -1,5 +1,6 @@
 package DataLayer;
 
+import java.sql.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import DTO.TruckDTO;
@@ -43,7 +44,7 @@ public class TruckController {
             return new TruckDTO(rst.getInt("id"), rst.getString("license_plate"), rst.getString("type"),
                     rst.getString("status"), rst.getString("location"), rst.getDouble("weight"));
         } else {
-            throw new Exception("Truck not found with id: " + rst.getInt("id"));
+            throw new SQLException("Truck not found with id: " + rst.getInt("id"));
         }
     }
 

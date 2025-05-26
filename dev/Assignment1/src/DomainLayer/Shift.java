@@ -51,7 +51,7 @@ public class Shift {
 
     public String getRole(int id) throws Exception {
         if (shiftManagerId == id) {
-            return "Shift Manager";
+            throw new Exception("shift manager. ");
         }
         if (assignedEmployeesID.containsKey(id)) {
             return assignedEmployeesID.get(id).toString();
@@ -59,7 +59,7 @@ public class Shift {
         if (id <= 0) {
             throw new Exception("ID is invalid. ");
         }
-        return null;
+        return "Employee with ID " + id + " is not assigned to this shift.";
     }
 
     // Getters and Setters

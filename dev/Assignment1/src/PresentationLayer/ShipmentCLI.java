@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import DomainLayer.EmployeeFacade;
 
 public class ShipmentCLI {
 
@@ -207,6 +208,7 @@ public class ShipmentCLI {
             return;
         }
         Map<LocationDL, Map<String, Integer>> items = ChooseItems(locations);
+        
         boolean flag = true;
         while (flag) {
             try {
@@ -265,7 +267,7 @@ public class ShipmentCLI {
         shipmentFacade.AddLocation(street, streetNumber, city, contactNumber, contactName, zone);
     }
 
-    public void AddDriver() {
+    /*public void AddDriver() {
         System.out.println("Please enter the driver name: ");
         String name = scanner.nextLine();
         boolean flag = true;
@@ -280,7 +282,7 @@ public class ShipmentCLI {
             }
         }
         shipmentFacade.AddDriver(name, licenses);
-    }
+    }*/
 
     public void AddTruck() {
         System.out.println("Please enter the truck number: ");
@@ -561,5 +563,9 @@ public class ShipmentCLI {
             }
         }
         System.out.println(shipmentFacade.GetDocumentString(shipment));
+    }
+
+    public void SetEmployeeFacade(EmployeeFacade employeeFacade) {
+        shipmentFacade.SetEmployeeFacade(employeeFacade);
     }
 }

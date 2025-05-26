@@ -289,7 +289,12 @@ public class EmployeeManager extends Employee {
         }
     }
 
-    public void createShift(LocalDate date, ShiftType shiftType, int shiftManagerId) throws Exception { // create a new shift, definig the date, type and shiftmanager
+    public void createShift(LocalDate date, ShiftType shiftType, int shiftManagerId) throws Exception { // create a new
+                                                                                                        // shift,
+                                                                                                        // definig the
+                                                                                                        // date, type
+                                                                                                        // and
+                                                                                                        // shiftmanager
         if (date == null || shiftType == null) {
             throw new Exception("invalid date or shift type");
         }
@@ -302,7 +307,8 @@ public class EmployeeManager extends Employee {
 
         if (shiftType == ShiftType.MORNING && morningShifts.containsKey(date)) {
             throw new Exception("morning shift already exists for this date");
-        } if (shiftType == ShiftType.EVENING && eveningShifts.containsKey(date)) {
+        }
+        if (shiftType == ShiftType.EVENING && eveningShifts.containsKey(date)) {
             throw new Exception("evening shift already exists for this date");
         }
         Shift shift = new Shift(date, shiftType, shiftManagerId);
@@ -364,7 +370,7 @@ public class EmployeeManager extends Employee {
     }
 
     // getters and setters
-    public void setTimes(Shift shift, int start, int end) throws Exception{ // set start time and end time of the shift
+    public void setTimes(Shift shift, int start, int end) throws Exception { // set start time and end time of the shift
         if (start < 0 || end < 0 || start >= end) {
             throw new Exception("invalid start or end time");
         }
@@ -379,10 +385,13 @@ public class EmployeeManager extends Employee {
         shift.setEndTime(end);
     }
 
-    public void setRequiredRole(Shift shift, Role role, int numOfEmployees) throws Exception { // set the amount of employess of thisspecific role for the shift
+    public void setRequiredRole(Shift shift, Role role, int numOfEmployees) throws Exception { // set the amount of
+                                                                                               // employess of
+                                                                                               // thisspecific role for
+                                                                                               // the shift
         if (shift.isShipmentShift() && role == role.DRIVER && numOfEmployees < 1) {
             throw new Exception("For shipment shifts, you must have at least one driver.");
-        } 
+        }
         if (shift.isShipmentShift() && role == role.STORE_KEEPER && numOfEmployees < 1) {
             throw new Exception("For shipment shifts, you must have at least one store keeper.");
         }
@@ -436,19 +445,33 @@ public class EmployeeManager extends Employee {
         for (LocalDate d : morningShifts.keySet()) {
             Shift s = morningShifts.get(d);
             if (s.getAssignedEmployeesID().containsKey(employeeID)) {
-                morning += s.getDate() + ", " + "Role: " + s.getRole(employeeID) + "\n";
+                try {
+                        String role = s.getRole(employeeID);
+                        morning += s.getDate() + ", " + "Role: " + role + "\n";
+                }
+                catch (Exception e) {
+                    throw new Exception("Error getting role for employee: " + e.getMessage());
+                }
             }
         }
         for (LocalDate d : eveningShifts.keySet()) {
             Shift s = eveningShifts.get(d);
             if (s.getAssignedEmployeesID().containsKey(employeeID)) {
-                evening += s.getDate() + ", " + "Role: " + s.getRole(employeeID) + "\n";
+                try {
+                    String role = s.getRole(employeeID);
+                    evening += s.getDate() + ", " + "Role: " + role + "\n";
+                }
+                catch (Exception e) {
+                    throw new Exception("Error getting role for employee: " + e.getMessage());
+                }
             }
         }
         System.out.println("Employee: " + employee.getName() + " " + employeeID + "\n" + morning + "\n" + evening);
     }
 
-    public void getAvailableEmployees(Shift shift, Role role) { // all the employees that can work in this shift and have this role
+    public void getAvailableEmployees(Shift shift, Role role) { // all the employees that can work in this shift and
+                                                                // have this role
+    try{
         String res = "Available employees for this shift and role: " + role.toString() + "\n";
         for (ShiftEmployee employee : allEmployees.values()) {
             if (employee.getRoles().contains(role) && employee.isAvailable(shift)) {
@@ -456,6 +479,10 @@ public class EmployeeManager extends Employee {
             }
         }
         System.out.println(res);
+    }
+    catch (Exception e) {
+        System.out.println("Error getting available employees: " + e.getMessage());
+    }
     }
 
     public void archiveWeeklyForAllEmployees() {

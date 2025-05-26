@@ -8,11 +8,16 @@ import java.util.Map;
 
 public class ShipmentFacade {
 
+    public EmployeeFacade employeeFacade;
     public List<ShipmentDL> shipments = new ArrayList<>();
     public List<LocationDL> locations = new ArrayList<>();
     public List<DriverDL> drivers = new ArrayList<>();
     public List<TruckDL> trucks = new ArrayList<>();
     public Map<String, Float> Items = new HashMap<>(Map.of("egg carton", 1.5f, "milk", 1f, "bread", 0.5f, "cheese", 1f, "butter", 0.25f, "yogurt", 0.6f, "juice", 0.75f, "soda", 0.75f, "water", 1f, "coffee", 0.5f));
+
+    public void SetEmployeeFacade(EmployeeFacade employeeFacade) {
+        this.employeeFacade = employeeFacade;
+    }
 
     public void CreateShipment(TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items) throws Exception {
         ShipmentDL shipment = new ShipmentDL(truck, driver, origin, destinations, items);
@@ -23,6 +28,7 @@ public class ShipmentFacade {
             throw new Exception("Truck is overweight");
         }
         shipment.setWeight(Items);
+        
         shipments.add(shipment);
     }
 
