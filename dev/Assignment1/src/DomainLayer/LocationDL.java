@@ -1,6 +1,7 @@
 package DomainLayer;
 
 public class LocationDL {
+
     public String Street;
     public int StreetNumber;
     public String City;
@@ -8,9 +9,8 @@ public class LocationDL {
     public String ContactName;
     public String Zone;
 
-
     public LocationDL(String street, int streetNumber, String city, String contactNumber, String contactName, String zone) {
-        
+
         this.Street = street;
         this.StreetNumber = streetNumber;
         this.City = city;
@@ -23,17 +23,31 @@ public class LocationDL {
         return Street + " " + StreetNumber + ", " + City + ", " + Zone + ", Contact: " + ContactName + ", Phone: " + ContactNumber;
     }
 
-    public String getZone()
-    {
+    public String getZone() {
         return Zone;
     }
 
+    public String getStreet() {
+        return Street;
+    }
 
+    public int getStreetNumber() {
+        return StreetNumber;
+    }
+
+    public String getCity() {
+        return City;
+    }
 
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
         LocationDL that = (LocationDL) obj;
         return StreetNumber == that.StreetNumber && ContactNumber == that.ContactNumber && Street.equals(that.Street) && City.equals(that.City) && ContactName.equals(that.ContactName) && Zone.equals(that.Zone);
     }
+
 }

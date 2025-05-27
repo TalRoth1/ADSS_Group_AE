@@ -1,22 +1,25 @@
 package DataLayer;
 
 import DTO.DriverDTO;
+import DTO.EmployeeDTO;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
 //TODO: move all of this to employeeController OwO
-
 public class DriverController {
+
     DriverDAO driverDAO;
-    
-    public DriverController(DriverDAO driverDAO) {
+    EmployeeDAO employeeDAO;
+
+    public DriverController(DriverDAO driverDAO, EmployeeDAO employeeDAO) {
         this.driverDAO = driverDAO;
+        this.employeeDAO = employeeDAO;
     }
 
     public void addDriver(DriverDTO driver) {
         try {
-            for(String LisenceType : driver.getLicenseTypes()) {
-                driverDAO.addDriver(driver.getId(), LisenceType);
+            for (String LicenseType : driver.getLicenseTypes()) {
+                driverDAO.addDriver(driver.getId(), LicenseType);
             }
         } catch (Exception e) {
             System.out.println("Error adding driver: " + e.getMessage());
@@ -33,8 +36,8 @@ public class DriverController {
 
     public void deleteDriver(DriverDTO driver) {
         try {
-            for(String LisenceType : driver.getLicenseTypes()) {
-                driverDAO.deleteDriver(driver.getId(), LisenceType);
+            for (String LicenseType : driver.getLicenseTypes()) {
+                driverDAO.deleteDriver(driver.getId(), LicenseType);
             }
         } catch (Exception e) {
             System.out.println("Error deleting driver: " + e.getMessage());
@@ -44,12 +47,12 @@ public class DriverController {
     public DriverDTO getDriver(int id) {
         try {
             ResultSet rs = driverDAO.getDriver(id);
-            if (rs.next()) {
-                return new DriverDTO(rs.getInt("id"), rs.getString("name"), rs.getString("branch"),
-                        rs.getString("bankAccount"), rs.getInt("salary"), rs.getString("startDate"),
-                        rs.getInt("vacationDays"), rs.getInt("sickDays"), rs.getDouble("educationFund"),
-                        rs.getDouble("socialBenefits"), rs.getString("password"), rs.getString("licenseNumber"),
-                        rs.getString("vehicleType"), rs.getString("drivingExperience"));
+            EmployeeDTO employee = employeeDAO.getEmployee(id);
+            if (employee != null && rs.next()) {
+                return new DriverDTO(rs.getInt("id"), employee.getName(), employee.getBranch(),
+                        employee.getBankAccount(), employee.getSalary(), employee.getStartDate(),
+                        employee.getVacationDays(), employee.getSickDays(), employee.getEducationFund(),
+                        employee.getSocialBenefits(), employee.getPassword(), rs.getBoolean("isFinishedWorking"));
             }
         } catch (Exception e) {
             System.out.println("Error getting driver: " + e.getMessage());
@@ -62,18 +65,19 @@ public class DriverController {
         try {
             ResultSet rs = driverDAO.getAllDrivers();
             while (rs.next()) {
-                drivers.add(new DriverDTO(rs.getInt("id"), rs.getString("name"), rs.getString("branch"),
-                        rs.getString("bankAccount"), rs.getInt("salary"), rs.getString("startDate"),
-                        rs.getInt("vacationDays"), rs.getInt("sickDays"), rs.getDouble("educationFund"),
-                        rs.getDouble("socialBenefits"), rs.getString("password"), rs.getString("licenseNumber"),
-                        rs.getString("vehicleType"), rs.getString("drivingExperience")));
+                int id = rs.getInt("id");
+                EmployeeDTO employee = employeeDAO.getEmployee(id);
+                if (employee != null) {
+                    drivers.add(new DriverDTO(rs.getInt("id"), employee.getName(), employee.getBranch(),
+                            employee.getBankAccount(), employee.getSalary(), employee.getStartDate(),
+                            employee.getVacationDays(), employee.getSickDays(), employee.getEducationFund(),
+                            employee.getSocialBenefits(), employee.getPassword(), rs.getBoolean("isFinishedWorking")));
+                }
             }
         } catch (Exception e) {
             System.out.println("Error getting all drivers: " + e.getMessage());
         }
         return drivers;
     }
-
-    
 
 }

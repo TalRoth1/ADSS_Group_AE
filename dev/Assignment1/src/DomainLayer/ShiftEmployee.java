@@ -14,7 +14,7 @@ public class ShiftEmployee extends Employee {
     private Map<Shift, Role> assignedShifts;
     private List<Role> roles;
 
-    public ShiftEmployee(int id, String name, String branch, String bankAccount, int salary, LocalDate startDate,
+    public ShiftEmployee(int id, String name, LocationDL branch, String bankAccount, int salary, LocalDate startDate,
             int vacationDays, int sickDays, double educationFund, double socialBenefits,
             String password, Role role) {
         super(id, name, branch, bankAccount, salary, startDate, vacationDays, sickDays, educationFund,
@@ -25,7 +25,7 @@ public class ShiftEmployee extends Employee {
         roles.add(role);
     }
 
-    public void getPreferredShiftsToString() throws Exception { //employee or manager can see emp's preferred shifts
+    public void getPreferredShiftsToString() throws Exception { // employee or manager can see emp's preferred shifts
         String res = "Preferred shifts: " + "\n";
         if (preferredShifts == null) {
             throw new Exception("No preferred shifts.");
@@ -36,7 +36,7 @@ public class ShiftEmployee extends Employee {
         System.out.println(res);
     }
 
-    public void getAssignedShiftsToString() throws Exception { //employee or manager can see emp's assigned shifts
+    public void getAssignedShiftsToString() throws Exception { // employee or manager can see emp's assigned shifts
         String res = "Assigned shifts: " + "\n";
         if (assignedShifts == null) {
             throw new Exception("No assigned shifts.");
@@ -54,7 +54,7 @@ public class ShiftEmployee extends Employee {
         return "You are not authorized to view assigned employees for this shift.";
     }
 
-    //methods
+    // methods
     public void addRole(Role role) throws Exception {
         if (role == null) {
             throw new Exception("Role cannot be null.");
@@ -156,13 +156,15 @@ public class ShiftEmployee extends Employee {
     public void archiveOldShiftsWeekly(LocalDate today) {
         // Find the start of this week (Sunday)
         LocalDate startOfWeek = today.with(DayOfWeek.SUNDAY);
-        // Iterate through the assigned shifts and check if they are older than the start of the week
+        // Iterate through the assigned shifts and check if they are older than the
+        // start of the week
         Iterator<Map.Entry<Shift, Role>> assignedIterator = assignedShifts.entrySet().iterator();
         while (assignedIterator.hasNext()) {
             Map.Entry<Shift, Role> entry = assignedIterator.next();
             Shift shift = entry.getKey();
             if (shift.getDate().isBefore(startOfWeek)) {
-                // If the shift is older than the start of the week, remove it from the assigned shifts
+                // If the shift is older than the start of the week, remove it from the assigned
+                // shifts
                 assignedIterator.remove();
             }
         }

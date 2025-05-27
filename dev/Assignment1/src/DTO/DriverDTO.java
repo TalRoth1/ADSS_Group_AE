@@ -10,9 +10,9 @@ public class DriverDTO extends EmployeeDTO {
 
     public DriverDTO(int id, String name, String branch, String bankAccount, int salary, String startDate,
                      int vacationDays, int sickDays, double educationFund, double socialBenefits,
-                     String password, String licenseNumber, String vehicleType, String drivingExperience) {
+                     String password, boolean isFinishedWorking) {
         super(id, name, branch, bankAccount, salary, startDate, vacationDays, sickDays, educationFund,
-                socialBenefits, password);
+                socialBenefits, password, isFinishedWorking);
         this.licenseType = new ArrayList<>();
         this.isBusy = false;
     }

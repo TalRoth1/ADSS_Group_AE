@@ -1,7 +1,9 @@
 package DomainLayer;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,21 +21,24 @@ public class ShipmentFacade {
         this.employeeFacade = employeeFacade;
     }
 
-    public void CreateShipment(TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items) throws Exception {
-        ShipmentDL shipment = new ShipmentDL(truck, driver, origin, destinations, items);
-        if (!shipment.DriverCheck(driver)) {
-            throw new Exception("Driver does not have the right license for this truck");
-        }
+    public void CreateShipment(TruckDL truck, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items, String shiftTime, Date datetoSend) throws Exception {
+        ShipmentDL shipment = new ShipmentDL(truck, origin, destinations, items, shiftTime, datetoSend);
         if (!shipment.WeightCheck(Items)) {
             throw new Exception("Truck is overweight");
         }
         shipment.setWeight(Items);
-        
+
+        //assign driver
+        DriverDL driverToSend = tryToAssignShifts(shipment);
         shipments.add(shipment);
     }
 
     public void ChangeStatus(ShipmentDL shipment, String stat) throws Exception {
         if (stat.equals("SENT")) {
+            ShipmentStatus currentStatus = shipment.getStatus();
+            if (currentStatus.equals(ShipmentStatus.PENDING)) {
+                DriverDL driverToSend = tryToAssignShifts(shipment);
+            }
             if (shipment.DriverBusyCheck()) {
                 throw new Exception("Driver is busy");
             }
@@ -42,6 +47,7 @@ public class ShipmentFacade {
             }
             shipment.ChangeAvailablity();
         }
+
         shipment.ChangeStatus(stat);
         //assuming both where busy beforehand
         if (stat.equals("COMPLETED") || stat.equals("PROBLEM") || stat.equals("CANCELLED")) {
@@ -69,15 +75,14 @@ public class ShipmentFacade {
         return location;
     }
 
-    public DriverDL AddDriver(int id, String name, String branch, String bankAccount, int salary, LocalDate startDate,
+    /*public DriverDL AddDriver(int id, String name, String branch, String bankAccount, int salary, LocalDate startDate,
             int vacationDays, int sickDays, double educationFund, double socialBenefits,
             String password, List<String> licenseType) {
         DriverDL driver = new DriverDL(id, name, branch, bankAccount, salary, startDate,
                 vacationDays, sickDays, educationFund, socialBenefits, password, licenseType);
         drivers.add(driver);
         return driver;
-    }
-
+    }*/
     public TruckDL AddTruck(int number, String model, String type, float maxWeight) {
         TruckDL truck = new TruckDL(number, model, type, 0, maxWeight);
         trucks.add(truck);
@@ -106,7 +111,7 @@ public class ShipmentFacade {
         return ans;
     }
 
-    public void EditShipement(ShipmentDL shipment, TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items) throws Exception {
+    public void EditShipement(ShipmentDL shipment, TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items, Date dateToSend, String shiftTime) throws Exception {
         //assuming that the shipment exists in the list
         int index = shipments.indexOf(shipment);
         ShipmentDL shipmentToEdit = shipments.get(index);
@@ -136,9 +141,35 @@ public class ShipmentFacade {
                 throw new Exception("Truck cannot support the new weight");
             }
         }
+        if (shiftTime != null) {
+            shipmentToEdit.setShiftType(shiftTime);
+
+        }
+        if (dateToSend != null) {
+            shipmentToEdit.setDateSent(dateToSend);
+        }
+        tryToAssignShifts(shipmentToEdit);
+    }
+
+    public DriverDL tryToAssignShifts(ShipmentDL shipment) throws Exception {
+        if (shipment.getStatus().equals(ShipmentStatus.PENDING)) {
+            DriverDL driverToSend = employeeFacade.assignCheck(DatetoLocalDate(shipment.getDateSent()), shipment.getShiftType().toString(), shipment.getDocument().getOrigin(), shipment.getDocument().getLocations(), shipment.getTruck().GetType());
+            if (driverToSend == null) {
+                throw new Exception("No available driver for this shipment");
+            }
+            shipment.setDriver(driverToSend);
+            shipment.ChangeStatus("APPROVED");
+        }
+        return shipment.getDriver();
     }
 
     public String GetDocumentString(ShipmentDL shipment) {
         return shipment.getDocument().toString() + "\n" + "Status: " + shipment.getStatus().toString();
+    }
+
+    private LocalDate DatetoLocalDate(Date date) {
+        return date.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
     }
 }

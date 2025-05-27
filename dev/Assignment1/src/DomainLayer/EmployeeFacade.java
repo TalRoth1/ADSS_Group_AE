@@ -5,59 +5,72 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EmployeeFacade { // employee related methods
 
     private Map<Integer, EmployeeManager> employeeManagers;
     private Map<Integer, ShiftEmployee> shiftEmployees;
+    private List<LocationDL> branches;
 
     // initalize employees
-    EmployeeManager keren = new EmployeeManager(100, "Keren", "1", "111222", 7000,
-            LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "123");
-    ShiftEmployee Liat = new ShiftEmployee(101, "Liat", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
-            "password", Role.SHIFT_MANAGER);
-    ShiftEmployee Erez = new ShiftEmployee(102, "Erez", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
-            "password", Role.CASHIER);
-    ShiftEmployee Elad = new ShiftEmployee(103, "Elad", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
-            "password", Role.DRIVER);
-    ShiftEmployee Eylon = new ShiftEmployee(104, "Eylon", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100,
-            100, "password", Role.DRIVER);
-    ShiftEmployee Tal = new ShiftEmployee(105, "Tal", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
-            "password", Role.CASHIER);
-    ShiftEmployee Ofir = new ShiftEmployee(106, "Ofir", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
-            "password", Role.STORE_KEEPER);
-    ShiftEmployee Kiril = new ShiftEmployee(107, "Kiril", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100,
-            100, "password", Role.STORE_KEEPER);
-    ShiftEmployee Ofri = new ShiftEmployee(108, "Ofri", "1", "111222", 7000, LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
-            "password", Role.SHIFT_MANAGER);
-
-    public EmployeeFacade() {
-        this.employeeManagers = new HashMap<>();
-        this.shiftEmployees = new HashMap<>();
-
-        // Add the employee manager
-        employeeManagers.put(keren.getId(), keren);
-        // Add shift employees
-        shiftEmployees.put(Liat.getId(), Liat);
-        shiftEmployees.put(Erez.getId(), Erez);
-        shiftEmployees.put(Elad.getId(), Elad);
-        shiftEmployees.put(Eylon.getId(), Eylon);
-        shiftEmployees.put(Tal.getId(), Tal);
-        shiftEmployees.put(Ofir.getId(), Ofir);
-        shiftEmployees.put(Kiril.getId(), Kiril);
-        shiftEmployees.put(Ofri.getId(), Ofri);
-
-        keren.addEmployee(Liat);
-        keren.addEmployee(Erez);
-        keren.addEmployee(Elad);
-        keren.addEmployee(Eylon);
-        keren.addEmployee(Tal);
-        keren.addEmployee(Ofir);
-        keren.addEmployee(Kiril);
-        keren.addEmployee(Ofri);
-    }
-
+    /*
+     * EmployeeManager keren = new EmployeeManager(100, "Keren", "1", "111222",
+     * 7000,
+     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "123");
+     * ShiftEmployee Liat = new ShiftEmployee(101, "Liat", "1", "111222", 7000,
+     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
+     * "password", Role.SHIFT_MANAGER);
+     * ShiftEmployee Erez = new ShiftEmployee(102, "Erez", "1", "111222", 7000,
+     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
+     * "password", Role.CASHIER);
+     * ShiftEmployee Elad = new ShiftEmployee(103, "Elad", "1", "111222", 7000,
+     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
+     * "password", Role.DRIVER);
+     * ShiftEmployee Eylon = new ShiftEmployee(104, "Eylon", "1", "111222", 7000,
+     * LocalDate.of(2025, 4, 10), 20, 5, 100,
+     * 100, "password", Role.DRIVER);
+     * ShiftEmployee Tal = new ShiftEmployee(105, "Tal", "1", "111222", 7000,
+     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
+     * "password", Role.CASHIER);
+     * ShiftEmployee Ofir = new ShiftEmployee(106, "Ofir", "1", "111222", 7000,
+     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
+     * "password", Role.STORE_KEEPER);
+     * ShiftEmployee Kiril = new ShiftEmployee(107, "Kiril", "1", "111222", 7000,
+     * LocalDate.of(2025, 4, 10), 20, 5, 100,
+     * 100, "password", Role.STORE_KEEPER);
+     * ShiftEmployee Ofri = new ShiftEmployee(108, "Ofri", "1", "111222", 7000,
+     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
+     * "password", Role.SHIFT_MANAGER);
+     * 
+     * public EmployeeFacade() {
+     * this.employeeManagers = new HashMap<>();
+     * this.shiftEmployees = new HashMap<>();
+     * this.branches = Collections.emptyList(); // Initialize branches as empty list
+     * 
+     * // Add the employee manager
+     * employeeManagers.put(keren.getId(), keren);
+     * // Add shift employees
+     * shiftEmployees.put(Liat.getId(), Liat);
+     * shiftEmployees.put(Erez.getId(), Erez);
+     * shiftEmployees.put(Elad.getId(), Elad);
+     * shiftEmployees.put(Eylon.getId(), Eylon);
+     * shiftEmployees.put(Tal.getId(), Tal);
+     * shiftEmployees.put(Ofir.getId(), Ofir);
+     * shiftEmployees.put(Kiril.getId(), Kiril);
+     * shiftEmployees.put(Ofri.getId(), Ofri);
+     * 
+     * keren.addEmployee(Liat);
+     * keren.addEmployee(Erez);
+     * keren.addEmployee(Elad);
+     * keren.addEmployee(Eylon);
+     * keren.addEmployee(Tal);
+     * keren.addEmployee(Ofir);
+     * keren.addEmployee(Kiril);
+     * keren.addEmployee(Ofri);
+     * }
+     */
     public Employee login(int id, String password) throws Exception {
         Employee e = getEmployee(id);
         if (e == null) {
@@ -101,8 +114,19 @@ public class EmployeeFacade { // employee related methods
     // ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
     // return employeeManager.removeEmployee(employeeId);
     // }
+    // check if there is a driver available for delivery and there is store kepper
+    // in each branch of the delivery
+    public DriverDL assignCheck(LocalDate sentDate, String shiftType, LocationDL origin, List<LocationDL> destinations,
+            String licenceType) {
+        try {
+            return employeeManger.assignCheck(sentDate, parseShiftType(shiftType), origin, destinations, licenceType);
+        } catch (Exception e) {
+            System.out.println("Error in assignCheck: " + e.getMessage());
+            return null;
+        }
+    }
 
-    public void hireEmployee(int employeeId, int empManagerId, String branch, String employeeName, String bankAccount,
+    public void hireEmployee(int employeeId, int empManagerId, LocationDL branch, String employeeName, String bankAccount,
             int salary, LocalDate startDate, int vacationDays, int sickDays, double educationFund,
             double socialBenefits, String employeePassword, Role role) throws Exception {
         if (!isEmployeeManager(empManagerId)) {
@@ -110,6 +134,9 @@ public class EmployeeFacade { // employee related methods
         }
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
+        }
+        if( branches == null || !branches.contains(branch)) {
+            throw new Exception("Branch not found.");
         }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         if (employeeManager.checkEmployee(employeeId)) {
@@ -305,7 +332,13 @@ public class EmployeeFacade { // employee related methods
      * return employeeManager.removeTrainingFromEmployee(employeeId, training);
      * }
      */
-    public void getAvailableEmployees(int empManagerId, Shift shift, Role role) throws Exception { // get available employees for a shift with this role
+    public void getAvailableEmployees(int empManagerId,LocationDL branch, Shift shift, Role role) throws Exception { // get available
+        // employees for a
+        // shift with this
+        // role
+        if (branch == null || !branches.contains(branch)) {
+            throw new Exception("Branch does not exist.");
+        }
         if (shift == null) {
             throw new Exception("Shift cannot be null.");
         }
@@ -323,7 +356,8 @@ public class EmployeeFacade { // employee related methods
     }
 
     // shift employee methods
-    public String getPrefAllEmployees(int empManagerId) throws Exception { // get all employees' preferences, for employee manager
+    public String getPrefAllEmployees(int empManagerId) throws Exception { // get all employees' preferences, for
+        // employee manager
         if (!isEmployeeManager(empManagerId)) {
             throw new Exception("This action is allowed only for employee managers.");
         }
@@ -334,7 +368,8 @@ public class EmployeeFacade { // employee related methods
         return employeeManager.getPrefAllEmployees();
     }
 
-    public void getPreferredShiftsEmployee(int employeeId) throws Exception { // employee's preferred shifts for shift employee only
+    public void getPreferredShiftsEmployee(int employeeId) throws Exception { // employee's preferred shifts for shift
+        // employee only
         if (!isLoggedIn(employeeId)) {
             throw new Exception("You are not logged in.");
         }
@@ -346,7 +381,8 @@ public class EmployeeFacade { // employee related methods
         }
     }
 
-    public void getAssignedEmployeeShiftsEmployee(int employeeId) throws Exception { // employee's assigned shifts for shift employee only
+    public void getAssignedEmployeeShiftsEmployee(int employeeId) throws Exception { // employee's assigned shifts for
+        // shift employee only
         if (!isLoggedIn(employeeId)) {
             throw new Exception("You are not logged in.");
         }
@@ -359,9 +395,9 @@ public class EmployeeFacade { // employee related methods
     }
 
     public void getAssignedEmployeeShiftsManager(int employeeId, int empManagerId) throws Exception { // employee's
-                                                                                                      // assigned shifts
-                                                                                                      // for shift
-                                                                                                      // employee only
+        // assigned shifts
+        // for shift
+        // employee only
         if (!isEmployeeManager(empManagerId)) {
             throw new Exception("This action is allowed only for employee manager.");
         }
@@ -389,10 +425,8 @@ public class EmployeeFacade { // employee related methods
     // if (anyManager == null) {
     // System.out.println("No employee manager available to process request.");
     // }
-
     // return anyManager.getAssignedEmployeeShiftsManager(employeeId);
     // }
-
     private EmployeeManager getAnyEmployeeManager() {
         return employeeManagers.values().stream().findFirst().orElse(null);
     }
@@ -401,29 +435,26 @@ public class EmployeeFacade { // employee related methods
     // ShiftEmployee shiftEmployee = shiftEmployees.get(id);
     // return shiftEmployee.addRole(role);
     // }
-
     // public String removeRole(int id, Role role) {
     // ShiftEmployee shiftEmployee = shiftEmployees.get(id);
     // return shiftEmployee.removeRole(role);
     // }
-
     // public String changeRole(int id, Role oldRole, Role newRole) {
     // ShiftEmployee shiftEmployee = shiftEmployees.get(id);
     // return shiftEmployee.changeRole(oldRole, newRole);
     // }
-
     // shift methods
-    public Shift getShift(LocalDate date, ShiftType shiftType, int id) throws Exception {
+    public Shift getShift(LocationDL branch, LocalDate date, ShiftType shiftType, int id) throws Exception {
         if (!isLoggedIn(id)) {
             throw new Exception("You must be logged in.");
         }
         EmployeeManager employeeManager = getEmployeeManager(id);
-        return employeeManager.getShift(date, shiftType);
+        return employeeManager.getShift(branch, date, shiftType);
     }
 
-    public Shift getShiftForEmployee(LocalDate date, ShiftType shiftType) throws Exception {
+    public Shift getShiftForEmployee(LocationDL branch, LocalDate date, ShiftType shiftType) throws Exception {
         for (EmployeeManager manager : employeeManagers.values()) {
-            Shift shift = manager.getShift(date, shiftType);
+            Shift shift = manager.getShift(branch, date, shiftType);
             if (shift != null) {
                 return shift;
             }
@@ -431,7 +462,8 @@ public class EmployeeFacade { // employee related methods
         throw new Exception("Shift not found for date: " + date + " and type: " + shiftType);
     }
 
-    public void changeShiftManager(Shift shift, int oldShiftManagerId, int newShiftManagerId, int empManagerId) throws Exception {
+    public void changeShiftManager(Shift shift, int oldShiftManagerId, int newShiftManagerId, int empManagerId)
+            throws Exception {
         if (!isEmployeeManager(empManagerId)) {
             throw new Exception("This action is allowed only for employee managers.");
         }
@@ -455,7 +487,7 @@ public class EmployeeFacade { // employee related methods
         }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         try {
-            employeeManager.shiftReplacement(shift, employeeId, newEmployeeId);
+            employeeManager.shiftReplacement(shift.getBranch(), shift, employeeId, newEmployeeId); //add getBranch to the map
         } catch (Exception e) {
             throw new Exception("Failed to replace shift: " + e.getMessage());
         }
@@ -472,8 +504,7 @@ public class EmployeeFacade { // employee related methods
     // EmployeeManager employeeManager = getEmployeeManager(empManagerId);
     // return employeeManager.createShift(date, shiftType, shiftManagerId);
     // }
-
-    public void autoCreateShiftsForNextWeek(int empManagerId) throws Exception {
+    public void autoCreateShiftsForNextWeek(int empManagerId, LocationDL branch) throws Exception {
         if (!isEmployeeManager(empManagerId)) {
             throw new Exception("Only employee managers can create shifts.");
         }
@@ -488,7 +519,7 @@ public class EmployeeFacade { // employee related methods
             LocalDate date = nextSunday.plusDays(i);
             for (ShiftType type : ShiftType.values()) {
                 try {
-                    manager.createDefaultShift(date, type);
+                    manager.createDefaultShift(branch, date, type);
                 } catch (Exception e) {
                     if (!e.getMessage().contains("already exists")) {
                         System.out.println("Failed to create shift for " + date + " " + type + ": " + e.getMessage());
@@ -507,7 +538,7 @@ public class EmployeeFacade { // employee related methods
         }
         EmployeeManager employeeManager = getEmployeeManager(empManagerId);
         try {
-            employeeManager.addEmployeeToShift(employeeId, shift, role);
+            employeeManager.addEmployeeToShift(shift.getBranch(), employeeId, shift, role);
         } catch (Exception e) {
             throw new Exception("Failed to add employee to shift: " + e.getMessage());
         }
@@ -553,7 +584,6 @@ public class EmployeeFacade { // employee related methods
     // }
     // return shift.addEmployee(employeeId, role);
     // }
-
     // public String removeEmployee(int employeeId, Shift shift, int empManagerId) {
     // if (!isEmployeeManager(empManagerId)) {
     // return "this action is allowed only for employee manager";
@@ -563,7 +593,6 @@ public class EmployeeFacade { // employee related methods
     // }
     // return shift.removeEmployee(employeeId);
     // }
-
     public void setRequiredRoles(int empManagerId, Shift shift, Role role, int num) throws Exception {
         if (!isEmployeeManager(empManagerId)) {
             throw new Exception("This action is allowed only for employee managers.");
@@ -642,11 +671,11 @@ public class EmployeeFacade { // employee related methods
     // ShiftEmployee shiftEmployee = shiftEmployees.get(id);
     // return shiftEmployee.removeAssignedShift(shift);
     // }
-
     public boolean isAvailable(int id, Shift shift) throws Exception {
         ShiftEmployee shiftEmployee = shiftEmployees.get(id);
-        if (shiftEmployee == null)
+        if (shiftEmployee == null) {
             throw new Exception("Shift employee not found.");
+        }
         try {
             return shiftEmployee.isAvailable(shift);
         } catch (Exception e) {
@@ -682,13 +711,25 @@ public class EmployeeFacade { // employee related methods
         }
     }
 
+    public ShiftType parseShiftType(String type) throws Exception {
+        try {
+            return ShiftType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new Exception("Invalid shift type: " + type);
+        }
+    }
+
     // just for Main
-    public void addFirstEmployeeManager(int id, String name, String branch, String bankAccount, int salary,
+    public void addFirstEmployeeManager(int id, String name, LocationDL branch, String bankAccount, int salary,
             LocalDate startDate, int vacationDays, int sickDays,
             double educationFund, double socialBenefits, String password) {
-        EmployeeManager manager = new EmployeeManager(id, name, branch, bankAccount, salary, startDate,
+        EmployeeManager manager = new EmployeeManager(id, name, bankAccount, salary, startDate,
                 vacationDays, sickDays, educationFund, socialBenefits, password);
         employeeManagers.put(id, manager);
         // repository.addEmployee(manager);
+    }
+
+    public List<LocationDL> getBranches() {
+        return branches;
     }
 }

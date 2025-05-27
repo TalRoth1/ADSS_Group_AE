@@ -1,10 +1,12 @@
 package DomainLayer;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public class ShipmentDL {
+
     public Date DateCreated; // includes the hour and time zone
     public Date DateSent;
     public TruckDL Truck;
@@ -12,15 +14,13 @@ public class ShipmentDL {
     public List<LocationDL> Destinations;
     public ShipmentDocumentDL Document;
     public ShipmentStatus Status = ShipmentStatus.PENDING;
-
+    public String ShiftType;
 
     public Boolean DriverCheck(DriverDL driver) {
         TruckDL truck = this.Truck;
         String truckType = truck.GetType();
-        for(String type : driver.LicenseType)
-        {
-            if(type.equals(truckType))
-            {
+        for (String type : driver.LicenseType) {
+            if (type.equals(truckType)) {
                 return true;
             }
         }
@@ -33,6 +33,10 @@ public class ShipmentDL {
         }
         this.DriverName = driver;
         return true;
+    }
+
+    public void setDriver(DriverDL driver) {
+        this.DriverName = driver;
     }
 
     public void ChangeStatus(String stat) {
@@ -50,7 +54,7 @@ public class ShipmentDL {
             case "CANCELLED":
                 this.Status = ShipmentStatus.CANCELLED;
                 break;
-                case "COMPLETED":
+            case "COMPLETED":
                 this.Status = ShipmentStatus.COMPLETED;
                 break;
             default:
@@ -58,22 +62,18 @@ public class ShipmentDL {
         }
     }
 
-    public Boolean WeightCheck(Map<String, Float> itemWeights)
-    {
+    public Boolean WeightCheck(Map<String, Float> itemWeights) {
         //assuming all items in Document exists in itemWeight
-        float sum =0;
+        float sum = 0;
         Map<LocationDL, Map<String, Integer>> curr = Document.getItemsMap();
-        for (LocationDL loc : curr.keySet())
-        {
-            Map<String , Integer> locList = curr.get(loc);
-            for(String itemToCheck : locList.keySet())
-            {
+        for (LocationDL loc : curr.keySet()) {
+            Map<String, Integer> locList = curr.get(loc);
+            for (String itemToCheck : locList.keySet()) {
                 int itemAmount = locList.get(itemToCheck);
                 sum += itemAmount * itemWeights.get(itemToCheck);
             }
         }
-        if(sum > Truck.GetMaxWeight())
-        {
+        if (sum > Truck.GetMaxWeight()) {
             return false;
         }
         return true;
@@ -83,36 +83,32 @@ public class ShipmentDL {
         return Document.EditOrigin(origin, Document.getLocations());
     }
 
-    private void SetDestinations(List<LocationDL> dest)
-    {
+    private void SetDestinations(List<LocationDL> dest) {
         this.Destinations = dest;
     }
 
-    private void setTruck(TruckDL newTruck)
-    {
+    private void setTruck(TruckDL newTruck) {
         this.Truck = newTruck;
     }
 
-    public void setWeight(Map<String, Float> Items)
-    {
+    public void setWeight(Map<String, Float> Items) {
         this.Document.setWeight(Items);
     }
 
-    public ShipmentDL(TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String,Integer>> items) {
+    public ShipmentDL(TruckDL truck, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items, String shiftType, Date dateToSend) {
         this.Truck = truck;
-        this.DriverName = driver;
+        this.DriverName = null; // Driver should be set later
         this.Destinations = destinations;
         this.Document = new ShipmentDocumentDL(items, origin);
         this.DateCreated = new Date();
-        this.DateSent = null;
+        this.DateSent = dateToSend;
+        this.ShiftType = shiftType;
     }
 
-    public Boolean EditDestinations(Map<LocationDL, Map<String, Integer>> items, Map<String,Float> itemWeights)
-    {
+    public Boolean EditDestinations(Map<LocationDL, Map<String, Integer>> items, Map<String, Float> itemWeights) {
         ShipmentDocumentDL temp = getDocument();
         Document.Edit(items);
-        if(!WeightCheck(itemWeights))
-        {
+        if (!WeightCheck(itemWeights)) {
             Document = temp;
             return false;
         }
@@ -120,19 +116,16 @@ public class ShipmentDL {
         return true;
     }
 
-    public ShipmentDocumentDL getDocument()
-    {
+    public ShipmentDocumentDL getDocument() {
         return Document;
     }
 
-    public void AddDestinations(Map<LocationDL, Map<String, Integer>> items)
-    {
+    public void AddDestinations(Map<LocationDL, Map<String, Integer>> items) {
         Document.Edit(items);
         UpdateDestinationsFromDoc();
     }
 
-    public void RemoveDestinations(List<LocationDL> destinations)
-    {
+    public void RemoveDestinations(List<LocationDL> destinations) {
         Document.Remove(destinations);
         List<LocationDL> curr = new ArrayList<>(this.Destinations);
         curr.removeAll(destinations);
@@ -140,23 +133,16 @@ public class ShipmentDL {
 
     }
 
-    private void UpdateDestinationsFromDoc()
-    {
+    private void UpdateDestinationsFromDoc() {
         SetDestinations(Document.getLocations());
     }
 
-
-
-    public boolean EditTruck(Integer number , List<TruckDL> trucks, Map<String, Float> itemWeights)
-    {
-        for(TruckDL truck : trucks)
-        {
-            if (truck.Number == number)
-            {
+    public boolean EditTruck(Integer number, List<TruckDL> trucks, Map<String, Float> itemWeights) {
+        for (TruckDL truck : trucks) {
+            if (truck.Number == number) {
                 TruckDL prev = this.Truck;
                 setTruck(truck);
-                if(WeightCheck(itemWeights) && DriverCheck(DriverName))
-                {
+                if (WeightCheck(itemWeights) && DriverCheck(DriverName)) {
                     return true;
                 }
                 setTruck(prev);
@@ -165,46 +151,66 @@ public class ShipmentDL {
         return false;
     }
 
-    public ShipmentStatus getStatus()
-    {
+    public ShipmentStatus getStatus() {
         return Status;
     }
 
-    public String toString()
-    {
-        return "Truck: " + Truck.GetNumber() +
-                ", Driver: " + DriverName.getName() +
-                ", Origin: " + Document.getOrigin().toString() +
-                ", Destinations: " + Document.getLocations().toString() +
-                ", Date Created: " + DateCreated.toString() +
-                (DateSent != null ? ", Date Sent: " + DateSent.toString() : "");
+    public String toString() {
+        return "Truck: " + Truck.GetNumber()
+                + ", Driver: " + DriverName.getName()
+                + ", Origin: " + Document.getOrigin().toString()
+                + ", Destinations: " + Document.getLocations().toString()
+                + ", Date Created: " + DateCreated.toString()
+                + (DateSent != null ? ", Date Sent: " + DateSent.toString() : "");
     }
 
-    public void ChangeAvailablity()
-    {
+    public void ChangeAvailablity() {
         Truck.changeState();
         DriverName.changeState();
     }
-    
-    public boolean DriverBusyCheck()
-    {
+
+    public boolean DriverBusyCheck() {
         return DriverName.isBusy;
     }
 
-    public boolean TruckBusyCheck()
-    {
+    public boolean TruckBusyCheck() {
         return Truck.IsBusy;
     }
 
-    public int getTruckNumber()
-    {
+    public int getTruckNumber() {
         return Truck.GetNumber();
     }
 
-    public int getDriverId()
-    {
+    public int getDriverId() {
         return DriverName.getId();
     }
+
+    public Date getDateCreated() {
+        return DateCreated;
+    }
+
+    public Date getDateSent() {
+        return DateSent;
+    }
+
+    public String getShiftType() {
+        return ShiftType;
+    }
+
+    public TruckDL getTruck() {
+        return Truck;
+    }
+
+    public DriverDL getDriver() {
+        return DriverName;
+    }
+
+    public void setShiftType(String shiftType) {
+        this.ShiftType = shiftType;
+    }
+
+    public void setDateSent(Date dateSent) {
+        this.DateSent = dateSent;
+    }
+
 }
-
-

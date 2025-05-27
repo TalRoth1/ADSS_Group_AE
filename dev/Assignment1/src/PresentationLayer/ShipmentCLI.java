@@ -1,16 +1,17 @@
 package PresentationLayer;
 
 import DomainLayer.DriverDL;
+import DomainLayer.EmployeeFacade;
 import DomainLayer.LocationDL;
 import DomainLayer.ShipmentDL;
 import DomainLayer.ShipmentFacade;
 import DomainLayer.TruckDL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import DomainLayer.EmployeeFacade;
 
 public class ShipmentCLI {
 
@@ -190,7 +191,49 @@ public class ShipmentCLI {
         return items;
     }
 
+    public Date ChooseDate() {
+        boolean flag = true;
+        Date date = null;
+        while (flag) {
+            System.out.println("Please enter the date in the format YYYY-MM-DD: ");
+            String dateString = scanner.nextLine();
+            try {
+                date = new Date(dateString);
+                flag = false;
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Please try again.");
+            }
+        }
+        return date;
+    }
+
+    public String chooseShift() {
+        boolean flag = true;
+        String shift = null;
+        while (flag) {
+            System.out.println("Please choose a shift: ");
+            System.out.println("1. Morning");
+            System.out.println("2. Evening");
+            int choice = Integer.parseInt(scanner.nextLine());
+            switch (choice) {
+                case 1:
+                    shift = "Morning";
+                    flag = false;
+                    break;
+                case 2:
+                    shift = "Evening";
+                    flag = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        return shift;
+    }
+
     public void CreateShipment() {
+        Date date = ChooseDate();
+        String shift = chooseShift();
         LocationDL startLocation = ChooseStart();
         if (startLocation == null) {
             return;
@@ -203,22 +246,23 @@ public class ShipmentCLI {
         if (truck == null) {
             return;
         }
-        DriverDL driver = ChooseDriver();
+        /*DriverDL driver = ChooseDriver();
         if (driver == null) {
-            return;
-        }
+           return;
+        }*/
         Map<LocationDL, Map<String, Integer>> items = ChooseItems(locations);
-        
+
         boolean flag = true;
         while (flag) {
             try {
-                shipmentFacade.CreateShipment(truck, driver, startLocation, locations, items);
+                shipmentFacade.CreateShipment(truck, startLocation, locations, items, shift, date);
                 flag = false;
             } catch (Exception e) {
-                if (e.getMessage().equals("Driver does not have the right license for this truck")) {
+                /*if (e.getMessage().equals("Driver does not have the right license for this truck")) {
                     System.out.println("Driver does not have the right license for this truck. Please choose a different driver.");
                     driver = ChooseDriver();
-                } else if (e.getMessage().equals("Truck is overweight")) {
+                } else */
+                if (e.getMessage().equals("Truck is overweight")) {
                     System.out.println("Truck is overweight. How would you like to proceed?");
                     System.out.println("1. Choose a different truck");
                     System.out.println("2. Edit the items in the shipment");
@@ -243,12 +287,10 @@ public class ShipmentCLI {
                             default:
                                 System.out.println("Invalid choice. Please try again.");
                         }
-
                     }
                 }
             }
         }
-
     }
 
     public void AddLocation() {
@@ -283,7 +325,6 @@ public class ShipmentCLI {
         }
         shipmentFacade.AddDriver(name, licenses);
     }*/
-
     public void AddTruck() {
         System.out.println("Please enter the truck number: ");
         int number = Integer.parseInt(scanner.nextLine());
@@ -307,7 +348,7 @@ public class ShipmentCLI {
     public void EditTruck(ShipmentDL shipment) {
         TruckDL truck = ChooseTruck();
         try {
-            shipmentFacade.EditShipement(shipment, truck, null, null, null, null);
+            shipmentFacade.EditShipement(shipment, truck, null, null, null, null, null, null);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -316,7 +357,7 @@ public class ShipmentCLI {
     public void EditDriver(ShipmentDL shipment) {
         DriverDL driver = ChooseDriver();
         try {
-            shipmentFacade.EditShipement(shipment, null, driver, null, null, null);
+            shipmentFacade.EditShipement(shipment, null, driver, null, null, null, null, null);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -325,7 +366,7 @@ public class ShipmentCLI {
     public void EditOrigin(ShipmentDL shipment) {
         LocationDL origin = ChooseStart();
         try {
-            shipmentFacade.EditShipement(shipment, null, null, origin, null, null);
+            shipmentFacade.EditShipement(shipment, null, null, origin, null, null, null, null);
         } catch (Exception e) {
             System.out.println("An error occurred while editing the shipment: " + e.getMessage());
         }
@@ -335,7 +376,7 @@ public class ShipmentCLI {
         List<LocationDL> locations = ChooseLocations();
         Map<LocationDL, Map<String, Integer>> items = ChooseItems(locations);
         try {
-            shipmentFacade.EditShipement(shipment, null, null, null, locations, items);
+            shipmentFacade.EditShipement(shipment, null, null, null, locations, items, null, null);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -345,14 +386,24 @@ public class ShipmentCLI {
         List<LocationDL> locations = shipment.Destinations;
         Map<LocationDL, Map<String, Integer>> items = ChooseItems(locations);
         try {
-            shipmentFacade.EditShipement(shipment, null, null, null, null, items);
+            shipmentFacade.EditShipement(shipment, null, null, null, null, items, null, null);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
+    public void EditDate(ShipmentDL shipment) {
+        Date date = ChooseDate();
+        String shift = chooseShift();
+        try {
+            shipmentFacade.EditShipement(shipment, null, null, null, null, null, date, shift);
+        } catch (Exception e) {
+        }
+    }
+
     public void EditShipement() {
         List<ShipmentDL> shipments = shipmentFacade.GetStatusShipement("Pending");
+        shipments.addAll(shipmentFacade.GetStatusShipement("Approved"));
         if (shipments.size() == 0) {
             System.out.println("There are no shipments to edit.");
             return;
@@ -381,7 +432,8 @@ public class ShipmentCLI {
             System.out.println("3. Origin");
             System.out.println("4. Destinations");
             System.out.println("5. Items");
-            System.out.println("6. Finish editing shipment");
+            System.out.println("6. Date and Shift");
+            System.out.println("7. Finish editing shipment");
             int choice2 = Integer.parseInt(scanner.nextLine());
             switch (choice2) {
                 case 1:
@@ -400,6 +452,9 @@ public class ShipmentCLI {
                     EditItems(shipment);
                     break;
                 case 6:
+                    EditDate(shipment);
+                    break;
+                case 7:
                     flag = false;
                     break;
                 default:
@@ -423,6 +478,7 @@ public class ShipmentCLI {
         switch (choice) {
             case 1:
                 shipments = shipmentFacade.GetStatusShipement("Pending");
+                shipments.addAll(shipmentFacade.GetStatusShipement("approved"));
                 if (shipments.size() == 0) {
                     System.out.println("There are no shipments to send.");
                     return;
@@ -449,6 +505,10 @@ public class ShipmentCLI {
                     }
                     if (e.getMessage().equals("Truck is busy")) {
                         System.out.println("The Truck is busy, please wait for it to finish its current shipment, or change the truck.");
+                    }
+                    if (e.getMessage().equals("No available driver for this shipment")) {
+                        System.out.println("Shipment cannot be sent at the current time, please choose a different time");
+                        EditDate(shipment);
                     }
                 }
                 break;
@@ -480,6 +540,7 @@ public class ShipmentCLI {
                 break;
             case 3:
                 shipments = shipmentFacade.GetStatusShipement("Pending");
+                shipments.addAll(shipmentFacade.GetStatusShipement("Approved"));
                 if (shipments.size() == 0) {
                     System.out.println("There are no shipments to cancel.");
                     return;
@@ -539,6 +600,7 @@ public class ShipmentCLI {
 
     public void ShowDocuments() {
         List<ShipmentDL> shipments = shipmentFacade.GetStatusShipement("Pending");
+        shipments.addAll(shipmentFacade.GetStatusShipement("Approved"));
         shipments.addAll(shipmentFacade.GetStatusShipement("Sent"));
         shipments.addAll(shipmentFacade.GetStatusShipement("Problem"));
         shipments.addAll(shipmentFacade.GetStatusShipement("Cancelled"));

@@ -17,8 +17,9 @@ public class Shift {
     private Map<Integer, Role> assignedEmployeesID;
     private Map<Integer, Role> availableEmployeesID;
     private boolean isShipmentShift = false; // Indicates if the shift includes a shipment
+    private LocationDL branch;
 
-    public Shift(LocalDate date, ShiftType shiftType, int shiftManagerId) {
+    public Shift(LocalDate date, ShiftType shiftType, int shiftManagerId, LocationDL branch) {
         this.date = date;
         this.shiftType = shiftType;
         if (shiftType == ShiftType.MORNING) {
@@ -32,6 +33,7 @@ public class Shift {
         this.requiredRoles = new HashMap<>();
         this.availableEmployeesID = new HashMap<>();
         this.assignedEmployeesID = new HashMap<>();
+        this.branch = branch;
         for (Role role : Role.values()) {
             this.requiredRoles.put(role, 0); // Initialize roles with 0 required employees
         }
@@ -125,6 +127,10 @@ public class Shift {
             throw new Exception("Role not required for this shift.");
         }
         requiredRoles.put(role, num);
+    }
+
+    public LocationDL getBranch() {
+        return branch;
     }
 
     public String getEmployeesInfo() {

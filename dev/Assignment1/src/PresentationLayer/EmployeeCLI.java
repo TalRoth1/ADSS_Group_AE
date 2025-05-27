@@ -9,6 +9,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.List;
 
 public class EmployeeCLI {
 
@@ -19,18 +20,19 @@ public class EmployeeCLI {
     private LocalDate nowDate;
 
     private static final Integer[] MORNING_SHIFT_START_TIMES = {
-            600, 630, 700, 730, 800, 830, 900, 930, 1000 };
+        600, 630, 700, 730, 800, 830, 900, 930, 1000};
     private static final Integer[] MORNING_SHIFT_END_TIMES = {
-            1300, 1330, 1400 };
+        1300, 1330, 1400};
     // private static final Integer[] MORNING_SHIFT_END_TIMES = {
     // 1300, 1330, 1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800};
     private static final Integer[] EVENING_SHIFT_START_TIMES = {
-            1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800, 1830, 1900, 1930, 2000, 2030, 2100 };
+        1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800, 1830, 1900, 1930, 2000, 2030, 2100};
     private static final Integer[] EVENING_SHIFT_END_TIMES = {
-            2100, 2130, 2200 };
+        2100, 2130, 2200};
     // private static final Integer[] EVENING_SHIFT_END_TIMES = {
     // 2100, 2130, 2200, 2230, 2300, 2330, 2400, 30, 100, 130, 200, 230, 300, 330,
     // 400, 430, 500};
+    List<LocationDL> branches = employeeFacade.getBranches();
 
     public EmployeeCLI(EmployeeFacade employeeFacade) {
         this.employeeFacade = employeeFacade;
@@ -71,12 +73,12 @@ public class EmployeeCLI {
     }
 
     private void employeeManager() {
-        String[] actions = { "Create Shifts", "Set Shifts", "Add Employee to Exist Shift",
-                "Remove Employee From Exist Shift",
-                "Fire Employee", "Hire Employee", "Change Employee's Role",
-                "Add Role to Employee", "Change Shift Manager", "Replace Employee",
-                "Delete Employee's Role", "Change Employee's Data", "Show Shift Information",
-                "Show Past Shifts", "Show Employee's shifts", "Change Shift Hours", "Logout" };
+        String[] actions = {"Create Shifts", "Set Shifts", "Add Employee to Exist Shift",
+            "Remove Employee From Exist Shift",
+            "Fire Employee", "Hire Employee", "Change Employee's Role",
+            "Add Role to Employee", "Change Shift Manager", "Replace Employee",
+            "Delete Employee's Role", "Change Employee's Data", "Show Shift Information",
+            "Show Past Shifts", "Show Employee's shifts", "Change Shift Hours", "Logout"};
         String option = selectFromList("Select Employee Manager Action (Enter the number)", actions);
         switch (option) {
             case "Create Shifts" ->
@@ -144,6 +146,12 @@ public class EmployeeCLI {
 
     private void setShifts() {
         ShowPrefAllEmployees();
+        if (branches.isEmpty()) {
+            System.out.println("No branches available. Please create a branch first.");
+            employeeManager();
+        }
+        System.out.println("Please select a branch from the following list:");
+        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
         LocalDate dateOfShift = chooseDateForManager("please enter start date"); // choose date with helper method
         System.out.println("Shift morning hours: 06:00 - 14:00");
         System.out.println("Evening morning hours: 14:00 - 22:00");
@@ -151,7 +159,7 @@ public class EmployeeCLI {
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
 
         try {
-            Shift shift = employeeFacade.getShift(dateOfShift, shiftType, userId);
+            Shift shift = employeeFacade.getShift(branch, dateOfShift, shiftType, userId);
             // choose shift manager
             int shiftManagerId = selectEmployeeForRole(shift, Role.SHIFT_MANAGER);
             employeeFacade.setShiftManager(userId, shift, shiftManagerId);
@@ -171,8 +179,9 @@ public class EmployeeCLI {
         ShowPrefAllEmployees();
         LocalDate dateOfShift = chooseDateForAddEmployee("Please enter Date");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
+        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
         try {
-            Shift shift = employeeFacade.getShift(dateOfShift, shiftType, userId);
+            Shift shift = employeeFacade.getShift(branch, dateOfShift, shiftType, userId);
             int newEmployeeId = selectEmployeeForExistingShift(shift);
             if (newEmployeeId == -1) {
                 System.out.println("Invalid employee choice, please try again.");
@@ -195,8 +204,9 @@ public class EmployeeCLI {
         int employeeId = readInt("Please enter Employee's ID to remove: ");
         LocalDate dateOfShift = chooseDate("Please enter the date of the shift");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
+        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[2]));
         try {
-            Shift shift = employeeFacade.getShift(dateOfShift, shiftType, userId);
+            Shift shift = employeeFacade.getShift(branch, dateOfShift, shiftType, userId);
             if (shift.getShiftManagerId() == employeeId) {
                 System.out.println("You can't remove shift Manager.");
                 System.out.println("if you want to change shift manager, you have this option in the menu.");
@@ -232,12 +242,17 @@ public class EmployeeCLI {
         double educationFund = readDouble("Education fund: ");
         double socialBenefits = readDouble("Social Benefits: ");
         String employeePassword = readString("Password: ");
-        String branch = readString("Branch: ");
+        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[2]));
+        branches = employeeFacade.getBranches();
+        if (branches.isEmpty()) {
+            System.out.println("No branches available. Please create a branch first.");
+            employeeManager();
+        }
 
         // choose role
         Role selectedRole = selectFromList("Choose a role:", Role.values());
         try {
-            employeeFacade.hireEmployee(employeeID, userId, name, branch, bankAccount, salary, startDate,
+            employeeFacade.hireEmployee(employeeID, userId, branch, name, bankAccount, salary, startDate,
                     vacationDays, sickDays, educationFund, socialBenefits, employeePassword, selectedRole);
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -270,10 +285,11 @@ public class EmployeeCLI {
 
     private void changeShiftManager() {
         int oldShiftManagerId = readInt("Please enter old shift manager ID: ");
+        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
         LocalDate dateOfShift = chooseDate("Please enter the date of the shift");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         try {
-            Shift shift = employeeFacade.getShift(dateOfShift, shiftType, userId);
+            Shift shift = employeeFacade.getShift(branch, dateOfShift, shiftType, userId);
             int newShiftManagerId = selectEmployeeForExistingShift(shift);
             employeeFacade.changeShiftManager(shift, oldShiftManagerId, newShiftManagerId, userId);
         } catch (Exception e) {
@@ -284,11 +300,12 @@ public class EmployeeCLI {
 
     private void replaceEmployee() {
         ShowPrefAllEmployees();
+        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
         int oldEmployeeId = readInt("Please enter the ID of the employee you want to replace: ");
         LocalDate dateOfShift = chooseDate("Please enter the date of the shift");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         try {
-            Shift shift = employeeFacade.getShift(dateOfShift, shiftType, userId);
+            Shift shift = employeeFacade.getShift(branch, dateOfShift, shiftType, userId);
             int newEmployeeId = selectEmployeeForExistingShift(shift);
             if (newEmployeeId == -1) {
                 System.out.println("Invalid employee choice, please try again.");
@@ -313,8 +330,8 @@ public class EmployeeCLI {
     }
 
     private void changeEmployeeData() {
-        String[] labels = { "Salary", "Bank Account", "Vacation Days", "Sick Days", "Education Fund",
-                "Social Benefits" };
+        String[] labels = {"Salary", "Bank Account", "Vacation Days", "Sick Days", "Education Fund",
+            "Social Benefits"};
         String option = selectFromList("Select Employee Data to change:", labels);
         switch (option) {
             case "Salary" ->
@@ -358,11 +375,12 @@ public class EmployeeCLI {
     }
 
     private void setTimes() {
+        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
         LocalDate date = chooseDate("Please enter the date of the shift");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         int[] times = getValidShiftTimes(shiftType);
         try {
-            Shift shift = employeeFacade.getShift(date, shiftType, userId);
+            Shift shift = employeeFacade.getShift(branch, date, shiftType, userId);
             employeeFacade.setTimes(userId, shift, times[0], times[1]);
             System.out.println("Shift times updated successfully!");
         } catch (Exception e) {
@@ -462,9 +480,9 @@ public class EmployeeCLI {
     // EmployeeManager();
     // }
     private void shiftManager() {
-        String[] actions = { "Add Preferred Shift", "Remove Preferred Shift",
-                "Show Employee's shifts", "Show Shift Information", "Show my Preferences",
-                "Show my Assigned Shifts", "Logout" };
+        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift",
+            "Show Employee's shifts", "Show Shift Information", "Show my Preferences",
+            "Show my Assigned Shifts", "Logout"};
         String option = selectFromList("Select Shift Manager Action:", actions);
 
         switch (option) {
@@ -525,10 +543,11 @@ public class EmployeeCLI {
     }
 
     private void getShiftInfo(String type) { // for shift manager OR shift employee OR shift manager
+        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
         LocalDate dateOfShift = chooseDate("Please enter the date of the shift");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         try {
-            Shift shift = employeeFacade.getShiftForEmployee(dateOfShift, shiftType);
+            Shift shift = employeeFacade.getShiftForEmployee(branch, dateOfShift, shiftType);
             employeeFacade.getShiftInfo(userId, shift);
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -542,8 +561,8 @@ public class EmployeeCLI {
     }
 
     private void shiftEmployee() {
-        String[] actions = { "Add Preferred Shift", "Remove Preferred Shift", "Show Shift Information",
-                "Show my Preferences", "Show my Assigned Shifts", "Logout" };
+        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift", "Show Shift Information",
+            "Show my Preferences", "Show my Assigned Shifts", "Logout"};
         String option = selectFromList("Select Shift Employee Action:", actions);
 
         switch (option) {
@@ -567,10 +586,11 @@ public class EmployeeCLI {
     }
 
     private void addPreferredShift(String type) {
+        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
         LocalDate dateOfShift = chooseDateForEmployee("please enter start date"); // choose date with helper method
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         try {
-            Shift shift = employeeFacade.getShiftForEmployee(dateOfShift, shiftType);
+            Shift shift = employeeFacade.getShiftForEmployee(branch, dateOfShift, shiftType);
             System.out.println("Shift from " + shift.getStartTime() + " until " + shift.getEndTime());
             employeeFacade.addPreferredShift(userId, shift);
         } catch (Exception e) {
@@ -583,10 +603,11 @@ public class EmployeeCLI {
     }
 
     private void removePreferredShift(String type) {
+        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
         LocalDate dateOfShift = chooseDateForEmployee("please enter start date"); // choose date with helper method
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         try {
-            Shift shift = employeeFacade.getShiftForEmployee(dateOfShift, shiftType);
+            Shift shift = employeeFacade.getShiftForEmployee(branch, dateOfShift, shiftType);
             employeeFacade.removePreferredShift(userId, shift);
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -640,7 +661,7 @@ public class EmployeeCLI {
     }
 
     private int selectEmployeeForExistingShift(Shift shift) { // method to replaceEmployee(), addEmployeeToExistShift(),
-                                                              // changeShiftManager()
+        // changeShiftManager()
         int employeeId = readInt("Please enter the ID of the employee who will join the shift: ");
         try {
             if (!employeeFacade.isAvailable(employeeId, shift)) {
@@ -664,12 +685,15 @@ public class EmployeeCLI {
         while (true) {
             System.out.println("Please choose " + role + " for the shift from the following available employees:");
             try {
-                employeeFacade.getAvailableEmployees(userId, shift, role);
+                LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
+
+                employeeFacade.getAvailableEmployees(userId, branch, shift, role);
                 int employeeId = readInt("Please enter the ID of the employee: ");
 
                 if (!employeeFacade.isAvailable(employeeId, shift)) {
                     System.out.println("This employee is not available for this shift.");
-                    int choice = readInt( "If you still want to add them, enter 1. Otherwise, enter any number other than 1: ");
+                    int choice = readInt(
+                            "If you still want to add them, enter 1. Otherwise, enter any number other than 1: ");
                     if (choice == 1) {
                         return employeeId; // confirmed override
                     } else {
@@ -701,7 +725,7 @@ public class EmployeeCLI {
             endTime = selectFromList("Select end time (must be after start):", endTimeOptions);
         }
 
-        return new int[] { startTime, endTime };
+        return new int[]{startTime, endTime};
     }
 
     private <T> T selectFromList(String title, T[] options) {

@@ -1,7 +1,7 @@
 package DataLayer;
 
-import java.sql.*;
 import DTO.EmployeeDTO;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class EmployeeDAO {

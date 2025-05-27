@@ -5,5 +5,6 @@ public enum ShipmentStatus {
     SENT,
     PROBLEM,
     CANCELLED,
+    APPROVED,
     COMPLETED;
 }
