@@ -7,15 +7,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class SupplierController
+public class DiscountController
 {
-    private String tableName = "Suppliers";
+    private String tableName = "Discounts";
     String currentDir = System.getProperty("user.dir");
     String dbPath = currentDir + File.separator + "Data.db";
     String url = "jdbc:sqlite:" + dbPath;
 
-    public SupplierController() 
+    public DiscountController() 
     {
         // Ensure the database connection is established
         try {
@@ -24,19 +23,18 @@ public class SupplierController
             System.out.println("SQLite JDBC driver not found: " + e.getMessage());
         }
     }
-    public void insert(SupplierDAO supplier)
+
+    public void insert(DiscountDAO discount) 
     {
-        try (Connection conn = DriverManager.getConnection(url)) {
+        try(Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "INSERT INTO " + tableName + " (companyID, bankAccount, paymentMethod, contactMail, contactPhone) VALUES (?, ?, ?, ?, ?)";
+                String sql = "INSERT INTO " + tableName + " (catalogID, minimumQuantity, discountPercentage) VALUES (?, ?, ?)";
                 try (var pstmt = conn.prepareStatement(sql)) {
-                    pstmt.setInt(1, supplier.getCompanyID());
-                    pstmt.setInt(2, supplier.getBankAccount());
-                    pstmt.setString(3, supplier.getPaymentMethod());
-                    pstmt.setString(4, supplier.getContactMail());
-                    pstmt.setString(5, supplier.getContactPhone());
+                    pstmt.setInt(1, discount.getCatalogID());
+                    pstmt.setInt(2, discount.getMinimumQuantity());
+                    pstmt.setInt(3, discount.getDiscountPercentage());
                     pstmt.executeUpdate();
-                    System.out.println("Supplier inserted successfully.");
+                    System.out.println("Discount inserted successfully.");
                 } catch (SQLException e) {
                     System.out.println("Insert failed: " + e.getMessage());
                 }
@@ -48,16 +46,16 @@ public class SupplierController
         }
     }
 
-    public void Update(int id, String column, String value)
+    public void update(int catalogID, String column, String value) 
     {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "UPDATE " + tableName + " SET " + column + " = ? WHERE supplierId = ?";
+                String sql = "UPDATE " + tableName + " SET " + column + " = ? WHERE catalogID = ?";
                 try (var pstmt = conn.prepareStatement(sql)) {
                     pstmt.setString(1, value);
-                    pstmt.setInt(2, id);
+                    pstmt.setInt(2, catalogID);
                     pstmt.executeUpdate();
-                    System.out.println("Supplier updated successfully.");
+                    System.out.println("Discount updated successfully.");
                 } catch (SQLException e) {
                     System.out.println("Update failed: " + e.getMessage());
                 }
@@ -69,15 +67,15 @@ public class SupplierController
         }
     }
 
-    public void delete(int id)
+    public void delete(int catalogID) 
     {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "DELETE FROM " + tableName + " WHERE supplierId = ?";
+                String sql = "DELETE FROM " + tableName + " WHERE catalogID = ?";
                 try (var pstmt = conn.prepareStatement(sql)) {
-                    pstmt.setInt(1, id);
+                    pstmt.setInt(1, catalogID);
                     pstmt.executeUpdate();
-                    System.out.println("Supplier deleted successfully.");
+                    System.out.println("Discount deleted successfully.");
                 } catch (SQLException e) {
                     System.out.println("Delete failed: " + e.getMessage());
                 }
@@ -89,54 +87,52 @@ public class SupplierController
         }
     }
 
-    public SupplierDAO getSupplier(int id)
+    public DiscountDAO getDiscount(int catalogID) 
     {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "SELECT * FROM " + tableName + " WHERE supplierId = ?";
+                String sql = "SELECT * FROM " + tableName + " WHERE catalogID = ?";
                 try (var pstmt = conn.prepareStatement(sql)) {
-                    pstmt.setInt(1, id);
-                    try (var rs = pstmt.executeQuery()) {
-                        if (rs.next()) {
-                            int companyID = rs.getInt("companyID");
-                            int bankAccount = rs.getInt("bankAccount");
-                            String paymentMethod = rs.getString("paymentMethod");
-                            String contactMail = rs.getString("contactMail");
-                            String contactPhone = rs.getString("contactPhone");
-                            return new SupplierDAO(id, companyID, bankAccount, paymentMethod, contactMail, contactPhone);
-                        }
+                    pstmt.setInt(1, catalogID);
+                    var rs = pstmt.executeQuery();
+                    if (rs.next()) {
+                        int minimumQuantity = rs.getInt("minimumQuantity");
+                        int discountPercentage = rs.getInt("discountPercentage");
+                        return new DiscountDAO(catalogID, minimumQuantity, discountPercentage);
+                    } else {
+                        System.out.println("Discount not found.");
+                        return null;
                     }
                 } catch (SQLException e) {
-                    System.out.println("Get supplier failed: " + e.getMessage());
+                    System.out.println("Query failed: " + e.getMessage());
+                    return null;
                 }
             } else {
                 System.out.println("Connection to database failed.");
+                return null;
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return null;
         }
-        return null; // Supplier not found
     }
 
-    public List<SupplierDAO> getAllSuppliers()
+    public List<DiscountDAO> getAllDiscounts() 
     {
-        List<SupplierDAO> suppliers = new ArrayList<>();
+        List<DiscountDAO> discounts = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
                 String sql = "SELECT * FROM " + tableName;
                 try (var pstmt = conn.prepareStatement(sql);
                      var rs = pstmt.executeQuery()) {
                     while (rs.next()) {
-                        int id = rs.getInt("supplierId");
-                        int companyID = rs.getInt("companyID");
-                        int bankAccount = rs.getInt("bankAccount");
-                        String paymentMethod = rs.getString("paymentMethod");
-                        String contactMail = rs.getString("contactMail");
-                        String contactPhone = rs.getString("contactPhone");
-                        suppliers.add(new SupplierDAO(id, companyID, bankAccount, paymentMethod, contactMail, contactPhone));
+                        int catalogID = rs.getInt("catalogID");
+                        int minimumQuantity = rs.getInt("minimumQuantity");
+                        int discountPercentage = rs.getInt("discountPercentage");
+                        discounts.add(new DiscountDAO(catalogID, minimumQuantity, discountPercentage));
                     }
                 } catch (SQLException e) {
-                    System.out.println("Get all suppliers failed: " + e.getMessage());
+                    System.out.println("Get all discounts failed: " + e.getMessage());
                 }
             } else {
                 System.out.println("Connection to database failed.");
@@ -144,6 +140,6 @@ public class SupplierController
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return suppliers;
+        return discounts;
     }
 }
