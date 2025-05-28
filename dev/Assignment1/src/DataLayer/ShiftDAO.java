@@ -1,8 +1,8 @@
 package DataLayer;
 
+import DTO.ShiftDTO;
 import java.sql.*;
 import java.util.ArrayList;
-import DTO.ShiftDTO;
 
 public class ShiftDAO {
 
@@ -62,32 +62,34 @@ public class ShiftDAO {
                         rs.getString("shiftType"),
                         rs.getInt("startTime"),
                         rs.getInt("endTime"),
-                        rs.getInt("shiftManagerId")
+                        rs.getInt("shiftManagerId"),
+                        0,
+                        0,
+                        0,
+                        0,
+                        false
                 );
                 shifts.add(shift);
             }
+            return shifts;
         } catch (SQLException e) {
-            System.out.println("Error getting all shifts: " + e.getMessage());
+            System.out.println("Error retrieving all shifts: " + e.getMessage());
             throw e;
         }
-        return shifts;
+
     }
 
-    public void getRole(String date, String shiftType, int employeeId) throws SQLException {
+    public String getRole(String date, String shiftType, int employeeId) throws SQLException {
         String sql = "SELECT role FROM shift_assignments WHERE date = ? AND shiftType = ? AND employeeId = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, date);
             pstmt.setString(2, shiftType);
             pstmt.setInt(3, employeeId);
-            ResultSet rst = pstmt.executeQuery();
-            if (rst.next()) {
-                System.out.println("Role: " + rst.getString("role"));
-            } else {
-                System.out.println("No role found for this employee in the specified shift.");
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("role");
             }
-        } catch (SQLException e) {
-            System.out.println("Error getting role: " + e.getMessage());
-            throw e;
+            throw new SQLException("Role not found for employee in the specified shift.");
         }
     }
 
@@ -154,6 +156,75 @@ public class ShiftDAO {
         String sql = "UPDATE shifts SET shiftManagerId = ? WHERE date = ? AND shiftType = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, shiftManagerId);
+            pstmt.setString(2, date);
+            pstmt.setString(3, shiftType);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public void setNumOfRequiredcashiers(int numOfRequiredcashiers, String date, String shiftType) throws SQLException {
+        String sql = "UPDATE shifts SET numOfRequiredcashiers = ? WHERE date = ? AND shiftType = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, numOfRequiredcashiers);
+            pstmt.setString(2, date);
+            pstmt.setString(3, shiftType);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public int getNumOfRequiredcashiers(String date, String shiftType) throws SQLException {
+        String sql = "SELECT numOfRequiredcashiers FROM shifts WHERE date = ? AND shiftType = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, date);
+            pstmt.setString(2, shiftType);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("numOfRequiredcashiers");
+            }
+            throw new SQLException("Shift not found.");
+        }
+    }
+
+    public void setNumOfRequireddrivers(int numOfRequireddrivers, String date, String shiftType) throws SQLException {
+        String sql = "UPDATE shifts SET numOfRequireddrivers = ? WHERE date = ? AND shiftType = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, numOfRequireddrivers);
+            pstmt.setString(2, date);
+            pstmt.setString(3, shiftType);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public int getNumOfRequireddrivers(String date, String shiftType) throws SQLException {
+        String sql = "SELECT numOfRequireddrivers FROM shifts WHERE date = ? AND shiftType = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, date);
+            pstmt.setString(2, shiftType);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("numOfRequireddrivers");
+            }
+            throw new SQLException("Shift not found.");
+        }
+    }
+
+    public int getNumOfRequiredstoreKeepers(String date, String shiftType) throws SQLException {
+        String sql = "SELECT numOfRequiredstoreKeepers FROM shifts WHERE date = ? AND shiftType = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, date);
+            pstmt.setString(2, shiftType);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("numOfRequiredstoreKeepers");
+            }
+            throw new SQLException("Shift not found.");
+        }
+    }
+
+    public void setNumOfRequiredstoreKeepers(int numOfRequiredstoreKeepers, String date, String shiftType) throws SQLException {
+        String sql = "UPDATE shifts SET numOfRequiredstoreKeepers = ? WHERE date = ? AND shiftType = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, numOfRequiredstoreKeepers);
             pstmt.setString(2, date);
             pstmt.setString(3, shiftType);
             pstmt.executeUpdate();

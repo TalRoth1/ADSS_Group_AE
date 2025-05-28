@@ -1,10 +1,5 @@
 package DataLayer;
 
-import java.sql.ResultSet;
-import DTO.ShiftDTO;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-
 public class ShiftController {
 
     private ShiftDAO shiftDAO;
@@ -29,41 +24,12 @@ public class ShiftController {
         }
     }
 
-    public ShiftDTO getShift(String date, String shiftType) {
+    public String getRole(String date, String shiftType, int employeeId) {
         try {
-            ResultSet rs = shiftDAO.getShift(date, shiftType);
-            if (rs.next()) {
-                return new ShiftDTO(rs.getString("date"), rs.getString("shiftType"),
-                        rs.getInt("startTime"), rs.getInt("endTime"), rs.getInt("shiftManagerId"));
-            } else {
-                return null; // No shift found
-            }
-        } catch (Exception e) {
-            System.out.println("Error getting shift: " + e.getMessage());
-            return null;
-        }
-    }
-
-    public ArrayList<ShiftDTO> getAllShifts() {
-        try {
-            ResultSet rs = shiftDAO.getAllShifts();
-            ArrayList<ShiftDTO> shifts = new ArrayList<>();
-            while (rs.next()) {
-                shifts.add(new ShiftDTO(rs.getString("date"), rs.getString("shiftType"),
-                        rs.getInt("startTime"), rs.getInt("endTime"), rs.getInt("shiftManagerId")));
-            }
-            return shifts;
-        } catch (Exception e) {
-            System.out.println("Error getting all shifts: " + e.getMessage());
-            return null;
-        }
-    }
-
-    public void getRole(String date, String shiftType, int employeeId) {
-        try {
-            shiftDAO.getRole(date, shiftType, employeeId);
+            return shiftDAO.getRole(date, shiftType, employeeId);
         } catch (Exception e) {
             System.out.println("Error getting role: " + e.getMessage());
+            return null;
         }
     }
 
@@ -117,4 +83,56 @@ public class ShiftController {
             System.out.println("Error setting shift manager ID: " + e.getMessage());
         }
     }
+
+    public void setNumOfRequiredcashiers(int numOfRequiredcashiers, String date, String shiftType) {
+        try {
+            shiftDAO.setNumOfRequiredcashiers(numOfRequiredcashiers, date, shiftType);
+        } catch (Exception e) {
+            System.out.println("Error setting number of required cashiers: " + e.getMessage());
+        }
+    }
+
+    public void setNumOfRequireddrivers(int numOfRequireddrivers, String date, String shiftType) {
+        try {
+            shiftDAO.setNumOfRequireddrivers(numOfRequireddrivers, date, shiftType);
+        } catch (Exception e) {
+            System.out.println("Error setting number of required drivers: " + e.getMessage());
+        }
+    }
+
+    public void setNumOfRequiredstoreKeepers(int numOfRequiredstoreKeepers, String date, String shiftType) {
+        try {
+            shiftDAO.setNumOfRequiredstoreKeepers(numOfRequiredstoreKeepers, date, shiftType);
+        } catch (Exception e) {
+            System.out.println("Error setting number of required store keepers: " + e.getMessage());
+        }
+    }
+
+    public int getNumOfRequiredcashiers(String date, String shiftType) {
+        try {
+            return shiftDAO.getNumOfRequiredcashiers(date, shiftType);
+        } catch (Exception e) {
+            System.out.println("Error getting number of required cashiers: " + e.getMessage());
+            return -1;
+        }
+    }
+
+    public int getNumOfRequireddrivers(String date, String shiftType) {
+        try {
+            return shiftDAO.getNumOfRequireddrivers(date, shiftType);
+        } catch (Exception e) {
+            System.out.println("Error getting number of required drivers: " + e.getMessage());
+            return -1;
+        }
+    }
+
+    public int getNumOfRequiredstoreKeepers(String date, String shiftType) {
+        try {
+            return shiftDAO.getNumOfRequiredstoreKeepers(date, shiftType);
+        } catch (Exception e) {
+            System.out.println("Error getting number of required store keepers: " + e.getMessage());
+            return -1;
+        }
+    }
+
 }

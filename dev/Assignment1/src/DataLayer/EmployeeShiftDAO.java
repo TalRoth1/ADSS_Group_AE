@@ -1,9 +1,9 @@
 package DataLayer;
 
+import DTO.EmployeeShiftDTO;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import DTO.EmployeeShiftDTO;
 
 public class EmployeeShiftDAO {
 
@@ -73,5 +73,19 @@ public class EmployeeShiftDAO {
             }
         }
         return shifts;
+    }
+
+    public void shiftReplacement(int oldemployeeId, int newEmployeeId, String shiftDate, String shiftType, String branch) throws SQLException {
+        String sql = "UPDATE employee_shifts SET employeeId=? WHERE employeeId=? AND shiftDate=? AND shiftType=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, newEmployeeId);
+            pstmt.setInt(2, oldemployeeId);
+            pstmt.setString(3, shiftDate);
+            pstmt.setString(4, shiftType);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error replacing shift: " + e.getMessage());
+            throw e;
+        }
     }
 }

@@ -3,6 +3,7 @@ package DataLayer;
 import DTO.EmployeeDTO;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class EmployeeDAO {
 
@@ -181,6 +182,53 @@ public class EmployeeDAO {
             if (rs.next() && rs.getInt(1) == 0) {
                 throw new SQLException("Employee with ID " + employeeId + " does not exist.");
             }
+        }
+    }
+
+    public void setloginEmployee(int employeeId, boolean isLoggedIn) throws SQLException {
+        String sql = "UPDATE employees SET isLoggedIn=? WHERE id=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setBoolean(1, isLoggedIn);
+            pstmt.setInt(2, employeeId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public void changeShiftManager(int oldid, int newid) throws SQLException {
+        String sql = "UPDATE shifts SET shiftManagerId=? WHERE shiftManagerId=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, newid);
+            pstmt.setInt(2, oldid);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public List<EmployeeDTO> getAllEmployeesInBranch(String branch) throws SQLException {
+        String sql = "SELECT name FROM employees WHERE branch=? AND isFinishedWorking=FALSE";
+        List<EmployeeDTO> employees = new ArrayList<>();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, branch);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                employees.add(new EmployeeDTO(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        branch,
+                        rs.getString("bankAccount"),
+                        rs.getInt("salary"),
+                        rs.getString("startDate"),
+                        rs.getInt("vacationDays"),
+                        rs.getInt("sickDays"),
+                        rs.getDouble("educationFund"),
+                        rs.getDouble("socialBenefits"),
+                        rs.getString("password"),
+                        rs.getBoolean("isFinishedWorking")
+                ));
+            }
+            return employees;
+        } catch (SQLException e) {
+            System.out.println("Error retrieving employees in branch: " + e.getMessage());
+            throw e;
         }
     }
 

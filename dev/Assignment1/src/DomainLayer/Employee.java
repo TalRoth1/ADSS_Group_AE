@@ -191,11 +191,11 @@ public class Employee {
         return isLoggedIn;
     }
 
-    public LocationDL getBranchId() {
+    public LocationDL getBranch() {
         return branch;
     }
 
-    public void setBranchId(LocationDL branchId) {
+    public void setBranch(LocationDL branchId) {
         this.branch = branchId;
     }
 

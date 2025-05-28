@@ -7,9 +7,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.List;
 
 public class EmployeeCLI {
 
@@ -136,7 +136,9 @@ public class EmployeeCLI {
     // }
     private void autoCreateShifts() {
         try {
-            employeeFacade.autoCreateShiftsForNextWeek(userId);
+            System.out.println("Please select a branch from the following list:");
+            LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
+            employeeFacade.autoCreateShiftsForNextWeek(userId, branch);
             System.out.println("Shifts for next week created successfully.");
         } catch (Exception e) {
             System.out.println("Failed to auto-create shifts: " + e.getMessage());

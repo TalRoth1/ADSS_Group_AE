@@ -1,8 +1,6 @@
 package DataLayer;
 
 import java.sql.SQLException;
-import java.util.List;
-import DTO.EmployeeShiftDTO;
 
 public class EmployeeShiftController {
 
@@ -25,6 +23,15 @@ public class EmployeeShiftController {
             employeeShiftDAO.removeEmployeeShift(employeeId, shiftDate, shiftType);
         } catch (SQLException e) {
             System.out.println("Error removing employee shift: " + e.getMessage());
+        }
+    }
+
+    public void shiftReplacement(int employeeId, String shiftDate, String shiftType, String newRole) {
+        try {
+            employeeShiftDAO.removeEmployeeShift(employeeId, shiftDate, shiftType);
+            employeeShiftDAO.addEmployeeShift(employeeId, shiftDate, shiftType, newRole);
+        } catch (SQLException e) {
+            System.out.println("Error replacing employee shift: " + e.getMessage());
         }
     }
 

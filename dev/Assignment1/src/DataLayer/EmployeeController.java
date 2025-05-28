@@ -1,7 +1,6 @@
 package DataLayer;
 
 import DTO.EmployeeDTO;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -127,4 +126,36 @@ public class EmployeeController {
             System.out.println("Error checking employee: " + e.getMessage());
         }
     }
+
+    public void login(int employeeId, String password) {
+        try {
+            employeeDAO.setloginEmployee(employeeId, true);
+        } catch (SQLException e) {
+            System.out.println("Error logging in: " + e.getMessage());
+        }
+    }
+
+    public void logout(int employeeId) {
+        try {
+            employeeDAO.setloginEmployee(employeeId, false);
+        } catch (SQLException e) {
+            System.out.println("Error logging out: " + e.getMessage());
+        }
+    }
+
+    public void getAllEmployeesInBranch(String branch) {
+        try {
+            employeeDAO.getAllEmployeesInBranch(branch);
+        } catch (SQLException e) {
+            System.out.println("Error getting employees by branch: " + e.getMessage());
+        }
+    }
+
+    /*  public void changeShiftManager(int employeeId, String newShiftManager, LocalDate shiftDate, String shiftType, Lo) {
+        try {
+            employeeDAO.changeShiftManager(employeeId, employeeId);
+        } catch (SQLException e) {
+            System.out.println("Error changing shift manager: " + e.getMessage());
+        }
+    }*/
 }

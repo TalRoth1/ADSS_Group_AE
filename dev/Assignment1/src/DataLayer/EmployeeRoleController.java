@@ -28,7 +28,7 @@ public class EmployeeRoleController {
         }
     }
 
-    public List<Role> getRoles(int employeeId) {
+    public List<String> getRoles(int employeeId) {
         try {
             return employeeRoleDAO.getRoles(employeeId);
         } catch (SQLException e) {

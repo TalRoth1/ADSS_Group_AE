@@ -1,9 +1,9 @@
 package DataLayer;
 
+import DTO.EmployeeManagerDTO;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import DTO.EmployeeManagerDTO;
 
 public class EmployeeManagerDAO {
 
@@ -61,11 +61,20 @@ public class EmployeeManagerDAO {
         try (Statement stmt = connection.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                managers.add(new EmployeeManagerDTO(
+                EmployeeManagerDTO manager = new EmployeeManagerDTO(
                         rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getString("branch")
-                ));
+                        rs.getString("branch"),
+                        rs.getString("bankAccount"),
+                        rs.getInt("salary"),
+                        rs.getString("startDate"),
+                        rs.getInt("vacationDays"),
+                        rs.getInt("sickDays"),
+                        rs.getDouble("educationFund"),
+                        rs.getDouble("socialBenefits"),
+                        rs.getString("password")
+                );
+                managers.add(manager);
             }
         }
         return managers;

@@ -1,10 +1,9 @@
 package DataLayer;
 
+import DomainLayer.Role;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-// Import Role if it's in another package, or define it here if missing
-import DomainLayer.Role;
 
 public class EmployeeRoleDAO {
 
@@ -32,14 +31,14 @@ public class EmployeeRoleDAO {
         }
     }
 
-    public List<Role> getRoles(int employeeId) throws SQLException {
+    public List<String> getRoles(int employeeId) throws SQLException {
         String sql = "SELECT role FROM employee_roles WHERE employeeId=?";
-        List<Role> roles = new ArrayList<>();
+        List<String> roles = new ArrayList<>();
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, employeeId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                roles.add(Role.valueOf(rs.getString("role"))); // Convert String to Enum
+                roles.add(rs.getString("role"));
             }
         }
         return roles;
