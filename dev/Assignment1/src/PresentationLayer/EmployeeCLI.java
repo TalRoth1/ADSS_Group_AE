@@ -159,6 +159,10 @@ public class EmployeeCLI {
         System.out.println("Evening morning hours: 14:00 - 22:00");
         System.out.println("if you want to change shift hours, you have option for this in the main menu");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
+        if (employeeFacade.checkPendingShipment(branch, dateOfShift, shiftType)) {
+            System.out.println("This shift has a pending shipment ");
+            System.out.println("Make sure to assign store keeper and driver in this shift setup.");
+        }
 
         try {
             Shift shift = employeeFacade.getShift(branch, dateOfShift, shiftType, userId);
@@ -624,8 +628,7 @@ public class EmployeeCLI {
     private void ShowPrefAllEmployees() {
         System.out.println("First, you will see all employees along with their shift preferences.");
         System.out.println("Later, when assigning roles, you'll be shown only employees who are available.");
-        System.out
-                .println("You may still choose unavailable employees if needed, the system will alert you about that.");
+        System.out.println("You may still choose unavailable employees if needed, the system will alert you about that.");
         try {
             String result = employeeFacade.getPrefAllEmployees(userId);
             System.out.println(result);

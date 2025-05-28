@@ -15,20 +15,21 @@ public class EmployeeManager extends Employee {
     private Map<LocationDL, Map<LocalDate, Shift>> eveningShifts;
     private Map<LocalDate, Shift> pastShifts;
     private ArrayList<LocationDL> branches;
-    private Map<LocationDL, Map<LocalDate, Set<ShiftType>>> missingShiftMap;
+    private Map<LocationDL, Map<LocalDate, Set<ShiftType>>> missingShift;
     private static final LocationDL EMPTY_LOCATION = new LocationDL("Empty", 0, "Empty", "Empty", "Empty", "Empty");
 
     public EmployeeManager(int id, String name, String bankAccount, int salary, LocalDate startDate,
             int vacationDays, int sickDays, double educationFund, double socialBenefits,
             String password) {
-        super(id, name, EMPTY_LOCATION, bankAccount, salary, startDate, vacationDays, sickDays, educationFund, socialBenefits,
+        super(id, name, EMPTY_LOCATION, bankAccount, salary, startDate, vacationDays, sickDays, educationFund,
+                socialBenefits,
                 password);
         allEmployees = new HashMap<>();
         morningShifts = new HashMap<>();
         eveningShifts = new HashMap<>();
         pastShifts = new HashMap<>();
         branches = new ArrayList<>();
-        missingShiftMap = new HashMap<>();
+        missingShift = new HashMap<>();
     }
 
     // methods
@@ -39,7 +40,8 @@ public class EmployeeManager extends Employee {
         branches.add(branch);
     }
 
-    public DriverDL assignCheck(LocalDate sentDate, ShiftType shiftType, LocationDL origin, List<LocationDL> destinations,
+    public DriverDL assignCheck(LocalDate sentDate, ShiftType shiftType, LocationDL origin,
+            List<LocationDL> destinations,
             String licenceType) {
         List<LocationDL> allLocations = new ArrayList<>(destinations);
         allLocations.add(origin);
@@ -47,7 +49,7 @@ public class EmployeeManager extends Employee {
         DriverDL selectedDriver = null;
 
         for (LocationDL location : allLocations) {
-            // 1. Check location exists
+            // Check if location exists
             if (!branches.contains(location)) {
                 System.out.println("Unknown location: " + location);
                 return null;
@@ -55,38 +57,25 @@ public class EmployeeManager extends Employee {
 
             Shift shift = getValidShift(location, shiftType, sentDate);
             if (shift == null) {
-                System.out.println("No valid shift found for " + sentDate + " at location: " + location);
                 recordMissingShift(location, sentDate, shiftType);
                 return null;
             }
 
-            // 4. Check for storekeeper
-            boolean hasStorekeeper = shift.getAssignedEmployeesID()
-                    .values()
-                    .stream()
-                    .anyMatch(role -> role == Role.STORE_KEEPER);
+            boolean hasStorekeeper = checkStorekeeperExistInBranch(shift);
+            if (!hasStorekeeper) {
+                recordMissingShift(location, sentDate, shiftType);
+                return null;
+            }
 
-            // 5. Check for driver with required licence
-            boolean hasDriverWithLicence = false;
-            for (Map.Entry<Integer, Role> entry : shift.getAssignedEmployeesID().entrySet()) {
-                if (entry.getValue() == Role.DRIVER) {
-                    ShiftEmployee emp = allEmployees.get(entry.getKey());
-                    if (emp instanceof DriverDL driver) {
-                        if (driver.getLicenceType().contains(licenceType)) {
-                            hasDriverWithLicence = true;
-                            if (selectedDriver == null) {
-                                selectedDriver = driver;
-                            }
-                            break; // Found a matching driver, no need to check more
-                        }
-                    }
+            if (selectedDriver == null) {
+                DriverDL candidate = checkDriverExistInBranch(shift, licenceType);
+                if (candidate != null) {
+                    selectedDriver = candidate;
+                } else {
+                    System.out.println("No driver with licence " + licenceType + " found for shift at " + location + " on " + sentDate);
+                    recordMissingShift(location, sentDate, shiftType);
+                    return null;
                 }
-            }
-
-            // 6. If missing storekeeper or driver with licence, add to missingShiftMap (if date is future)
-            if (!hasStorekeeper || !hasDriverWithLicence) {
-                recordMissingShift(location, sentDate, shiftType);
-                return null;
             }
         }
 
@@ -308,7 +297,14 @@ public class EmployeeManager extends Employee {
         }
     }
 
-    public void shiftReplacement(LocationDL location, Shift shift, int empID, int replacementID) throws Exception { // replace employee in the shift with another employee
+    public void shiftReplacement(LocationDL location, Shift shift, int empID, int replacementID) throws Exception { // replace
+                                                                                                                    // employee
+                                                                                                                    // in
+                                                                                                                    // the
+                                                                                                                    // shift
+                                                                                                                    // with
+                                                                                                                    // another
+                                                                                                                    // employee
         if (!checkEmployee(empID) || !checkEmployee(replacementID)) {
             throw new Exception("employee not found in the system");
         }
@@ -350,7 +346,10 @@ public class EmployeeManager extends Employee {
         }
     }
 
-    public void createDefaultShift(LocationDL location, LocalDate date, ShiftType shiftType) throws Exception { // create a default shift,
+    public void createDefaultShift(LocationDL location, LocalDate date, ShiftType shiftType) throws Exception { // create
+                                                                                                                // a
+                                                                                                                // default
+                                                                                                                // shift,
         // used for testing
         if (date == null || shiftType == null) {
             throw new Exception("invalid date or shift type");
@@ -372,7 +371,8 @@ public class EmployeeManager extends Employee {
         }
     }
 
-    public void createShift(LocationDL location, LocalDate date, ShiftType shiftType, int shiftManagerId) throws Exception { // create a new
+    public void createShift(LocationDL location, LocalDate date, ShiftType shiftType, int shiftManagerId)
+            throws Exception { // create a new
         // shift,
         // definig the
         // date, type
@@ -407,7 +407,9 @@ public class EmployeeManager extends Employee {
         pastShifts.put(date, shift);
     }
 
-    public void addEmployeeToShift(LocationDL location, int id, Shift shift, Role role) throws Exception { // add employee to shift
+    public void addEmployeeToShift(LocationDL location, int id, Shift shift, Role role) throws Exception { // add
+                                                                                                           // employee
+                                                                                                           // to shift
         if (!checkEmployee(id)) {
             throw new Exception("employee not exist");
         }
@@ -521,7 +523,8 @@ public class EmployeeManager extends Employee {
         return sb.toString();
     }
 
-    public void getAssignedEmployeeShiftsManager(int employeeID) throws Exception { // all the assigned shifts of the employee
+    public void getAssignedEmployeeShiftsManager(int employeeID) throws Exception { // all the assigned shifts of the
+                                                                                    // employee
         if (!checkEmployee(employeeID)) {
             throw new Exception("employee not exist");
         }
@@ -615,13 +618,20 @@ public class EmployeeManager extends Employee {
         return shiftMap.get(sentDate); // Everything is valid
     }
 
+    public boolean checkPendingShipment(LocationDL location, LocalDate date, ShiftType type) {
+        if (!missingShift.containsKey(location))
+            return false;
+        Map<LocalDate, Set<ShiftType>> dateMap = missingShift.get(location);
+        return dateMap.containsKey(date) && dateMap.get(date).contains(type);
+    }
+
     private void recordMissingShift(LocationDL location, LocalDate sentDate, ShiftType shiftType) {
         LocalDate now = LocalDate.now();
         LocalDate startOfThisWeek = now.with(java.time.DayOfWeek.MONDAY);
 
         // Only track missing shifts if the date is next week or later
         if (sentDate.isAfter(now) && !sentDate.isBefore(startOfThisWeek)) {
-            missingShiftMap
+            missingShift
                     .computeIfAbsent(location, loc -> new HashMap<>())
                     .computeIfAbsent(sentDate, date -> new HashSet<>())
                     .add(shiftType);
@@ -638,48 +648,32 @@ public class EmployeeManager extends Employee {
         return employeesInBranch;
     }
 
-    //add to dao?
-    public void checkStorekeeperExistInBranch(List<LocationDL> locations, Shift shift) throws Exception { //all loacations must have a storekeeper in the shift
-        for (LocationDL location : locations) {
-            Map<LocalDate, Shift> shiftMap = (shift.getShiftType() == ShiftType.MORNING)
-                    ? morningShifts.get(location)
-                    : eveningShifts.get(location);
-            if (shiftMap == null || !shiftMap.containsKey(shift.getDate())) {
-                throw new Exception("No shift found at " + location + " on " + shift.getDate());
-            }
-            Shift currentShift = shiftMap.get(shift.getDate());
-            boolean hasStorekeeper = currentShift.getAssignedEmployeesID()
-                    .values()
-                    .stream()
-                    .anyMatch(role -> role == Role.STORE_KEEPER);
-            if (!hasStorekeeper) {
-                throw new Exception("No storekeeper assigned to the shift at " + location + " on " + shift.getDate());
-            }
+    // add to dao?
+    public boolean checkStorekeeperExistInBranch(Shift shift) { // all locations must have a storekeeper in the shift
+        boolean hasStorekeeper = shift.getAssignedEmployeesID()
+                .values()
+                .stream()
+                .anyMatch(role -> role == Role.STORE_KEEPER);
+        if (!hasStorekeeper) {
+            System.out.println("No storekeeper assigned to the shift on " + shift.getDate());
+            return false;
         }
+        return true;
     }
 
-    public void checkDriverExistInBranch(List<LocationDL> locations) throws Exception { // check if there is at least one driver in 2 branches of the shipment 
-        for (LocationDL location : locations) {
-            Map<LocalDate, Shift> shiftMap = eveningShifts.get(location);
-            if (shiftMap == null || shiftMap.isEmpty()) {
-                throw new Exception("No evening shifts found at " + location);
-            }
-            boolean hasDriver = false;
-            for (Shift shift : shiftMap.values()) {
-                for (Role role : shift.getAssignedEmployeesID().values()) {
-                    if (role == Role.DRIVER) {
-                        hasDriver = true;
-                        break;
+    public DriverDL checkDriverExistInBranch(Shift shift, String licenceType) { // check if there is at least one driver
+                                                                                // in any branch of the shipment
+        for (Map.Entry<Integer, Role> entry : shift.getAssignedEmployeesID().entrySet()) {
+            if (entry.getValue() == Role.DRIVER) {
+                ShiftEmployee emp = allEmployees.get(entry.getKey());
+                if (emp instanceof DriverDL driver) {
+                    if (driver.getLicenceType().contains(licenceType)) {
+                        return driver;
                     }
                 }
-                if (hasDriver) {
-                    break;
-                }
-            }
-            if (!hasDriver) {
-                throw new Exception("No driver assigned to the evening shifts at " + location);
             }
         }
+        return null;
     }
 
 }

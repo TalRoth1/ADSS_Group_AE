@@ -729,6 +729,10 @@ public class EmployeeFacade { // employee related methods
         }
     }
 
+    public boolean checkPendingShipment(LocationDL location, LocalDate date, ShiftType type) {
+        return employeeManager.checkFutureShipment(location, date, type);
+    }
+
     // just for Main
     public void addFirstEmployeeManager(int id, String name, LocationDL branch, String bankAccount, int salary,
             LocalDate startDate, int vacationDays, int sickDays,
