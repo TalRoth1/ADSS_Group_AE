@@ -10,16 +10,16 @@ public class ContractDAO
     private boolean isPersisted = false;
     private int contractID;
     private int supplierID;
-    private Map<Integer, Integer> itemCatalogID;
+    private List<Integer> items;
     private List<DiscountDAO> billOfQuantities;
     private DeliveryMethod deliveryMethod;
     private ContractController contractController;
 
-    public ContractDAO(int contractID, int supplierID, Map<Integer, Integer> itemCatalogID, List<DiscountDAO> billOfQuantities, DeliveryMethod deliveryMethod)
+    public ContractDAO(int contractID, int supplierID, List<Integer> items, List<DiscountDAO> billOfQuantities, DeliveryMethod deliveryMethod)
     {
         this.contractID = contractID;
         this.supplierID = supplierID;
-        this.itemCatalogID = itemCatalogID;
+        this.items = items;
         this.billOfQuantities = billOfQuantities;
         this.deliveryMethod = deliveryMethod;
         this.contractController = new ContractController();
@@ -34,9 +34,9 @@ public class ContractDAO
     {
         return supplierID;
     }
-    public Map<Integer, Integer> getItemCatalogID() 
+    public List<Integer> getItemCatalogID() 
     {
-        return itemCatalogID;
+        return items;
     }
     public List<DiscountDAO> getBillOfQuantities() 
     {
@@ -53,11 +53,11 @@ public class ContractDAO
             this.deliveryMethod = deliveryMethod;
         }
     }
-    public void setItemCatalogID(Map<Integer, Integer> itemCatalogID) 
+    public void setItemCatalogID(List<Integer> items) 
     {
         if (isPersisted) 
         {
-            this.itemCatalogID = itemCatalogID;
+            this.items = items;
         }
     }
     public void setBillOfQuantities(List<DiscountDAO> billOfQuantities) 

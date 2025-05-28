@@ -7,14 +7,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContractController
+public class CatalogController
 {
-    private String tableName = "Contracts";
+    private String tableName = "Catalogs";
     String currentDir = System.getProperty("user.dir");
     String dbPath = currentDir + File.separator + "Data.db";
     String url = "jdbc:sqlite:" + dbPath;
 
-    public ContractController() 
+    public CatalogController() 
     {
         // Ensure the database connection is established
         try {
@@ -24,18 +24,18 @@ public class ContractController
         }
     }
 
-    public void insert(ContractDAO contract)
+    public void insert(CatalogDAO catalog)
     {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "INSERT INTO " + tableName + " (contractID, supplierID, itemCatalogID, deliveryMethod) VALUES (?, ?, ?, ?)";
+                String sql = "INSERT INTO " + tableName + " (supplierID, contractID, productID, catalogID) VALUES (?, ?, ?, ?)";
                 try (var pstmt = conn.prepareStatement(sql)) {
-                    pstmt.setInt(1, contract.getContractID());
-                    pstmt.setInt(2, contract.getSupplierID());
-                    pstmt.setObject(3, contract.getItemCatalogID()); // Assuming itemCatalogID is serializable
-                    pstmt.setString(4, contract.getDeliveryMethod().toString());
+                    pstmt.setInt(1, catalog.getSupplierID());
+                    pstmt.setInt(2, catalog.getContractID());
+                    pstmt.setInt(3, catalog.getProductID());
+                    pstmt.setInt(4, catalog.getCatalogID());
                     pstmt.executeUpdate();
-                    System.out.println("Contract inserted successfully.");
+                    System.out.println("Catalog inserted successfully.");
                 } catch (SQLException e) {
                     System.out.println("Insert failed: " + e.getMessage());
                 }
@@ -47,16 +47,18 @@ public class ContractController
         }
     }
 
-    public void update(int id, String column, String value)
+    public void update(int supplierID, int contractID, int productID, String column, String value)
     {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "UPDATE " + tableName + " SET " + column + " = ? WHERE contractID = ?";
+                String sql = "UPDATE " + tableName + " SET " + column + " = ? WHERE supplierID = ? AND contractID = ? AND productID = ?";
                 try (var pstmt = conn.prepareStatement(sql)) {
                     pstmt.setString(1, value);
-                    pstmt.setInt(2, id);
+                    pstmt.setInt(2, supplierID);
+                    pstmt.setInt(3, contractID);
+                    pstmt.setInt(4, productID);
                     pstmt.executeUpdate();
-                    System.out.println("Contract updated successfully.");
+                    System.out.println("Catalog updated successfully.");
                 } catch (SQLException e) {
                     System.out.println("Update failed: " + e.getMessage());
                 }
@@ -68,15 +70,17 @@ public class ContractController
         }
     }
 
-    public void delete(int id)
+    public void delete(int supllierId, int contractId, int productID)
     {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "DELETE FROM " + tableName + " WHERE contractID = ?";
+                String sql = "DELETE FROM " + tableName + " WHERE supplierID = ? AND contractID = ? AND productID = ?";
                 try (var pstmt = conn.prepareStatement(sql)) {
-                    pstmt.setInt(1, id);
+                    pstmt.setInt(1, supllierId);
+                    pstmt.setInt(2, contractId);
+                    pstmt.setInt(3, productID);
                     pstmt.executeUpdate();
-                    System.out.println("Contract deleted successfully.");
+                    System.out.println("Catalog deleted successfully.");
                 } catch (SQLException e) {
                     System.out.println("Delete failed: " + e.getMessage());
                 }
@@ -88,42 +92,49 @@ public class ContractController
         }
     }
 
-    public ContractDAO getContract(int id)
+    public CatalogDAO getCatalog(int supplierId, int contractId, int productID)
     {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "SELECT * FROM " + tableName + " WHERE contractID = ?";
+                String sql = "SELECT * FROM " + tableName + " WHERE supplierID = ? AND contractID = ? AND productID = ?";
                 try (var pstmt = conn.prepareStatement(sql)) {
-                    pstmt.setInt(1, id);
+                    pstmt.setInt(1, supplierId);
+                    pstmt.setInt(2, contractId);
+                    pstmt.setInt(3, productID);
                     var rs = pstmt.executeQuery();
                     if (rs.next()) {
-                        // Assuming the constructor of ContractDAO matches the columns in the database
-                        return new ContractDAO(rs.getInt("contractID"), rs.getInt("supplierID"), rs.getObject("itemCatalogID", List.class), rs.getObject("billOfQuantities", List.class), DeliveryMethod.valueOf(rs.getString("deliveryMethod")));
+                        return new CatalogDAO(rs.getInt("supplierID"), rs.getInt("contractID"), rs.getInt("productID"), rs.getInt("catalogID"));
+                    } else {
+                        System.out.println("Catalog not found.");
+                        return null;
                     }
                 } catch (SQLException e) {
-                    System.out.println("Get contract failed: " + e.getMessage());
+                    System.out.println("Query failed: " + e.getMessage());
+                    return null;
                 }
             } else {
                 System.out.println("Connection to database failed.");
+                return null;
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return null;
         }
-        return null; // Return null if no contract found
     }
 
-    public List<ContractDAO> getAllContracts()
+    public List<CatalogDAO> getAllCatalogs()
     {
-        List<ContractDAO> contracts = new ArrayList<>();
+        List<CatalogDAO> catalogs = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
                 String sql = "SELECT * FROM " + tableName;
-                try (var pstmt = conn.prepareStatement(sql); var rs = pstmt.executeQuery()) {
+                try (var pstmt = conn.prepareStatement(sql);
+                     var rs = pstmt.executeQuery()) {
                     while (rs.next()) {
-                        contracts.add(new ContractDAO(rs.getInt("contractID"), rs.getInt("supplierID"), rs.getObject("itemCatalogID", List.class), rs.getObject("billOfQuantities", List.class), DeliveryMethod.valueOf(rs.getString("deliveryMethod"))));
+                        catalogs.add(new CatalogDAO(rs.getInt("supplierID"), rs.getInt("contractID"), rs.getInt("productID"), rs.getInt("catalogID")));
                     }
                 } catch (SQLException e) {
-                    System.out.println("Get all contracts failed: " + e.getMessage());
+                    System.out.println("Query failed: " + e.getMessage());
                 }
             } else {
                 System.out.println("Connection to database failed.");
@@ -131,6 +142,6 @@ public class ContractController
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return contracts;
+        return catalogs;
     }
 }
