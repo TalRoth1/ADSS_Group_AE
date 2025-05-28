@@ -100,4 +100,8 @@ public class ShiftDTO {
         this.numOfRequiredshipmentManagers = numOfRequiredshipmentManagers;
     }
 
+    public boolean isShipmentShift() {
+        return isShipmentShift;
+    }
+
 }

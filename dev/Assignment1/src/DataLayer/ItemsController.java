@@ -1,18 +1,22 @@
 package DataLayer;
 import DTO.ItemDTO;
+import DataLayer.DAOs.ItemsDAO;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ItemsController {
+    private DBConnection dbConnection = new DBConnection();
     private Connection connection;
     private ItemsDAO itemsDAO;
     private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
-    public ItemsController(Connection connection) {
-        this.connection = connection;
+    public ItemsController() {
+        String DB_URL = "Items.db";
+        DBConnection.connect(DB_URL);
+        this.connection = DBConnection.getConnection();
         this.itemsDAO = new ItemsDAO(connection);
-
     }
 
     private int generateId() {

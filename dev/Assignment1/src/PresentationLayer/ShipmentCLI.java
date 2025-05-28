@@ -112,31 +112,33 @@ public class ShipmentCLI {
         return truck;
     }
 
-    public DriverDL ChooseDriver() {
-        boolean flag = true;
-        List<DriverDL> drivers = shipmentFacade.drivers;
-        if (drivers.size() == 0) {
-            System.out.println("No drivers available. Please add a driver first.");
-            return null;
-        }
-        DriverDL driver = null;
-        while (flag) {
-            System.out.println("Please choose a driver from the list below: ");
-            for (int i = 0; i < drivers.size(); i++) {
-                System.out.println(i + ": " + drivers.get(i).toString());
-            }
-            System.out.println("Enter the number of the driver you want to choose: ");
-            int choice = Integer.parseInt(scanner.nextLine());
-            if (choice >= 0 && choice < drivers.size()) {
-                driver = drivers.get(choice);
-                flag = false;
-            } else {
-                System.out.println("Invalid choice. Please try again.");
-            }
-
-        }
-        return driver;
-    }
+    /*
+     * public DriverDL ChooseDriver() {
+     * boolean flag = true;
+     * List<DriverDL> drivers = shipmentFacade.drivers;
+     * if (drivers.size() == 0) {
+     * System.out.println("No drivers available. Please add a driver first.");
+     * return null;
+     * }
+     * DriverDL driver = null;
+     * while (flag) {
+     * System.out.println("Please choose a driver from the list below: ");
+     * for (int i = 0; i < drivers.size(); i++) {
+     * System.out.println(i + ": " + drivers.get(i).toString());
+     * }
+     * System.out.println("Enter the number of the driver you want to choose: ");
+     * int choice = Integer.parseInt(scanner.nextLine());
+     * if (choice >= 0 && choice < drivers.size()) {
+     * driver = drivers.get(choice);
+     * flag = false;
+     * } else {
+     * System.out.println("Invalid choice. Please try again.");
+     * }
+     * 
+     * }
+     * return driver;
+     * }
+     */
 
     public Map<LocationDL, Map<String, Integer>> ChooseItems(List<LocationDL> locations) {
         boolean flag = true;
@@ -246,10 +248,12 @@ public class ShipmentCLI {
         if (truck == null) {
             return;
         }
-        /*DriverDL driver = ChooseDriver();
-        if (driver == null) {
-           return;
-        }*/
+        /*
+         * DriverDL driver = ChooseDriver();
+         * if (driver == null) {
+         * return;
+         * }
+         */
         Map<LocationDL, Map<String, Integer>> items = ChooseItems(locations);
 
         boolean flag = true;
@@ -258,10 +262,15 @@ public class ShipmentCLI {
                 shipmentFacade.CreateShipment(truck, startLocation, locations, items, shift, date);
                 flag = false;
             } catch (Exception e) {
-                /*if (e.getMessage().equals("Driver does not have the right license for this truck")) {
-                    System.out.println("Driver does not have the right license for this truck. Please choose a different driver.");
-                    driver = ChooseDriver();
-                } else */
+                /*
+                 * if (e.getMessage().
+                 * equals("Driver does not have the right license for this truck")) {
+                 * System.out.
+                 * println("Driver does not have the right license for this truck. Please choose a different driver."
+                 * );
+                 * driver = ChooseDriver();
+                 * } else
+                 */
                 if (e.getMessage().equals("Truck is overweight")) {
                     System.out.println("Truck is overweight. How would you like to proceed?");
                     System.out.println("1. Choose a different truck");
@@ -309,22 +318,25 @@ public class ShipmentCLI {
         shipmentFacade.AddLocation(street, streetNumber, city, contactNumber, contactName, zone);
     }
 
-    /*public void AddDriver() {
-        System.out.println("Please enter the driver name: ");
-        String name = scanner.nextLine();
-        boolean flag = true;
-        List<String> licenses = new ArrayList<>();
-        while (flag) {
-            System.out.println("Please enter the driver license types or finish to end: ");
-            String licenseType = scanner.nextLine();
-            if (licenseType.equalsIgnoreCase("Finish")) {
-                flag = false;
-            } else {
-                licenses.add(licenseType);
-            }
-        }
-        shipmentFacade.AddDriver(name, licenses);
-    }*/
+    /*
+     * public void AddDriver() {
+     * System.out.println("Please enter the driver name: ");
+     * String name = scanner.nextLine();
+     * boolean flag = true;
+     * List<String> licenses = new ArrayList<>();
+     * while (flag) {
+     * System.out.println("Please enter the driver license types or finish to end: "
+     * );
+     * String licenseType = scanner.nextLine();
+     * if (licenseType.equalsIgnoreCase("Finish")) {
+     * flag = false;
+     * } else {
+     * licenses.add(licenseType);
+     * }
+     * }
+     * shipmentFacade.AddDriver(name, licenses);
+     * }
+     */
     public void AddTruck() {
         System.out.println("Please enter the truck number: ");
         int number = Integer.parseInt(scanner.nextLine());
@@ -354,14 +366,17 @@ public class ShipmentCLI {
         }
     }
 
-    public void EditDriver(ShipmentDL shipment) {
-        DriverDL driver = ChooseDriver();
-        try {
-            shipmentFacade.EditShipement(shipment, null, driver, null, null, null, null, null);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
+    /*
+     * public void EditDriver(ShipmentDL shipment) {
+     * DriverDL driver = ChooseDriver();
+     * try {
+     * shipmentFacade.EditShipement(shipment, null, driver, null, null, null, null,
+     * null);
+     * } catch (Exception e) {
+     * System.out.println(e.getMessage());
+     * }
+     * }
+     */
 
     public void EditOrigin(ShipmentDL shipment) {
         LocationDL origin = ChooseStart();
@@ -428,7 +443,7 @@ public class ShipmentCLI {
         while (flag) {
             System.out.println("Please choose what you want to edit: ");
             System.out.println("1. Truck");
-            System.out.println("2. Driver");
+            // System.out.println("2. Driver");
             System.out.println("3. Origin");
             System.out.println("4. Destinations");
             System.out.println("5. Items");
@@ -439,9 +454,9 @@ public class ShipmentCLI {
                 case 1:
                     EditTruck(shipment);
                     break;
-                case 2:
-                    EditDriver(shipment);
-                    break;
+                // case 2:
+                // EditDriver(shipment);
+                // break;
                 case 3:
                     EditOrigin(shipment);
                     break;
@@ -501,13 +516,16 @@ public class ShipmentCLI {
                     shipmentFacade.ChangeStatus(shipment, "SENT");
                 } catch (Exception e) {
                     if (e.getMessage().equals("Driver is busy")) {
-                        System.out.println("The driver is busy, please wait for them to finish their current shipment, or change the driver.");
+                        System.out.println(
+                                "The driver is busy, please wait for them to finish their current shipment, or change the driver.");
                     }
                     if (e.getMessage().equals("Truck is busy")) {
-                        System.out.println("The Truck is busy, please wait for it to finish its current shipment, or change the truck.");
+                        System.out.println(
+                                "The Truck is busy, please wait for it to finish its current shipment, or change the truck.");
                     }
                     if (e.getMessage().equals("No available driver for this shipment")) {
-                        System.out.println("Shipment cannot be sent at the current time, please choose a different time");
+                        System.out
+                                .println("Shipment cannot be sent at the current time, please choose a different time");
                         EditDate(shipment);
                     }
                 }

@@ -1,41 +1,47 @@
 package DTO;
 
+import java.util.List;
+import java.util.Map;
+
 public class ShipmentDTO {
     private int id;
-    private String truck;
-    private String driver;
-    private String origin;
-    private String destination;
+    private TruckDTO truck;
+    private DriverDTO driver;
+    private LocationDTO origin; // should go to document as well ya goof. goofball
+    private List<LocationDTO> destination; // should go to document as well ya goof. goofball
     private String status;
-    private String items;
+    // private Map<String, Integer> items; go to document silly
+    private DocumentDTO document;
 
-    public ShipmentDTO(int id, String truck, String driver, String origin, String destination, String status, String items) {
+    public ShipmentDTO(int id, TruckDTO truck, DriverDTO driver, LocationDTO origin, List<LocationDTO> destination,
+            String status, DocumentDTO document) {
         this.id = id;
         this.truck = truck;
         this.driver = driver;
         this.origin = origin;
         this.destination = destination;
         this.status = status;
-        this.items = items;
+        this.document = document;
+        // this.items = null;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getTruck() {
+    public TruckDTO getTruck() {
         return truck;
     }
 
-    public String getDriver() {
+    public DriverDTO getDriver() {
         return driver;
     }
 
-    public String getOrigin() {
+    public LocationDTO getOrigin() {
         return origin;
     }
 
-    public String getDestination() {
+    public List<LocationDTO> getDestination() {
         return destination;
     }
 
@@ -43,9 +49,8 @@ public class ShipmentDTO {
         return status;
     }
 
-    public String getItems() {
-        return items;
+    public DocumentDTO getDocument() {
+        return document;
     }
 
 }
-    

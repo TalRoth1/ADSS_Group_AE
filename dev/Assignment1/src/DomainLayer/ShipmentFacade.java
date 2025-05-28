@@ -8,27 +8,42 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import DataLayer.ShipmentController;
+import DataLayer.TruckController;
+import DataLayer.LocationController;
+
 public class ShipmentFacade {
 
     public EmployeeFacade employeeFacade;
+    public ShipmentController shipmentController;
+    public LocationController locationController;
+    public TruckController truckController;
     public List<ShipmentDL> shipments = new ArrayList<>();
     public List<LocationDL> locations = new ArrayList<>();
-    public List<DriverDL> drivers = new ArrayList<>();
+    // public List<DriverDL> drivers = new ArrayList<>();
     public List<TruckDL> trucks = new ArrayList<>();
-    public Map<String, Float> Items = new HashMap<>(Map.of("egg carton", 1.5f, "milk", 1f, "bread", 0.5f, "cheese", 1f, "butter", 0.25f, "yogurt", 0.6f, "juice", 0.75f, "soda", 0.75f, "water", 1f, "coffee", 0.5f));
+    public Map<String, Float> Items = new HashMap<>(Map.of("egg carton", 1.5f, "milk", 1f, "bread", 0.5f, "cheese", 1f,
+            "butter", 0.25f, "yogurt", 0.6f, "juice", 0.75f, "soda", 0.75f, "water", 1f, "coffee", 0.5f));
+
+    public ShipmentFacade() {
+        this.shipmentController = new ShipmentController();
+        this.locationController = new LocationController();
+        this.truckController = new TruckController();
+    }
 
     public void SetEmployeeFacade(EmployeeFacade employeeFacade) {
         this.employeeFacade = employeeFacade;
     }
 
-    public void CreateShipment(TruckDL truck, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items, String shiftTime, Date datetoSend) throws Exception {
+    public void CreateShipment(TruckDL truck, LocationDL origin, List<LocationDL> destinations,
+            Map<LocationDL, Map<String, Integer>> items, String shiftTime, Date datetoSend) throws Exception {
         ShipmentDL shipment = new ShipmentDL(truck, origin, destinations, items, shiftTime, datetoSend);
         if (!shipment.WeightCheck(Items)) {
             throw new Exception("Truck is overweight");
         }
         shipment.setWeight(Items);
 
-        //assign driver
+        // assign driver
         DriverDL driverToSend = tryToAssignShifts(shipment);
         shipments.add(shipment);
     }
@@ -49,7 +64,7 @@ public class ShipmentFacade {
         }
 
         shipment.ChangeStatus(stat);
-        //assuming both where busy beforehand
+        // assuming both where busy beforehand
         if (stat.equals("COMPLETED") || stat.equals("PROBLEM") || stat.equals("CANCELLED")) {
             shipment.ChangeAvailablity();
         }
@@ -69,20 +84,26 @@ public class ShipmentFacade {
         shipments.remove(shipment);
     }
 
-    public LocationDL AddLocation(String street, int streetNumber, String city, String contactNumber, String contactName, String zone) {
+    public LocationDL AddLocation(String street, int streetNumber, String city, String contactNumber,
+            String contactName, String zone) {
         LocationDL location = new LocationDL(street, streetNumber, city, contactNumber, contactName, zone);
         locations.add(location);
         return location;
     }
 
-    /*public DriverDL AddDriver(int id, String name, String branch, String bankAccount, int salary, LocalDate startDate,
-            int vacationDays, int sickDays, double educationFund, double socialBenefits,
-            String password, List<String> licenseType) {
-        DriverDL driver = new DriverDL(id, name, branch, bankAccount, salary, startDate,
-                vacationDays, sickDays, educationFund, socialBenefits, password, licenseType);
-        drivers.add(driver);
-        return driver;
-    }*/
+    /*
+     * public DriverDL AddDriver(int id, String name, String branch, String
+     * bankAccount, int salary, LocalDate startDate,
+     * int vacationDays, int sickDays, double educationFund, double socialBenefits,
+     * String password, List<String> licenseType) {
+     * DriverDL driver = new DriverDL(id, name, branch, bankAccount, salary,
+     * startDate,
+     * vacationDays, sickDays, educationFund, socialBenefits, password,
+     * licenseType);
+     * drivers.add(driver);
+     * return driver;
+     * }
+     */
     public TruckDL AddTruck(int number, String model, String type, float maxWeight) {
         TruckDL truck = new TruckDL(number, model, type, 0, maxWeight);
         trucks.add(truck);
@@ -111,8 +132,10 @@ public class ShipmentFacade {
         return ans;
     }
 
-    public void EditShipement(ShipmentDL shipment, TruckDL truck, DriverDL driver, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items, Date dateToSend, String shiftTime) throws Exception {
-        //assuming that the shipment exists in the list
+    public void EditShipement(ShipmentDL shipment, TruckDL truck, DriverDL driver, LocationDL origin,
+            List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items, Date dateToSend,
+            String shiftTime) throws Exception {
+        // assuming that the shipment exists in the list
         int index = shipments.indexOf(shipment);
         ShipmentDL shipmentToEdit = shipments.get(index);
         if (truck != null) {
@@ -153,7 +176,9 @@ public class ShipmentFacade {
 
     public DriverDL tryToAssignShifts(ShipmentDL shipment) throws Exception {
         if (shipment.getStatus().equals(ShipmentStatus.PENDING)) {
-            DriverDL driverToSend = employeeFacade.assignCheck(DatetoLocalDate(shipment.getDateSent()), shipment.getShiftType().toString(), shipment.getDocument().getOrigin(), shipment.getDocument().getLocations(), shipment.getTruck().GetType());
+            DriverDL driverToSend = employeeFacade.assignCheck(DatetoLocalDate(shipment.getDateSent()),
+                    shipment.getShiftType().toString(), shipment.getDocument().getOrigin(),
+                    shipment.getDocument().getLocations(), shipment.getTruck().GetType());
             if (driverToSend == null) {
                 throw new Exception("No available driver for this shipment");
             }

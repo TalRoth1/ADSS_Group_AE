@@ -78,8 +78,11 @@ public class EmployeeManager extends Employee {
                 }
             }
         }
-
-        return selectedDriver; // could be null if no driver with the required license found
+        for (LocationDL location : allLocations) {
+            Shift shiftWithShip = getValidShift(location, shiftType, sentDate);
+            shiftWithShip.setShipmentShift(true);
+        }
+        return selectedDriver;
     }
 
     public void removeEmployee(int id) { // delete employee from the system, currently not used
@@ -267,8 +270,8 @@ public class EmployeeManager extends Employee {
     }
 
     public void changeShiftManager(Shift shift, int oldManager, int newManager) throws Exception { // switch the
-        // shiftmanager to
-        // another employee
+                                                                                                   // shiftmanager to
+                                                                                                   // another employee
         ShiftEmployee oldManagerE = allEmployees.get(oldManager);
         ShiftEmployee newManagerE = allEmployees.get(newManager);
         if (!checkEmployee(newManager) || !checkEmployee(oldManager)) {
@@ -297,9 +300,7 @@ public class EmployeeManager extends Employee {
         }
     }
 
-    public void shiftReplacement(LocationDL location, Shift shift, int empID, int replacementID) throws Exception { // replace
-                                                                                                                    // employee
-                                                                                                                    // in
+    public void shiftReplacement(LocationDL location, Shift shift, int empID, int replacementID) throws Exception { // replaceemployeein
                                                                                                                     // the
                                                                                                                     // shift
                                                                                                                     // with
@@ -349,7 +350,7 @@ public class EmployeeManager extends Employee {
     public void createDefaultShift(LocationDL location, LocalDate date, ShiftType shiftType) throws Exception { // create
                                                                                                                 // a
                                                                                                                 // default
-                                                                                                                // shift,
+                                                                                                                // shift
         // used for testing
         if (date == null || shiftType == null) {
             throw new Exception("invalid date or shift type");
@@ -372,12 +373,7 @@ public class EmployeeManager extends Employee {
     }
 
     public void createShift(LocationDL location, LocalDate date, ShiftType shiftType, int shiftManagerId)
-            throws Exception { // create a new
-        // shift,
-        // definig the
-        // date, type
-        // and
-        // shiftmanager
+            throws Exception { // create a new shift, defining the date, type and shift manager
         if (date == null || shiftType == null) {
             throw new Exception("invalid date or shift type");
         }
@@ -475,9 +471,9 @@ public class EmployeeManager extends Employee {
     }
 
     public void setRequiredRole(Shift shift, Role role, int numOfEmployees) throws Exception { // set the amount of
-        // employess of
-        // thisspecific role for
-        // the shift
+                                                                                               // employess of this
+                                                                                               // specific role for the
+                                                                                               // shift
         if (shift.isShipmentShift() && role == role.DRIVER && numOfEmployees < 1) {
             throw new Exception("For shipment shifts, you must have at least one driver.");
         }
@@ -566,7 +562,7 @@ public class EmployeeManager extends Employee {
     }
 
     public void getAvailableEmployees(Shift shift, Role role) { // all the employees that can work in this shift and
-        // have this role
+                                                                // have this role
         try {
             String res = "Available employees for this shift and role: " + role.toString() + "\n";
             for (ShiftEmployee employee : allEmployees.values()) {

@@ -1,13 +1,20 @@
 package DataLayer;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
-public class EmployeeShiftController {
+import DataLayer.DAOs.EmployeeShiftDAO;
 
+public class EmployeeShiftController {
+    private DBConnection dbConnection = new DBConnection();
+    private Connection connection;
     private EmployeeShiftDAO employeeShiftDAO;
 
     public EmployeeShiftController(EmployeeShiftDAO employeeShiftDAO) {
-        this.employeeShiftDAO = employeeShiftDAO;
+        String DB_URL = "EmployeesShift.db";
+        DBConnection.connect(DB_URL);
+        this.connection = DBConnection.getConnection();
+        this.employeeShiftDAO = new EmployeeShiftDAO(connection);
     }
 
     public void addEmployeeShift(int employeeId, String shiftDate, String shiftType, String role) {

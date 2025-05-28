@@ -3,13 +3,21 @@ package DataLayer;
 import DomainLayer.Role;
 import java.sql.SQLException;
 import java.util.List;
+import java.sql.Connection;
+
+
+import DataLayer.DAOs.EmployeeRoleDAO;
 
 public class EmployeeRoleController {
-
+    private DBConnection dbConnection = new DBConnection();
+    private Connection connection;
     private EmployeeRoleDAO employeeRoleDAO;
 
-    public EmployeeRoleController(EmployeeRoleDAO employeeRoleDAO) {
-        this.employeeRoleDAO = employeeRoleDAO;
+    public EmployeeRoleController() {
+        String DB_URL = "EmployeesRoles.db";
+        DBConnection.connect(DB_URL);
+        this.connection = DBConnection.getConnection();
+        this.employeeRoleDAO = new EmployeeRoleDAO(connection);
     }
 
     public void addRole(int employeeId, Role role) {

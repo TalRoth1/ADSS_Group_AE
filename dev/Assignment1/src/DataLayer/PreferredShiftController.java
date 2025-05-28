@@ -1,13 +1,20 @@
 package DataLayer;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
-public class PreferredShiftController {
+import DataLayer.DAOs.PreferredShiftDAO;
 
+public class PreferredShiftController {
+    private DBConnection dbConnection = new DBConnection();
+    private Connection connection;
     private PreferredShiftDAO preferredShiftDAO;
 
-    public PreferredShiftController(PreferredShiftDAO preferredShiftDAO) {
-        this.preferredShiftDAO = preferredShiftDAO;
+    public PreferredShiftController() {
+        String DB_URL = "PreferredShift.db";
+        DBConnection.connect(DB_URL);
+        this.connection = DBConnection.getConnection();
+        this.preferredShiftDAO = new PreferredShiftDAO(connection);
     }
 
     public void addPreferredShift(int employeeId, String shiftDate, String shiftType) {

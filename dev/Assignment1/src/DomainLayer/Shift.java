@@ -9,8 +9,10 @@ public class Shift {
     private LocalDate date;
     private ShiftType shiftType;
     private int startTime; // 24-hour format: e.g. 9:00 AM = 900, 10:30 PM = 2230
-    // Morning shifts: default start time is 600 (6:00 AM) and end time is 1400 (2:00 PM)
-    // Evening shifts: default start time is 1400 (2:00 PM) and end time is 2200 (10:00 PM)
+    // Morning shifts: default start time is 600 (6:00 AM) and end time is 1400
+    // (2:00 PM)
+    // Evening shifts: default start time is 1400 (2:00 PM) and end time is 2200
+    // (10:00 PM)
     private int endTime; // 24-hour format like startTime
     private int shiftManagerId;
     private Map<Role, Integer> requiredRoles; // roles and number of employees required
@@ -26,8 +28,8 @@ public class Shift {
             this.startTime = 600; // Default start time for morning shifts
             this.endTime = 1400; // Default end time for morning shifts
         } else {
-            this.startTime = 1400; //Default start time for evening shifts
-            this.endTime = 2200; //Default end time for evening shifts
+            this.startTime = 1400; // Default start time for evening shifts
+            this.endTime = 2200; // Default end time for evening shifts
         }
         this.shiftManagerId = shiftManagerId;
         this.requiredRoles = new HashMap<>();
@@ -143,7 +145,7 @@ public class Shift {
         return sb.toString();
     }
 
-    //methods
+    // methods
     public void addEmployee(int id, Role role) throws Exception {
         if (assignedEmployeesID.containsKey(id)) {
             throw new Exception("This employee is already assigned to this shift.");
@@ -192,6 +194,10 @@ public class Shift {
         return isShipmentShift;
     }
 
+    public void setShipmentShift(boolean shipmentShift) {
+        isShipmentShift = shipmentShift;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -207,6 +213,22 @@ public class Shift {
     @Override
     public int hashCode() {
         return date.hashCode() + shiftType.hashCode();
+    }
+
+    public int getNumOfRequiredcashiers() {
+        return requiredRoles.get(Role.CASHIER);
+    }
+
+    public int getNumOfRequireddrivers() {
+        return requiredRoles.get(Role.DRIVER);
+    }
+
+    public int getNumOfRequiredstorekeepers() {
+        return requiredRoles.get(Role.STORE_KEEPER);
+    }
+
+    public int getNumOfRequiredshipmentManagers() {
+        return requiredRoles.get(Role.SHIPMENT_MANAGER);
     }
 
 }

@@ -1,6 +1,10 @@
 package DomainLayer;
 
 import DataLayer.*;
+import DataLayer.DAOs.EmployeeDAO;
+import DataLayer.DAOs.EmployeeRoleDAO;
+import DataLayer.DAOs.EmployeeShiftDAO;
+
 import java.sql.Connection;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -12,7 +16,7 @@ import java.util.Map;
 
 public class EmployeeFacade { // employee related methods
 
-    private Map<Integer, EmployeeManager> employeeManagers;
+    private EmployeeManager employeeManager;
     private Map<Integer, ShiftEmployee> shiftEmployees;
     private List<LocationDL> branches;
     private Connection connection;
@@ -106,8 +110,7 @@ public class EmployeeFacade { // employee related methods
 
     // employee manager methods
     public boolean isEmployeeManager(int id) {
-        ////////////////change
-        return employeeManagers.containsKey(id);
+        return employeeManager.getId() == id;
     }
 
     public boolean isShiftManager(int id) {
@@ -122,7 +125,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new RuntimeException("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
         employeeManager.removeEmployee(employeeId);
     }
@@ -132,14 +135,15 @@ public class EmployeeFacade { // employee related methods
     public DriverDL assignCheck(LocalDate sentDate, String shiftType, LocationDL origin, List<LocationDL> destinations,
             String licenceType) {
         try {
-            return employeeManger.assignCheck(sentDate, parseShiftType(shiftType), origin, destinations, licenceType);
+            return employeeManager.assignCheck(sentDate, parseShiftType(shiftType), origin, destinations, licenceType);
         } catch (Exception e) {
             System.out.println("Error in assignCheck: " + e.getMessage());
             return null;
         }
     }
 
-    public void hireEmployee(int employeeId, int empManagerId, LocationDL branch, String employeeName, String bankAccount,
+    public void hireEmployee(int employeeId, int empManagerId, LocationDL branch, String employeeName,
+            String bankAccount,
             int salary, LocalDate startDate, int vacationDays, int sickDays, double educationFund,
             double socialBenefits, String employeePassword, Role role) throws Exception {
         if (!isEmployeeManager(empManagerId)) {
@@ -151,7 +155,7 @@ public class EmployeeFacade { // employee related methods
         if (branches == null || !branches.contains(branch)) {
             throw new Exception("Branch not found.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         if (employeeManager.checkEmployee(employeeId)) {
             throw new Exception("Employee with ID " + employeeId + " already hired.");
         }
@@ -159,7 +163,8 @@ public class EmployeeFacade { // employee related methods
         ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName, branch, bankAccount,
                 salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
 
-        empController.addEmployee(sickDays, employeeName, bankAccount, bankAccount, salary, bankAccount, vacationDays, sickDays, educationFund, socialBenefits, employeePassword);
+        empController.addEmployee(sickDays, employeeName, bankAccount, bankAccount, salary, bankAccount, vacationDays,
+                sickDays, educationFund, socialBenefits, employeePassword);
         shiftEmployees.put(employeeId, shiftEmployee);
         System.out.println("Employee hired: " + shiftEmployee.getName() + " with ID: " + employeeId);
     }
@@ -171,7 +176,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             empController.removeEmployee(employeeId);
             employeeManager.fireEmployee(employeeId);
@@ -187,7 +192,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             empRoleController.updateRole(employeeId, oldRole, newRole);
             employeeManager.changeRoleToEmployee(employeeId, oldRole, newRole);
@@ -203,7 +208,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             empRoleController.addRole(employeeId, newRole);
             employeeManager.addRoleToEmployee(employeeId, newRole);
@@ -219,7 +224,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             empRoleController.removeRole(employeeId, roleToDelete);
             employeeManager.deleteRoleFromEmployee(employeeId, roleToDelete);
@@ -236,7 +241,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             empController.updateSalary(employeeId, salary);
             employeeManager.updateSalaryEmployee(employeeId, salary);
@@ -252,7 +257,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             empController.updateBankAccount(employeeId, bankAccount);
             employeeManager.updateBankAccountEmployee(employeeId, bankAccount);
@@ -268,7 +273,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             empController.updateVacationDays(employeeId, vacationDays);
             employeeManager.updateVacationDaysEmployee(employeeId, vacationDays);
@@ -284,7 +289,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             empController.updateSickDays(employeeId, sickDays);
             employeeManager.updateSickDaysEmployee(employeeId, sickDays);
@@ -300,7 +305,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             empController.updateEducationFund(employeeId, educationFund);
             employeeManager.updateEducationFund(employeeId, educationFund);
@@ -316,7 +321,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             empController.updateSocialBenefits(employeeId, socialBenefits);
             employeeManager.updateSocialBenefits(employeeId, socialBenefits);
@@ -326,23 +331,23 @@ public class EmployeeFacade { // employee related methods
     }
 
     public Employee getEmployee(int id) {
-        Employee employee = employeeManagers.get(id);
-        if (employee == null) {
-            employee = shiftEmployees.get(id);
+        boolean manager = isEmployeeManager(id);
+        if (!manager) {
+            return shiftEmployees.get(id);
         }
-
-        return employee;
+        return employeeManager;
     }
 
     private boolean isLoggedIn(int id) {
         return getEmployee(id).isLoggedIn();
     }
 
-    private EmployeeManager getEmployeeManager(int id) {
-        return employeeManagers.get(id);
+    private EmployeeManager getEmployeeManager() {
+        return employeeManager;
     }
 
-    public void getAvailableEmployees(int empManagerId, LocationDL branch, Shift shift, Role role) throws Exception { // get available
+    public void getAvailableEmployees(int empManagerId, LocationDL branch, Shift shift, Role role) throws Exception { // get
+                                                                                                                      // available
         // employees for a
         // shift with this
         // role
@@ -359,7 +364,7 @@ public class EmployeeFacade { // employee related methods
             throw new Exception("You are not logged in.");
         }
 
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
 
         employeeManager.getAvailableEmployees(shift, role);
     }
@@ -373,7 +378,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         return employeeManager.getPrefAllEmployees();
     }
 
@@ -413,7 +418,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             employeeManager.getAssignedEmployeeShiftsManager(employeeId);
         } catch (Exception e) {
@@ -436,9 +441,9 @@ public class EmployeeFacade { // employee related methods
     // }
     // return anyManager.getAssignedEmployeeShiftsManager(employeeId);
     // }
-    private EmployeeManager getAnyEmployeeManager() {
-        return employeeManagers.values().stream().findFirst().orElse(null);
-    }
+    // private EmployeeManager getAnyEmployeeManager() {
+    // return employeeManagers.values().stream().findFirst().orElse(null);
+    // }
 
     // public String addRole(int id, Role role) {
     // ShiftEmployee shiftEmployee = shiftEmployees.get(id);
@@ -457,16 +462,14 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(id)) {
             throw new Exception("You must be logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(id);
+        EmployeeManager employeeManager = getEmployeeManager();
         return employeeManager.getShift(branch, date, shiftType);
     }
 
     public Shift getShiftForEmployee(LocationDL branch, LocalDate date, ShiftType shiftType) throws Exception {
-        for (EmployeeManager manager : employeeManagers.values()) {
-            Shift shift = manager.getShift(branch, date, shiftType);
-            if (shift != null) {
-                return shift;
-            }
+        Shift shift = getEmployeeManager().getShift(branch, date, shiftType);
+        if (shift != null) {
+            return shift;
         }
         throw new Exception("Shift not found for date: " + date + " and type: " + shiftType);
     }
@@ -479,9 +482,10 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
-            //   empController.changeShiftManager(oldShiftManagerId, newShiftManagerId, shift.getDate(), shift.getShiftType(), shift.getBranch());
+            // empController.changeShiftManager(oldShiftManagerId, newShiftManagerId,
+            // shift.getDate(), shift.getShiftType(), shift.getBranch());
             employeeManager.changeShiftManager(shift, oldShiftManagerId, newShiftManagerId);
         } catch (Exception e) {
             throw new Exception("Failed to change shift manager: " + e.getMessage());
@@ -495,9 +499,10 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
-            employeeManager.shiftReplacement(shift.getBranch(), shift, employeeId, newEmployeeId); //add getBranch to the map
+            employeeManager.shiftReplacement(shift.getBranch(), shift, employeeId, newEmployeeId); // add getBranch to
+                                                                                                   // the map
         } catch (Exception e) {
             throw new Exception("Failed to replace shift: " + e.getMessage());
         }
@@ -522,7 +527,7 @@ public class EmployeeFacade { // employee related methods
             throw new Exception("You must be logged in.");
         }
 
-        EmployeeManager manager = getEmployeeManager(empManagerId);
+        EmployeeManager manager = getEmployeeManager();
         LocalDate nextSunday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY));
 
         for (int i = 0; i < 6; i++) {
@@ -546,7 +551,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You must be logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             employeeManager.addEmployeeToShift(shift.getBranch(), employeeId, shift, role);
         } catch (Exception e) {
@@ -561,7 +566,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             employeeManager.removeEmployeeFromShift(employeeId, shift);
         } catch (Exception e) {
@@ -702,7 +707,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         return employeeManager.getPastShifts();
     }
 
@@ -713,7 +718,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        EmployeeManager employeeManager = getEmployeeManager(empManagerId);
+        EmployeeManager employeeManager = getEmployeeManager();
         try {
             employeeManager.setTimes(shift, startTime, endTime);
         } catch (Exception e) {
@@ -730,16 +735,16 @@ public class EmployeeFacade { // employee related methods
     }
 
     public boolean checkPendingShipment(LocationDL location, LocalDate date, ShiftType type) {
-        return employeeManager.checkFutureShipment(location, date, type);
+        return employeeManager.checkPendingShipment(location, date, type);
     }
 
     // just for Main
     public void addFirstEmployeeManager(int id, String name, LocationDL branch, String bankAccount, int salary,
             LocalDate startDate, int vacationDays, int sickDays,
             double educationFund, double socialBenefits, String password) {
-        EmployeeManager manager = new EmployeeManager(id, name, bankAccount, salary, startDate,
+        employeeManager = new EmployeeManager(id, name, bankAccount, salary, startDate,
                 vacationDays, sickDays, educationFund, socialBenefits, password);
-        employeeManagers.put(id, manager);
+        // employeeManagers.put(id, manager);
         // repository.addEmployee(manager);
     }
 

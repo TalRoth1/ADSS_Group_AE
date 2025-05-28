@@ -8,7 +8,7 @@ public class DriverDTO extends EmployeeDTO {
     private boolean isBusy;
 
 
-    public DriverDTO(int id, String name, String branch, String bankAccount, int salary, String startDate,
+    public DriverDTO(int id, String name, LocationDTO branch, String bankAccount, int salary, String startDate,
                      int vacationDays, int sickDays, double educationFund, double socialBenefits,
                      String password, boolean isFinishedWorking) {
         super(id, name, branch, bankAccount, salary, startDate, vacationDays, sickDays, educationFund,

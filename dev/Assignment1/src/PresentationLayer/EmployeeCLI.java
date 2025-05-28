@@ -20,15 +20,15 @@ public class EmployeeCLI {
     private LocalDate nowDate;
 
     private static final Integer[] MORNING_SHIFT_START_TIMES = {
-        600, 630, 700, 730, 800, 830, 900, 930, 1000};
+            600, 630, 700, 730, 800, 830, 900, 930, 1000 };
     private static final Integer[] MORNING_SHIFT_END_TIMES = {
-        1300, 1330, 1400};
+            1300, 1330, 1400 };
     // private static final Integer[] MORNING_SHIFT_END_TIMES = {
     // 1300, 1330, 1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800};
     private static final Integer[] EVENING_SHIFT_START_TIMES = {
-        1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800, 1830, 1900, 1930, 2000, 2030, 2100};
+            1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800, 1830, 1900, 1930, 2000, 2030, 2100 };
     private static final Integer[] EVENING_SHIFT_END_TIMES = {
-        2100, 2130, 2200};
+            2100, 2130, 2200 };
     // private static final Integer[] EVENING_SHIFT_END_TIMES = {
     // 2100, 2130, 2200, 2230, 2300, 2330, 2400, 30, 100, 130, 200, 230, 300, 330,
     // 400, 430, 500};
@@ -49,7 +49,7 @@ public class EmployeeCLI {
      * else {
      */
     // }
-    private void loginCLI() {
+    public void loginCLI() {
         while (true) {
             System.out.println("LOGIN:");
             userId = readInt("Please enter your ID:");
@@ -73,12 +73,12 @@ public class EmployeeCLI {
     }
 
     private void employeeManager() {
-        String[] actions = {"Create Shifts", "Set Shifts", "Add Employee to Exist Shift",
-            "Remove Employee From Exist Shift",
-            "Fire Employee", "Hire Employee", "Change Employee's Role",
-            "Add Role to Employee", "Change Shift Manager", "Replace Employee",
-            "Delete Employee's Role", "Change Employee's Data", "Show Shift Information",
-            "Show Past Shifts", "Show Employee's shifts", "Change Shift Hours", "Logout"};
+        String[] actions = { "Create Shifts", "Set Shifts", "Add Employee to Exist Shift",
+                "Remove Employee From Exist Shift",
+                "Fire Employee", "Hire Employee", "Change Employee's Role",
+                "Add Role to Employee", "Change Shift Manager", "Replace Employee",
+                "Delete Employee's Role", "Change Employee's Data", "Show Shift Information",
+                "Show Past Shifts", "Show Employee's shifts", "Change Shift Hours", "Logout" };
         String option = selectFromList("Select Employee Manager Action (Enter the number)", actions);
         switch (option) {
             case "Create Shifts" ->
@@ -336,8 +336,8 @@ public class EmployeeCLI {
     }
 
     private void changeEmployeeData() {
-        String[] labels = {"Salary", "Bank Account", "Vacation Days", "Sick Days", "Education Fund",
-            "Social Benefits"};
+        String[] labels = { "Salary", "Bank Account", "Vacation Days", "Sick Days", "Education Fund",
+                "Social Benefits" };
         String option = selectFromList("Select Employee Data to change:", labels);
         switch (option) {
             case "Salary" ->
@@ -486,9 +486,9 @@ public class EmployeeCLI {
     // EmployeeManager();
     // }
     private void shiftManager() {
-        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift",
-            "Show Employee's shifts", "Show Shift Information", "Show my Preferences",
-            "Show my Assigned Shifts", "Logout"};
+        String[] actions = { "Add Preferred Shift", "Remove Preferred Shift",
+                "Show Employee's shifts", "Show Shift Information", "Show my Preferences",
+                "Show my Assigned Shifts", "Logout" };
         String option = selectFromList("Select Shift Manager Action:", actions);
 
         switch (option) {
@@ -567,8 +567,8 @@ public class EmployeeCLI {
     }
 
     private void shiftEmployee() {
-        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift", "Show Shift Information",
-            "Show my Preferences", "Show my Assigned Shifts", "Logout"};
+        String[] actions = { "Add Preferred Shift", "Remove Preferred Shift", "Show Shift Information",
+                "Show my Preferences", "Show my Assigned Shifts", "Logout" };
         String option = selectFromList("Select Shift Employee Action:", actions);
 
         switch (option) {
@@ -628,7 +628,8 @@ public class EmployeeCLI {
     private void ShowPrefAllEmployees() {
         System.out.println("First, you will see all employees along with their shift preferences.");
         System.out.println("Later, when assigning roles, you'll be shown only employees who are available.");
-        System.out.println("You may still choose unavailable employees if needed, the system will alert you about that.");
+        System.out
+                .println("You may still choose unavailable employees if needed, the system will alert you about that.");
         try {
             String result = employeeFacade.getPrefAllEmployees(userId);
             System.out.println(result);
@@ -730,7 +731,7 @@ public class EmployeeCLI {
             endTime = selectFromList("Select end time (must be after start):", endTimeOptions);
         }
 
-        return new int[]{startTime, endTime};
+        return new int[] { startTime, endTime };
     }
 
     private <T> T selectFromList(String title, T[] options) {

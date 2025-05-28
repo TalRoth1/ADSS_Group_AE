@@ -1,15 +1,26 @@
 package DataLayer;
 
 import DTO.EmployeeDTO;
+import DataLayer.DAOs.EmployeeDAO;
+
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
 public class EmployeeController {
-
+    private DBConnection dbConnection = new DBConnection();
+    private Connection connection;
     private EmployeeDAO employeeDAO;
 
-    public EmployeeController(EmployeeDAO employeeDAO) {
-        this.employeeDAO = employeeDAO;
+    public EmployeeController() {
+        String DB_URL = "Employees.db";
+        DBConnection.connect(DB_URL);
+        this.connection = DBConnection.getConnection();
+        this.employeeDAO = new EmployeeDAO(connection);
+    }
+
+    public EmployeeDAO getEmployeeDAO() {
+        return employeeDAO;
     }
 
     public void addEmployee(int id, String name, String branch, String bankAccount, int salary, String startDate,

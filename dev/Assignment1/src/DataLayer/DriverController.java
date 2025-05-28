@@ -2,18 +2,27 @@ package DataLayer;
 
 import DTO.DriverDTO;
 import DTO.EmployeeDTO;
+import DataLayer.DAOs.DriverDAO;
+import DataLayer.DAOs.EmployeeDAO;
+
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
-//TODO: move all of this to employeeController OwO
+
 public class DriverController {
 
+    private DBConnection dbConnection = new DBConnection();
+    private Connection connection;
     DriverDAO driverDAO;
     EmployeeDAO employeeDAO;
 
-    public DriverController(DriverDAO driverDAO, EmployeeDAO employeeDAO) {
-        this.driverDAO = driverDAO;
-        this.employeeDAO = employeeDAO;
+    public DriverController(EmployeeController employeeController) {
+        String DB_URL = "drivers.db";
+        DBConnection.connect(DB_URL);
+        this.connection = DBConnection.getConnection();
+        this.driverDAO = new DriverDAO(connection);
+        this.employeeDAO = employeeController.getEmployeeDAO();
     }
 
     public void addDriver(DriverDTO driver) {

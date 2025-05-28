@@ -1,11 +1,19 @@
 package DataLayer;
 
-public class ShiftController {
+import java.sql.Connection;
 
+import DataLayer.DAOs.ShiftDAO;
+
+public class ShiftController {
+    private DBConnection dbConnection = new DBConnection();
+    private Connection connection;
     private ShiftDAO shiftDAO;
 
-    public ShiftController(ShiftDAO shiftDAO) {
-        this.shiftDAO = shiftDAO;
+    public ShiftController() {
+        String DB_URL = "Shift.db";
+        DBConnection.connect(DB_URL);
+        this.connection = DBConnection.getConnection();
+        this.shiftDAO = new ShiftDAO(connection);
     }
 
     public void addShift(String date, String shiftType, int startTime, int endTime, int shiftManagerId) {

@@ -4,13 +4,17 @@ import java.sql.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import DTO.TruckDTO;
+import DataLayer.DAOs.TruckDAO;
 
 public class TruckController {
+    private DBConnection dbConnection = new DBConnection();
     private Connection connection;
     private TruckDAO truckDAO;
 
-    public TruckController(Connection connection) {
-        this.connection = connection;
+    public TruckController() {
+        String DB_URL = "Trucks.db";
+        DBConnection.connect(DB_URL);
+        this.connection = DBConnection.getConnection();
         this.truckDAO = new TruckDAO(connection);
     }
 
@@ -21,7 +25,8 @@ public class TruckController {
 
     public void updateTruck(TruckDTO truck) throws SQLException {
         truckCheck(truck);
-        truckDAO.updateTruck(truck.getId(), truck.getLicensePlate(), truck.getWeight());
+        truckDAO.updateTruck(truck.getId(), truck.getLicensePlate(), truck.getWeight(), truck.getMaxWeight(),
+                truck.getStatus() ? 1 : 0, truck.getType());
     }
 
     public void deleteTruck(TruckDTO truck) throws SQLException {
@@ -41,8 +46,13 @@ public class TruckController {
 
     private TruckDTO getTruckFromResultSet(ResultSet rst) throws SQLException {
         if (rst.next()) {
-            return new TruckDTO(rst.getInt("id"), rst.getString("license_plate"), rst.getString("type"),
-                    rst.getString("status"), rst.getString("location"), rst.getDouble("weight"));
+            return new TruckDTO(
+                    rst.getInt("id"),
+                    rst.getString("license_plate"),
+                    rst.getString("type"),
+                    rst.getFloat("weight"),
+                    rst.getFloat("max_weight"),
+                    rst.getInt("status") == 1 ? true : false);
         } else {
             throw new SQLException("Truck not found with id: " + rst.getInt("id"));
         }

@@ -11,7 +11,7 @@ public class ShipmentDL {
     public Date DateSent;
     public TruckDL Truck;
     public DriverDL DriverName;
-    public List<LocationDL> Destinations;
+    public List<LocationDL> Destinations; // TODO: INSTEAD OF HOLDING, GET IT FROM DOCUMENT
     public ShipmentDocumentDL Document;
     public ShipmentStatus Status = ShipmentStatus.PENDING;
     public String ShiftType;
@@ -63,7 +63,7 @@ public class ShipmentDL {
     }
 
     public Boolean WeightCheck(Map<String, Float> itemWeights) {
-        //assuming all items in Document exists in itemWeight
+        // assuming all items in Document exists in itemWeight
         float sum = 0;
         Map<LocationDL, Map<String, Integer>> curr = Document.getItemsMap();
         for (LocationDL loc : curr.keySet()) {
@@ -95,7 +95,8 @@ public class ShipmentDL {
         this.Document.setWeight(Items);
     }
 
-    public ShipmentDL(TruckDL truck, LocationDL origin, List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items, String shiftType, Date dateToSend) {
+    public ShipmentDL(TruckDL truck, LocationDL origin, List<LocationDL> destinations,
+            Map<LocationDL, Map<String, Integer>> items, String shiftType, Date dateToSend) {
         this.Truck = truck;
         this.DriverName = null; // Driver should be set later
         this.Destinations = destinations;
