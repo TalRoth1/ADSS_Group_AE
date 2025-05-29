@@ -3,7 +3,6 @@ package PresentationLayer;
 import java.util.Scanner;
 import PresentationLayer.EmployeeCLI;
 import PresentationLayer.ShipmentCLI;
-import PresentationLayer.ShipMain;
 import DomainLayer.*;
 
 public class Main {
@@ -11,7 +10,8 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         EmployeeFacade employeeFacade = new EmployeeFacade();
         EmployeeCLI employeeCLI = new EmployeeCLI(employeeFacade);
-        ShipMain shipcli;
+        ShipmentCLI shipmentCLI = new ShipmentCLI();
+        shipmentCLI.SetEmployeeFacade(employeeFacade);
 
         System.out.println("Welcome! Please select the menu");
         System.out.println("1. Shipment Menu (shipment manager)");
@@ -21,7 +21,7 @@ public class Main {
         int choice = scanner.nextInt();
         switch (choice) {
             case 1:
-                shipcli = new ShipMain();
+                shipmentCLI.loginCLI();
                 break;
             case 2:
                 employeeCLI.loginCLI();

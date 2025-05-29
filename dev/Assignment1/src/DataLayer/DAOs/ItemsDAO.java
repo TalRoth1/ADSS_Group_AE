@@ -2,6 +2,8 @@ package DataLayer.DAOs;
 
 import java.sql.*;
 
+import javax.naming.spi.DirStateFactory.Result;
+
 public class ItemsDAO {
     private Connection connection;
 
@@ -16,7 +18,7 @@ public class ItemsDAO {
 
     public void initializeTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS items (" +
-                "id INTEGER PRIMARY KEY, " +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "name TEXT NOT NULL, " +
                 "weight REAL NOT NULL)";
         try (Statement stmt = connection.createStatement()) {
@@ -111,5 +113,12 @@ public class ItemsDAO {
         String sql = "SELECT * FROM items";
         Statement stmt = connection.createStatement();
         return stmt.executeQuery(sql);
+    }
+
+    public ResultSet getItemByName(String name) throws SQLException {
+        String sql = "SELECT * FROM items WHERE name = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, name);
+        return pstmt.executeQuery();
     }
 }

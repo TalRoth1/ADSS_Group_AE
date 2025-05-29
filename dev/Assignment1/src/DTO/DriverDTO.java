@@ -1,6 +1,7 @@
 package DTO;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class DriverDTO extends EmployeeDTO {
@@ -10,11 +11,11 @@ public class DriverDTO extends EmployeeDTO {
 
     public DriverDTO(int id, String name, LocationDTO branch, String bankAccount, int salary, String startDate,
                      int vacationDays, int sickDays, double educationFund, double socialBenefits,
-                     String password, boolean isFinishedWorking) {
+                     String password, boolean isFinishedWorking, ArrayList<String> licenseType, boolean isBusy) {
         super(id, name, branch, bankAccount, salary, startDate, vacationDays, sickDays, educationFund,
                 socialBenefits, password, isFinishedWorking);
-        this.licenseType = new ArrayList<>();
-        this.isBusy = false;
+        this.licenseType = licenseType;
+        this.isBusy = isBusy;
     }
 
     public ArrayList<String> getLicenseTypes() {

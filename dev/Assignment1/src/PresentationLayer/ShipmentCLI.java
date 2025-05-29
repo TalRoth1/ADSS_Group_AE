@@ -6,6 +6,8 @@ import DomainLayer.LocationDL;
 import DomainLayer.ShipmentDL;
 import DomainLayer.ShipmentFacade;
 import DomainLayer.TruckDL;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,6 +16,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class ShipmentCLI {
+    HashMap<String, String> users = new HashMap<>(Map.of("eylon", "admin", "elad", "manager"));
 
     public ShipmentFacade shipmentFacade;
     Scanner scanner = new Scanner(System.in);
@@ -200,7 +203,8 @@ public class ShipmentCLI {
             System.out.println("Please enter the date in the format YYYY-MM-DD: ");
             String dateString = scanner.nextLine();
             try {
-                date = new Date(dateString);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                date = sdf.parse(dateString);
                 flag = false;
             } catch (Exception e) {
                 System.out.println("Invalid date format. Please try again.");
@@ -647,5 +651,65 @@ public class ShipmentCLI {
 
     public void SetEmployeeFacade(EmployeeFacade employeeFacade) {
         shipmentFacade.SetEmployeeFacade(employeeFacade);
+    }
+
+    public void ShipmentMenu() {
+        boolean flag = true;
+        while (flag) {
+            System.out.println("Please choose an option from the list below: ");
+            System.out.println("1. Create Shipment");
+            System.out.println("2. Edit Shipment");
+            System.out.println("3. Change Shipment Status");
+            System.out.println("4. Show Shipment Documents");
+            System.out.println("5. Add Location");
+            System.out.println("6. Add Truck");
+            System.out.println("7. Add Item");
+            System.out.println("8. Exit Shipment Menu");
+            int choice = Integer.parseInt(scanner.nextLine());
+            switch (choice) {
+                case 1:
+                    CreateShipment();
+                    break;
+                case 2:
+                    EditShipement();
+                    break;
+                case 3:
+                    ChangeStatus();
+                    break;
+                case 4:
+                    ShowDocuments();
+                    break;
+                case 5:
+                    AddLocation();
+                    break;
+                case 6:
+                    AddTruck();
+                    break;
+                case 7:
+                    AddItem();
+                    break;
+                case 8:
+                    flag = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+    public void loginCLI() {
+        boolean flag = true;
+        while (flag) {
+            System.out.println("Please enter your username: ");
+            String username = scanner.nextLine();
+            System.out.println("Please enter your password: ");
+            String password = scanner.nextLine();
+            if (users.containsKey(username) && users.get(username).equals(password)) {
+                System.out.println("Login successful!");
+                ShipmentMenu();
+                flag = false;
+            } else {
+                System.out.println("Invalid username or password. Please try again.");
+            }
+        }
     }
 }

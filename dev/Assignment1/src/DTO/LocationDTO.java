@@ -9,8 +9,9 @@ public class LocationDTO {
     public String ContactName;
     public String Zone;
 
-    public LocationDTO(String street, int streetNumber, String city, String contactNumber, String contactName,
+    public LocationDTO(int id,String street, int streetNumber, String city, String contactNumber, String contactName,
             String zone) {
+        this.id = id;
         this.Street = street;
         this.StreetNumber = streetNumber;
         this.City = city;

@@ -105,7 +105,7 @@ public class ShipmentFacade {
      * }
      */
     public TruckDL AddTruck(int number, String model, String type, float maxWeight) {
-        TruckDL truck = new TruckDL(number, model, type, 0, maxWeight);
+        TruckDL truck = new TruckDL(number, model, type, maxWeight);
         trucks.add(truck);
         return truck;
     }

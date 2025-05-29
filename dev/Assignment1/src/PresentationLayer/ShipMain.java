@@ -9,7 +9,7 @@ public class ShipMain {
     public static void main(String[] args) {
         ShipmentCLI shipCli = new ShipmentCLI();
         Scanner scanner = new Scanner(System.in);
-        LocalDate today = LocalDate.now();
+        //LocalDate today = LocalDate.now();
         EmployeeFacade employeeFacade = new EmployeeFacade();
         shipCli.SetEmployeeFacade(employeeFacade);
         EmployeeCLI cli = new EmployeeCLI(employeeFacade);

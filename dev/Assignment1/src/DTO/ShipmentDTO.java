@@ -2,55 +2,53 @@ package DTO;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 
 public class ShipmentDTO {
     private int id;
+    private Date dateCreated;
+    private Date dateSent;
     private TruckDTO truck;
     private DriverDTO driver;
-    private LocationDTO origin; // should go to document as well ya goof. goofball
-    private List<LocationDTO> destination; // should go to document as well ya goof. goofball
     private String status;
-    // private Map<String, Integer> items; go to document silly
     private DocumentDTO document;
+    private String shiftType;
 
-    public ShipmentDTO(int id, TruckDTO truck, DriverDTO driver, LocationDTO origin, List<LocationDTO> destination,
-            String status, DocumentDTO document) {
+    public ShipmentDTO(int id, Date dateCreated, Date dateSent, TruckDTO truck, DriverDTO driver, String status,
+                       DocumentDTO document, String shiftType) {
         this.id = id;
+        this.dateCreated = dateCreated;
+        this.dateSent = dateSent;
         this.truck = truck;
         this.driver = driver;
-        this.origin = origin;
-        this.destination = destination;
         this.status = status;
         this.document = document;
-        // this.items = null;
+        this.shiftType = shiftType;
     }
-
     public int getId() {
         return id;
     }
-
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+    public Date getDateSent() {
+        return dateSent;
+    }
     public TruckDTO getTruck() {
         return truck;
     }
-
     public DriverDTO getDriver() {
         return driver;
     }
-
-    public LocationDTO getOrigin() {
-        return origin;
-    }
-
-    public List<LocationDTO> getDestination() {
-        return destination;
-    }
-
     public String getStatus() {
         return status;
     }
-
     public DocumentDTO getDocument() {
         return document;
     }
+    public String getShiftType() {
+        return shiftType;
+    }
+    
 
 }

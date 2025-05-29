@@ -13,23 +13,19 @@ public class ItemsController {
     private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
     public ItemsController() {
-        String DB_URL = "Items.db";
-        DBConnection.connect(DB_URL);
+        String DB_URL = "items.db";
+        dbConnection.connect(DB_URL);
         this.connection = DBConnection.getConnection();
         this.itemsDAO = new ItemsDAO(connection);
     }
 
-    private int generateId() {
-        return idGenerator.getAndIncrement();
-    }
+
 
     public void addItem(ItemDTO item) throws SQLException {
-        itemCheck(item.getName(), item.getWeight());
-        itemsDAO.addItem(generateId(), item.getName(), item.getWeight());
+        itemsDAO.addItem(item.getId(), item.getName(), item.getWeight());
     }
 
     public void updateItem(ItemDTO item) throws SQLException {
-        itemCheck(item.getName(), item.getWeight());
         itemsDAO.updateItem(item.getId(), item.getName(), item.getWeight());
     }
 
@@ -40,7 +36,7 @@ public class ItemsController {
     public ItemDTO getItem(int id) throws SQLException {
         ResultSet rst =  itemsDAO.getItem(id);
         if (rst.next()) {
-            return new ItemDTO(rst.getInt("id"), rst.getString("name"), rst.getDouble("weight"));
+            return new ItemDTO(rst.getInt("id"), rst.getString("name"), rst.getFloat("weight"));
         } else {
             throw new SQLException("Item not found with id: " + id);
         }
@@ -50,15 +46,17 @@ public class ItemsController {
         ArrayList<ItemDTO> items = new ArrayList<>();
         ResultSet rst = itemsDAO.getAllItems();
         while (rst.next()) {
-            items.add(new ItemDTO(rst.getInt("id"), rst.getString("name"), rst.getDouble("weight")));
+            items.add(new ItemDTO(rst.getInt("id"), rst.getString("name"), rst.getFloat("weight")));
         }
         return items;
     }
 
-    private void itemCheck(String name, double weight) {
-        if (name == null || weight <= 0) {
-            throw new IllegalArgumentException("Invalid item data provided.");
+    public ItemDTO getItemByName(String name) throws SQLException {
+        ResultSet rst = itemsDAO.getItemByName(name);
+        if (rst.next()) {
+            return new ItemDTO(rst.getInt("id"), rst.getString("name"), rst.getFloat("weight"));
+        } else {
+            throw new SQLException("Item not found with name: " + name);
         }
     }
-
 }

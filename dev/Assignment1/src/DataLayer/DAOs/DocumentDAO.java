@@ -1,9 +1,13 @@
 package DataLayer.DAOs;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+
+import javax.naming.spi.DirStateFactory.Result;
 
 public class DocumentDAO {
     private Connection connection;
@@ -21,7 +25,7 @@ public class DocumentDAO {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS documents (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
                 "originID INT FOREIGN KEY REFERENCES locations(id), " +
-                "destinationID INT FOREIGN KEY REFERENCES locations(id), " +
+                "weight FLOAT, " +
                 ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSQL);
@@ -31,48 +35,72 @@ public class DocumentDAO {
         }
     }
 
-    public void createDocument(int docId, int originId, int destId) throws SQLException {
-        String insertSQL = "INSERT INTO documents (id, originID, destinationID) VALUES (" + docId + ", " + originId
-                + ", " + destId + ")";
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate(insertSQL);
+    public void createDocument(int docId, int originId, float weight) throws SQLException {
+        String sql = "INSERT INTO documents (id, originID) VALUES (?, ? ,?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, docId);
+            preparedStatement.setInt(2, originId);
+            preparedStatement.setFloat(3, weight);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error creating document: " + e.getMessage());
+            throw e;
         }
-
     }
+        
 
-    public ArrayList<String> getDocument(int documentId) {
-        String sql = "SELECT * FROM documents WHERE id = " + documentId;
-        try (Statement stmt = connection.createStatement()) {
-            var resultSet = stmt.executeQuery(sql);
-            ArrayList<String> documentDetails = new ArrayList<>();
-            while (resultSet.next()) {
-                documentDetails.add("ID: " + resultSet.getInt("id"));
-                documentDetails.add("Origin ID: " + resultSet.getInt("originID"));
-                documentDetails.add("Destination ID: " + resultSet.getInt("destinationID"));
-            }
-            return documentDetails;
+    public ResultSet getDocument(int documentId) throws SQLException {
+        String sql = "SELECT * FROM documents WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, documentId);
+            return pstmt.executeQuery();
         } catch (SQLException e) {
             System.out.println("Error retrieving document: " + e.getMessage());
-            return null;
+            throw e;
         }
-
     }
 
-    public void updateDocument(int documentId, String field, int newValue) {
-        String sql = "UPDATE documents SET " + field + " = " + newValue + " WHERE id = " + documentId;
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate(sql);
+    public void updateDocument(int documentId, int originId, float weight) {
+        String sql = "UPDATE documents SET originID = ?, weight = ? WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, originId);
+            pstmt.setFloat(2, weight);
+            pstmt.setInt(3, documentId);
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error updating document: " + e.getMessage());
         }
     }
+    
+
+    public void updateDocumentByField(String fieldName, Object value, int documentId) {
+        String sql = "UPDATE documents SET " + fieldName + " = ? WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setObject(1, value);
+            pstmt.setInt(2, documentId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error updating document by field: " + e.getMessage());
+        }
+    }
 
     public void deleteDocument(int documentId) {
-        String sql = "DELETE FROM documents WHERE id = " + documentId;
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate(sql);
+        String sql = "DELETE FROM documents WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, documentId);
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error deleting document: " + e.getMessage());
+        }
+    }
+
+    public ResultSet getAllDocuments() throws SQLException {
+        String sql = "SELECT * FROM documents";
+        try (Statement stmt = connection.createStatement()) {
+            return stmt.executeQuery(sql);
+        } catch (SQLException e) {
+            System.out.println("Error retrieving all documents: " + e.getMessage());
+            throw e;
         }
     }
 }

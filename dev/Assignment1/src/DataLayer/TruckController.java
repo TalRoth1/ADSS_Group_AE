@@ -12,25 +12,27 @@ public class TruckController {
     private TruckDAO truckDAO;
 
     public TruckController() {
-        String DB_URL = "Trucks.db";
-        DBConnection.connect(DB_URL);
+        String DB_URL = "trucks.db";
+        dbConnection.connect(DB_URL);
         this.connection = DBConnection.getConnection();
         this.truckDAO = new TruckDAO(connection);
     }
 
     public void addTruck(TruckDTO truck) throws SQLException {
-        truckCheck(truck);
-        truckDAO.addTruck(truck.getId(), truck.getLicensePlate(), truck.getWeight());
-    }
-
-    public void updateTruck(TruckDTO truck) throws SQLException {
-        truckCheck(truck);
-        truckDAO.updateTruck(truck.getId(), truck.getLicensePlate(), truck.getWeight(), truck.getMaxWeight(),
+        truckDAO.addTruck(truck.getId(), truck.getLicensePlate(), truck.getMaxWeight(),
                 truck.getStatus() ? 1 : 0, truck.getType());
     }
 
+    public void updateTruck(TruckDTO truck) throws SQLException {
+        truckDAO.updateTruck(   
+                truck.getId(),
+                truck.getLicensePlate(),
+                truck.getMaxWeight(),
+                truck.getStatus() ? 1 : 0,
+                truck.getType());
+    }
+
     public void deleteTruck(TruckDTO truck) throws SQLException {
-        truckCheck(truck);
         truckDAO.deleteTruck(truck.getId());
     }
 
@@ -38,11 +40,6 @@ public class TruckController {
         return getTruckFromResultSet(truckDAO.getTruck(id));
     }
 
-    private void truckCheck(TruckDTO truck) {
-        if (truck == null || truck.getId() <= 0 || truck.getLicensePlate() == null || truck.getWeight() <= 0) {
-            throw new IllegalArgumentException("Invalid truck data provided.");
-        }
-    }
 
     private TruckDTO getTruckFromResultSet(ResultSet rst) throws SQLException {
         if (rst.next()) {
@@ -50,7 +47,6 @@ public class TruckController {
                     rst.getInt("id"),
                     rst.getString("license_plate"),
                     rst.getString("type"),
-                    rst.getFloat("weight"),
                     rst.getFloat("max_weight"),
                     rst.getInt("status") == 1 ? true : false);
         } else {

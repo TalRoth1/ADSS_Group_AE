@@ -10,7 +10,7 @@ public class TruckMapper {
             return null;
         }
         return new TruckDTO(truck.getId(), truck.getLicensePlate(), truck.getType(),
-                truck.getWeight(), truck.getMaxWeight(), truck.getStatus());
+                 truck.getMaxWeight(), truck.getStatus());
     }
 
     public static TruckDL toDomain(TruckDTO truckDTO) {
@@ -18,6 +18,6 @@ public class TruckMapper {
             return null;
         }
         return new TruckDL(truckDTO.getId(), truckDTO.getLicensePlate(), truckDTO.getType(),
-                truckDTO.getWeight(), truckDTO.getMaxWeight(), truckDTO.getStatus());
+                 truckDTO.getMaxWeight(), truckDTO.getStatus());
     }
 }

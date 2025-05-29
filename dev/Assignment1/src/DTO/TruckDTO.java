@@ -5,14 +5,12 @@ public class TruckDTO {
     private String licensePlate;
     private String type;
     private Boolean status;
-    private float weight;
     private float maxWeight;
 
-    public TruckDTO(int id, String licensePlate, String type, float weight, float maxWeight, boolean status) {
+    public TruckDTO(int id, String licensePlate, String type, float maxWeight, boolean status) {
         this.id = id;
         this.licensePlate = licensePlate;
         this.type = type;
-        this.weight = weight;
         this.maxWeight = maxWeight;
         this.status = status;
     }
@@ -31,10 +29,6 @@ public class TruckDTO {
 
     public Boolean getStatus() {
         return status;
-    }
-
-    public float getWeight() {
-        return weight;
     }
 
     public float getMaxWeight() {

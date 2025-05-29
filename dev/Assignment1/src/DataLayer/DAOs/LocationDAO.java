@@ -51,7 +51,7 @@ public class LocationDAO {
     }
 
     public void updateLocation(String street, int streetNumber, String city, String contactNumber, String contactName,
-            String zone) throws SQLException {
+            String zone, int id) throws SQLException {
         String sql = "UPDATE locations SET street = ?, street_number = ?, city = ?, contact_number = ?, contact_name = ?, zone = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, street);
@@ -60,6 +60,7 @@ public class LocationDAO {
             pstmt.setString(4, contactNumber);
             pstmt.setString(5, contactName);
             pstmt.setString(6, zone);
+            pstmt.setInt(7, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error updating location: " + e.getMessage());

@@ -16,11 +16,10 @@ public class TruckDAO {
 
     public void initializeTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS trucks (" +
-                "id INTEGER PRIMARY KEY, " +
-                "license_plate TEXT NOT NULL, " +
+                "id INTEGER PRIMARY KEY, " +  //represents truck num
+                "license_plate TEXT NOT NULL, " + //model
                 "type TEXT NOT NULL, " +
-                "status INTEGER NOT NULL, " + // BOOLEAN as INTEGER: 0 = false, 1 = true
-                "weight FLOAT NOT NULL, " +
+                "status INTEGER NOT NULL, " + // BOOLEAN as INTEGER: 0 = false, 1 = true; represents isBusy
                 "max_weight FLOAT NOT NULL" +
                 ")";
         try (Statement stmt = connection.createStatement()) {
@@ -31,12 +30,14 @@ public class TruckDAO {
         }
     }
 
-    public void addTruck(int id, String licensePlate, double weight) throws SQLException {
-        String sql = "INSERT INTO trucks (id, license_plate, weight) VALUES (?, ?, ?)";
+    public void addTruck(int id, String licensePlate, float max_weight, int status, String type) throws SQLException {
+        String sql = "INSERT INTO trucks (id, license_plate, max_weight, status, type) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.setString(2, licensePlate);
-            pstmt.setDouble(3, weight);
+            pstmt.setFloat(3, max_weight);
+            pstmt.setInt(4, status);
+            pstmt.setString(5, type);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding truck: " + e.getMessage());
@@ -44,16 +45,15 @@ public class TruckDAO {
         }
     }
 
-    public void updateTruck(int id, String licensePlate, float weight, float max_weight, int status, String type)
+    public void updateTruck(int id, String licensePlate, float max_weight, int status, String type)
             throws SQLException {
-        String sql = "UPDATE trucks SET license_plate = ?, weight = ?, max_weight = ?, status = ?, type = ? WHERE id = ?";
+        String sql = "UPDATE trucks SET license_plate = ?, max_weight = ?, status = ?, type = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, licensePlate);
-            pstmt.setFloat(2, weight);
-            pstmt.setFloat(3, max_weight);
-            pstmt.setInt(4, status);
-            pstmt.setString(5, type);
-            pstmt.setInt(6, id);
+            pstmt.setFloat(2, max_weight);
+            pstmt.setInt(3, status);
+            pstmt.setString(4, type);
+            pstmt.setInt(5, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error updating truck: " + e.getMessage());
