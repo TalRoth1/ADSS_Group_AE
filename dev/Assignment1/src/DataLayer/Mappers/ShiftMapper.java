@@ -29,10 +29,8 @@ public class ShiftMapper {
             return null;
         }
         return new Shift(
-                dto.getDate().toString(),
-                dto.getShiftType().toString(),
-                dto.getStartTime(),
-                dto.getEndTime(),
+                dto.getDate(),
+                dto.getShiftType(),
                 dto.getShiftManagerId(),
                 dto.getNumOfRequiredcashiers(),
                 dto.getNumOfRequireddrivers(),
