@@ -2,6 +2,7 @@ package DomainLayer;
 
 public class LocationDL {
 
+    //public int id;
     public String Street;
     public int StreetNumber;
     public String City;

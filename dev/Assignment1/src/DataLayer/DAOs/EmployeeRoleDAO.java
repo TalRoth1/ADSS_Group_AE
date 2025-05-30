@@ -1,9 +1,9 @@
 package DataLayer.DAOs;
 
+import DomainLayer.Role;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import DomainLayer.Role;
 
 public class EmployeeRoleDAO {
 
@@ -14,12 +14,12 @@ public class EmployeeRoleDAO {
     }
 
     private void initializeTable() throws SQLException {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS employee_role (" +
-                "employeeId INT NOT NULL, " +
-                "role TEXT NOT NULL, " +
-                "PRIMARY KEY (employeeId, role), " +
-                "FOREIGN KEY (employeeId) REFERENCES employees(id)" +
-                ")";
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS employee_role ("
+                + "employeeId INT NOT NULL, "
+                + "role TEXT NOT NULL, "
+                + "PRIMARY KEY (employeeId, role), "
+                + "FOREIGN KEY (employeeId) REFERENCES employees(id)"
+                + ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
@@ -48,6 +48,16 @@ public class EmployeeRoleDAO {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error removing role: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public ResultSet getAllRoles() throws SQLException {
+        String sql = "SELECT * FROM employee_role";
+        try (Statement stmt = connection.createStatement()) {
+            return stmt.executeQuery(sql);
+        } catch (SQLException e) {
+            System.out.println("Error getting all roles: " + e.getMessage());
             throw e;
         }
     }
@@ -82,4 +92,5 @@ public class EmployeeRoleDAO {
         }
 
     }
+
 }

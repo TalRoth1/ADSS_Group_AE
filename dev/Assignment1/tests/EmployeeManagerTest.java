@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EmployeeManagerTest {
+
     private EmployeeManager manager;
     private final int MANAGER_ID = 100;
     private final LocalDate START_DATE = LocalDate.now();
@@ -150,5 +151,45 @@ class EmployeeManagerTest {
 
         assertNull(result);
         assertTrue(shift.getAssignedEmployeesID().containsKey(EMPLOYEE_ID));
+    }
+
+//צריך להוסיף בטסט הוספת רשיון לנהג, פשוט כרגע זה לא ממומש בקוד
+//אז אחרי המימוש בקוש צריך להוסיף את זה פה לטסט
+    @Test
+    void assignCheck_Success() {
+        LocationDL origin = new LocationDL("Haifa");
+        LocationDL destination1 = new LocationDL("Karkur");
+        List<LocationDL> destinations = List.of(destination1);
+
+        LocalDate date = LocalDate.now();
+        ShiftType shiftType = ShiftType.MORNING;
+        String licenceType = "B";
+
+        manager.getBranches().add(origin);
+        manager.getBranches().add(destination1);
+
+        // Create and add shifts for each location including storekeeper and driver
+        Shift originShift = new Shift(date, shiftType, origin);
+        originShift.addEmployee(manager.hireEmployee(200, "Yossi", origin.getName(), "acc1", 5000, date, 10, 5, 80,
+                90, "pass", Role.DRIVER));
+        originShift.addEmployee(manager.hireEmployee(201, "Dan", origin.getName(), "acc2", 5000, date, 10,
+                5, 80, 90, "pass", Role.STORE_KEEPER));
+        manager.addShift(originShift);
+
+        Shift destShift = new Shift(date, shiftType, destination1);
+        destShift.addEmployee(manager.hireEmployee(202, "Eli", destination1.getName(), "acc3", 5000, date, 10, 5,
+                80, 90, "pass", Role.DRIVER));
+        destShift.addEmployee(manager.hireEmployee(203, "Moshe", destination1.getName(), "acc4", 5000, date,
+                10, 5, 80, 90, "pass", Role.STORE_KEEPER));
+        manager.addShift(destShift);
+
+        DriverDL driver = manager.assignCheck(date, shiftType, origin, destinations, licenceType);
+
+        assertNotNull(driver);
+        assertEquals("Yossi", driver.getName());
+
+        // Check that the shifts have shipmentShift set to true
+        assertTrue(manager.getShift(origin, date, shiftType).isShipmentShift());
+        assertTrue(manager.getShift(destination1, date, shiftType).isShipmentShift());
     }
 }

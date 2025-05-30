@@ -7,6 +7,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -20,18 +23,13 @@ public class EmployeeCLI {
     private LocalDate nowDate;
 
     private static final Integer[] MORNING_SHIFT_START_TIMES = {
-            600, 630, 700, 730, 800, 830, 900, 930, 1000 };
+        600, 630, 700, 730, 800, 830, 900, 930, 1000};
     private static final Integer[] MORNING_SHIFT_END_TIMES = {
-            1300, 1330, 1400 };
-    // private static final Integer[] MORNING_SHIFT_END_TIMES = {
-    // 1300, 1330, 1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800};
+        1300, 1330, 1400};
     private static final Integer[] EVENING_SHIFT_START_TIMES = {
-            1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800, 1830, 1900, 1930, 2000, 2030, 2100 };
+        1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800, 1830, 1900, 1930, 2000, 2030, 2100};
     private static final Integer[] EVENING_SHIFT_END_TIMES = {
-            2100, 2130, 2200 };
-    // private static final Integer[] EVENING_SHIFT_END_TIMES = {
-    // 2100, 2130, 2200, 2230, 2300, 2330, 2400, 30, 100, 130, 200, 230, 300, 330,
-    // 400, 430, 500};
+        2100, 2130, 2200};
     List<LocationDL> branches = employeeFacade.getBranches();
 
     public EmployeeCLI(EmployeeFacade employeeFacade) {
@@ -40,15 +38,6 @@ public class EmployeeCLI {
         loginCLI();
     }
 
-    // private void loadExampleData() {
-    // employeeFacade.initExampleData();
-    // System.out.println("data loaded successfully!");
-    /*
-     * if (username.equals("abcde") && password.equals("12345"))
-     * addEmployeeManager();
-     * else {
-     */
-    // }
     public void loginCLI() {
         while (true) {
             System.out.println("LOGIN:");
@@ -59,26 +48,80 @@ public class EmployeeCLI {
                 Employee emp = employeeFacade.login(userId, password);
                 if (emp instanceof EmployeeManager) {
                     employeeManager();
-                } else if (employeeFacade.isShiftManager(userId)) {
-                    shiftManager();
-                } else {
-                    shiftEmployee();
                 }
-                break; // Exit the loop after successful login
+                if (employeeFacade.isShiftManager(userId)) {
+                    shiftManager();
+                }
+                if (emp instanceof ShiftEmployee) {
+                    shiftEmployee();
+                } else {
+                    employeeManager();
+                }
             } catch (Exception e) {
                 System.out.println("Login failed: " + e.getMessage());
-                // Loop continues for another attempt
+                System.out.println("Please try again.");
+                loginCLI();
             }
         }
     }
 
     private void employeeManager() {
-        String[] actions = { "Create Shifts", "Set Shifts", "Add Employee to Exist Shift",
-                "Remove Employee From Exist Shift",
-                "Fire Employee", "Hire Employee", "Change Employee's Role",
-                "Add Role to Employee", "Change Shift Manager", "Replace Employee",
-                "Delete Employee's Role", "Change Employee's Data", "Show Shift Information",
-                "Show Past Shifts", "Show Employee's shifts", "Change Shift Hours", "Logout" };
+        try {
+            EmployeeManager emp = employeeFacade.getEmployeeManager();
+            LocalDate now = LocalDate.now();
+            LocalDate thisSunday = now.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.SUNDAY));
+            Iterator<Map.Entry<LocationDL, Map<LocalDate, Shift>>> branchIterator2 = emp.getMissingShift().entrySet().iterator();
+            LocalDate endOfNextWeek = thisSunday.plusWeeks(2).minusDays(1);
+
+            while (branchIterator2.hasNext()) { //check if there are any branches with missing shifts
+                Map.Entry<LocationDL, Map<LocalDate, Shift>> branchEntry = branchIterator2.next();
+                Map<LocalDate, Shift> shiftsByDate = branchEntry.getValue();
+                Iterator<Map.Entry<LocalDate, Shift>> shiftIterator = shiftsByDate.entrySet().iterator();
+                while (shiftIterator.hasNext()) {
+                    Map.Entry<LocalDate, Shift> shiftEntry = shiftIterator.next();
+                    LocalDate shiftDate = shiftEntry.getKey();
+                    Shift shift = shiftEntry.getValue();
+
+                    if (!shiftDate.isBefore(now) && !shiftDate.isAfter(endOfNextWeek)) {
+                        emp.getToCompleteShifts()
+                                .computeIfAbsent(branchEntry.getKey(), k -> new HashMap<>())
+                                .put(shiftDate, shift);
+                    }
+                }
+            }
+            // looping through the toCompleteShifts
+            while (emp != null && emp.getToCompleteShifts() != null && !emp.getToCompleteShifts().isEmpty()) {
+                System.out.println("You have shifts to complete. Please complete them before proceeding.");
+                Iterator<Map.Entry<LocationDL, Map<LocalDate, Shift>>> branchIterator = emp.getToCompleteShifts().entrySet().iterator();
+                while (branchIterator.hasNext()) {
+                    Map.Entry<LocationDL, Map<LocalDate, Shift>> branchEntry = branchIterator.next();
+                    Map<LocalDate, Shift> shiftsByDate = branchEntry.getValue();
+                    Iterator<Map.Entry<LocalDate, Shift>> shiftIterator = shiftsByDate.entrySet().iterator();
+                    while (shiftIterator.hasNext()) {
+                        Map.Entry<LocalDate, Shift> shiftEntry = shiftIterator.next();
+                        Shift shift = shiftEntry.getValue();
+                        System.out.println("Shift on " + shift.getDate() + " in the " + shift.getShiftType().toString() + ":");
+                        int shiftManagerId = selectEmployeeForRole(shift, Role.SHIFT_MANAGER);
+                        employeeFacade.setShiftManager(emp.getId(), shift, shiftManagerId);
+                        for (Role role : Role.values()) {
+                            if (role != Role.SHIFT_MANAGER) {
+                                chooseNumOfEmployeesForShift(role, shift, userId);
+                            }
+                        }
+                        shiftIterator.remove(); // remove the shift from the list
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error retrieving Employee Manager: " + e.getMessage());
+        }
+
+        String[] actions = {"Create Shifts", "Set Shifts", "Add Employee to Exist Shift",
+            "Remove Employee From Exist Shift",
+            "Fire Employee", "Hire Employee", "Change Employee's Role",
+            "Add Role to Employee", "Change Shift Manager", "Replace Employee",
+            "Delete Employee's Role", "Change Employee's Data", "Show Shift Information",
+            "Show Past Shifts", "Show Employee's shifts", "Change Shift Hours", "Logout"};
         String option = selectFromList("Select Employee Manager Action (Enter the number)", actions);
         switch (option) {
             case "Create Shifts" ->
@@ -258,6 +301,22 @@ public class EmployeeCLI {
         // choose role
         Role selectedRole = selectFromList("Choose a role:", Role.values());
         try {
+            if (selectedRole == Role.DRIVER) {
+                boolean flag = true;
+                ArrayList<String> licenses = new ArrayList<>();
+                while (flag) {
+                    System.out.println("Please enter the driver license types or finish to end: "
+                    );
+                    String licenseType = scanner.nextLine();
+                    if (licenseType.equalsIgnoreCase("Finish")) {
+                        flag = false;
+                    } else {
+                        licenses.add(licenseType);
+                    }
+                }
+                employeeFacade.hireDriver(employeeID, userId, branch, name, bankAccount, salary, startDate,
+                        vacationDays, sickDays, educationFund, socialBenefits, employeePassword, licenses);
+            }
             employeeFacade.hireEmployee(employeeID, userId, branch, name, bankAccount, salary, startDate,
                     vacationDays, sickDays, educationFund, socialBenefits, employeePassword, selectedRole);
         } catch (Exception e) {
@@ -336,8 +395,8 @@ public class EmployeeCLI {
     }
 
     private void changeEmployeeData() {
-        String[] labels = { "Salary", "Bank Account", "Vacation Days", "Sick Days", "Education Fund",
-                "Social Benefits" };
+        String[] labels = {"Salary", "Bank Account", "Vacation Days", "Sick Days", "Education Fund",
+            "Social Benefits"};
         String option = selectFromList("Select Employee Data to change:", labels);
         switch (option) {
             case "Salary" ->
@@ -486,9 +545,9 @@ public class EmployeeCLI {
     // EmployeeManager();
     // }
     private void shiftManager() {
-        String[] actions = { "Add Preferred Shift", "Remove Preferred Shift",
-                "Show Employee's shifts", "Show Shift Information", "Show my Preferences",
-                "Show my Assigned Shifts", "Logout" };
+        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift",
+            "Show Employee's shifts", "Show Shift Information", "Show my Preferences",
+            "Show my Assigned Shifts", "Logout"};
         String option = selectFromList("Select Shift Manager Action:", actions);
 
         switch (option) {
@@ -567,8 +626,8 @@ public class EmployeeCLI {
     }
 
     private void shiftEmployee() {
-        String[] actions = { "Add Preferred Shift", "Remove Preferred Shift", "Show Shift Information",
-                "Show my Preferences", "Show my Assigned Shifts", "Logout" };
+        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift", "Show Shift Information",
+            "Show my Preferences", "Show my Assigned Shifts", "Logout"};
         String option = selectFromList("Select Shift Employee Action:", actions);
 
         switch (option) {
@@ -643,6 +702,9 @@ public class EmployeeCLI {
             int numOfEmployees = readInt("Please enter the number of employees for " + role + ": ");
             try {
                 employeeFacade.setRequiredRoles(empManagerId, shift, role, numOfEmployees);
+                if (numOfEmployees == 0) {
+                    return;
+                }
                 addEmployeesWithSameRoleToShift(shift, role, empManagerId, numOfEmployees);
                 break;
             } catch (Exception e) {
@@ -731,7 +793,7 @@ public class EmployeeCLI {
             endTime = selectFromList("Select end time (must be after start):", endTimeOptions);
         }
 
-        return new int[] { startTime, endTime };
+        return new int[]{startTime, endTime};
     }
 
     private <T> T selectFromList(String title, T[] options) {
@@ -832,24 +894,6 @@ public class EmployeeCLI {
 
     private LocalDate chooseDateForManager(String prompt) {
         LocalDate date = chooseDate(prompt);
-
-        // the next few lines are in comments just for the tests by the staff.
-        // in the "Real time", those lines will not be in comment
-        // because we want to make sure the Employee manager do it only
-        // from Thursday 17:30 and all day Friday and Saturday
-        // LocalTime nowTime = LocalTime.now();
-        // DayOfWeek today = nowDate.getDayOfWeek();
-        // boolean isAllowedTime =
-        // (today == DayOfWeek.THURSDAY && nowTime.isAfter(LocalTime.of(17, 30))) ||
-        // (today == DayOfWeek.FRIDAY) ||
-        // (today == DayOfWeek.SATURDAY);
-        // if(!isAllowedTime) {
-        // System.out.println("You allow to do this action from Thursday 17:30 and all
-        // day Friday and Saturday");
-        // System.out.println("Now, you will return to the main menu");
-        // employeeManager();
-        // }
-        // check if date is in the past OR SHABBAT
         if (!isValidDate(date)) {
             return chooseDateForManager(prompt);
         }
@@ -863,22 +907,6 @@ public class EmployeeCLI {
 
     private LocalDate chooseDateForEmployee(String prompt) {
         LocalDate date = chooseDate(prompt);
-
-        // the next few lines are in comments just for the tests by the staff.
-        // in the "Real time", those lines will not be in comment
-        // LocalTime nowTime = LocalTime.now();
-        // DayOfWeek today = nowDate.getDayOfWeek();
-        // boolean isAllowedTime =
-        // (today.getValue() >= DayOfWeek.SUNDAY.getValue() &&
-        // today.getValue() <= DayOfWeek.WEDNESDAY.getValue()) ||
-        // (today == DayOfWeek.THURSDAY && nowTime.isBefore(LocalTime.of(17, 0)));
-        // if (!isAllowedTime) {
-        // System.out.println("You are only allowed to do this action from Sunday until
-        // Thursday 17:00.");
-        // System.out.println("Now, you will return to the main menu.");
-        // shiftEmployee();
-        // }
-        // check if date is in the past
         if (!isValidDate(date)) {
             return chooseDateForEmployee(prompt);
         }

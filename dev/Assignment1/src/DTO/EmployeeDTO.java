@@ -1,5 +1,9 @@
 package DTO;
 
+import DomainLayer.Role;
+import DomainLayer.Shift;
+import java.util.List;
+
 public class EmployeeDTO {
 
     private int id;
@@ -15,10 +19,13 @@ public class EmployeeDTO {
     private String password;
     private boolean isFinishedWorking;
     private boolean isLoggedIn;
+    private List<Role> roles;
+    private List<Shift> shifts;
+    private List<Shift> prefShifts;
 
     public EmployeeDTO(int id, String name, int branchid, String bankAccount, int salary, String startDate,
             int vacationDays, int sickDays, double educationFund, double socialBenefits,
-            String password, boolean isFinishedWorking) {
+            String password, boolean isFinishedWorking, List<Role> roles, List<Shift> shifts, List<Shift> prefShifts) {
         this.id = id;
         this.name = name;
         this.branchid = branchid;
@@ -32,6 +39,9 @@ public class EmployeeDTO {
         this.password = password;
         this.isFinishedWorking = isFinishedWorking;
         this.isLoggedIn = false;
+        this.roles = roles;
+        this.shifts = shifts;
+        this.prefShifts = prefShifts;
     }
 
     public int getId() {
@@ -92,6 +102,10 @@ public class EmployeeDTO {
 
     public void setLoggedIn() {
         isLoggedIn = true;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 
 }

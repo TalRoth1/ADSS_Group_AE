@@ -36,10 +36,10 @@ public class ShiftMapper {
         }
         return new Shift(
                 dto.getDate(),
-                dto.getShiftType(), 
-                dto.getStartTime(),
+                dto.getShiftType().toUpperCase(),
+                dto.getShiftManagerId(),
+                dto.getBranchid());
 
-
-                //LocalDate date, ShiftType shiftType, int shiftManagerId, LocationDL branch)
+        //LocalDate date, ShiftType shiftType, int shiftManagerId, LocationDL branch)
     }
 }

@@ -1,5 +1,6 @@
 package DomainLayer;
 
+import DataLayer.DriverController;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class ShipmentFacade {
 
     public ShipmentFacade() {
         this.shipmentController = new ShipmentController();
+        this.employeeFacade = new EmployeeFacade();
         this.locationController = new LocationController();
         this.truckController = new TruckController();
     }
@@ -91,19 +93,6 @@ public class ShipmentFacade {
         return location;
     }
 
-    /*
-     * public DriverDL AddDriver(int id, String name, String branch, String
-     * bankAccount, int salary, LocalDate startDate,
-     * int vacationDays, int sickDays, double educationFund, double socialBenefits,
-     * String password, List<String> licenseType) {
-     * DriverDL driver = new DriverDL(id, name, branch, bankAccount, salary,
-     * startDate,
-     * vacationDays, sickDays, educationFund, socialBenefits, password,
-     * licenseType);
-     * drivers.add(driver);
-     * return driver;
-     * }
-     */
     public TruckDL AddTruck(int number, String model, String type, float maxWeight) {
         TruckDL truck = new TruckDL(number, model, type, maxWeight);
         trucks.add(truck);

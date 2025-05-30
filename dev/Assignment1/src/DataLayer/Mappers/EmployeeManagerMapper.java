@@ -14,6 +14,7 @@ public class EmployeeManagerMapper {
         return new EmployeeManagerDTO(
                 em.getId(),
                 em.getName(),
+                em.getBranch().toString(),
                 em.getBankAccount(),
                 em.getSalary(),
                 em.getStartDate().toString(),
@@ -22,7 +23,6 @@ public class EmployeeManagerMapper {
                 em.getEducationFund(),
                 em.getSocialBenefits(),
                 em.getPassword(),
-                em.isFinishWorking()
         );
     }
 

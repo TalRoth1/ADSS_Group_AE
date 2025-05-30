@@ -1,10 +1,16 @@
 package DataLayer.Mappers;
 
 import DTO.EmployeeDTO;
+import DTO.EmployeeRoleDTO;
 import DomainLayer.Employee;
 import DomainLayer.LocationDL;
+import DomainLayer.Role;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EmployeeMapper {
 
@@ -37,7 +43,7 @@ public class EmployeeMapper {
         }
         return new Employee(e.getId(),
                 e.getName(),
-                LocationMapper.toDomain(e.getBranch()),
+                LocationDL.getLocationById(e.getBranchid()), // Assuming LocationDL has a method to get location by ID
                 e.getBankAccount(),
                 e.getSalary(),
                 LocalDate.parse(e.getStartDate()),
@@ -47,5 +53,20 @@ public class EmployeeMapper {
                 e.getSocialBenefits(),
                 e.getPassword(),
                 e.isFinishedWorking());
+    }
+
+    public static void StoreRolesToEmployees(List<EmployeeDTO> employees, List<EmployeeRoleDTO> employeeRoles) {
+        // Map employeeId to list of roles
+        Map<Integer, List<Role>> rolesByEmployee = new HashMap<>();
+
+        for (EmployeeRoleDTO er : employeeRoles) {
+            int employeeId = er.getEmployeeId();
+            Role role = Role.valueOf(er.getRole());  // assumes string matches enum
+            rolesByEmployee.computeIfAbsent(employeeId, k -> new ArrayList<>()).add(role);
+        }
+        for (EmployeeDTO employee : employees) {
+            List<Role> roles = rolesByEmployee.get(employee.getId());
+            employee.setRoles(roles != null ? roles : new ArrayList<>());
+        }
     }
 }

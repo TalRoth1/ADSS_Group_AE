@@ -1,6 +1,8 @@
 package DomainLayer;
 
+import DTO.DriverDTO;
 import DataLayer.*;
+import DataLayer.DAOs.DriverDAO;
 import DataLayer.DAOs.EmployeeDAO;
 import DataLayer.DAOs.EmployeeRoleDAO;
 import DataLayer.DAOs.EmployeeShiftDAO;
@@ -9,6 +11,7 @@ import java.sql.Connection;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +29,8 @@ public class EmployeeFacade { // employee related methods
     private EmployeeRoleController empRoleController;
     private EmployeeShiftDAO empShiftDAO;
     private EmployeeController empShiftController;
+    private DriverDAO driverDAO;
+    private DriverController driverController;
 
     // initalize employees
     /*
@@ -167,6 +172,48 @@ public class EmployeeFacade { // employee related methods
                 salary, startDate.toString(), vacationDays, sickDays, educationFund, socialBenefits, employeePassword);
         shiftEmployees.put(employeeId, shiftEmployee);
         System.out.println("Employee hired: " + shiftEmployee.getName() + " with ID: " + employeeId);
+    }
+
+    public void hireDriver(int employeeId, int empManagerId, LocationDL b, String employeeName,
+            String bankAccount, int salary, LocalDate startDate, int vacationDays, int sickDays,
+            double educationFund, double socialBenefits, String employeePassword, ArrayList<String> licenceType)
+            throws Exception {
+        if (!isEmployeeManager(empManagerId)) {
+            throw new Exception("This action is allowed only for employee manager.");
+        }
+        if (!isLoggedIn(empManagerId)) {
+            throw new Exception("You are not logged in.");
+        }
+        if (branches == null || !branches.contains(b)) {
+            throw new Exception("Branch not found.");
+        }
+        EmployeeManager employeeManager = getEmployeeManager();
+        if (employeeManager.checkEmployee(employeeId)) {
+            throw new Exception("Employee with ID " + employeeId + " already hired.");
+        }
+
+        DriverDL driver = employeeManager.hireDriver(employeeId, employeeName, b, bankAccount,
+                salary, startDate, vacationDays, sickDays, educationFund, socialBenefits,
+                employeePassword, licenceType);
+        DriverDTO driverDTO = new DriverDTO(
+                driver.getId(),
+                driver.getName(),
+                driver.getBranch().toString(),
+                driver.getBankAccount(),
+                driver.getSalary(),
+                driver.getStartDate().toString(),
+                driver.getVacationDays(),
+                driver.getSickDays(),
+                driver.getEducationFund(),
+                driver.getSocialBenefits(),
+                driver.getPassword(),
+                driver.getLicenseTypes()
+        );
+        driverController.addDriver(driverDTO);
+        empController.addEmployee(employeeId, employeeName, b, bankAccount,
+                salary, startDate.toString(), vacationDays, sickDays, educationFund, socialBenefits, employeePassword);
+        shiftEmployees.put(employeeId, driver);
+        System.out.println("Driver hired: " + driver.getName() + " with ID: " + employeeId);
     }
 
     public void fireEmployee(int employeeId, int empManagerId) throws Exception {
@@ -342,12 +389,16 @@ public class EmployeeFacade { // employee related methods
         return getEmployee(id).isLoggedIn();
     }
 
-    private EmployeeManager getEmployeeManager() {
+    public EmployeeManager getEmployeeManager() {
         return employeeManager;
     }
 
+    public void setEmployeeManager(EmployeeManager employeeManager) {
+        this.employeeManager = employeeManager;
+    }
+
     public void getAvailableEmployees(int empManagerId, LocationDL branch, Shift shift, Role role) throws Exception { // get
-                                                                                                                      // available
+        // available
         // employees for a
         // shift with this
         // role
@@ -444,7 +495,6 @@ public class EmployeeFacade { // employee related methods
     // private EmployeeManager getAnyEmployeeManager() {
     // return employeeManagers.values().stream().findFirst().orElse(null);
     // }
-
     // public String addRole(int id, Role role) {
     // ShiftEmployee shiftEmployee = shiftEmployees.get(id);
     // return shiftEmployee.addRole(role);
@@ -502,7 +552,7 @@ public class EmployeeFacade { // employee related methods
         EmployeeManager employeeManager = getEmployeeManager();
         try {
             employeeManager.shiftReplacement(shift.getBranch(), shift, employeeId, newEmployeeId); // add getBranch to
-                                                                                                   // the map
+            // the map
         } catch (Exception e) {
             throw new Exception("Failed to replace shift: " + e.getMessage());
         }
@@ -639,11 +689,27 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You must be logged in.");
         }
-        if (!shift.setShiftManagerId(id)) {
+        int managerIdToAssign = id;
+        // If id == 0, find an existing shift manager
+        if (id == 0) {
+            boolean found = false;
+            for (ShiftEmployee employee : shiftEmployees.values()) {
+                if (employee.getRoles().contains(Role.SHIFT_MANAGER)) {
+                    managerIdToAssign = employee.getId();
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                throw new Exception("No shift manager available to assign.");
+            }
+        }
+
+        if (!shift.setShiftManagerId(managerIdToAssign)) {
             throw new Exception("Shift Manager ID is invalid. ");
         }
         try {
-            addAssignedShift(id, shift, Role.SHIFT_MANAGER);
+            addAssignedShift(managerIdToAssign, shift, Role.SHIFT_MANAGER);
         } catch (Exception e) {
             throw new Exception("Failed to set shift manager: " + e.getMessage());
         }
@@ -751,4 +817,5 @@ public class EmployeeFacade { // employee related methods
     public List<LocationDL> getBranches() {
         return branches;
     }
+
 }

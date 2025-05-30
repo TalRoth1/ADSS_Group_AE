@@ -1,10 +1,6 @@
 package DataLayer.DAOs;
 
-import DTO.EmployeeDTO;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.sql.ResultSet;
 
 public class EmployeeDAO {
 
@@ -15,19 +11,19 @@ public class EmployeeDAO {
     }
 
     private void initializeTable() throws SQLException {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS employees (" +
-                "id INT PRIMARY KEY, " +
-                "name TEXT NOT NULL, " +
-                "locationId INT NOT NULL, " +
-                "bankAccount TEXT NOT NULL, " +
-                "salary INT NOT NULL, " +
-                "startDate DATE NOT NULL, " +
-                "vacationDays INT NOT NULL, " +
-                "sickDays INT NOT NULL, " +
-                "educationFund REAL NOT NULL, " +
-                "socialBenefits REAL NOT NULL, " +
-                "password TEXT NOT NULL" +
-                ")";
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS employees ("
+                + "id INT PRIMARY KEY, "
+                + "name TEXT NOT NULL, "
+                + "locationId INT NOT NULL, "
+                + "bankAccount TEXT NOT NULL, "
+                + "salary INT NOT NULL, "
+                + "startDate DATE NOT NULL, "
+                + "vacationDays INT NOT NULL, "
+                + "sickDays INT NOT NULL, "
+                + "educationFund REAL NOT NULL, "
+                + "socialBenefits REAL NOT NULL, "
+                + "password TEXT NOT NULL"
+                + ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSQL);
         } catch (SQLException e) {

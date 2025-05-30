@@ -1,6 +1,7 @@
 package DTO;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class ShiftDTO {
 
@@ -15,6 +16,7 @@ public class ShiftDTO {
     private int numOfRequiredstoreKeepers;
     private int numOfRequiredshipmentManagers;
     private boolean isShipmentShift;
+    private List<Integer> employees;
 
     public ShiftDTO(LocalDate date, String shiftType, int startTime, int endTime, int shiftManagerId,
             int numOfRequiredcashiers, int numOfRequireddrivers, int numOfRequiredstoreKeepers,
