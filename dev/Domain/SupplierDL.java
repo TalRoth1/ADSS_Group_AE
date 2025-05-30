@@ -16,8 +16,7 @@ public class SupplierDL {
     private List<ContractDL> contracts;
     private int nextcontractID = 1; // Static variable to keep track of the next contract ID
 
-    public SupplierDL(int supplierID, int companyID, int banckAccount, PaymentMethod paymentMethod, String contactMail,
-            String contactPhone, List<ContractDL> contracts) {
+    public SupplierDL(int supplierID, int companyID, int banckAccount, PaymentMethod paymentMethod, String contactMail, String contactPhone, List<ContractDL> contracts) {
         this.supplierID = supplierID;
         this.companyID = companyID;
         this.bankAccount = banckAccount;

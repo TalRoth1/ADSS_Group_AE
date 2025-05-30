@@ -7,15 +7,54 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.catalog.Catalog;
+
+import DAL.CatalogController;
+import DAL.CatalogDAO;
+import DAL.ContractController;
+import DAL.ContractDAO;
+import DAL.DiscountController;
+import DAL.DiscountDAO;
+import DAL.SupplierController;
+import DAL.SupplierDAO;
 import Utils.PaymentMethod;
 
 public class SupplierFacade {
     private final List<SupplierDL> suppliers;
     private List<Item> items; // Will be saved in inventory after the merge
     private int nextId = 1;
+    private SupplierController supplierController = new SupplierController();
+    private ContractController contractController = new ContractController();
+    private CatalogController catalogController = new CatalogController();
+    private DiscountController discountController = new DiscountController();
 
     public SupplierFacade() {
         this.suppliers = new ArrayList<>();
+        List<SupplierDAO> sups = supplierController.getAllSuppliers();
+        for (SupplierDAO sup : sups) 
+        {
+            List<ContractDAO> contracts = contractController.getSupplierContracts(sup.getId());
+            List<ContractDL> contractList = new ArrayList<>();
+            List<DiscountDL> discounts = new ArrayList<>();
+            for (ContractDAO contract : contracts)
+            {
+                Map<Item, Integer> itemCatalog = new HashMap<>();
+                List<CatalogDAO> catalogItems = catalogController.getContractSupplierCatalogs(sup.getId(), contract.getContractID());
+                for (CatalogDAO catalogItem : catalogItems) {
+                    Item item = new Item(catalogItem.getProductID()) // need to get item from inventory based on Item id
+                    DiscountDAO dis = discountController.getDiscount(catalogItem.getCatalogID());
+                    if (dis != null) {
+                        discounts.add(new DiscountDL(dis.getCatalogID(), dis.getMinimumQuantity(), dis.getDiscountPercentage()));
+                    }
+                    itemCatalog.put(item, catalogItem.getCatalogID());
+                }
+                ContractDL contractDL = new ContractDL(contract.getContractID(), itemCatalog, discounts, DeliveryMethod.valueOf(contract.getDeliveryMethod().toUpperCase()));
+                contractList.add(contractDL);
+            }
+            PaymentMethod paymentMethod = PaymentMethod.valueOf(sup.getPaymentMethod().toUpperCase());
+            SupplierDL supplier = new SupplierDL(sup.getId(), sup.getCompanyID(), sup.getBankAccount(), paymentMethod, sup.getContactMail(), sup.getContactPhone(), contractList);
+            suppliers.add(supplier);
+        }
     }
 
     public void addSupplier(int companyID, int bankAccount, PaymentMethod paymentMethod, String contactEmail,

@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import Domain.DeliveryMethod;
+
 public class ContractController
 {
     private String tableName = "Contracts";
@@ -88,28 +90,30 @@ public class ContractController
         }
     }
 
-    public ContractDAO getContract(int id)
+    public List<ContractDAO> getSupplierContracts(int suppId)
     {
-        try (Connection conn = DriverManager.getConnection(url)) {
+        try(Connection conn = DriverManager.getConnection(url)) {
+            List<ContractDAO> contracts = new ArrayList<>();
             if (conn != null) {
-                String sql = "SELECT * FROM " + tableName + " WHERE contractID = ?";
+                String sql = "SELECT * FROM " + tableName + " WHERE supplierID = ?";
                 try (var pstmt = conn.prepareStatement(sql)) {
-                    pstmt.setInt(1, id);
-                    var rs = pstmt.executeQuery();
-                    if (rs.next()) {
-                        // Assuming the constructor of ContractDAO matches the columns in the database
-                        return new ContractDAO(rs.getInt("contractID"), rs.getInt("supplierID"), rs.getObject("itemCatalogID", List.class), rs.getObject("billOfQuantities", List.class), DeliveryMethod.valueOf(rs.getString("deliveryMethod")));
+                    pstmt.setInt(1, suppId);
+                    try (var rs = pstmt.executeQuery()) {
+                        while (rs.next()) {
+                            contracts.add(new ContractDAO(rs.getInt("contractID"), rs.getInt("supplierID"), rs.getObject("itemCatalogID", List.class), rs.getObject("billOfQuantities", List.class), DeliveryMethod.valueOf(rs.getString("deliveryMethod"))));
+                        }
                     }
                 } catch (SQLException e) {
-                    System.out.println("Get contract failed: " + e.getMessage());
+                    System.out.println("Get supplier contracts failed: " + e.getMessage());
                 }
             } else {
                 System.out.println("Connection to database failed.");
             }
+            return contracts;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return new ArrayList<>();
         }
-        return null; // Return null if no contract found
     }
 
     public List<ContractDAO> getAllContracts()
