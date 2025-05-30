@@ -4,7 +4,10 @@ import DTO.EmployeeDTO;
 import DataLayer.DAOs.EmployeeDAO;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeController {
@@ -23,10 +26,11 @@ public class EmployeeController {
         return employeeDAO;
     }
 
-    public void addEmployee(int id, String name, String branch, String bankAccount, int salary, String startDate,
+    public void addEmployee(int id, String name, LocationDL b, String bankAccount, int salary, String startDate,
             int vacationDays, int sickDays, double educationFund, double socialBenefits, String password) {
         try {
-            employeeDAO.addEmployee(id, name, branch, bankAccount, salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, password);
+            employeeDAO.addEmployee(id, name, branchid, bankAccount, salary, startDate, vacationDays, sickDays,
+                    educationFund, socialBenefits, password);
         } catch (SQLException e) {
             System.out.println("Error adding employee: " + e.getMessage());
         }
@@ -50,7 +54,24 @@ public class EmployeeController {
 
     public EmployeeDTO getEmployee(int employeeId) {
         try {
-            return employeeDAO.getEmployee(employeeId);
+            ResultSet rst = employeeDAO.getEmployee(employeeId);
+            if (rst.next()) {
+                int id = rst.getInt("id");
+                String name = rst.getString("name");
+                int branchid = rst.getInt("branchid");
+                String bankAccount = rst.getString("bankAccount");
+                int salary = rst.getInt("salary");
+                String startDate = rst.getString("startDate");
+                int vacationDays = rst.getInt("vacationDays");
+                int sickDays = rst.getInt("sickDays");
+                double educationFund = rst.getDouble("educationFund");
+                double socialBenefits = rst.getDouble("socialBenefits");
+                String password = rst.getString("password");
+                Boolean isFinishedWorking = rst.getBoolean("isFinishedWorking");
+                return new EmployeeDTO(id, name, branchid, bankAccount, salary, startDate, vacationDays, sickDays,
+                        educationFund, socialBenefits, password, isFinishedWorking);
+            }
+            return null;
         } catch (SQLException e) {
             System.out.println("Error getting employee: " + e.getMessage());
             return null;
@@ -123,7 +144,25 @@ public class EmployeeController {
 
     public List<EmployeeDTO> getAllEmployees() {
         try {
-            return employeeDAO.getAllEmployees();
+            ResultSet rst = employeeDAO.getAllEmployees();
+            List<EmployeeDTO> employees = new ArrayList<>();
+            while (rst.next()) {
+                int id = rst.getInt("id");
+                String name = rst.getString("name");
+                int branchid = rst.getInt("branchid");
+                String bankAccount = rst.getString("bankAccount");
+                int salary = rst.getInt("salary");
+                String startDate = rst.getString("startDate");
+                int vacationDays = rst.getInt("vacationDays");
+                int sickDays = rst.getInt("sickDays");
+                double educationFund = rst.getDouble("educationFund");
+                double socialBenefits = rst.getDouble("socialBenefits");
+                String password = rst.getString("password");
+                Boolean isFinishedWorking = rst.getBoolean("isFinishedWorking");
+                employees.add(new EmployeeDTO(id, name, branchid, bankAccount, salary, startDate, vacationDays,
+                        sickDays, educationFund, socialBenefits, password, isFinishedWorking));
+            }
+            return employees;
         } catch (SQLException e) {
             System.out.println("Error getting all employees: " + e.getMessage());
             return null;
@@ -154,7 +193,7 @@ public class EmployeeController {
         }
     }
 
-    public void getAllEmployeesInBranch(String branch) {
+    public void getAllEmployeesInBranch(int branch) {
         try {
             employeeDAO.getAllEmployeesInBranch(branch);
         } catch (SQLException e) {
@@ -162,11 +201,4 @@ public class EmployeeController {
         }
     }
 
-    /*  public void changeShiftManager(int employeeId, String newShiftManager, LocalDate shiftDate, String shiftType, Lo) {
-        try {
-            employeeDAO.changeShiftManager(employeeId, employeeId);
-        } catch (SQLException e) {
-            System.out.println("Error changing shift manager: " + e.getMessage());
-        }
-    }*/
 }

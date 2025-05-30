@@ -33,6 +33,15 @@ public class EmployeeShiftController {
         }
     }
 
+    public String getRole(int employeeId, String shiftDate, String shiftType) {
+        try {
+            return employeeShiftDAO.getRole(employeeId, shiftDate, shiftType);
+        } catch (SQLException e) {
+            System.out.println("Error getting role for shift: " + e.getMessage());
+            return null;
+        }
+    }
+
     public void shiftReplacement(int employeeId, String shiftDate, String shiftType, String newRole) {
         try {
             employeeShiftDAO.removeEmployeeShift(employeeId, shiftDate, shiftType);
@@ -42,21 +51,24 @@ public class EmployeeShiftController {
         }
     }
 
-    /*public List<EmployeeShiftDTO> getShiftsForEmployee(int employeeId) {
-        try {
-            return employeeShiftDAO.getShiftsForEmployee(employeeId);
-        } catch (SQLException e) {
-            System.out.println("Error getting shifts for employee: " + e.getMessage());
-            return null;
-        }
-    }
-
-    public List<EmployeeShiftDTO> getEmployeesForShift(String shiftDate, String shiftType) {
-        try {
-            return employeeShiftDAO.getEmployeesForShift(shiftDate, shiftType);
-        } catch (SQLException e) {
-            System.out.println("Error getting employees for shift: " + e.getMessage());
-            return null;
-        }
-    }*/
+    /*
+     * public List<EmployeeShiftDTO> getShiftsForEmployee(int employeeId) {
+     * try {
+     * return employeeShiftDAO.getShiftsForEmployee(employeeId);
+     * } catch (SQLException e) {
+     * System.out.println("Error getting shifts for employee: " + e.getMessage());
+     * return null;
+     * }
+     * }
+     * 
+     * public List<EmployeeShiftDTO> getEmployeesForShift(String shiftDate, String
+     * shiftType) {
+     * try {
+     * return employeeShiftDAO.getEmployeesForShift(shiftDate, shiftType);
+     * } catch (SQLException e) {
+     * System.out.println("Error getting employees for shift: " + e.getMessage());
+     * return null;
+     * }
+     * }
+     */
 }

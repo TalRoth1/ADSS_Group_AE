@@ -14,7 +14,7 @@ public class EmployeeMapper {
         }
         return new EmployeeDTO(e.getId(),
                 e.getName(),
-                LocationMapper.toDTO(e.getBranch()),
+                e.getBranchid(),
                 e.getBankAccount(),
                 e.getSalary(),
                 e.getStartDate().toString(),
@@ -24,7 +24,7 @@ public class EmployeeMapper {
                 e.getSocialBenefits(),
                 e.getPassword(),
                 e.isFinishWorking());
-        // int id, String name, String branch, String bankAccount, int salary, String
+        // int id, String name, int branchid, String bankAccount, int salary, String
         // startDate,
         // int vacationDays, int sickDays, double educationFund, double socialBenefits,
         // String password, boolean isFinishedWorking

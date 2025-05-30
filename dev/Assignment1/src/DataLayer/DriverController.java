@@ -10,7 +10,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
-
 public class DriverController {
 
     private DBConnection dbConnection = new DBConnection();
@@ -31,10 +30,10 @@ public class DriverController {
 
     public void addDriver(DriverDTO driver) {
         try {
-            //add driver
+            // add driver
             driverDAO.addDriver(driver.getId(), driver.isBusy() ? 1 : 0);
 
-            //add all license types
+            // add all license types
             for (String licenseType : driver.getLicenseTypes()) {
                 driverLicenseDAO.addDriver(driver.getId(), licenseType);
             }
@@ -57,7 +56,8 @@ public class DriverController {
             System.out.println("Error updating driver: " + e.getMessage());
         }
     }
-    //assuming employee was deleted in emoployees beforehand
+
+    // assuming employee was deleted in emoployees beforehand
     public void deleteDriver(int id) {
         try {
             driverDAO.deleteDriver(id);

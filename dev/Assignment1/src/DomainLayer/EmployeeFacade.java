@@ -142,7 +142,7 @@ public class EmployeeFacade { // employee related methods
         }
     }
 
-    public void hireEmployee(int employeeId, int empManagerId, LocationDL branch, String employeeName,
+    public void hireEmployee(int employeeId, int empManagerId, LocationDL b, String employeeName,
             String bankAccount,
             int salary, LocalDate startDate, int vacationDays, int sickDays, double educationFund,
             double socialBenefits, String employeePassword, Role role) throws Exception {
@@ -152,7 +152,7 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-        if (branches == null || !branches.contains(branch)) {
+        if (branches == null || !branches.contains(b)) {
             throw new Exception("Branch not found.");
         }
         EmployeeManager employeeManager = getEmployeeManager();
@@ -160,11 +160,11 @@ public class EmployeeFacade { // employee related methods
             throw new Exception("Employee with ID " + employeeId + " already hired.");
         }
 
-        ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName, branch, bankAccount,
+        ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName, b, bankAccount,
                 salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
 
-        empController.addEmployee(sickDays, employeeName, bankAccount, bankAccount, salary, bankAccount, vacationDays,
-                sickDays, educationFund, socialBenefits, employeePassword);
+        empController.addEmployee(employeeId, employeeName, b, bankAccount,
+                salary, startDate.toString(), vacationDays, sickDays, educationFund, socialBenefits, employeePassword);
         shiftEmployees.put(employeeId, shiftEmployee);
         System.out.println("Employee hired: " + shiftEmployee.getName() + " with ID: " + employeeId);
     }

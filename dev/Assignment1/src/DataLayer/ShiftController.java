@@ -1,6 +1,8 @@
 package DataLayer;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.time.LocalDate;
 
 import DataLayer.DAOs.ShiftDAO;
 
@@ -32,18 +34,12 @@ public class ShiftController {
         }
     }
 
-    public String getRole(String date, String shiftType, int employeeId) {
-        try {
-            return shiftDAO.getRole(date, shiftType, employeeId);
-        } catch (Exception e) {
-            System.out.println("Error getting role: " + e.getMessage());
-            return null;
-        }
-    }
-
     public int getStartTime(String date, String shiftType) {
         try {
-            return shiftDAO.getStartTime(date, shiftType);
+            ResultSet resultSet = shiftDAO.getStartTime(date, shiftType);
+            if (resultSet.next())
+                return resultSet.getInt("startTime");
+            return -1;
         } catch (Exception e) {
             System.out.println("Error getting start time: " + e.getMessage());
             return -1;
@@ -52,7 +48,10 @@ public class ShiftController {
 
     public int getEndTime(String date, String shiftType) {
         try {
-            return shiftDAO.getEndTime(date, shiftType);
+            ResultSet resultSet = shiftDAO.getEndTime(date, shiftType);
+            if (resultSet.next())
+                return resultSet.getInt("endTime");
+            return -1;
         } catch (Exception e) {
             System.out.println("Error getting end time: " + e.getMessage());
             return -1;
@@ -61,7 +60,10 @@ public class ShiftController {
 
     public int getShiftManagerId(String date, String shiftType) {
         try {
-            return shiftDAO.getShiftManagerId(date, shiftType);
+            ResultSet resultSet = shiftDAO.getShiftManagerId(date, shiftType);
+            if (resultSet.next())
+                return resultSet.getInt("shiftManagerId");
+            return -1;
         } catch (Exception e) {
             System.out.println("Error getting shift manager ID: " + e.getMessage());
             return -1;
@@ -118,7 +120,10 @@ public class ShiftController {
 
     public int getNumOfRequiredcashiers(String date, String shiftType) {
         try {
-            return shiftDAO.getNumOfRequiredcashiers(date, shiftType);
+            ResultSet resultSet = shiftDAO.getNumOfRequiredcashiers(date, shiftType);
+            if (resultSet.next())
+                return resultSet.getInt("numOfRequiredcashiers");
+            return -1;
         } catch (Exception e) {
             System.out.println("Error getting number of required cashiers: " + e.getMessage());
             return -1;
@@ -127,7 +132,11 @@ public class ShiftController {
 
     public int getNumOfRequireddrivers(String date, String shiftType) {
         try {
-            return shiftDAO.getNumOfRequireddrivers(date, shiftType);
+            ResultSet resultSet = shiftDAO.getNumOfRequireddrivers(date, shiftType);
+            if (resultSet.next()) {
+                return resultSet.getInt("numOfRequireddrivers");
+            }
+            return -1;
         } catch (Exception e) {
             System.out.println("Error getting number of required drivers: " + e.getMessage());
             return -1;
@@ -136,10 +145,21 @@ public class ShiftController {
 
     public int getNumOfRequiredstoreKeepers(String date, String shiftType) {
         try {
-            return shiftDAO.getNumOfRequiredstoreKeepers(date, shiftType);
+            ResultSet resultSet = shiftDAO.getNumOfRequiredstoreKeepers(date, shiftType);
+            if (resultSet.next())
+                return resultSet.getInt("numOfRequiredstoreKeepers");
+            return -1;
         } catch (Exception e) {
             System.out.println("Error getting number of required store keepers: " + e.getMessage());
             return -1;
+        }
+    }
+
+    public void changeShiftManager(int oldId, int newId) {
+        try {
+            shiftDAO.changeShiftManager(oldId, newId);
+        } catch (Exception e) {
+            System.out.println("Error changing shift manager: " + e.getMessage());
         }
     }
 

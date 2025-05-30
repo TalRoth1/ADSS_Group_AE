@@ -2,9 +2,10 @@ package DataLayer;
 
 import DomainLayer.Role;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.sql.Connection;
-
+import java.sql.ResultSet;
 
 import DataLayer.DAOs.EmployeeRoleDAO;
 
@@ -38,7 +39,12 @@ public class EmployeeRoleController {
 
     public List<String> getRoles(int employeeId) {
         try {
-            return employeeRoleDAO.getRoles(employeeId);
+            ResultSet rs = employeeRoleDAO.getRoles(employeeId);
+            List<String> roles = new ArrayList<>();
+            while (rs.next()) {
+                roles.add(rs.getString("role"));
+            }
+            return roles;
         } catch (SQLException e) {
             System.out.println("Error getting roles: " + e.getMessage());
             return null;

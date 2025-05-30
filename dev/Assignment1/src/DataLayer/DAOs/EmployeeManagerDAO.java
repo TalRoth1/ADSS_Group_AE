@@ -48,8 +48,7 @@ public class EmployeeManagerDAO {
                         rs.getInt("sickDays"),
                         rs.getDouble("educationFund"),
                         rs.getDouble("socialBenefits"),
-                        rs.getString("password")
-                );
+                        rs.getString("password"));
             }
         }
         return null;
@@ -72,8 +71,7 @@ public class EmployeeManagerDAO {
                         rs.getInt("sickDays"),
                         rs.getDouble("educationFund"),
                         rs.getDouble("socialBenefits"),
-                        rs.getString("password")
-                );
+                        rs.getString("password"));
                 managers.add(manager);
             }
         }

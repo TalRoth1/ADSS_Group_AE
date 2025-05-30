@@ -15,13 +15,14 @@ public class EmployeeShiftDAO {
 
     private void initializeTable() throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS employee_shifts (" +
-            "employeeId INT NOT NULL, " +
-            "shiftDate DATE NOT NULL, " +
-            "shiftType TEXT NOT NULL, " +
-            "role TEXT NOT NULL, " +
-            "PRIMARY KEY (employeeId, shiftDate, shiftType, role), " +
-            "FOREIGN KEY (employeeId) REFERENCES employees(id)" +
-            ")";
+                "employeeId INT NOT NULL, " +
+                "shiftDate DATE NOT NULL, " +
+                "shiftType TEXT NOT NULL, " +
+                "role TEXT NOT NULL, " +
+                "PRIMARY KEY (employeeId, shiftDate, shiftType), " +
+                "FOREIGN KEY (employeeId) REFERENCES employees(id)" +
+
+                ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
@@ -38,6 +39,9 @@ public class EmployeeShiftDAO {
             pstmt.setString(3, shiftType);
             pstmt.setString(4, role);
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error adding employee shift: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -48,10 +52,13 @@ public class EmployeeShiftDAO {
             pstmt.setString(2, shiftDate);
             pstmt.setString(3, shiftType);
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error removing employee shift: " + e.getMessage());
+            throw e;
         }
     }
 
-    //view all shifts for an employee
+    // view all shifts for an employee
     public List<EmployeeShiftDTO> getEmployeeShifts(int employeeId) throws SQLException {
         String sql = "SELECT * FROM employee_shifts WHERE employeeId=?";
         List<EmployeeShiftDTO> shifts = new ArrayList<>();
@@ -63,15 +70,17 @@ public class EmployeeShiftDAO {
                         rs.getInt("employeeId"),
                         rs.getString("shiftDate"),
                         rs.getString("shiftType"),
-                        rs.getString("role")
-                );
+                        rs.getString("role"));
                 shifts.add(shift);
             }
+            return shifts;
+        } catch (SQLException e) {
+            System.out.println("Error retrieving employee shifts: " + e.getMessage());
+            throw e;
         }
-        return shifts;
     }
 
-    //view all employees of a shift
+    // view all employees of a shift
     public List<EmployeeShiftDTO> getShiftEmployees(String shiftDate, String shiftType) throws SQLException {
         String sql = "SELECT * FROM employee_shifts WHERE shiftDate=? AND shiftType=?";
         List<EmployeeShiftDTO> shifts = new ArrayList<>();
@@ -84,15 +93,18 @@ public class EmployeeShiftDAO {
                         rs.getInt("employeeId"),
                         rs.getString("shiftDate"),
                         rs.getString("shiftType"),
-                        rs.getString("role")
-                );
+                        rs.getString("role"));
                 shifts.add(shift);
             }
+            return shifts;
+        } catch (SQLException e) {
+            System.out.println("Error retrieving shift employees: " + e.getMessage());
+            throw e;
         }
-        return shifts;
     }
 
-    public void shiftReplacement(int oldemployeeId, int newEmployeeId, String shiftDate, String shiftType, String branch) throws SQLException {
+    public void shiftReplacement(int oldemployeeId, int newEmployeeId, String shiftDate, String shiftType,
+            String branch) throws SQLException {
         String sql = "UPDATE employee_shifts SET employeeId=? WHERE employeeId=? AND shiftDate=? AND shiftType=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, newEmployeeId);
@@ -102,6 +114,24 @@ public class EmployeeShiftDAO {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error replacing shift: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public String getRole(int employeeId, String shiftDate, String shiftType) throws SQLException {
+        String sql = "SELECT role FROM employee_shifts WHERE employeeId=? AND shiftDate=? AND shiftType=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, employeeId);
+            pstmt.setString(2, shiftDate);
+            pstmt.setString(3, shiftType);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("role");
+            } else {
+                return null; // No role found for the given parameters
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving role: " + e.getMessage());
             throw e;
         }
     }

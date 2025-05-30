@@ -1,9 +1,12 @@
 package DTO;
 
+import java.time.LocalDate;
+
 public class ShiftDTO {
 
-    private String date;
+    private LocalDate date;
     private String shiftType;
+    private int branchid;
     private int startTime;
     private int endTime;
     private int shiftManagerId;
@@ -13,9 +16,10 @@ public class ShiftDTO {
     private int numOfRequiredshipmentManagers;
     private boolean isShipmentShift;
 
-    public ShiftDTO(String date, String shiftType, int startTime, int endTime, int shiftManagerId,
+    public ShiftDTO(LocalDate date, String shiftType, int startTime, int endTime, int shiftManagerId,
             int numOfRequiredcashiers, int numOfRequireddrivers, int numOfRequiredstoreKeepers,
-            int numOfRequiredshipmentManagers, boolean isShipmentShift) {
+            int numOfRequiredshipmentManagers, boolean isShipmentShift, int branchid) {
+        this.branchid = branchid;
         this.date = date;
         this.shiftType = shiftType;
         this.startTime = startTime;
@@ -28,7 +32,7 @@ public class ShiftDTO {
         this.isShipmentShift = isShipmentShift;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
@@ -48,7 +52,7 @@ public class ShiftDTO {
         return shiftManagerId;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -102,6 +106,14 @@ public class ShiftDTO {
 
     public boolean isShipmentShift() {
         return isShipmentShift;
+    }
+
+    public void setBranchid(int branchid) {
+        this.branchid = branchid;
+    }
+
+    public int getBranchid() {
+        return branchid;
     }
 
 }

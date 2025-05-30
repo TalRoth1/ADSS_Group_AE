@@ -12,17 +12,23 @@ public class ShiftMapper {
             return null;
         }
         return new ShiftDTO(
-                shift.getDate().toString(),
-                shift.getShiftType().toString(),
+                shift.getDate(),
+                shift.getShiftType(),
                 shift.getStartTime(),
                 shift.getEndTime(),
                 shift.getShiftManagerId(),
                 shift.getNumOfRequiredcashiers(),
                 shift.getNumOfRequireddrivers(),
-                shift.getNumOfRequiredstorekeepers(),
+                shift.getNumOfRequiredstoreKeepers(),
                 shift.getNumOfRequiredshipmentManagers(),
-                shift.isShipmentShift());
+                shift.isShipmentShift(),
+                shift.getBranchid());
     }
+    // String date, String shiftType, int startTime, int endTime, int
+    // shiftManagerId,
+    // int numOfRequiredcashiers, int numOfRequireddrivers, int
+    // numOfRequiredstoreKeepers,
+    // int numOfRequiredshipmentManagers, boolean isShipmentShift, int branchid)
 
     public static Shift toDomain(ShiftDTO dto) {
         if (dto == null) {
@@ -30,13 +36,10 @@ public class ShiftMapper {
         }
         return new Shift(
                 dto.getDate(),
-                dto.getShiftType(),
-                dto.getShiftManagerId(),
-                dto.getNumOfRequiredcashiers(),
-                dto.getNumOfRequireddrivers(),
-                dto.getNumOfRequiredstoreKeepers(),
-                dto.getNumOfRequiredshipmentManagers(),
-                dto.isShipmentShift());
+                dto.getShiftType(), 
+                dto.getStartTime(),
 
+
+                //LocalDate date, ShiftType shiftType, int shiftManagerId, LocationDL branch)
     }
 }

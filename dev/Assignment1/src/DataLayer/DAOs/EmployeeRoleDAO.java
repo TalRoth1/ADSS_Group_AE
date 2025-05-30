@@ -14,12 +14,12 @@ public class EmployeeRoleDAO {
     }
 
     private void initializeTable() throws SQLException {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS employee_roles (" +
-            "employeeId INT NOT NULL, " +
-            "role TEXT NOT NULL, " +
-            "PRIMARY KEY (employeeId, role), " +
-            "FOREIGN KEY (employeeId) REFERENCES employees(id)" +
-            ")";
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS employee_role (" +
+                "employeeId INT NOT NULL, " +
+                "role TEXT NOT NULL, " +
+                "PRIMARY KEY (employeeId, role), " +
+                "FOREIGN KEY (employeeId) REFERENCES employees(id)" +
+                ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
@@ -28,47 +28,57 @@ public class EmployeeRoleDAO {
         }
     }
 
-
     public void addRole(int employeeId, Role role) throws SQLException {
-        String sql = "INSERT INTO employee_roles (employeeId, role) VALUES (?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            pstmt.setString(2, role.name()); // Store enum as String
-            pstmt.executeUpdate();
-        }
-    }
-
-    public void removeRole(int employeeId, Role role) throws SQLException {
-        String sql = "DELETE FROM employee_roles WHERE employeeId=? AND role=?";
+        String sql = "INSERT INTO employee_role (employeeId, role) VALUES (?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, employeeId);
             pstmt.setString(2, role.name());
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error adding role: " + e.getMessage());
+            throw e;
         }
     }
 
-    public List<String> getRoles(int employeeId) throws SQLException {
-        String sql = "SELECT role FROM employee_roles WHERE employeeId=?";
+    public void removeRole(int employeeId, Role role) throws SQLException {
+        String sql = "DELETE FROM employee_role WHERE employeeId=? AND role=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, employeeId);
+            pstmt.setString(2, role.name());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error removing role: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public ResultSet getRoles(int employeeId) throws SQLException {
+        String sql = "SELECT role FROM employee_role WHERE employeeId=?";
         List<String> roles = new ArrayList<>();
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, employeeId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 roles.add(rs.getString("role"));
-
             }
-            return roles;
+            return rs;
+        } catch (SQLException e) {
+            System.out.println("Error getting roles: " + e.getMessage());
+            throw e;
         }
+
     }
-    //
 
     public void updateRole(int employeeId, Role oldRole, Role newRole) throws SQLException {
-        String sql = "UPDATE employee_roles SET role=? WHERE employeeId=? AND role=?";
+        String sql = "UPDATE employee_role SET role=? WHERE employeeId=? AND role=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, newRole.name());
             pstmt.setInt(2, employeeId);
             pstmt.setString(3, oldRole.name());
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error updating role: " + e.getMessage());
+            throw e;
         }
 
     }

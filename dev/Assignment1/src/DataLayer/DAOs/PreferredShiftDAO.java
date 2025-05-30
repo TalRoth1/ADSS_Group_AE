@@ -36,6 +36,9 @@ public class PreferredShiftDAO {
             pstmt.setString(2, shiftDate);
             pstmt.setString(3, shiftType);
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error adding preferred shift: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -46,44 +49,35 @@ public class PreferredShiftDAO {
             pstmt.setString(2, shiftDate);
             pstmt.setString(3, shiftType);
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error removing preferred shift: " + e.getMessage());
+            throw e;
         }
     }
 
     // view all preferred shifts for an employee
-    public List<PreferredShiftDTO> getPreferredShifts(int employeeId) throws SQLException {
+    public ResultSet getPreferredShifts(int employeeId) throws SQLException {
         String sql = "SELECT * FROM preferred_shifts WHERE employeeId=?";
-        List<PreferredShiftDTO> preferredShifts = new ArrayList<>();
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, employeeId);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                PreferredShiftDTO shift = new PreferredShiftDTO(
-                        rs.getInt("employeeId"),
-                        rs.getString("shiftDate"),
-                        rs.getString("shiftType"));
-                preferredShifts.add(shift);
-            }
+            return pstmt.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error retrieving preferred shifts: " + e.getMessage());
+            throw e;
         }
-        return preferredShifts;
     }
 
     // view all employees that chose this preferred shift
-    public List<PreferredShiftDTO> getPrefShiftEmployees(String shiftDate, String shiftType) throws SQLException {
+    public ResultSet getPrefShiftEmployees(String shiftDate, String shiftType) throws SQLException {
         String sql = "SELECT * FROM preferred_shifts WHERE shiftDate=? AND shiftType=?";
-        List<PreferredShiftDTO> preferredShifts = new ArrayList<>();
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, shiftDate);
             pstmt.setString(2, shiftType);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                PreferredShiftDTO shift = new PreferredShiftDTO(
-                        rs.getInt("employeeId"),
-                        rs.getString("shiftDate"),
-                        rs.getString("shiftType"));
-                preferredShifts.add(shift);
-            }
+            return pstmt.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error retrieving preferred shift employees: " + e.getMessage());
+            throw e;
         }
-        return preferredShifts;
     }
 
 }

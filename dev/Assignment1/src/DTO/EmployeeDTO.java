@@ -4,7 +4,7 @@ public class EmployeeDTO {
 
     private int id;
     private String name;
-    private LocationDTO branch;
+    private int branchid;
     private String bankAccount;
     private int salary;
     private String startDate;
@@ -16,12 +16,12 @@ public class EmployeeDTO {
     private boolean isFinishedWorking;
     private boolean isLoggedIn;
 
-    public EmployeeDTO(int id, String name, LocationDTO branch, String bankAccount, int salary, String startDate,
+    public EmployeeDTO(int id, String name, int branchid, String bankAccount, int salary, String startDate,
             int vacationDays, int sickDays, double educationFund, double socialBenefits,
             String password, boolean isFinishedWorking) {
         this.id = id;
         this.name = name;
-        this.branch = branch;
+        this.branchid = branchid;
         this.bankAccount = bankAccount;
         this.salary = salary;
         this.startDate = startDate;
@@ -42,8 +42,8 @@ public class EmployeeDTO {
         return name;
     }
 
-    public LocationDTO getBranch() {
-        return branch;
+    public int getBranchid() {
+        return branchid;
     }
 
     public String getBankAccount() {
