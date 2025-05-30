@@ -55,6 +55,8 @@ public class EmployeeMapper {
                 e.isFinishedWorking());
     }
 
+
+    //בשביל הקונטרולר של עובד לפונקציה של גט אול עובדים אבל אולי לא צריך את זה כפונקציית עזר
     public static void StoreRolesToEmployees(List<EmployeeDTO> employees, List<EmployeeRoleDTO> employeeRoles) {
         // Map employeeId to list of roles
         Map<Integer, List<Role>> rolesByEmployee = new HashMap<>();

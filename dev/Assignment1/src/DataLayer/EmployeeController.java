@@ -6,6 +6,8 @@ import DataLayer.DAOs.EmployeeDAO;
 import DataLayer.DAOs.EmployeeRoleDAO;
 import DataLayer.DAOs.EmployeeShiftDAO;
 import DataLayer.DAOs.PreferredShiftDAO;
+import DataLayer.DAOs.ShiftDAO;
+import DomainLayer.LocationDL;
 import DomainLayer.Role;
 import DomainLayer.Shift;
 import DomainLayer.ShiftType;
@@ -15,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class EmployeeController {
@@ -25,6 +28,7 @@ public class EmployeeController {
     private EmployeeRoleDAO employeeRoleDAO;
     private EmployeeShiftDAO employeeShiftDAO;
     private PreferredShiftDAO preferredShiftDAO;
+    private ShiftDAO shiftDAO;
 
     public EmployeeController() {
         String DB_URL = "Employees.db";
@@ -34,6 +38,7 @@ public class EmployeeController {
         this.employeeRoleDAO = new EmployeeRoleDAO(connection);
         this.employeeShiftDAO = new EmployeeShiftDAO(connection);
         this.preferredShiftDAO = new PreferredShiftDAO(connection);
+        this.shiftDAO = new ShiftDAO(connection);
     }
 
     public EmployeeDAO getEmployeeDAO() {
@@ -94,20 +99,22 @@ public class EmployeeController {
                 List<Shift> assignedshifts = new ArrayList<>();
                 while (assignedResult.next()) {
                     LocalDate date = assignedResult.getDate("date").toLocalDate();
-                    ShiftType shiftType = ShiftType.valueOf(assignedResult.getString("shiftType"));
-                    //צריך להביא פה איכשהו את האיידי של מנהל המשמרת
-                    //וגם צריך להחליט אם שומרים אובייקט של לוקיישן או רק איידי
-                    Shift shift = new Shift(date, shiftType,  ?  ?  ?, branchid);
+                    String shiftType = assignedResult.getString("shiftType");
+                    ResultSet shiftManagerIdResultSet = shiftDAO.getShiftManagerId(date.toString(), shiftType, branchid);
+                    int shiftManagerId = shiftManagerIdResultSet.getInt("shiftManagerId");
+                    //הבנאי מקבל כפרמטר אחרון אובייקט של לוקיישן ולא רק איידי אז צריך לפתור את זה
+                    Shift shift = new Shift(date, ShiftType.valueOf(shiftType), shiftManagerId, branchid);
                     assignedshifts.add(shift);
                 }
                 ResultSet prefResult = preferredShiftDAO.getPreferredShifts(employeeId);
                 List<Shift> prefShifts = new ArrayList<>();
                 while (prefResult.next()) {
                     LocalDate date = prefResult.getDate("date").toLocalDate();
-                    ShiftType shiftType = ShiftType.valueOf(prefResult.getString("shiftType"));
-                    //צריך להביא פה איכשהו את האיידי של מנהל המשמרת
-                    //וגם צריך להחליט אם שומרים אובייקט של לוקיישן או רק איידי
-                    Shift shift = new Shift(date, shiftType,  ?  ?  ?, branchid);
+                    String shiftType = prefResult.getString("shiftType");
+                    ResultSet shiftManagerIdResultSet = shiftDAO.getShiftManagerId(date.toString(), shiftType, branchid);
+                    int shiftManagerID = shiftManagerIdResultSet.getInt("shiftManagerId");
+                    //הבנאי מקבל כפרמטר אחרון אובייקט של לוקיישן ולא רק איידי אז צריך לפתור את זה
+                    Shift shift = new Shift(date, ShiftType.valueOf(shiftType), shiftManagerID, branchid);
                     prefShifts.add(shift);
                 }
                 return new EmployeeDTO(id, name, branchid, bankAccount, salary, startDate, vacationDays, sickDays,
@@ -184,6 +191,9 @@ public class EmployeeController {
         }
     }
 
+    //get employee צריך לעשות פה כמו בפונקציה
+    //EmployeeDTO כלומר לבנות כמו שצריך את ה 
+    //יש במאפר של העובד פונקציה שאולי תעזור עם זה אבל לא בטוח
     public List<EmployeeDTO> getAllEmployees() {
         try {
             ResultSet rst = employeeDAO.getAllEmployees();
