@@ -161,7 +161,7 @@ public class OrderFacade {
     }
 
     private double calculateTotalPrice(int quantity, int catalogID, int supplierID, int contractID) {
-        double price = quantity * sf.getContract(supplierID, contractID).getItem(catalogID).getPrice();
+        double price = quantity * sf.getContract(supplierID, contractID).getItem(catalogID).getSellingPrice();
         DiscountDL discount = sf.getContract(supplierID, contractID).getDiscount(catalogID);
         if (discount != null) {
             if (discount.getMinimumQuantity() <= quantity) {

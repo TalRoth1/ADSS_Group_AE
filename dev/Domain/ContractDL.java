@@ -5,11 +5,11 @@ import java.util.Map;
 
 public class ContractDL {
     private int contractID;
-    private Map<Item, Integer> itemCatalog;
+    private Map<ProductBL, Integer> itemCatalog;
     private List<DiscountDL> billOfQuantities;
     private DeliveryMethod deliveryMethod;
 
-    public ContractDL(int contractID,Map <Item, Integer> itemCatalog, List<DiscountDL> billOfQuantities ,DeliveryMethod deliveryMethod) {
+    public ContractDL(int contractID,Map <ProductBL, Integer> itemCatalog, List<DiscountDL> billOfQuantities ,DeliveryMethod deliveryMethod) {
         this.contractID = contractID;
         this.itemCatalog = itemCatalog;
         this.billOfQuantities = billOfQuantities;
@@ -44,9 +44,9 @@ public class ContractDL {
         this.deliveryMethod = deliveryMethod;
     }
 
-    public Item getItem(int itemID) {
-        for (Item item : itemCatalog.keySet()) {
-            if (item.getItemID() == itemID) {
+    public ProductBL getItem(int itemID) {
+        for (ProductBL item : itemCatalog.keySet()) {
+            if (item.getProductID() == itemID) {
                 return item;
             }
         }
@@ -54,15 +54,15 @@ public class ContractDL {
     }
 
     public int getItemCatalogID(int itemID) {
-        for (Map.Entry<Item, Integer> entry : itemCatalog.entrySet()) {
-            if (entry.getKey().getItemID() == itemID) {
+        for (Map.Entry<ProductBL, Integer> entry : itemCatalog.entrySet()) {
+            if (entry.getKey().getProductID() == itemID) {
                 return entry.getValue();
             }
         }
         return -1;
     }
 
-    public Map<Item, Integer> getItemCatalog()
+    public Map<ProductBL, Integer> getItemCatalog()
     {
         return itemCatalog;
     }
