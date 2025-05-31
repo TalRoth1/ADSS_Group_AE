@@ -122,6 +122,32 @@ public class CatalogController
         }
     }
 
+    public List<CatalogDAO> getContractSupplierCatalogs(int supplierId, int contractId)
+    {
+        List<CatalogDAO> catalogs = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(url)) {
+            if (conn != null) {
+                String sql = "SELECT * FROM " + tableName + " WHERE supplierID = ? AND contractID = ?";
+                try (var pstmt = conn.prepareStatement(sql)) {
+                    pstmt.setInt(1, supplierId);
+                    pstmt.setInt(2, contractId);
+                    try (var rs = pstmt.executeQuery()) {
+                        while (rs.next()) {
+                            catalogs.add(new CatalogDAO(rs.getInt("supplierID"), rs.getInt("contractID"), rs.getInt("productID"), rs.getInt("catalogID")));
+                        }
+                    }
+                } catch (SQLException e) {
+                    System.out.println("Query failed: " + e.getMessage());
+                }
+            } else {
+                System.out.println("Connection to database failed.");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return catalogs;
+    }
+
     public List<CatalogDAO> getAllCatalogs()
     {
         List<CatalogDAO> catalogs = new ArrayList<>();

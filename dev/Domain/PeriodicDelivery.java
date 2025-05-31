@@ -22,4 +22,7 @@ public class PeriodicDelivery implements DeliveryMethod{
     public void setOrderItems(List<OrderItemDL> orderItems) {
         this.orderItems = orderItems;
     }
+    public String toString() {
+        return "Periodic Delivery";
+    }
 }
