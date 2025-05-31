@@ -5,29 +5,46 @@ import PresentationLayer.EmployeeCLI;
 import PresentationLayer.ShipmentCLI;
 import DomainLayer.*;
 
-public class    Main {
+public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         EmployeeFacade employeeFacade = new EmployeeFacade();
         EmployeeCLI employeeCLI = new EmployeeCLI(employeeFacade);
-        ShipmentCLI shipmentCLI = new ShipmentCLI();
-        shipmentCLI.SetEmployeeFacade(employeeFacade);
+        ShipmentCLI shipmentCLI = new ShipmentCLI(employeeFacade);
 
-        System.out.println("Welcome! Please select the menu");
-        System.out.println("1. Shipment Menu (shipment manager)");
-        System.out.println("2. Employee Menu (employee manager or employee)");
-        System.out.print("Enter your choice: ");
+        System.out.println("Hello! load data? answer y / n");
+        String loadData = scanner.nextLine();
+        if (loadData.equalsIgnoreCase("y")) {
+            shipmentCLI.loadData();
+            employeeCLI.loadData();
+        } else if (!loadData.equalsIgnoreCase("n")) {
+            System.out.println("Invalid input, please restart the application.");
+            return;
+        }
 
-        int choice = scanner.nextInt();
-        switch (choice) {
-            case 1:
-                shipmentCLI.loginCLI();
-                break;
-            case 2:
-                employeeCLI.loginCLI();
-                break;
-            default:
-                System.out.println("Invalid choice. Please restart the application.");
+        boolean running = true;
+        while (running) {
+            System.out.println("Welcome! Please select the menu");
+            System.out.println("1. Shipment Menu (shipment manager)");
+            System.out.println("2. Employee Menu (employee manager or employee)");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+
+            int choice = scanner.nextInt();
+            switch (choice) {
+                case 1:
+                    shipmentCLI.loginCLI();
+                    break;
+                case 2:
+                    employeeCLI.loginCLI();
+                    break;
+                case 3:
+                    running = false;
+                    System.out.println("Exiting application.");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please restart the application.");
+            }
         }
     }
 }

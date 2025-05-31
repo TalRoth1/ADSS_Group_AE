@@ -21,8 +21,8 @@ public class ShipmentCLI {
     public ShipmentFacade shipmentFacade;
     Scanner scanner = new Scanner(System.in);
 
-    public ShipmentCLI() {
-        shipmentFacade = new ShipmentFacade();
+    public ShipmentCLI(EmployeeFacade employeeFacade) {
+        shipmentFacade = new ShipmentFacade(employeeFacade);
     }
 
     public LocationDL ChooseStart() {

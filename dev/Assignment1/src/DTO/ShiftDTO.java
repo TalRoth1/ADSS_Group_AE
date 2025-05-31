@@ -1,11 +1,11 @@
 package DTO;
 
-import java.time.LocalDate;
+//import java.time.LocalDate;
 import java.util.List;
 
 public class ShiftDTO {
 
-    private LocalDate date;
+    private String date;
     private String shiftType;
     private int branchid;
     private int startTime;
@@ -18,7 +18,7 @@ public class ShiftDTO {
     private boolean isShipmentShift;
     private List<Integer> employees;
 
-    public ShiftDTO(LocalDate date, String shiftType, int startTime, int endTime, int shiftManagerId,
+    public ShiftDTO(String date, String shiftType, int startTime, int endTime, int shiftManagerId,
             int numOfRequiredcashiers, int numOfRequireddrivers, int numOfRequiredstoreKeepers,
             int numOfRequiredshipmentManagers, boolean isShipmentShift, int branchid) {
         this.branchid = branchid;
@@ -34,7 +34,7 @@ public class ShiftDTO {
         this.isShipmentShift = isShipmentShift;
     }
 
-    public LocalDate getDate() {
+    public String getDate() {
         return date;
     }
 
@@ -54,7 +54,7 @@ public class ShiftDTO {
         return shiftManagerId;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

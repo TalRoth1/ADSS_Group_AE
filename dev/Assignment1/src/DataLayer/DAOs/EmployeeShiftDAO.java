@@ -54,7 +54,17 @@ public class EmployeeShiftDAO {
         }
     }
 
-    // view all shifts for an employee
+    public void removeAllEmployeeShifts(int employeeId) throws SQLException {
+        String sql = "DELETE FROM employee_shifts WHERE employeeId=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, employeeId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error removing all employee shifts: " + e.getMessage());
+            throw e;
+        }
+    }
+
     public ResultSet getEmployeeShifts(int employeeId) throws SQLException {
         String sql = "SELECT * FROM employee_shifts WHERE employeeId=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {

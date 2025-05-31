@@ -46,11 +46,12 @@ public class EmployeeController {
     }
 
     public void addEmployee(int id, String name, LocationDL b, String bankAccount, int salary, String startDate,
-            int vacationDays, int sickDays, double educationFund, double socialBenefits, String password) {
+            int vacationDays, int sickDays, double educationFund, double socialBenefits, String password, Role role) {
         try {
             int branchid = b.getId();
             employeeDAO.addEmployee(id, name, branchid, bankAccount, salary, startDate, vacationDays, sickDays,
                     educationFund, socialBenefits, password);
+            employeeRoleDAO.addRole(id, role);
         } catch (SQLException e) {
             System.out.println("Error adding employee: " + e.getMessage());
         }
@@ -58,12 +59,16 @@ public class EmployeeController {
 
     public void removeEmployee(int id) {
         try {
+            employeeRoleDAO.removeAllRoles(id);
+            employeeShiftDAO.removeAllEmployeeShifts(id);
+            preferredShiftDAO.removeAllPreferredShifts(id);
             employeeDAO.removeEmployee(id);
         } catch (SQLException e) {
             System.out.println("Error removing employee: " + e.getMessage());
         }
     }
 
+    // update employee.isFinishedWorking to true
     public void fireEmployee(int employeeId) {
         try {
             employeeDAO.fireEmployee(employeeId);
@@ -76,49 +81,7 @@ public class EmployeeController {
         try {
             ResultSet rst = employeeDAO.getEmployee(employeeId);
             if (rst.next()) {
-                int id = rst.getInt("id");
-                String name = rst.getString("name");
-                int branchid = rst.getInt("branchid");
-                String bankAccount = rst.getString("bankAccount");
-                int salary = rst.getInt("salary");
-                String startDate = rst.getString("startDate");
-                int vacationDays = rst.getInt("vacationDays");
-                int sickDays = rst.getInt("sickDays");
-                double educationFund = rst.getDouble("educationFund");
-                double socialBenefits = rst.getDouble("socialBenefits");
-                String password = rst.getString("password");
-                Boolean isFinishedWorking = rst.getBoolean("isFinishedWorking");
-                ResultSet rolesResult = employeeRoleDAO.getRoles(employeeId);
-                List<Role> roles = new ArrayList<>();
-                while (rolesResult.next()) {
-                    String roleName = rolesResult.getString("role");
-                    roles.add(Role.valueOf(roleName.toUpperCase()));
-                }
-
-                ResultSet assignedResult = employeeShiftDAO.getEmployeeShifts(employeeId);
-                List<Shift> assignedshifts = new ArrayList<>();
-                while (assignedResult.next()) {
-                    LocalDate date = assignedResult.getDate("date").toLocalDate();
-                    String shiftType = assignedResult.getString("shiftType");
-                    ResultSet shiftManagerIdResultSet = shiftDAO.getShiftManagerId(date.toString(), shiftType, branchid);
-                    int shiftManagerId = shiftManagerIdResultSet.getInt("shiftManagerId");
-                    //הבנאי מקבל כפרמטר אחרון אובייקט של לוקיישן ולא רק איידי אז צריך לפתור את זה
-                    Shift shift = new Shift(date, ShiftType.valueOf(shiftType), shiftManagerId, branchid);
-                    assignedshifts.add(shift);
-                }
-                ResultSet prefResult = preferredShiftDAO.getPreferredShifts(employeeId);
-                List<Shift> prefShifts = new ArrayList<>();
-                while (prefResult.next()) {
-                    LocalDate date = prefResult.getDate("date").toLocalDate();
-                    String shiftType = prefResult.getString("shiftType");
-                    ResultSet shiftManagerIdResultSet = shiftDAO.getShiftManagerId(date.toString(), shiftType, branchid);
-                    int shiftManagerID = shiftManagerIdResultSet.getInt("shiftManagerId");
-                    //הבנאי מקבל כפרמטר אחרון אובייקט של לוקיישן ולא רק איידי אז צריך לפתור את זה
-                    Shift shift = new Shift(date, ShiftType.valueOf(shiftType), shiftManagerID, branchid);
-                    prefShifts.add(shift);
-                }
-                return new EmployeeDTO(id, name, branchid, bankAccount, salary, startDate, vacationDays, sickDays,
-                        educationFund, socialBenefits, password, isFinishedWorking, roles, assignedshifts, prefShifts);
+                return buildEmployeeDTO(rst);
             }
             return null;
         } catch (SQLException e) {
@@ -191,28 +154,12 @@ public class EmployeeController {
         }
     }
 
-    //get employee צריך לעשות פה כמו בפונקציה
-    //EmployeeDTO כלומר לבנות כמו שצריך את ה 
-    //יש במאפר של העובד פונקציה שאולי תעזור עם זה אבל לא בטוח
     public List<EmployeeDTO> getAllEmployees() {
         try {
             ResultSet rst = employeeDAO.getAllEmployees();
             List<EmployeeDTO> employees = new ArrayList<>();
             while (rst.next()) {
-                int id = rst.getInt("id");
-                String name = rst.getString("name");
-                int branchid = rst.getInt("branchid");
-                String bankAccount = rst.getString("bankAccount");
-                int salary = rst.getInt("salary");
-                String startDate = rst.getString("startDate");
-                int vacationDays = rst.getInt("vacationDays");
-                int sickDays = rst.getInt("sickDays");
-                double educationFund = rst.getDouble("educationFund");
-                double socialBenefits = rst.getDouble("socialBenefits");
-                String password = rst.getString("password");
-                Boolean isFinishedWorking = rst.getBoolean("isFinishedWorking");
-                employees.add(new EmployeeDTO(id, name, branchid, bankAccount, salary, startDate, vacationDays,
-                        sickDays, educationFund, socialBenefits, password, isFinishedWorking));
+                employees.add(buildEmployeeDTO(rst));
             }
             return employees;
         } catch (SQLException e) {
@@ -267,6 +214,57 @@ public class EmployeeController {
         } catch (SQLException e) {
             System.out.println("Error getting employees by branch: " + e.getMessage());
         }
+    }
+
+    // helper function to build EmployeeDTO for getEmployee and getAllEmployees
+    // method
+    private EmployeeDTO buildEmployeeDTO(ResultSet rst) throws SQLException {
+        int id = rst.getInt("id");
+        String name = rst.getString("name");
+        int branchid = rst.getInt("branchid");
+        String bankAccount = rst.getString("bankAccount");
+        int salary = rst.getInt("salary");
+        String startDate = rst.getString("startDate");
+        int vacationDays = rst.getInt("vacationDays");
+        int sickDays = rst.getInt("sickDays");
+        double educationFund = rst.getDouble("educationFund");
+        double socialBenefits = rst.getDouble("socialBenefits");
+        String password = rst.getString("password");
+        Boolean isFinishedWorking = rst.getBoolean("isFinishedWorking");
+
+        ResultSet rolesResult = employeeRoleDAO.getRoles(id);
+        List<Role> roles = new ArrayList<>();
+        while (rolesResult.next()) {
+            String roleName = rolesResult.getString("role");
+            roles.add(Role.valueOf(roleName.toUpperCase()));
+        }
+
+        ResultSet assignedResult = employeeShiftDAO.getEmployeeShifts(id);
+        List<Shift> assignedshifts = new ArrayList<>();
+        while (assignedResult.next()) {
+            LocalDate date = assignedResult.getDate("date").toLocalDate();
+            String shiftType = assignedResult.getString("shiftType");
+            ResultSet shiftManagerIdResultSet = shiftDAO.getShiftManagerId(date.toString(), shiftType, branchid);
+            int shiftManagerId = shiftManagerIdResultSet.getInt("shiftManagerId");
+            // הבנאי מקבל כפרמטר אחרון אובייקט של לוקיישן ולא רק איידי אז צריך לפתור את זה
+            Shift shift = new Shift(date, ShiftType.valueOf(shiftType), shiftManagerId, branchid);
+            assignedshifts.add(shift);
+        }
+
+        ResultSet prefResult = preferredShiftDAO.getPreferredShifts(id);
+        List<Shift> prefShifts = new ArrayList<>();
+        while (prefResult.next()) {
+            LocalDate date = prefResult.getDate("date").toLocalDate();
+            String shiftType = prefResult.getString("shiftType");
+            ResultSet shiftManagerIdResultSet = shiftDAO.getShiftManagerId(date.toString(), shiftType, branchid);
+            int shiftManagerID = shiftManagerIdResultSet.getInt("shiftManagerId");
+            // הבנאי מקבל כפרמטר אחרון אובייקט של לוקיישן ולא רק איידי אז צריך לפתור את זה
+            Shift shift = new Shift(date, ShiftType.valueOf(shiftType), shiftManagerID, branchid);
+            prefShifts.add(shift);
+        }
+
+        return new EmployeeDTO(id, name, branchid, bankAccount, salary, startDate, vacationDays, sickDays,
+                educationFund, socialBenefits, password, isFinishedWorking, roles, assignedshifts, prefShifts);
     }
 
 }

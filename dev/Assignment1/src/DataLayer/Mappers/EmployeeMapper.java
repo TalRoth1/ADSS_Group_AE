@@ -5,6 +5,7 @@ import DTO.EmployeeRoleDTO;
 import DomainLayer.Employee;
 import DomainLayer.LocationDL;
 import DomainLayer.Role;
+import DomainLayer.ShiftEmployee;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 public class EmployeeMapper {
 
-    public static EmployeeDTO toDTO(Employee e) {
+    public static EmployeeDTO toDTO(ShiftEmployee e) {
         if (e == null) {
             return null;
         }
@@ -37,7 +38,7 @@ public class EmployeeMapper {
 
     }
 
-    public static Employee toDomain(EmployeeDTO e) {
+    public static ShiftEmployee toDomain(EmployeeDTO e) {
         if (e == null) {
             return null;
         }
@@ -52,23 +53,27 @@ public class EmployeeMapper {
                 e.getEducationFund(),
                 e.getSocialBenefits(),
                 e.getPassword(),
-                e.isFinishedWorking());
+                e.isFinishedWorking(),
+              );
+
     }
 
+    // for employeeController
+    // currently not used
+    // public static void StoreRolesToEmployees(List<EmployeeDTO> employees,
+    // List<EmployeeRoleDTO> employeeRoles) {
+    // // Map employeeId to list of roles
+    // Map<Integer, List<Role>> rolesByEmployee = new HashMap<>();
 
-    //בשביל הקונטרולר של עובד לפונקציה של גט אול עובדים אבל אולי לא צריך את זה כפונקציית עזר
-    public static void StoreRolesToEmployees(List<EmployeeDTO> employees, List<EmployeeRoleDTO> employeeRoles) {
-        // Map employeeId to list of roles
-        Map<Integer, List<Role>> rolesByEmployee = new HashMap<>();
-
-        for (EmployeeRoleDTO er : employeeRoles) {
-            int employeeId = er.getEmployeeId();
-            Role role = Role.valueOf(er.getRole());  // assumes string matches enum
-            rolesByEmployee.computeIfAbsent(employeeId, k -> new ArrayList<>()).add(role);
-        }
-        for (EmployeeDTO employee : employees) {
-            List<Role> roles = rolesByEmployee.get(employee.getId());
-            employee.setRoles(roles != null ? roles : new ArrayList<>());
-        }
-    }
+    // for (EmployeeRoleDTO er : employeeRoles) {
+    // int employeeId = er.getEmployeeId();
+    // Role role = Role.valueOf(er.getRole()); // assumes string matches enum
+    // rolesByEmployee.computeIfAbsent(employeeId, k -> new
+    // ArrayList<>()).add(role);
+    // }
+    // for (EmployeeDTO employee : employees) {
+    // List<Role> roles = rolesByEmployee.get(employee.getId());
+    // employee.setRoles(roles != null ? roles : new ArrayList<>());
+    // }
+    // }
 }

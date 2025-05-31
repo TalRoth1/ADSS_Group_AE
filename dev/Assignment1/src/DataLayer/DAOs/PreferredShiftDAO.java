@@ -55,6 +55,17 @@ public class PreferredShiftDAO {
         }
     }
 
+    public void removeAllPreferredShifts(int employeeId) throws SQLException {
+        String sql = "DELETE FROM preferred_shifts WHERE employeeId=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, employeeId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error removing all preferred shifts: " + e.getMessage());
+            throw e;
+        }
+    }
+
     // view all preferred shifts for an employee
     public ResultSet getPreferredShifts(int employeeId) throws SQLException {
         String sql = "SELECT * FROM preferred_shifts WHERE employeeId=?";

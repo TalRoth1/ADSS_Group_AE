@@ -38,7 +38,7 @@ public class ShiftDAO {
         }
     }
 
-    public void addShift(String date, String shiftType, int startTime, int endTime, int locationId, int shiftManagerId)
+    public void addShift(String date, String shiftType, int locationId, int startTime, int endTime, int shiftManagerId)
             throws SQLException {
         String sql = "INSERT INTO shifts (date, shiftType, locationId, startTime, endTime, shiftManagerId) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -266,17 +266,18 @@ public class ShiftDAO {
             throw e;
         }
     }
-
-    public void changeShiftManager(int oldid, int newid) throws SQLException {
-        String sql = "UPDATE shifts SET shiftManagerId=? WHERE shiftManagerId=?";
+    public void changeShiftManager(int oldid, int newid, String date, String shiftType, int locationId) throws SQLException {
+        String sql = "UPDATE shifts SET shiftManagerId=? WHERE shiftManagerId=? AND date=? AND shiftType=? AND locationId=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, newid);
             pstmt.setInt(2, oldid);
+            pstmt.setString(3, date);
+            pstmt.setString(4, shiftType);
+            pstmt.setInt(5, locationId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error changing shift manager: " + e.getMessage());
             throw e;
         }
     }
-
 }

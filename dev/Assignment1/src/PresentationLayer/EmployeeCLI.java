@@ -23,13 +23,13 @@ public class EmployeeCLI {
     private LocalDate nowDate;
 
     private static final Integer[] MORNING_SHIFT_START_TIMES = {
-        600, 630, 700, 730, 800, 830, 900, 930, 1000};
+            600, 630, 700, 730, 800, 830, 900, 930, 1000 };
     private static final Integer[] MORNING_SHIFT_END_TIMES = {
-        1300, 1330, 1400};
+            1300, 1330, 1400 };
     private static final Integer[] EVENING_SHIFT_START_TIMES = {
-        1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800, 1830, 1900, 1930, 2000, 2030, 2100};
+            1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800, 1830, 1900, 1930, 2000, 2030, 2100 };
     private static final Integer[] EVENING_SHIFT_END_TIMES = {
-        2100, 2130, 2200};
+            2100, 2130, 2200 };
     List<LocationDL> branches = employeeFacade.getBranches();
 
     public EmployeeCLI(EmployeeFacade employeeFacade) {
@@ -65,15 +65,26 @@ public class EmployeeCLI {
         }
     }
 
+    public void loadData() {
+        try {
+            employeeFacade.loadData();
+            System.out.println("Employee data loaded successfully.");
+        } catch (Exception e) {
+            System.out.println("Failed to load employee data: " + e.getMessage());
+        }
+    }
+
     private void employeeManager() {
         try {
             EmployeeManager emp = employeeFacade.getEmployeeManager();
             LocalDate now = LocalDate.now();
-            LocalDate thisSunday = now.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.SUNDAY));
-            Iterator<Map.Entry<LocationDL, Map<LocalDate, Shift>>> branchIterator2 = emp.getMissingShift().entrySet().iterator();
+            LocalDate thisSunday = now
+                    .with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.SUNDAY));
+            Iterator<Map.Entry<LocationDL, Map<LocalDate, Shift>>> branchIterator2 = emp.getMissingShift().entrySet()
+                    .iterator();
             LocalDate endOfNextWeek = thisSunday.plusWeeks(2).minusDays(1);
 
-            while (branchIterator2.hasNext()) { //check if there are any branches with missing shifts
+            while (branchIterator2.hasNext()) { // check if there are any branches with missing shifts
                 Map.Entry<LocationDL, Map<LocalDate, Shift>> branchEntry = branchIterator2.next();
                 Map<LocalDate, Shift> shiftsByDate = branchEntry.getValue();
                 Iterator<Map.Entry<LocalDate, Shift>> shiftIterator = shiftsByDate.entrySet().iterator();
@@ -92,7 +103,8 @@ public class EmployeeCLI {
             // looping through the toCompleteShifts
             while (emp != null && emp.getToCompleteShifts() != null && !emp.getToCompleteShifts().isEmpty()) {
                 System.out.println("You have shifts to complete. Please complete them before proceeding.");
-                Iterator<Map.Entry<LocationDL, Map<LocalDate, Shift>>> branchIterator = emp.getToCompleteShifts().entrySet().iterator();
+                Iterator<Map.Entry<LocationDL, Map<LocalDate, Shift>>> branchIterator = emp.getToCompleteShifts()
+                        .entrySet().iterator();
                 while (branchIterator.hasNext()) {
                     Map.Entry<LocationDL, Map<LocalDate, Shift>> branchEntry = branchIterator.next();
                     Map<LocalDate, Shift> shiftsByDate = branchEntry.getValue();
@@ -100,7 +112,8 @@ public class EmployeeCLI {
                     while (shiftIterator.hasNext()) {
                         Map.Entry<LocalDate, Shift> shiftEntry = shiftIterator.next();
                         Shift shift = shiftEntry.getValue();
-                        System.out.println("Shift on " + shift.getDate() + " in the " + shift.getShiftType().toString() + ":");
+                        System.out.println(
+                                "Shift on " + shift.getDate() + " in the " + shift.getShiftType().toString() + ":");
                         int shiftManagerId = selectEmployeeForRole(shift, Role.SHIFT_MANAGER);
                         employeeFacade.setShiftManager(emp.getId(), shift, shiftManagerId);
                         for (Role role : Role.values()) {
@@ -116,12 +129,12 @@ public class EmployeeCLI {
             System.out.println("Error retrieving Employee Manager: " + e.getMessage());
         }
 
-        String[] actions = {"Create Shifts", "Set Shifts", "Add Employee to Exist Shift",
-            "Remove Employee From Exist Shift",
-            "Fire Employee", "Hire Employee", "Change Employee's Role",
-            "Add Role to Employee", "Change Shift Manager", "Replace Employee",
-            "Delete Employee's Role", "Change Employee's Data", "Show Shift Information",
-            "Show Past Shifts", "Show Employee's shifts", "Change Shift Hours", "Logout"};
+        String[] actions = { "Create Shifts", "Set Shifts", "Add Employee to Exist Shift",
+                "Remove Employee From Exist Shift",
+                "Fire Employee", "Hire Employee", "Change Employee's Role",
+                "Add Role to Employee", "Change Shift Manager", "Replace Employee",
+                "Delete Employee's Role", "Change Employee's Data", "Show Shift Information",
+                "Show Past Shifts", "Show Employee's shifts", "Change Shift Hours", "Logout" };
         String option = selectFromList("Select Employee Manager Action (Enter the number)", actions);
         switch (option) {
             case "Create Shifts" ->
@@ -305,8 +318,7 @@ public class EmployeeCLI {
                 boolean flag = true;
                 ArrayList<String> licenses = new ArrayList<>();
                 while (flag) {
-                    System.out.println("Please enter the driver license types or finish to end: "
-                    );
+                    System.out.println("Please enter the driver license types or finish to end: ");
                     String licenseType = scanner.nextLine();
                     if (licenseType.equalsIgnoreCase("Finish")) {
                         flag = false;
@@ -395,8 +407,8 @@ public class EmployeeCLI {
     }
 
     private void changeEmployeeData() {
-        String[] labels = {"Salary", "Bank Account", "Vacation Days", "Sick Days", "Education Fund",
-            "Social Benefits"};
+        String[] labels = { "Salary", "Bank Account", "Vacation Days", "Sick Days", "Education Fund",
+                "Social Benefits" };
         String option = selectFromList("Select Employee Data to change:", labels);
         switch (option) {
             case "Salary" ->
@@ -460,7 +472,6 @@ public class EmployeeCLI {
         } catch (Exception e) {
             System.out.println("Error during logout: " + e.getMessage());
         }
-        loginCLI();
     }
 
     private void updateSalary() {
@@ -545,9 +556,9 @@ public class EmployeeCLI {
     // EmployeeManager();
     // }
     private void shiftManager() {
-        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift",
-            "Show Employee's shifts", "Show Shift Information", "Show my Preferences",
-            "Show my Assigned Shifts", "Logout"};
+        String[] actions = { "Add Preferred Shift", "Remove Preferred Shift",
+                "Show Employee's shifts", "Show Shift Information", "Show my Preferences",
+                "Show my Assigned Shifts", "Logout" };
         String option = selectFromList("Select Shift Manager Action:", actions);
 
         switch (option) {
@@ -626,8 +637,8 @@ public class EmployeeCLI {
     }
 
     private void shiftEmployee() {
-        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift", "Show Shift Information",
-            "Show my Preferences", "Show my Assigned Shifts", "Logout"};
+        String[] actions = { "Add Preferred Shift", "Remove Preferred Shift", "Show Shift Information",
+                "Show my Preferences", "Show my Assigned Shifts", "Logout" };
         String option = selectFromList("Select Shift Employee Action:", actions);
 
         switch (option) {
@@ -793,7 +804,7 @@ public class EmployeeCLI {
             endTime = selectFromList("Select end time (must be after start):", endTimeOptions);
         }
 
-        return new int[]{startTime, endTime};
+        return new int[] { startTime, endTime };
     }
 
     private <T> T selectFromList(String title, T[] options) {

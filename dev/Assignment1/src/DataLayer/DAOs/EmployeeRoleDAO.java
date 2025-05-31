@@ -52,6 +52,17 @@ public class EmployeeRoleDAO {
         }
     }
 
+    public void removeAllRoles(int employeeId) throws SQLException {
+        String sql = "DELETE FROM employee_role WHERE employeeId=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, employeeId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error removing all roles: " + e.getMessage());
+            throw e;
+        }
+    }
+
     public ResultSet getAllRoles() throws SQLException {
         String sql = "SELECT * FROM employee_role";
         try (Statement stmt = connection.createStatement()) {

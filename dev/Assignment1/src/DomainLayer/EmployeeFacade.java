@@ -1,11 +1,13 @@
 package DomainLayer;
 
 import DTO.DriverDTO;
+import DTO.EmployeeDTO;
 import DataLayer.*;
 import DataLayer.DAOs.DriverDAO;
 import DataLayer.DAOs.EmployeeDAO;
 import DataLayer.DAOs.EmployeeRoleDAO;
 import DataLayer.DAOs.EmployeeShiftDAO;
+import DataLayer.Mappers.EmployeeMapper;
 
 import java.sql.Connection;
 import java.time.DayOfWeek;
@@ -113,6 +115,34 @@ public class EmployeeFacade { // employee related methods
         System.out.println("Employee with ID " + id + " has logged out.");
     }
 
+    public void loadData() {
+        try {
+            connection = DBConnection.getConnection();
+            empDAO = new EmployeeDAO(connection);
+            empController = new EmployeeController();
+            empRoleDAO = new EmployeeRoleDAO(connection);
+            empRoleController = new EmployeeRoleController();
+            empShiftDAO = new EmployeeShiftDAO(connection);
+            empShiftController = new EmployeeController();
+
+            // branches = empController.getBranches(); // Load branches from the database
+            if (branches == null) {
+                branches = Collections.emptyList();
+            }
+
+            // Load employees from the database
+            List<EmployeeDTO> employeeDTOs = empController.getAllEmployees();
+            shiftEmployees = new HashMap<>();
+            for (EmployeeDTO dto : employeeDTOs) {
+                EmployeeMapper employeeMapper = new EmployeeMapper();
+                ShiftEmployee shiftEmployee = employeeMapper.toDomain(dto);
+                shiftEmployees.put(shiftEmployee.getId(), shiftEmployee);
+            }
+        } catch (Exception e) {
+            System.out.println("Error loading data: " + e.getMessage());
+        }
+    }
+
     // employee manager methods
     public boolean isEmployeeManager(int id) {
         return employeeManager.getId() == id;
@@ -207,8 +237,7 @@ public class EmployeeFacade { // employee related methods
                 driver.getEducationFund(),
                 driver.getSocialBenefits(),
                 driver.getPassword(),
-                driver.getLicenseTypes()
-        );
+                driver.getLicenseTypes());
         driverController.addDriver(driverDTO);
         empController.addEmployee(employeeId, employeeName, b, bankAccount,
                 salary, startDate.toString(), vacationDays, sickDays, educationFund, socialBenefits, employeePassword);
@@ -816,6 +845,11 @@ public class EmployeeFacade { // employee related methods
 
     public List<LocationDL> getBranches() {
         return branches;
+    }
+
+    public DriverController getDriverController()
+    {
+        return driverController;
     }
 
 }

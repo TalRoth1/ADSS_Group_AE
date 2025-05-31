@@ -47,7 +47,8 @@ public class PreferredShiftController {
             while (rs.next()) {
                 String shiftDate = rs.getString("shiftDate");
                 String shiftType = rs.getString("shiftType");
-                ResultSet shiftRs = shiftDAO.getShift(shiftDate, shiftType);
+                int branchId = rs.getInt("branchid");
+                ResultSet shiftRs = shiftDAO.getShift(shiftDate, shiftType, branchId);
                 if (shiftRs.next()) {
                     ShiftDTO shift = new ShiftDTO(
                             shiftDate,
@@ -60,7 +61,7 @@ public class PreferredShiftController {
                             shiftRs.getInt("numOfRequiredstoreKeepers"),
                             shiftRs.getInt("numOfRequiredshipmentManagers"),
                             shiftRs.getBoolean("isShipmentShift"),
-                            shiftRs.getInt("branchid"));
+                            branchId);//call me when you get back
                     preferredShifts.add(shift);
                 }
             }

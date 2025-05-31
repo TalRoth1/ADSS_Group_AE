@@ -1,6 +1,8 @@
 package DomainLayer;
 
 import DataLayer.DriverController;
+import DataLayer.ItemsController;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ public class ShipmentFacade {
     public ShipmentController shipmentController;
     public LocationController locationController;
     public TruckController truckController;
+    public ItemsController itemsController;
     public List<ShipmentDL> shipments = new ArrayList<>();
     public List<LocationDL> locations = new ArrayList<>();
     // public List<DriverDL> drivers = new ArrayList<>();
@@ -26,11 +29,13 @@ public class ShipmentFacade {
     public Map<String, Float> Items = new HashMap<>(Map.of("egg carton", 1.5f, "milk", 1f, "bread", 0.5f, "cheese", 1f,
             "butter", 0.25f, "yogurt", 0.6f, "juice", 0.75f, "soda", 0.75f, "water", 1f, "coffee", 0.5f));
 
-    public ShipmentFacade() {
-        this.shipmentController = new ShipmentController();
-        this.employeeFacade = new EmployeeFacade();
+    public ShipmentFacade(EmployeeFacade employeeFacade){
+        this.employeeFacade = employeeFacade;
         this.locationController = new LocationController();
         this.truckController = new TruckController();
+        this.itemsController = new ItemsController();
+        this.shipmentController = new ShipmentController(truckController, this.employeeFacade.getDriverController(),
+                locationController, itemsController);
     }
 
     public void SetEmployeeFacade(EmployeeFacade employeeFacade) {

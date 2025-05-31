@@ -7,12 +7,12 @@ import java.util.Scanner;
 public class ShipMain {
 
     public static void main(String[] args) {
-        ShipmentCLI shipCli = new ShipmentCLI();
-        Scanner scanner = new Scanner(System.in);
+        /*Scanner scanner = new Scanner(System.in);
         //LocalDate today = LocalDate.now();
         EmployeeFacade employeeFacade = new EmployeeFacade();
-        shipCli.SetEmployeeFacade(employeeFacade);
         EmployeeCLI cli = new EmployeeCLI(employeeFacade);
+        ShipmentCLI shipCli = new ShipmentCLI(employeeFacade);
+
 
         System.out.println("Welcome to the Delivery Management System!");
         boolean exit = false;
@@ -70,6 +70,6 @@ public class ShipMain {
                     System.out.println("Exiting the program. Goodbye!");
                     break;
             }
-        }
+        }*/
     }
 }
