@@ -43,10 +43,10 @@ public class LocationController {
             return new LocationDTO(
                     rst.getInt("id"),
                     rst.getString("street"),
-                    rst.getInt("streetNumber"),
+                    rst.getInt("street_number"),
                     rst.getString("city"),
-                    rst.getString("contactNumber"),
-                    rst.getString("contactName"),
+                    rst.getString("contact_number"),
+                    rst.getString("contact_name"),
                     rst.getString("zone"));
         }
         return null;
@@ -58,10 +58,10 @@ public class LocationController {
             return new LocationDTO(
                     rst.getInt("id"),
                     rst.getString("street"),
-                    rst.getInt("streetNumber"),
+                    rst.getInt("street_number"),
                     rst.getString("city"),
-                    rst.getString("contactNumber"),
-                    rst.getString("contactName"),
+                    rst.getString("contact_number"),
+                    rst.getString("contact_name"),
                     rst.getString("zone"));
         }
         return null;
@@ -74,12 +74,16 @@ public class LocationController {
             locations.add(new LocationDTO(
                     rst.getInt("id"),
                     rst.getString("street"),
-                    rst.getInt("streetNumber"),
+                    rst.getInt("street_number"),
                     rst.getString("city"),
-                    rst.getString("contactNumber"),
-                    rst.getString("contactName"),
+                    rst.getString("contact_number"),
+                    rst.getString("contact_name"),
                     rst.getString("zone")));
         }
         return locations;
+    }
+
+    public void resetLocationsTable() throws SQLException {
+        locationDAO.resetTable();
     }
 }

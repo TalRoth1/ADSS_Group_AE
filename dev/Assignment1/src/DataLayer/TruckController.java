@@ -1,8 +1,8 @@
 package DataLayer;
 
 import java.sql.*;
-import java.sql.Connection;
-import java.sql.ResultSet;
+import java.util.ArrayList;
+
 import DTO.TruckDTO;
 import DataLayer.DAOs.TruckDAO;
 
@@ -40,6 +40,20 @@ public class TruckController {
         return getTruckFromResultSet(truckDAO.getTruck(id));
     }
 
+    public ArrayList<TruckDTO> getAllTrucks() throws SQLException {
+        ArrayList<TruckDTO> trucks = new ArrayList<>();
+        ResultSet rst = truckDAO.getAllTrucks();
+        while (rst.next()) {
+            trucks.add(new TruckDTO(
+                    rst.getInt("id"),
+                    rst.getString("license_plate"),
+                    rst.getString("type"),
+                    rst.getFloat("max_weight"),
+                    rst.getInt("status") == 1 ? true : false));
+        }
+        return trucks;
+    }    
+
 
     private TruckDTO getTruckFromResultSet(ResultSet rst) throws SQLException {
         if (rst.next()) {
@@ -53,5 +67,10 @@ public class TruckController {
             throw new SQLException("Truck not found with id: " + rst.getInt("id"));
         }
     }
+
+    public void resetTrucksTable() throws SQLException {
+        truckDAO.clearTable();
+    }
+    
 
 }

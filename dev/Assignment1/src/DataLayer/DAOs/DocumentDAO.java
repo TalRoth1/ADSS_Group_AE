@@ -103,4 +103,14 @@ public class DocumentDAO {
             throw e;
         }
     }
+
+    public void clearTable() throws SQLException {
+    try (Statement stmt = connection.createStatement()) {
+        stmt.executeUpdate("DELETE FROM documents"); // clear rows
+        stmt.executeUpdate("DELETE FROM sqlite_sequence WHERE name='documents'"); // reset AUTOINCREMENT
+    } catch (SQLException e) {
+        System.out.println("Error clearing documents table: " + e.getMessage());
+        throw e;
+    }
+}
 }

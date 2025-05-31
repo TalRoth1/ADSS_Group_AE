@@ -1,6 +1,7 @@
 package DataLayer.DAOs;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -22,28 +23,29 @@ public class DocumentItemDAO {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS document_item (" +
                 "documentID INT NOT NULL, " +
                 "locationID INT NOT NULL, " +
-                "itemID INT FOREIGN KEY REFERENCES items(id), " +
+                "itemName TEXT NOT NULL, " +
                 "amount INT NOT NULL, " +
-                "PRIMARY KEY (documentID, locationID, itemID)" +
-                "FOREIGN KEY (documentID) REFERENCES documents(id)" +
+                "PRIMARY KEY (documentID, locationID, itemName), " +
+                "FOREIGN KEY (documentID) REFERENCES documents(id), " +
+                "FOREIGN KEY (itemName) REFERENCES items(name)" +
                 ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
-            System.out.println("Error creating documents table: " + e.getMessage());
+            System.out.println("Error creating document_item table: " + e.getMessage());
             throw e;
         }
     }
-
-    public void addDocumentItem(int documentID, int locationID, int itemID, int amount) throws SQLException {
-        String insertSQL = "INSERT INTO document_item (documentID, locationID, itemID, amount) VALUES (?, ?, ?, ?)";
-        try (var preparedStatement = connection.prepareStatement(insertSQL)) {
+    public void addDocumentItem(int documentID, int locationID, String itemName, int amount) throws SQLException {
+        String insertSQL = "INSERT INTO document_item (documentID, locationID, itemName, amount) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             preparedStatement.setInt(1, documentID);
             preparedStatement.setInt(2, locationID);
-            preparedStatement.setInt(3, itemID);
+            preparedStatement.setString(3, itemName);
             preparedStatement.setInt(4, amount);
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             System.out.println("Error adding document item: " + e.getMessage());
             throw e;
         }
@@ -60,28 +62,30 @@ public class DocumentItemDAO {
         }
     }
 
-    public void deleteDocumentItem(int documentID, int locationID, int itemID) throws SQLException {
-        String deleteSQL = "DELETE FROM document_item WHERE documentID = ? AND locationID = ? AND itemID = ?";
-        try (var preparedStatement = connection.prepareStatement(deleteSQL)) {
+    public void deleteDocumentItem(int documentID, int locationID, String itemName) throws SQLException {
+        String deleteSQL = "DELETE FROM document_item WHERE documentID = ? AND locationID = ? AND itemName = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
             preparedStatement.setInt(1, documentID);
             preparedStatement.setInt(2, locationID);
-            preparedStatement.setInt(3, itemID);
+            preparedStatement.setString(3, itemName);
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             System.out.println("Error deleting document item: " + e.getMessage());
             throw e;
         }
     }
 
-    public void updateDocumentItem(int documentID,int locationID, int itemID, int newAmount) throws SQLException {
-        String updateSQL = "UPDATE document_item SET amount = ? WHERE documentID = ? AND locationID = ? AND itemID = ?";
-        try (var preparedStatement = connection.prepareStatement(updateSQL)) {
+    public void updateDocumentItem(int documentID, int locationID, String itemName, int newAmount) throws SQLException {
+        String updateSQL = "UPDATE document_item SET amount = ? WHERE documentID = ? AND locationID = ? AND itemName = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
             preparedStatement.setInt(1, newAmount);
             preparedStatement.setInt(2, documentID);
             preparedStatement.setInt(3, locationID);
-            preparedStatement.setInt(4, itemID);
+            preparedStatement.setString(4, itemName);
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             System.out.println("Error updating document item: " + e.getMessage());
             throw e;
         }
@@ -107,6 +111,12 @@ public class DocumentItemDAO {
         } catch (SQLException e) {
             System.out.println("Error deleting document location: " + e.getMessage());
             throw e;
+        }
+    }
+    public void clearTable() throws SQLException {
+        String sql = "DELETE FROM document_item";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(sql);
         }
     }
 }

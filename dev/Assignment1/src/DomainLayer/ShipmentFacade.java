@@ -11,8 +11,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import DTO.ItemDTO;
+import DTO.LocationDTO;
+import DTO.ShipmentDTO;
+import DTO.TruckDTO;
 import DataLayer.ShipmentController;
 import DataLayer.TruckController;
+import DataLayer.Mappers.LocationMapper;
+import DataLayer.Mappers.ShipmentMapper;
+import DataLayer.Mappers.TruckMapper;
 import DataLayer.LocationController;
 
 public class ShipmentFacade {
@@ -22,6 +29,9 @@ public class ShipmentFacade {
     public LocationController locationController;
     public TruckController truckController;
     public ItemsController itemsController;
+    public LocationMapper locationMapper = new LocationMapper();
+    public TruckMapper truckMapper = new TruckMapper();
+    public ShipmentMapper shipmentMapper = new ShipmentMapper();
     public List<ShipmentDL> shipments = new ArrayList<>();
     public List<LocationDL> locations = new ArrayList<>();
     // public List<DriverDL> drivers = new ArrayList<>();
@@ -44,7 +54,7 @@ public class ShipmentFacade {
 
     public void CreateShipment(TruckDL truck, LocationDL origin, List<LocationDL> destinations,
             Map<LocationDL, Map<String, Integer>> items, String shiftTime, Date datetoSend) throws Exception {
-        ShipmentDL shipment = new ShipmentDL(truck, origin, destinations, items, shiftTime, datetoSend);
+        ShipmentDL shipment = new ShipmentDL(getHighestShipmentId() ,truck, origin, destinations, items, shiftTime, datetoSend);
         if (!shipment.WeightCheck(Items)) {
             throw new Exception("Truck is overweight");
         }
@@ -58,9 +68,7 @@ public class ShipmentFacade {
     public void ChangeStatus(ShipmentDL shipment, String stat) throws Exception {
         if (stat.equals("SENT")) {
             ShipmentStatus currentStatus = shipment.getStatus();
-            if (currentStatus.equals(ShipmentStatus.PENDING)) {
-                DriverDL driverToSend = tryToAssignShifts(shipment);
-            }
+            DriverDL driverToSend = tryToAssignShifts(shipment);        
             if (shipment.DriverBusyCheck()) {
                 throw new Exception("Driver is busy");
             }
@@ -93,7 +101,7 @@ public class ShipmentFacade {
 
     public LocationDL AddLocation(String street, int streetNumber, String city, String contactNumber,
             String contactName, String zone) {
-        LocationDL location = new LocationDL(street, streetNumber, city, contactNumber, contactName, zone);
+        LocationDL location = new LocationDL(getHighestLocationId() ,street, streetNumber, city, contactNumber, contactName, zone);
         locations.add(location);
         return location;
     }
@@ -190,5 +198,74 @@ public class ShipmentFacade {
         return date.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
+    }
+
+    public void LoadData() {
+        try{
+            List<LocationDTO> locationDTOs = locationController.getAllLocations();
+            for (LocationDTO locationDTO : locationDTOs) {
+                LocationDL location = locationMapper.toDomain(locationDTO);
+                locations.add(location);
+            }
+            List<TruckDTO> truckDTOs = truckController.getAllTrucks();
+            for (TruckDTO truckDTO : truckDTOs) {
+                TruckDL truck = truckMapper.toDomain(truckDTO);
+                trucks.add(truck);
+            }
+            List<ItemDTO> itemDTOs = itemsController.getAllItems();
+            for (ItemDTO itemDTO : itemDTOs) {
+                Items.put(itemDTO.getName(), itemDTO.getWeight());
+            }
+            List<ShipmentDTO> shipmentDTOs = shipmentController.getAllShipments();
+            for (ShipmentDTO shipmentDTO : shipmentDTOs) {
+                ShipmentDL shipment = shipmentMapper.toDL(shipmentDTO);
+                shipments.add(shipment);
+            }
+            
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void ClearDataBase() {
+        try {
+            locationController.resetLocationsTable();
+            truckController.resetTrucksTable();
+            itemsController.clearAllItems();
+            shipmentController.clearAllShipments();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+}
+
+    public int getHighestLocationId() {
+        int maxId = 0;
+        for (LocationDL location : locations) {
+            if (location.getId() > maxId) {
+                maxId = location.getId();
+            }
+        }
+        return maxId + 1; // Return the next available ID
+    }
+
+    public int getHighestTruckNumber() {
+        int maxNumber = 0;
+        for (TruckDL truck : trucks) {
+            if (truck.GetNumber() > maxNumber) {
+                maxNumber = truck.GetNumber();
+            }
+        }
+        return maxNumber + 1; // Return the next available truck number
+    }
+
+    public int getHighestShipmentId() {
+        int maxId = 0;
+        for (ShipmentDL shipment : shipments) {
+            if (shipment.getId() > maxId) {
+                maxId = shipment.getId();
+            }
+        }
+        return maxId + 1; // Return the next available shipment ID
     }
 }

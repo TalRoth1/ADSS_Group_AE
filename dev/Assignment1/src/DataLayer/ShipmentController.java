@@ -13,6 +13,7 @@ import DomainLayer.ShipmentDL;
 import DataLayer.DAOs.DocumentDAO;
 import DataLayer.DAOs.DocumentItemDAO;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.sql.*;
@@ -66,9 +67,9 @@ public class ShipmentController {
             Map<String, Integer> itemQuantities = entry.getValue();
             for (Map.Entry<String, Integer> itemEntry : itemQuantities.entrySet()) {
                 ItemDTO DTOitem = itemsController.getItemByName(itemEntry.getKey());
-                int itemId = DTOitem.getId();
+                String itemName = DTOitem.getName();
                 int quantity = itemEntry.getValue();
-                documentItemDAO.addDocumentItem(shipment.getDocument().getId(), location.getId(), itemId, quantity);
+                documentItemDAO.addDocumentItem(shipment.getDocument().getId(), location.getId(), itemName, quantity);
             }
         }
     }
@@ -90,9 +91,9 @@ public class ShipmentController {
             Map<String, Integer> itemQuantities = entry.getValue();
             for (Map.Entry<String, Integer> itemEntry : itemQuantities.entrySet()) {
                 ItemDTO DTOitem = itemsController.getItemByName(itemEntry.getKey());
-                int itemId = DTOitem.getId();
+                String itemName = DTOitem.getName();
                 int quantity = itemEntry.getValue();
-                documentItemDAO.updateDocumentItem(shipment.getDocument().getId(), location.getId(), itemId, quantity);
+                documentItemDAO.updateDocumentItem(shipment.getDocument().getId(), location.getId(), itemName, quantity);
             }
         }
     }
@@ -123,22 +124,62 @@ public class ShipmentController {
             ResultSet docItemRst = documentItemDAO.getDocumentItems(documentId);
             Map<LocationDTO, Map<String, Integer>> items = new HashMap<>();
             while (docItemRst.next()) {
-                int locationId = docItemRst.getInt("location_id");
-                String itemName = itemsController.getItem(docItemRst.getInt("item_id")).getName();
-                int quantity = docItemRst.getInt("quantity");
+                int locationId = docItemRst.getInt("locationID");
+                String itemName = itemsController.getItemByName(docItemRst.getString("itemName")).getName();
+                int quantity = docItemRst.getInt("amount");
                 LocationDTO location = locationController.getLocation(locationId);
                 
                 items.putIfAbsent(location, new HashMap<>());
                 items.get(location).put(itemName, quantity);
             }
-            DocumentDTO document = new DocumentDTO(documentId, locationController.getLocation(docRst.getInt("origin_id")), 
+            DocumentDTO document = new DocumentDTO(documentId, locationController.getLocation(docRst.getInt("originID")), 
                  items, docRst.getFloat("weight"));
             ShipmentDTO shipment = new ShipmentDTO(rst.getInt("id"), 
-                rst.getDate("date_created"), rst.getDate("date_sent"), 
-                truck, driver, rst.getString("status"), document, rst.getString("shift_type"));
+                rst.getDate("dateCreated"), rst.getDate("dateSent"), 
+                truck, driver, rst.getString("status"), document, rst.getString("shiftType"));
             return shipment;
         } else {
             throw new SQLException("Shipment not found with id: " + id);
         }
+    }
+
+    public ArrayList<ShipmentDTO> getAllShipments() throws SQLException {
+        ResultSet rst = shipmentDAO.getAllShipments();
+        ArrayList<ShipmentDTO> shipments = new ArrayList<>();
+        while (rst.next()) {
+            int truckId = rst.getInt("truck_id");
+            int driverId = rst.getInt("driver_id");
+            int documentId = rst.getInt("doc_id");
+            TruckDTO truck = truckController.getTruck(truckId);
+            DriverDTO driver = driverController.getDriver(driverId);
+            ResultSet docRst = documentDAO.getDocument(documentId);
+            if (!docRst.next()) {
+                throw new SQLException("Document not found with id: " + documentId);
+            }
+            ResultSet docItemRst = documentItemDAO.getDocumentItems(documentId);
+            Map<LocationDTO, Map<String, Integer>> items = new HashMap<>();
+            while (docItemRst.next()) {
+                int locationId = docItemRst.getInt("locationID");
+                String itemName = itemsController.getItemByName(docItemRst.getString("itemName")).getName();
+                int quantity = docItemRst.getInt("amount");
+                LocationDTO location = locationController.getLocation(locationId);
+                
+                items.putIfAbsent(location, new HashMap<>());
+                items.get(location).put(itemName, quantity);
+            }
+            DocumentDTO document = new DocumentDTO(documentId, locationController.getLocation(docRst.getInt("originID")), 
+                 items, docRst.getFloat("weight"));
+            ShipmentDTO shipment = new ShipmentDTO(rst.getInt("id"), 
+                rst.getDate("dateCreated"), rst.getDate("dateSent"), 
+                truck, driver, rst.getString("status"), document, rst.getString("shiftType"));
+            shipments.add(shipment);
+        }
+        return shipments;
+    }
+
+    public void clearAllShipments() throws SQLException {
+        documentItemDAO.clearTable();  // delete dependent table first
+        shipmentDAO.clearTable();      // then shipments
+        documentDAO.clearTable();      // finally documents (also resets AUTOINCREMENT)
     }
 }

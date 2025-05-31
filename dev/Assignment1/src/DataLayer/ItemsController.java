@@ -10,7 +10,6 @@ public class ItemsController {
     private DBConnection dbConnection = new DBConnection();
     private Connection connection;
     private ItemsDAO itemsDAO;
-    private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
     public ItemsController() {
         String DB_URL = "items.db";
@@ -19,26 +18,24 @@ public class ItemsController {
         this.itemsDAO = new ItemsDAO(connection);
     }
 
-
-
     public void addItem(ItemDTO item) throws SQLException {
-        itemsDAO.addItem(item.getId(), item.getName(), item.getWeight());
+        itemsDAO.addItem(item.getName(), item.getWeight());
     }
 
     public void updateItem(ItemDTO item) throws SQLException {
-        itemsDAO.updateItem(item.getId(), item.getName(), item.getWeight());
+        itemsDAO.updateItem(item.getName(), item.getWeight());
     }
 
     public void deleteItem(ItemDTO item) throws SQLException {
-        itemsDAO.deleteItem(item.getId());
+        itemsDAO.deleteItem(item.getName());
     }
 
-    public ItemDTO getItem(int id) throws SQLException {
-        ResultSet rst =  itemsDAO.getItem(id);
+    public ItemDTO getItemByName(String name) throws SQLException {
+        ResultSet rst = itemsDAO.getItem(name);
         if (rst.next()) {
-            return new ItemDTO(rst.getInt("id"), rst.getString("name"), rst.getFloat("weight"));
+            return new ItemDTO(rst.getString("name"), rst.getFloat("weight"));
         } else {
-            throw new SQLException("Item not found with id: " + id);
+            throw new SQLException("Item not found with name: " + name);
         }
     }
 
@@ -46,17 +43,12 @@ public class ItemsController {
         ArrayList<ItemDTO> items = new ArrayList<>();
         ResultSet rst = itemsDAO.getAllItems();
         while (rst.next()) {
-            items.add(new ItemDTO(rst.getInt("id"), rst.getString("name"), rst.getFloat("weight")));
+            items.add(new ItemDTO(rst.getString("name"), rst.getFloat("weight")));
         }
         return items;
     }
 
-    public ItemDTO getItemByName(String name) throws SQLException {
-        ResultSet rst = itemsDAO.getItemByName(name);
-        if (rst.next()) {
-            return new ItemDTO(rst.getInt("id"), rst.getString("name"), rst.getFloat("weight"));
-        } else {
-            throw new SQLException("Item not found with name: " + name);
-        }
-    }
+    public void clearAllItems() throws SQLException {
+        itemsDAO.clearTable();
+    }   
 }

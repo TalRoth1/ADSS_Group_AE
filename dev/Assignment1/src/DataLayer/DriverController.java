@@ -5,6 +5,7 @@ import DTO.EmployeeDTO;
 import DataLayer.DAOs.DriverDAO;
 import DataLayer.DAOs.DriverLicenseDAO;
 import DataLayer.DAOs.EmployeeDAO;
+import DomainLayer.Employee;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -15,17 +16,17 @@ public class DriverController {
     private DBConnection dbConnection = new DBConnection();
     private DBConnection dbConnection2 = new DBConnection();
     DriverLicenseDAO driverLicenseDAO;
-    EmployeeDAO employeeDAO;
+    EmployeeController employeeController;
     DriverDAO driverDAO;
 
     public DriverController(EmployeeController employeeController) {
+        this.employeeController = employeeController;
         String DB_URL = "drivers.db";
         dbConnection.connect(DB_URL);
         String DB_URL2 = "driver_license.db";
         dbConnection2.connect(DB_URL2);
         this.driverLicenseDAO = new DriverLicenseDAO(dbConnection2.getConnection());
         this.driverDAO = new DriverDAO(dbConnection.getConnection());
-        this.employeeDAO = employeeController.getEmployeeDAO();
     }
 
     public void addDriver(DriverDTO driver) {
@@ -71,7 +72,7 @@ public class DriverController {
         try {
             ResultSet rs = driverDAO.getDriver(id);
             if (rs.next()) {
-                EmployeeDTO employee = employeeDAO.getEmployee(id);
+                EmployeeDTO employee = employeeController.getEmployee(id);
                 if (employee != null) {
                     ArrayList<String> licenseTypes = new ArrayList<>();
                     ResultSet licenseRs = driverLicenseDAO.getDriver(id);
@@ -97,7 +98,7 @@ public class DriverController {
             ResultSet rs = driverDAO.getAllDrivers();
             while (rs.next()) {
                 int id = rs.getInt("id");
-                EmployeeDTO employee = employeeDAO.getEmployee(id);
+                EmployeeDTO employee = employeeController.getEmployee(id);
                 if (employee != null) {
                     ArrayList<String> licenseTypes = new ArrayList<>();
                     ResultSet licenseRs = driverLicenseDAO.getDriver(id);

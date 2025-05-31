@@ -100,4 +100,15 @@ public class TruckDAO {
         Statement stmt = connection.createStatement();
         return stmt.executeQuery(sql);
     }
+
+    public void clearTable() throws SQLException {
+        String sql = "DELETE FROM trucks";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            System.out.println("Error clearing trucks table: " + e.getMessage());
+            throw e;
+        }
+    }
+
 }

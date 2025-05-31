@@ -10,11 +10,11 @@ public class ItemMapper {
     // versa.
 
     // Example method to map an Item object to a database record
-    public ItemDTO mapToDTO(int id, String itemName, double itemWeight) {
+    public ItemDTO mapToDTO(String itemName, float itemWeight) {
         if (itemName == null || itemWeight <= 0) {
             throw new IllegalArgumentException("Invalid item data provided.");
         }
-        return new ItemDTO(id, itemName, itemWeight);
+        return new ItemDTO(itemName, itemWeight);
     }
 
 }

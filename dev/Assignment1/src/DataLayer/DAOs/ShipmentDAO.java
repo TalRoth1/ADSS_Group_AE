@@ -123,5 +123,14 @@ public class ShipmentDAO {
         }
     }
 
+    public void clearTable() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate("DELETE FROM shipments");
+        } catch (SQLException e) {
+            System.out.println("Error clearing shipments table: " + e.getMessage());
+            throw e;
+        }
+    }
+
     
 }

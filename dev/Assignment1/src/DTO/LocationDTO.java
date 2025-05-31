@@ -48,4 +48,8 @@ public class LocationDTO {
         return id;
     }
 
+    public LocationDTO() {
+        // Default constructor placeholder until they change the employee to hold the branch   
+    }
+
 }

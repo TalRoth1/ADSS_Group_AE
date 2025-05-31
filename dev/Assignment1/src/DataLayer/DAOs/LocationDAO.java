@@ -151,4 +151,25 @@ public class LocationDAO {
         }
 
     }
+
+    public void clearTable() throws SQLException {
+        String sql = "DELETE FROM locations";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            System.out.println("Error clearing locations table: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public void resetTable() throws SQLException {
+        clearTable();
+        String resetSql = "DELETE FROM sqlite_sequence WHERE name='locations'";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(resetSql);
+        } catch (SQLException e) {
+            System.out.println("Error resetting locations table sequence: " + e.getMessage());
+            throw e;
+        }
+    }
 }

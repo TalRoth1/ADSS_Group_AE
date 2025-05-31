@@ -18,94 +18,43 @@ public class ItemsDAO {
 
     public void initializeTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS items (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "name TEXT NOT NULL, " +
+                "name TEXT PRIMARY KEY, " +
                 "weight REAL NOT NULL)";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
-        } catch (SQLException e) {
-            System.out.println("Error creating items table: " + e.getMessage());
-            throw e;
         }
     }
 
-    public void addItem(int id, String name, double weight) throws SQLException {
-        String sql = "INSERT INTO items (id ,name, weight) VALUES (?, ?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            pstmt.setString(2, name);
-            pstmt.setDouble(3, weight);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error adding item: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    public void updateItem(int id, String name, double weight) throws SQLException {
-        String sql = "UPDATE items SET name = ?, weight = ? WHERE id = ?";
+    public void addItem(String name, double weight) throws SQLException {
+        String sql = "INSERT INTO items (name, weight) VALUES (?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, name);
             pstmt.setDouble(2, weight);
-            pstmt.setInt(3, id);
             pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error updating item: " + e.getMessage());
-            throw e;
         }
     }
 
     public void updateItem(String name, double weight) throws SQLException {
-        String sql = "UPDATE items SET name = ?, weight = ? ? WHERE name = ?";
+        String sql = "UPDATE items SET weight = ? WHERE name = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setDouble(1, weight);
+            pstmt.setString(2, name);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public void deleteItem(String name) throws SQLException {
+        String sql = "DELETE FROM items WHERE name = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, name);
-            pstmt.setDouble(2, weight);
             pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error updating item: " + e.getMessage());
-            throw e;
         }
     }
 
-    public void updateItemField(int id, String fieldName, String newValue) throws SQLException {
-        String sql = "UPDATE items SET " + fieldName + " = ? WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, newValue);
-            pstmt.setInt(2, id);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error updating item field: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    public void updateItemField(int id, String fieldName, int newValue) throws SQLException {
-        String sql = "UPDATE items SET " + fieldName + " = ? WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, newValue);
-            pstmt.setInt(2, id);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error updating item field: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    public void deleteItem(int id) throws SQLException {
-        String sql = "DELETE FROM items WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error deleting item: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    public ResultSet getItem(int id) throws SQLException {
-        String sql = "SELECT * FROM items WHERE id = ?";
+    public ResultSet getItem(String name) throws SQLException {
+        String sql = "SELECT * FROM items WHERE name = ?";
         PreparedStatement pstmt = connection.prepareStatement(sql);
-        pstmt.setInt(1, id);
+        pstmt.setString(1, name);
         return pstmt.executeQuery();
     }
 
@@ -115,10 +64,13 @@ public class ItemsDAO {
         return stmt.executeQuery(sql);
     }
 
-    public ResultSet getItemByName(String name) throws SQLException {
-        String sql = "SELECT * FROM items WHERE name = ?";
-        PreparedStatement pstmt = connection.prepareStatement(sql);
-        pstmt.setString(1, name);
-        return pstmt.executeQuery();
+    public void clearTable() throws SQLException {
+        String sql = "DELETE FROM items";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            System.out.println("Error clearing items table: " + e.getMessage());
+            throw e;
+        }
     }
 }

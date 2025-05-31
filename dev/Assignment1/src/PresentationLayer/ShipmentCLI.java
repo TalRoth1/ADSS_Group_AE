@@ -712,4 +712,22 @@ public class ShipmentCLI {
             }
         }
     }
+
+    public void loadData() {
+        try {
+            shipmentFacade.LoadData();
+            System.out.println("Data loaded successfully.");
+        } catch (Exception e) {
+            System.out.println("Error loading data: " + e.getMessage());
+        }
+    }
+
+    public void ClearDataBase() {
+        try {
+            shipmentFacade.ClearDataBase();
+            System.out.println("Database cleared successfully.");
+        } catch (Exception e) {
+            System.out.println("Error clearing database: " + e.getMessage());
+        }
+    }
 }

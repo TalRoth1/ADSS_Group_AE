@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class ShipmentDL {
 
+    public int Id; // unique identifier for the shipment
     public Date DateCreated; // includes the hour and time zone
     public Date DateSent;
     public TruckDL Truck;
@@ -95,13 +96,25 @@ public class ShipmentDL {
         this.Document.setWeight(Items);
     }
 
-    public ShipmentDL(TruckDL truck, LocationDL origin, List<LocationDL> destinations,
+    public ShipmentDL(int id, TruckDL truck, LocationDL origin, List<LocationDL> destinations,
             Map<LocationDL, Map<String, Integer>> items, String shiftType, Date dateToSend) {
+        this.Id = id;
         this.Truck = truck;
         this.DriverName = null; // Driver should be set later
         this.Destinations = destinations;
         this.Document = new ShipmentDocumentDL(items, origin);
         this.DateCreated = new Date();
+        this.DateSent = dateToSend;
+        this.ShiftType = shiftType;
+    }
+
+    public ShipmentDL(int id, TruckDL truck, LocationDL origin, List<LocationDL> destinations,
+            Map<LocationDL, Map<String, Integer>> items, String shiftType, Date dateToSend, Date dateCreated) {
+        this.Id = id;
+        this.Truck = truck;
+        this.Destinations = destinations;
+        this.Document = new ShipmentDocumentDL(items, origin);
+        this.DateCreated = dateCreated;
         this.DateSent = dateToSend;
         this.ShiftType = shiftType;
     }
@@ -204,6 +217,10 @@ public class ShipmentDL {
 
     public DriverDL getDriver() {
         return DriverName;
+    }
+
+    public int getId() {
+        return Id;
     }
 
     public void setShiftType(String shiftType) {

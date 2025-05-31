@@ -2,7 +2,7 @@ package DomainLayer;
 
 public class LocationDL {
 
-    //public int id;
+    public int id;
     public String Street;
     public int StreetNumber;
     public String City;
@@ -10,8 +10,8 @@ public class LocationDL {
     public String ContactName;
     public String Zone;
 
-    public LocationDL(String street, int streetNumber, String city, String contactNumber, String contactName, String zone) {
-
+    public LocationDL(int id, String street, int streetNumber, String city, String contactNumber, String contactName, String zone) {
+        this.id = id;
         this.Street = street;
         this.StreetNumber = streetNumber;
         this.City = city;
@@ -22,6 +22,18 @@ public class LocationDL {
 
     public String toString() {
         return Street + " " + StreetNumber + ", " + City + ", " + Zone + ", Contact: " + ContactName + ", Phone: " + ContactNumber;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getContactNumber() {
+        return ContactNumber;
+    }
+
+    public String getContactName() {
+        return ContactName;
     }
 
     public String getZone() {
@@ -50,5 +62,7 @@ public class LocationDL {
         LocationDL that = (LocationDL) obj;
         return StreetNumber == that.StreetNumber && ContactNumber == that.ContactNumber && Street.equals(that.Street) && City.equals(that.City) && ContactName.equals(that.ContactName) && Zone.equals(that.Zone);
     }
+
+
 
 }
