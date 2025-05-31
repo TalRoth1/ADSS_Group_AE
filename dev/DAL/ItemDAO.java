@@ -13,15 +13,15 @@ public class ItemDAO
         this.itemPrice = itemPrice;
     }
 
-    private int getItemID() {
+    public int getItemID() {
         return itemID;
     }
 
-    private String getItemName()
+    public String getItemName()
     {
         return itemName;
     }
-    private void setItemName(String itemName)
+    public void setItemName(String itemName)
     {
         if (isPersisted)
         {
@@ -29,12 +29,12 @@ public class ItemDAO
         }
     }
     
-    private double getItemPrice()
+    public double getItemPrice()
     {
         return itemPrice;
     }
 
-    private void setItemPrice(double itemPrice)
+    public void setItemPrice(double itemPrice)
     {
         if (isPersisted)
         {

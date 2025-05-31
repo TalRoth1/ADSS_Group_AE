@@ -16,7 +16,6 @@ public class DiscountController
 
     public DiscountController() 
     {
-        // Ensure the database connection is established
         try {
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException e) {
@@ -98,7 +97,7 @@ public class DiscountController
                     if (rs.next()) {
                         int minimumQuantity = rs.getInt("minimumQuantity");
                         int discountPercentage = rs.getInt("discountPercentage");
-                        return new DiscountDAO(catalogID, minimumQuantity, discountPercentage);
+                        return new DiscountDAO(catalogID, minimumQuantity, discountPercentage, this);
                     } else {
                         System.out.println("Discount not found.");
                         return null;
@@ -129,7 +128,7 @@ public class DiscountController
                         int catalogID = rs.getInt("catalogID");
                         int minimumQuantity = rs.getInt("minimumQuantity");
                         int discountPercentage = rs.getInt("discountPercentage");
-                        discounts.add(new DiscountDAO(catalogID, minimumQuantity, discountPercentage));
+                        discounts.add(new DiscountDAO(catalogID, minimumQuantity, discountPercentage, this));
                     }
                 } catch (SQLException e) {
                     System.out.println("Get all discounts failed: " + e.getMessage());

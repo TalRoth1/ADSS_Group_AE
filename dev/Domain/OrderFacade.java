@@ -3,7 +3,9 @@ package Domain;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import DAL.OrderController;
 import DAL.OrderDAO;
@@ -21,23 +23,24 @@ public class OrderFacade {
         this.sf = sf;
         this.orderController = new OrderController();
         this.orders = new ArrayList<>();
-        List<OrderDAO> savedOrders = orderController.getAllOrders();
-        for(OrderDAO order: savedOrders){
-            List<OrderItemDL> items = new ArrayList<>();
-            for (OrderItemDAO item : order.getOrderItems()) {
-                items.add(new OrderItemDL(item.getItemID(), item.getQuantity(), item.getCatalogID(), item.getTotalPrice()));
-            }
-            OrderDL orderDL = new OrderDL(order.getOrderID(), order.getSupplierID(), order.getContractID(),
-                    order.getOrderDate(), order.getDestination(), items, order.getOrderStatus());
-            orders.add(orderDL);
+        List<OrderDAO> orderDAOs = orderController.getAllOrders();
+        for (OrderDAO orderDAO : orderDAOs) {
+            OrderDL order = new OrderDL(orderDAO);
             if (order.getOrderID() >= nextID) {
                 nextID = order.getOrderID() + 1;
             }
+            List<OrderItemDAO> itemDAOs = orderController.getOrderItems(order.getOrderID());
+            Map<Integer,OrderItemDL> items = new HashMap<>();
+            for (OrderItemDAO itemDAO : itemDAOs) {
+                OrderItemDL item = new OrderItemDL(itemDAO);
+                items.putIfAbsent(item.getItemID(), item);
+            }
+            order.setOrderItems(items);
+            orders.add(order);
         }
     }
 
-    public void createOrder(int supplierID, String destination, int contractID, Date orderDate, List<int[]> Orders) {
-        List<OrderItemDL> items = new ArrayList<>();
+    public void createOrder(int supplierID, int contractID, Date orderDate, String destination, List<int[]> Orders) {
         if(!verifySupplier(supplierID)) {
             System.out.println("Can't create order, supplier not found");
             return;
@@ -46,15 +49,9 @@ public class OrderFacade {
             System.out.println("Can't create order, contract not found");
             return;
         }
-        for (int[] order : Orders) {
-            int itemID = order[0];
-            int quantity = order[1];
-            int catalogID = getCatalogID(itemID, supplierID, contractID);
-            double totalPrice = calculateTotalPrice(quantity, catalogID, supplierID, contractID);
-            OrderItemDL item = new OrderItemDL(itemID, quantity, catalogID, totalPrice);
-            items.add(item);
-        }
-        OrderDL newOrder = new OrderDL(nextID++, supplierID, contractID, orderDate, destination, items);
+        Map<Integer,OrderItemDL> items = makeItemsFromArray(Orders);
+        OrderDL newOrder = new OrderDL(nextID++, supplierID, supplierID, orderDate, destination, items, this.orderController);
+        orderController.insertOrder(newOrder.getDao());
         orders.add(newOrder);
     }
 
@@ -70,15 +67,7 @@ public class OrderFacade {
             if (!order.getOrderDate().equals(newDate)) {
                 changeOrderDate(orderID, newDate);
             }
-            List<OrderItemDL> items = new ArrayList<>();
-            for (int[] item : newItems) {
-                int itemID = item[0];
-                int quantity = item[1];
-                int catalogID = getCatalogID(itemID, order.getSupplierID(), order.getContractID());
-                double totalPrice = calculateTotalPrice(quantity, catalogID, order.getSupplierID(), order.getContractID());
-                OrderItemDL newItem = new OrderItemDL(itemID, quantity, catalogID, totalPrice);
-                items.add(newItem);
-            }
+            Map<Integer,OrderItemDL> items = makeItemsFromArray(newItems);
             if (!order.getOrderItems().equals(items)){
                 changeOrderItems(orderID, items);
             }
@@ -100,14 +89,15 @@ public class OrderFacade {
     private void changeOrderDate(int orderID, Date orderDate) throws IllegalArgumentException {
         try {
             OrderDL order = getOrder(orderID);
+            orderController.updateOrder(orderID, "orderDate", orderDate.toString());
             order.setOrderDate(orderDate);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Order not found: " + orderID);
         }
     }
 
-    private void changeOrderItems(int orderID, List<OrderItemDL> newItems) throws IllegalArgumentException {
-        try {
+    private void changeOrderItems(int orderID, Map<Integer,OrderItemDL> newItems) throws IllegalArgumentException {
+        try { 
             OrderDL order = getOrder(orderID);
             order.setOrderItems(newItems);
         } catch (IllegalArgumentException e) {
@@ -145,31 +135,39 @@ public class OrderFacade {
     }
 
     
-    // public void updateScheduledDeliveryItems(int supplierID, int contractID, List<int[]> newItems) throws IllegalArgumentException {
-    //     SupplierDL supplier = sf.getSupplier(supplierID);
-    //     if (supplier == null) {
-    //         throw new IllegalArgumentException("Supplier not found: " + supplierID);
-    //     }
-    //     contractDL contract = supplier.getcontract(contractID);
-    //     if (contract == null) {
-    //         throw new IllegalArgumentException("contract not found: " + contractID);
-    //     }
-    //     List<OrderItemDL> items = new ArrayList<>();
-    //     try{
-    //         for (int[] item : newItems) {
-    //             int itemID = item[0];
-    //             int quantity = item[1];
-    //             int catalogID = getCatalogID(itemID, supplierID, contractID);
-    //             double totalPrice = calculateTotalPrice(quantity, catalogID, supplierID, contractID);
-    //             OrderItemDL newItem = new OrderItemDL(itemID, quantity, catalogID, totalPrice);
-    //             items.add(newItem);
-    //         }
-    //         contract.getDeliveryMethod().setItems(items);
-    //     } catch (IllegalArgumentException e) {
-    //         throw new IllegalArgumentException("Error updating scheduled delivery items: " + e.getMessage());
-    //     }
-        
-    // }
+    public void updateScheduledDeliveryItems(int supplierID, int contractID, List<int[]> newItems) throws IllegalArgumentException {
+        SupplierDL supplier = sf.getSupplier(supplierID);
+        if (supplier == null) {
+            throw new IllegalArgumentException("Supplier not found: " + supplierID);
+        }
+        ContractDL contract = supplier.getContract(contractID);
+        if (contract == null) {
+            throw new IllegalArgumentException("contract not found: " + contractID);
+        }
+        if( !contract.getDeliveryMethod().toString().equals("Periodic Delivery") ) {
+            throw new IllegalArgumentException("Delivery method for contract is not periodic: " + contractID);
+        }
+        else{
+            PeriodicDelivery periodicDelivery = (PeriodicDelivery) contract.getDeliveryMethod();
+            if(periodicDelivery.getOrderItems() == null) {
+                periodicDelivery.setOrderItems(new ArrayList<>());
+            }
+            List<OrderItemDL> items = new ArrayList<>();
+            try{
+                for (int[] item : newItems) {
+                    int itemID = item[0];
+                    int quantity = item[1];
+                    int catalogID = getCatalogID(itemID, supplierID, contractID);
+                    double totalPrice = calculateTotalPrice(quantity, catalogID, supplierID, contractID);
+                    OrderItemDL newItem = new OrderItemDL(-1, itemID, quantity, catalogID, totalPrice, this.orderController);
+                    items.add(newItem);
+                }
+                periodicDelivery.setOrderItems(items);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Error updating scheduled delivery items: " + e.getMessage());
+            }
+        }
+    }
 
     private boolean verifySupplier(int supplierID){
         return sf.getSupplier(supplierID) != null;
@@ -194,42 +192,55 @@ public class OrderFacade {
         return sf.getContract(supplierID, contractID).getItemCatalogID(itemID);
     }
 
+    private Map<Integer,OrderItemDL> makeItemsFromArray(List<int[]> items) {
+        Map<Integer,OrderItemDL> itemMap = new HashMap<>();
+        for (int[] item : items) {
+            int itemID = item[0];
+            int quantity = item[1];
+            int catalogID = getCatalogID(itemID, 1, 1); // Assuming supplierID and contractID are 1 for this example
+            double totalPrice = calculateTotalPrice(quantity, catalogID, 1, 1);
+            OrderItemDL orderItem = new OrderItemDL(nextID++, itemID, quantity, catalogID, totalPrice, this.orderController);
+            itemMap.put(itemID, orderItem);
+        }
+        return itemMap;
+    }
+
     public void loadData() {
-        createOrder(1, "Central Warehouse", 1, java.sql.Date.valueOf("2025-04-10"), Arrays.asList(
+        createOrder(1, 1, java.sql.Date.valueOf("2025-04-10"), "Central Warehouse", Arrays.asList(
                 new int[] { 1, 120 },
                 new int[] { 2, 160 }));
 
-        createOrder(1, "Branch A", 1, java.sql.Date.valueOf("2025-04-15"), List.of(
+        createOrder(1, 1, java.sql.Date.valueOf("2025-04-15"), "Branch A", List.of(
                 new int[]{1, 50}));
 
-        createOrder(1, "Branch B", 1, java.sql.Date.valueOf("2025-04-20"), List.of(
+        createOrder(1, 1, java.sql.Date.valueOf("2025-04-20"), "Branch B", List.of(
                 new int[]{2, 90}));
 
-        createOrder(1, "Branch C", 1, java.sql.Date.valueOf("2025-04-22"), List.of(
+        createOrder(1, 1, java.sql.Date.valueOf("2025-04-22"), "Branch C", List.of(
                 new int[]{2, 80}));
 
-        createOrder(2, "Central Warehouse", 1, java.sql.Date.valueOf("2025-04-11"), List.of(
+        createOrder(2, 1, java.sql.Date.valueOf("2025-04-11"), "Central Warehouse", List.of(
                 new int[]{6, 220}));
 
-        createOrder(2, "Branch A", 1, java.sql.Date.valueOf("2025-04-16"), List.of(
+        createOrder(2, 1, java.sql.Date.valueOf("2025-04-16"), "Branch A", List.of(
                 new int[]{6, 100}));
 
-        createOrder(2, "Branch B", 1, java.sql.Date.valueOf("2025-04-18"), List.of(
+        createOrder(2, 1, java.sql.Date.valueOf("2025-04-18"), "Branch B", List.of(
                 new int[]{6, 80}));
 
-        createOrder(2, "Branch C", 1, java.sql.Date.valueOf("2025-04-21"), List.of(
+        createOrder(2, 1, java.sql.Date.valueOf("2025-04-21"), "Branch C", List.of(
                 new int[]{6, 90}));
 
-        createOrder(3, "Central Warehouse", 1, java.sql.Date.valueOf("2025-04-12"), List.of(
+        createOrder(3, 1, java.sql.Date.valueOf("2025-04-12"), "Central Warehouse", List.of(
                 new int[]{7, 150}));
 
-        createOrder(3, "Branch A", 2, java.sql.Date.valueOf("2025-04-14"), List.of(
+        createOrder(3, 2, java.sql.Date.valueOf("2025-04-14"), "Branch A", List.of(
                 new int[]{10, 100}));
 
-        createOrder(3, "Branch B", 2, java.sql.Date.valueOf("2025-04-17"), List.of(
+        createOrder(3, 2, java.sql.Date.valueOf("2025-04-17"), "Branch B", List.of(
                 new int[]{10, 120}));
 
-        createOrder(3, "Branch C", 1, java.sql.Date.valueOf("2025-04-23"), List.of(
+        createOrder(3, 1, java.sql.Date.valueOf("2025-04-23"), "Branch C", List.of(
                 new int[]{7, 100}));
 
     }

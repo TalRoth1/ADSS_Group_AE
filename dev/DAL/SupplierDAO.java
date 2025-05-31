@@ -12,14 +12,14 @@ public class SupplierDAO
 
     private SupplierController supplierController;
 
-    public SupplierDAO(int id, int companyID, int bankAccount, String paymentMethod, String contactMail, String contactPhone) {
+    public SupplierDAO(int id, int companyID, int bankAccount, String paymentMethod, String contactMail, String contactPhone, SupplierController supplierController) {
         this.id = id;
         this.companyID = companyID;
         this.bankAccount = bankAccount;
         this.paymentMethod = paymentMethod;
         this.contactMail = contactMail;
         this.contactPhone = contactPhone;
-        this.supplierController = new SupplierController();
+        this.supplierController = supplierController;
     }
 
     public int getId()

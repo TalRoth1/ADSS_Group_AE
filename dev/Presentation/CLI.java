@@ -228,7 +228,12 @@ public class CLI {
         String destination = scanner.nextLine();
         System.out.println("Order Items (Item ID and Quantity seperated by ,):");
         List<int[]> items = getOrderItems(scanner);
-        of.createOrder(supplierID, destination, contractID, orderDate, items);
+        try{
+            of.createOrder(supplierID, contractID, orderDate, destination, items);
+        }
+        catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void getOrderDetails(Scanner scanner) {
@@ -297,6 +302,10 @@ public class CLI {
             String orderDateInput = scanner.nextLine();
             try {
                 orderDate = Date.valueOf(orderDateInput);
+                if(orderDate.before(new Date(System.currentTimeMillis()))) {
+                    System.out.println("Order date cannot be in the past. Please enter a valid date.");
+                    orderDate = null;
+                }
             } catch (IllegalArgumentException e) {
                 System.out.println("Invalid date format. Please enter the date in the format YYYY-MM-DD:");
             }
