@@ -8,19 +8,20 @@ import java.util.List;
 
 import DTO.EmployeeDTO;
 import DTO.ShiftDTO;
-import DataLayer.DAOs.PreferredShiftDAO;
+import DataLayer.DAOs.ShiftPreferredDAO;
 import DataLayer.DAOs.ShiftDAO;
 
 public class PreferredShiftController {
     private DBConnection dbConnection = new DBConnection();
     private Connection connection;
-    private PreferredShiftDAO preferredShiftDAO;
+    private ShiftPreferredDAO preferredShiftDAO;
+    
 
     public PreferredShiftController() {
-        String DB_URL = "PreferredShift.db";
+        String DB_URL = "preferred_shifts.db";
         DBConnection.connect(DB_URL);
         this.connection = DBConnection.getConnection();
-        this.preferredShiftDAO = new PreferredShiftDAO(connection);
+        this.preferredShiftDAO = new ShiftPreferredDAO(connection);
     }
 
     public void addPreferredShift(int employeeId, String shiftDate, String shiftType) {
@@ -72,7 +73,8 @@ public class PreferredShiftController {
         return preferredShifts;
     }
 
-    public List<EmployeeDTO> getPrefShiftEmployees(String shiftDate, String shiftType) { // all employees in this shift
+    //ארז חושב שאין צורך בפונקציה הזאת
+    /*public List<EmployeeDTO> getPrefShiftEmployees(String shiftDate, String shiftType) { // all employees in this shift
         List<EmployeeDTO> employees = new ArrayList<>();
         try {
             ResultSet rs = preferredShiftDAO.getPrefShiftEmployees(shiftDate, shiftType);
@@ -89,7 +91,6 @@ public class PreferredShiftController {
                 double socialBenefits = rs.getDouble("socialBenefits");
                 String password = rs.getString("password");
                 boolean isFinishedWorking = rs.getBoolean("isFinishedWorking");
-
                 EmployeeDTO employee = new EmployeeDTO(id, name, branchId, bankAccount, salary, startDate,
                         vacationDays, sickDays, educationFund, socialBenefits, password, isFinishedWorking);
                 employees.add(employee);
@@ -99,5 +100,5 @@ public class PreferredShiftController {
             System.out.println("Error getting preferred shift employees: " + e.getMessage());
         }
         return employees;
-    }
+    }*/
 }

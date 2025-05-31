@@ -8,21 +8,30 @@ public class EmployeeDAO {
 
     public EmployeeDAO(Connection connection) {
         this.connection = connection;
+        try {
+            initializeTable();
+        } catch (SQLException e) {
+            System.out.println("Error initializing employeesDAO: " + e.getMessage());
+        }
     }
 
+    //לקחת פונקציית עזר מאילון המרה בין סטרינג לבין דייט זה יהיה בקונטרולר
+    //להוסיף את כל הבוליאנים לכל הפונקציות פה
     private void initializeTable() throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS employees ("
                 + "id INT PRIMARY KEY, "
                 + "name TEXT NOT NULL, "
-                + "locationId INT NOT NULL, "
                 + "bankAccount TEXT NOT NULL, "
                 + "salary INT NOT NULL, "
-                + "startDate DATE NOT NULL, "
+                + "startDate TEXT NOT NULL, "
                 + "vacationDays INT NOT NULL, "
                 + "sickDays INT NOT NULL, "
-                + "educationFund REAL NOT NULL, "
-                + "socialBenefits REAL NOT NULL, "
+                + "educationFund FLOAT NOT NULL, "
+                + "socialBenefits FLOAT NOT NULL, "
                 + "password TEXT NOT NULL"
+                + "isFired INT NOT NULL, " //false 0, true 1
+                + "isloggedIn INT NOT NULL, " //false 0, true 1
+                + "locationId INT NOT NULL, "
                 + ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSQL);

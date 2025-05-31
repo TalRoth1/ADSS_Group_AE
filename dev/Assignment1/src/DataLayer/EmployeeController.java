@@ -2,43 +2,51 @@ package DataLayer;
 
 import DTO.EmployeeDTO;
 import DTO.EmployeeRoleDTO;
+import DTO.EmployeeShiftDTO;
+import DTO.LocationDTO;
+import DTO.PreferredShiftDTO;
 import DataLayer.DAOs.EmployeeDAO;
 import DataLayer.DAOs.EmployeeRoleDAO;
-import DataLayer.DAOs.EmployeeShiftDAO;
-import DataLayer.DAOs.PreferredShiftDAO;
+import DataLayer.DAOs.ShiftAssignedDAO;
+import DataLayer.DAOs.ShiftPreferredDAO;
 import DataLayer.DAOs.ShiftDAO;
 import DomainLayer.LocationDL;
 import DomainLayer.Role;
-import DomainLayer.Shift;
-import DomainLayer.ShiftType;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class EmployeeController {
 
     private DBConnection dbConnection = new DBConnection();
+    private DBConnection dbConnection2 = new DBConnection();
+    private DBConnection dbConnection3 = new DBConnection();
+    private DBConnection dbConnection4 = new DBConnection();
     private Connection connection;
     private EmployeeDAO employeeDAO;
-    private EmployeeRoleDAO employeeRoleDAO;
-    private EmployeeShiftDAO employeeShiftDAO;
-    private PreferredShiftDAO preferredShiftDAO;
+    private EmployeeRoleController employeeRoleController;
+    private LocationController locationController;
+    // לקונטרולר המתאים DAO אולי להחליף כל  
+    private ShiftAssignedDAO employeeShiftDAO;
+    private ShiftPreferredDAO preferredShiftDAO;
     private ShiftDAO shiftDAO;
 
-    public EmployeeController() {
-        String DB_URL = "Employees.db";
-        DBConnection.connect(DB_URL);
+    //לוודא שהשמות האלה תואמים
+    public EmployeeController(EmployeeRoleController employeeRoleController, LocationController locationController) {
+        DBConnection.connect("employees.db");  
         this.connection = DBConnection.getConnection();
+        this.dbConnection2.connect("employee_shifts.db");
+        this.dbConnection3.connect("preferred_shifts.db");
+        this.dbConnection4.connect("shifts.db");
         this.employeeDAO = new EmployeeDAO(connection);
-        this.employeeRoleDAO = new EmployeeRoleDAO(connection);
-        this.employeeShiftDAO = new EmployeeShiftDAO(connection);
-        this.preferredShiftDAO = new PreferredShiftDAO(connection);
-        this.shiftDAO = new ShiftDAO(connection);
+        this.employeeRoleController = employeeRoleController;
+        this.locationController = locationController;
+        this.employeeShiftDAO = new ShiftAssignedDAO(dbConnection2.getConnection());
+        this.preferredShiftDAO = new ShiftPreferredDAO(dbConnection3.getConnection());
+        this.shiftDAO = new ShiftDAO(dbConnection4.getConnection());
     }
 
     public EmployeeDAO getEmployeeDAO() {
@@ -51,7 +59,7 @@ public class EmployeeController {
             int branchid = b.getId();
             employeeDAO.addEmployee(id, name, branchid, bankAccount, salary, startDate, vacationDays, sickDays,
                     educationFund, socialBenefits, password);
-            employeeRoleDAO.addRole(id, role);
+            employeeRoleController.addRole(id, role);
         } catch (SQLException e) {
             System.out.println("Error adding employee: " + e.getMessage());
         }
@@ -59,10 +67,11 @@ public class EmployeeController {
 
     public void removeEmployee(int id) {
         try {
-            employeeRoleDAO.removeAllRoles(id);
+            employeeRoleController.removeAllRoles(id);
             employeeShiftDAO.removeAllEmployeeShifts(id);
             preferredShiftDAO.removeAllPreferredShifts(id);
             employeeDAO.removeEmployee(id);
+            
         } catch (SQLException e) {
             System.out.println("Error removing employee: " + e.getMessage());
         }
@@ -169,19 +178,7 @@ public class EmployeeController {
     }
 
     public List<EmployeeRoleDTO> getAllEmployeeRoles() {
-        try {
-            ResultSet rst = employeeRoleDAO.getAllRoles();
-            List<EmployeeRoleDTO> roles = new ArrayList<>();
-            while (rst.next()) {
-                int id = rst.getInt("id");
-                String roleName = rst.getString("roleName");
-                roles.add(new EmployeeRoleDTO(id, roleName));
-            }
-            return roles;
-        } catch (SQLException e) {
-            System.out.println("Error getting all employee roles: " + e.getMessage());
-            return null;
-        }
+        return employeeRoleController.getAllRoles();
     }
 
     public void checkEmployee(int employeeId) {
@@ -216,12 +213,12 @@ public class EmployeeController {
         }
     }
 
-    // helper function to build EmployeeDTO for getEmployee and getAllEmployees
-    // method
+    // helper function to build EmployeeDTO for getEmployee and getAllEmployees method
     private EmployeeDTO buildEmployeeDTO(ResultSet rst) throws SQLException {
         int id = rst.getInt("id");
         String name = rst.getString("name");
         int branchid = rst.getInt("branchid");
+        LocationDTO branch = locationController.getLocation(branchid);
         String bankAccount = rst.getString("bankAccount");
         int salary = rst.getInt("salary");
         String startDate = rst.getString("startDate");
@@ -232,38 +229,29 @@ public class EmployeeController {
         String password = rst.getString("password");
         Boolean isFinishedWorking = rst.getBoolean("isFinishedWorking");
 
-        ResultSet rolesResult = employeeRoleDAO.getRoles(id);
-        List<Role> roles = new ArrayList<>();
-        while (rolesResult.next()) {
-            String roleName = rolesResult.getString("role");
-            roles.add(Role.valueOf(roleName.toUpperCase()));
-        }
+        List<String> roles = new ArrayList<>();
+        roles = employeeRoleController.getRolesForEmployee(id);
 
         ResultSet assignedResult = employeeShiftDAO.getEmployeeShifts(id);
-        List<Shift> assignedshifts = new ArrayList<>();
+        List<EmployeeShiftDTO> assignedshifts = new ArrayList<>();
         while (assignedResult.next()) {
-            LocalDate date = assignedResult.getDate("date").toLocalDate();
+            String date = assignedResult.getDate("date").toString();
             String shiftType = assignedResult.getString("shiftType");
-            ResultSet shiftManagerIdResultSet = shiftDAO.getShiftManagerId(date.toString(), shiftType, branchid);
-            int shiftManagerId = shiftManagerIdResultSet.getInt("shiftManagerId");
-            // הבנאי מקבל כפרמטר אחרון אובייקט של לוקיישן ולא רק איידי אז צריך לפתור את זה
-            Shift shift = new Shift(date, ShiftType.valueOf(shiftType), shiftManagerId, branchid);
+            String role = assignedResult.getString("role");
+            EmployeeShiftDTO shift = new EmployeeShiftDTO(id, date, shiftType, role);
             assignedshifts.add(shift);
         }
 
         ResultSet prefResult = preferredShiftDAO.getPreferredShifts(id);
-        List<Shift> prefShifts = new ArrayList<>();
+        List<PreferredShiftDTO> prefShifts = new ArrayList<>();
         while (prefResult.next()) {
-            LocalDate date = prefResult.getDate("date").toLocalDate();
+            String date = prefResult.getDate("date").toString();
             String shiftType = prefResult.getString("shiftType");
-            ResultSet shiftManagerIdResultSet = shiftDAO.getShiftManagerId(date.toString(), shiftType, branchid);
-            int shiftManagerID = shiftManagerIdResultSet.getInt("shiftManagerId");
-            // הבנאי מקבל כפרמטר אחרון אובייקט של לוקיישן ולא רק איידי אז צריך לפתור את זה
-            Shift shift = new Shift(date, ShiftType.valueOf(shiftType), shiftManagerID, branchid);
-            prefShifts.add(shift);
+            PreferredShiftDTO shiftDTO = new PreferredShiftDTO(id, date, shiftType);
+            prefShifts.add(shiftDTO);
         }
 
-        return new EmployeeDTO(id, name, branchid, bankAccount, salary, startDate, vacationDays, sickDays,
+        return new EmployeeDTO(id, name, branch, bankAccount, salary, startDate, vacationDays, sickDays,
                 educationFund, socialBenefits, password, isFinishedWorking, roles, assignedshifts, prefShifts);
     }
 

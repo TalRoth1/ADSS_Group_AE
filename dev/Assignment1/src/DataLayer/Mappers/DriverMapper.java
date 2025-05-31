@@ -14,7 +14,7 @@ public class DriverMapper {
         return new DriverDTO(
                 dl.getId(),
                 dl.getName(),
-                dl.getBranch().getId(), // assuming LocationDL has getId() IMPORTANT
+                LocationMapper.toDTO(dl.getBranch()), // assuming LocationDL has getId() IMPORTANT
                 dl.getBankAccount(),
                 dl.getSalary(),
                 dl.getStartDate().format(dateFormatter),
@@ -29,11 +29,11 @@ public class DriverMapper {
         );
     }
 
-    public static DriverDL toDL(DriverDTO dto, LocationDTO branch) {// this should get the branch from the dto
+    public static DriverDL toDL(DriverDTO dto) {// this should get the branch from the dto
         return new DriverDL(
                 dto.getId(),
                 dto.getName(),
-                LocationMapper.toDomain(branch), // Convert LocationDTO to LocationDL
+                LocationMapper.toDomain(dto.getBranchid()), // Convert LocationDTO to LocationDL
                 dto.getBankAccount(),
                 dto.getSalary(),
                 LocalDate.parse(dto.getStartDate(), dateFormatter),

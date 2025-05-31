@@ -22,7 +22,7 @@ public class EmployeeManagerMapper {
                 em.getSickDays(),
                 em.getEducationFund(),
                 em.getSocialBenefits(),
-                em.getPassword(),
+                em.getPassword()
         );
     }
 

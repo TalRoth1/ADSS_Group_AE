@@ -5,7 +5,6 @@ public class EmployeeShiftDTO {
     private int employeeId;
     private String shiftDate; // for example "2024-06-01"
     private String shiftType; // "MORNING" or "EVENING"
-
     private String role;
 
     public EmployeeShiftDTO(int employeeId, String shiftDate, String shiftType, String role) {

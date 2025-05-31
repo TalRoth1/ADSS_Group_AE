@@ -7,7 +7,7 @@ public class ShiftDTO {
 
     private String date;
     private String shiftType;
-    private int branchid;
+    private LocationDTO branch;
     private int startTime;
     private int endTime;
     private int shiftManagerId;
@@ -20,8 +20,8 @@ public class ShiftDTO {
 
     public ShiftDTO(String date, String shiftType, int startTime, int endTime, int shiftManagerId,
             int numOfRequiredcashiers, int numOfRequireddrivers, int numOfRequiredstoreKeepers,
-            int numOfRequiredshipmentManagers, boolean isShipmentShift, int branchid) {
-        this.branchid = branchid;
+            int numOfRequiredshipmentManagers, boolean isShipmentShift, LocationDTO branch) {
+        this.branch = branch;
         this.date = date;
         this.shiftType = shiftType;
         this.startTime = startTime;
@@ -110,12 +110,11 @@ public class ShiftDTO {
         return isShipmentShift;
     }
 
-    public void setBranchid(int branchid) {
-        this.branchid = branchid;
+    public void setBranch(LocationDTO branch) {
+        this.branch = branch;
     }
-
-    public int getBranchid() {
-        return branchid;
+    public LocationDTO getBranch() {
+        return branch;
     }
 
 }

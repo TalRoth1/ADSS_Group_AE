@@ -79,7 +79,7 @@ public class DriverController {
                     while (licenseRs.next()) {
                         licenseTypes.add(licenseRs.getString("licenseType"));
                     }
-                    return new DriverDTO(rs.getInt("id"), employee.getName(), employee.getBranch(),
+                    return new DriverDTO(rs.getInt("id"), employee.getName(), employee.getBranchid(),
                             employee.getBankAccount(), employee.getSalary(), employee.getStartDate(),
                             employee.getVacationDays(), employee.getSickDays(), employee.getEducationFund(),
                             employee.getSocialBenefits(), employee.getPassword(), rs.getBoolean("isFinishedWorking"),
@@ -105,7 +105,7 @@ public class DriverController {
                     while (licenseRs.next()) {
                         licenseTypes.add(licenseRs.getString("licenseType"));
                     }
-                    drivers.add(new DriverDTO(rs.getInt("id"), employee.getName(), employee.getBranch(),
+                    drivers.add(new DriverDTO(rs.getInt("id"), employee.getName(), employee.getBranchid(),
                             employee.getBankAccount(), employee.getSalary(), employee.getStartDate(),
                             employee.getVacationDays(), employee.getSickDays(), employee.getEducationFund(),
                             employee.getSocialBenefits(), employee.getPassword(), rs.getBoolean("isFinishedWorking"),

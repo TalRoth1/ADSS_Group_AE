@@ -2,6 +2,7 @@ package DataLayer.Mappers;
 
 import DTO.EmployeeDTO;
 import DTO.EmployeeRoleDTO;
+import DTO.LocationDTO;
 import DomainLayer.Employee;
 import DomainLayer.LocationDL;
 import DomainLayer.Role;
@@ -19,9 +20,10 @@ public class EmployeeMapper {
         if (e == null) {
             return null;
         }
+        LocationDTO branchDTO = LocationMapper.toDTO(e.getBranch()); 
         return new EmployeeDTO(e.getId(),
                 e.getName(),
-                e.getBranchid(),
+                branchDTO,
                 e.getBankAccount(),
                 e.getSalary(),
                 e.getStartDate().toString(),
@@ -30,7 +32,9 @@ public class EmployeeMapper {
                 e.getEducationFund(),
                 e.getSocialBenefits(),
                 e.getPassword(),
-                e.isFinishWorking());
+                e.isFinishWorking(),
+                e.getRoles(),
+                
         // int id, String name, int branchid, String bankAccount, int salary, String
         // startDate,
         // int vacationDays, int sickDays, double educationFund, double socialBenefits,

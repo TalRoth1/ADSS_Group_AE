@@ -10,7 +10,7 @@ public class ShipmentMapper {
 
     public static ShipmentDL toDL(ShipmentDTO dto) {
         TruckDL truckDL = TruckMapper.toDomain(dto.getTruck());
-        DriverDL driverDL = DriverMapper.toDL(dto.getDriver(), new LocationDTO()); //need to fix this, should get the branch from the dto
+        DriverDL driverDL = DriverMapper.toDL(dto.getDriver()); //need to fix this, should get the branch from the dto
         ShipmentDocumentDL documentDL = DocumentMapper.toDL(dto.getDocument());
 
         ShipmentDL dl = new ShipmentDL(

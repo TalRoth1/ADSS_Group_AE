@@ -15,7 +15,7 @@ public class EmployeeManager extends Employee {
     private ArrayList<LocationDL> branches;
     private Map<LocationDL, Map<LocalDate, Shift>> toCompleteShifts;
     private Map<LocationDL, Map<LocalDate, Shift>> missingShift;
-    private static final LocationDL EMPTY_LOCATION = new LocationDL("Empty", 0, "Empty", "Empty", "Empty", "Empty");
+    private static final LocationDL EMPTY_LOCATION = new LocationDL(0, "Empty", 0, "Empty", "Empty", "Empty", "Empty");
 
     public EmployeeManager(int id, String name, String bankAccount, int salary, LocalDate startDate,
             int vacationDays, int sickDays, double educationFund, double socialBenefits,

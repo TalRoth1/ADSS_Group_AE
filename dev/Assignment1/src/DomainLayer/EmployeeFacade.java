@@ -6,7 +6,8 @@ import DataLayer.*;
 import DataLayer.DAOs.DriverDAO;
 import DataLayer.DAOs.EmployeeDAO;
 import DataLayer.DAOs.EmployeeRoleDAO;
-import DataLayer.DAOs.EmployeeShiftDAO;
+import DataLayer.DAOs.ShiftAssignedDAO;
+import DataLayer.Mappers.DriverMapper;
 import DataLayer.Mappers.EmployeeMapper;
 
 import java.sql.Connection;
@@ -29,7 +30,7 @@ public class EmployeeFacade { // employee related methods
     private EmployeeController empController;
     private EmployeeRoleDAO empRoleDAO;
     private EmployeeRoleController empRoleController;
-    private EmployeeShiftDAO empShiftDAO;
+    private ShiftAssignedDAO empShiftDAO;
     private EmployeeController empShiftController;
     private DriverDAO driverDAO;
     private DriverController driverController;
@@ -122,7 +123,7 @@ public class EmployeeFacade { // employee related methods
             empController = new EmployeeController();
             empRoleDAO = new EmployeeRoleDAO(connection);
             empRoleController = new EmployeeRoleController();
-            empShiftDAO = new EmployeeShiftDAO(connection);
+            empShiftDAO = new ShiftAssignedDAO(connection);
             empShiftController = new EmployeeController();
 
             // branches = empController.getBranches(); // Load branches from the database
@@ -199,7 +200,7 @@ public class EmployeeFacade { // employee related methods
                 salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
 
         empController.addEmployee(employeeId, employeeName, b, bankAccount,
-                salary, startDate.toString(), vacationDays, sickDays, educationFund, socialBenefits, employeePassword);
+                salary, startDate.toString(), vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
         shiftEmployees.put(employeeId, shiftEmployee);
         System.out.println("Employee hired: " + shiftEmployee.getName() + " with ID: " + employeeId);
     }
@@ -238,9 +239,9 @@ public class EmployeeFacade { // employee related methods
                 driver.getSocialBenefits(),
                 driver.getPassword(),
                 driver.getLicenseTypes());
-        driverController.addDriver(driverDTO);
         empController.addEmployee(employeeId, employeeName, b, bankAccount,
-                salary, startDate.toString(), vacationDays, sickDays, educationFund, socialBenefits, employeePassword);
+                salary, startDate.toString(), vacationDays, sickDays, educationFund, socialBenefits, employeePassword, Role.DRIVER);
+        driverController.addDriver(driverDTO);
         shiftEmployees.put(employeeId, driver);
         System.out.println("Driver hired: " + driver.getName() + " with ID: " + employeeId);
     }
@@ -850,6 +851,29 @@ public class EmployeeFacade { // employee related methods
     public DriverController getDriverController()
     {
         return driverController;
+    }
+
+    public List<DriverDL> getAllDrivers() {
+        List<DriverDL> drivers = new ArrayList<>();
+        List<DriverDTO> driverDTOs = driverController.getAllDrivers();
+        for (DriverDTO dto : driverDTOs) {
+            DriverMapper driverMapper = new DriverMapper();
+            DriverDL driver = driverMapper.toDL(dto);
+            drivers.add(driver);
+        }
+        return drivers;
+    }
+
+    public void addBranch(LocationDL branch){
+        if (branches == null) {
+            branches = new ArrayList<>();
+        }
+        if (!branches.contains(branch)) {
+            branches.add(branch);
+            employeeManager.addBranch(branch);
+        } else {
+            System.out.println("Branch already exists.");
+        }
     }
 
 }

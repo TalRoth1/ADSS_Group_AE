@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class ShipmentCLI {
-    HashMap<String, String> users = new HashMap<>(Map.of("eylon", "admin", "elad", "manager"));
+    HashMap<String, String> users = new HashMap<>(Map.of("eylon", "admin", "elad", "admin"));
 
     public ShipmentFacade shipmentFacade;
     Scanner scanner = new Scanner(System.in);
@@ -728,6 +728,15 @@ public class ShipmentCLI {
             System.out.println("Database cleared successfully.");
         } catch (Exception e) {
             System.out.println("Error clearing database: " + e.getMessage());
+        }
+    }
+
+    public void MakePredefinedData() {
+        try {
+            shipmentFacade.MakePredefinedData();
+            System.out.println("Predefined data created successfully.");
+        } catch (Exception e) {
+            System.out.println("Error creating predefined data: " + e.getMessage());
         }
     }
 }

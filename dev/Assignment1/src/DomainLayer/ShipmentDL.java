@@ -231,4 +231,13 @@ public class ShipmentDL {
         this.DateSent = dateSent;
     }
 
+    public ShipmentDL clone() {
+        ShipmentDL clonedShipment = new ShipmentDL(this.Id, this.Truck, this.Document.getOrigin(),
+                new ArrayList<>(this.Destinations), this.Document.getItemsMap(), this.ShiftType, this.DateSent,
+                this.DateCreated);
+        clonedShipment.setDriver(this.DriverName);
+        clonedShipment.ChangeStatus(this.Status.toString());
+        return clonedShipment;
+    }
+
 }

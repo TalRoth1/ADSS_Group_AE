@@ -23,10 +23,13 @@ public class Main {
             switch (choice) {
                 case "1":
                     // Continue from previous session - should just continue with what we already had
+                    flag = false;
                     break;
                 case "2":
                     //Load predefined data - use a method on both CLIs to load predefined data
                     flag = false;
+                    employeeCLI.MakePredefinedData();
+                    shipmentCLI.MakePredefinedData();
                     break;
                 case "3":
                     //No data - use a method on both CLIs to delete all data

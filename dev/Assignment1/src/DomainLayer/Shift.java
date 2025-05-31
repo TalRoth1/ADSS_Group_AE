@@ -42,6 +42,26 @@ public class Shift {
 
     }
 
+    public Shift(LocalDate date, ShiftType shiftType, int startTime, int endTime, int shiftManagerId, Map<Role, Integer> requiredRoles,Map<Integer, Role> assignedEmployeesID,Map<Integer, Role> availableEmployeesID,boolean isShipmentShift ,LocationDL branch) {
+        this.date = date;
+        this.shiftType = shiftType;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.shiftManagerId = shiftManagerId;
+        this.requiredRoles = requiredRoles;
+        this.assignedEmployeesID = assignedEmployeesID;
+        this.availableEmployeesID = availableEmployeesID;
+        this.isShipmentShift = isShipmentShift;
+        this.branch = branch;
+
+        // Ensure all roles are initialized in requiredRoles
+        for (Role role : Role.values()) {
+            if (!this.requiredRoles.containsKey(role)) {
+                this.requiredRoles.put(role, 0);
+            }
+        }
+    }
+
     public String toString() {
         String assigned = getEmployeesInfo();
         return "Shift{"

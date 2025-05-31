@@ -5,21 +5,28 @@ import java.util.ArrayList;
 import java.util.List;
 import DTO.PreferredShiftDTO;
 
-public class PreferredShiftDAO {
+public class ShiftPreferredDAO {
 
     private Connection connection;
 
-    public PreferredShiftDAO(Connection connection) {
+    public ShiftPreferredDAO(Connection connection) {
         this.connection = connection;
+        try {
+            initializeTable();
+        } catch (SQLException e) {
+            System.out.println("Error initializing prefrredAssignedDAO: " + e.getMessage());
+        }
     }
 
+    //למחוק את כל הפעולות ולרשום אותן מחדש בהתאם לשדות האלו של הטבלה
     private void initializeTable() throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS preferred_shifts (" +
+                "shiftId INT NOT NULL, " +
                 "employeeId INT NOT NULL, " +
-                "shiftDate DATE NOT NULL, " +
-                "shiftType TEXT NOT NULL, " +
-                "PRIMARY KEY (employeeId, shiftDate, shiftType), " +
+                "role TEXT NOT NULL, " +
+                "PRIMARY KEY (employeeId, shiftId) " +
                 "FOREIGN KEY (employeeId) REFERENCES employees(id)" +
+                "FOREIGN KEY (shiftId) REFERENCES shifts(id)" +
                 ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSQL);

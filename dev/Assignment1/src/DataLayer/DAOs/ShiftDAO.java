@@ -20,13 +20,15 @@ public class ShiftDAO {
 
     private void initializeTable() throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS shifts (" +
-                "date DATE NOT NULL, " +
+                "id INT NOT NULL, " +        
+                "date TEXT NOT NULL, " +
                 "shiftType TEXT NOT NULL, " +
-                "locationId INT NOT NULL, " +
                 "startTime INT NOT NULL, " +
                 "endTime INT NOT NULL, " +
                 "shiftManagerId INT NOT NULL, " +
-                "PRIMARY KEY (date, shiftType, locationId), " +
+                "isShipment INT NOT NULL, " + //0 false, 1 for true
+                "locationId INT NOT NULL, " +
+                "PRIMARY KEY (id), " +
                 "FOREIGN KEY (shiftManagerId) REFERENCES employees(id), " +
                 "FOREIGN KEY (locationId) REFERENCES locations(id)" +
                 ")";

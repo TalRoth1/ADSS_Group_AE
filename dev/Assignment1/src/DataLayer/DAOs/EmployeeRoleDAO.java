@@ -11,6 +11,11 @@ public class EmployeeRoleDAO {
 
     public EmployeeRoleDAO(Connection connection) {
         this.connection = connection;
+        try {
+            initializeTable();
+        } catch (SQLException e) {
+            System.out.println("Error initializing employee_roleDAO: " + e.getMessage());
+        }
     }
 
     private void initializeTable() throws SQLException {
@@ -73,7 +78,7 @@ public class EmployeeRoleDAO {
         }
     }
 
-    public ResultSet getRoles(int employeeId) throws SQLException {
+    public ResultSet getRolesForEmployee(int employeeId) throws SQLException { //get roles of a specific employee
         String sql = "SELECT role FROM employee_role WHERE employeeId=?";
         List<String> roles = new ArrayList<>();
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {

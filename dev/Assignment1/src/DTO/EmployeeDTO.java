@@ -1,14 +1,13 @@
 package DTO;
 
-import DomainLayer.Role;
-import DomainLayer.Shift;
+
 import java.util.List;
 
 public class EmployeeDTO {
 
     private int id;
     private String name;
-    private int branchid;
+    private LocationDTO branch;
     private String bankAccount;
     private int salary;
     private String startDate;
@@ -19,16 +18,16 @@ public class EmployeeDTO {
     private String password;
     private boolean isFinishedWorking;
     private boolean isLoggedIn;
-    private List<Role> roles;
-    private List<Shift> shifts;
-    private List<Shift> prefShifts;
+    private List<String> roles;
+    private List<EmployeeShiftDTO> shifts;
+    private List<PreferredShiftDTO> prefShifts;
 
-    public EmployeeDTO(int id, String name, int branchid, String bankAccount, int salary, String startDate,
+    public EmployeeDTO(int id, String name, LocationDTO branch, String bankAccount, int salary, String startDate,
             int vacationDays, int sickDays, double educationFund, double socialBenefits,
-            String password, boolean isFinishedWorking, List<Role> roles, List<Shift> shifts, List<Shift> prefShifts) {
+            String password, boolean isFinishedWorking, List<String> roles, List<EmployeeShiftDTO> shifts, List<PreferredShiftDTO> prefShifts) {
         this.id = id;
         this.name = name;
-        this.branchid = branchid;
+        this.branch = branch;
         this.bankAccount = bankAccount;
         this.salary = salary;
         this.startDate = startDate;
@@ -52,8 +51,8 @@ public class EmployeeDTO {
         return name;
     }
 
-    public int getBranchid() {
-        return branchid;
+    public LocationDTO getBranchid() {
+        return branch;
     }
 
     public String getBankAccount() {
@@ -104,7 +103,7 @@ public class EmployeeDTO {
         isLoggedIn = true;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(List<String> roles) {
         this.roles = roles;
     }
 
