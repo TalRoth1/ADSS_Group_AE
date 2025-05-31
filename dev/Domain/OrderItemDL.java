@@ -1,18 +1,32 @@
 package Domain;
 
+import DAL.OrderController;
+import DAL.OrderItemDAO;
+
 public class OrderItemDL 
 {
     private int itemID;
     private int quantity;
     private int catalogID;
     private double totalPrice;
+    private OrderItemDAO DAO;
     
-    public OrderItemDL(int itemID, int quantity, int catalogID, double totalPrice)
+    public OrderItemDL(int orderID, int itemID, int quantity, int catalogID, double totalPrice, OrderController orderController)
     {
         this.itemID = itemID;
         this.quantity = quantity;
         this.catalogID = catalogID;
         this.totalPrice = totalPrice;
+        this.DAO = new OrderItemDAO(orderID, itemID, quantity, catalogID, totalPrice, orderController);
+    }
+    
+    public OrderItemDL(OrderItemDAO orderItemDAO)
+    {
+        this.itemID = orderItemDAO.getItemID();
+        this.quantity = orderItemDAO.getQuantity();
+        this.catalogID = orderItemDAO.getCatalogID();
+        this.totalPrice = orderItemDAO.getTotalPrice();
+        this.DAO = orderItemDAO;
     }
 
     public int getItemID()

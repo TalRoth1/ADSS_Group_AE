@@ -8,11 +8,11 @@ public class DiscountDAO
     private int discountPercentage;
     private DiscountController discountController; 
     
-    public DiscountDAO(int catalogID, int minimumQuantity, int discountPercentage) {
+    public DiscountDAO(int catalogID, int minimumQuantity, int discountPercentage, DiscountController discountController) {
         this.catalogID = catalogID;
         this.minimumQuantity = minimumQuantity;
         this.discountPercentage = discountPercentage;
-        this.discountController = new DiscountController();
+        this.discountController = discountController;
     }
 
     public int getCatalogID() {

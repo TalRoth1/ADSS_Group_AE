@@ -103,7 +103,7 @@ public class SupplierController
                             String paymentMethod = rs.getString("paymentMethod");
                             String contactMail = rs.getString("contactMail");
                             String contactPhone = rs.getString("contactPhone");
-                            return new SupplierDAO(id, companyID, bankAccount, paymentMethod, contactMail, contactPhone);
+                            return new SupplierDAO(id, companyID, bankAccount, paymentMethod, contactMail, contactPhone, this);
                         }
                     }
                 } catch (SQLException e) {
@@ -133,7 +133,7 @@ public class SupplierController
                         String paymentMethod = rs.getString("paymentMethod");
                         String contactMail = rs.getString("contactMail");
                         String contactPhone = rs.getString("contactPhone");
-                        suppliers.add(new SupplierDAO(id, companyID, bankAccount, paymentMethod, contactMail, contactPhone));
+                        suppliers.add(new SupplierDAO(id, companyID, bankAccount, paymentMethod, contactMail, contactPhone, this));
                     }
                 } catch (SQLException e) {
                     System.out.println("Get all suppliers failed: " + e.getMessage());

@@ -3,6 +3,8 @@ package Domain;
 import java.util.Date;
 import java.util.List;
 
+import DAL.OrderController;
+import DAL.OrderDAO;
 import Utils.OrderStatus;
 
 public class OrderDL {
@@ -13,8 +15,9 @@ public class OrderDL {
     private String destination;
     private List<OrderItemDL> orderItems;
     private OrderStatus orderStatus;
+    private OrderDAO DAO;
 
-    public OrderDL(int orderID, int supplierID, int contractID, Date orderDate, String destination, List<OrderItemDL> orderItems) {
+    public OrderDL(int orderID, int supplierID, int contractID, Date orderDate, String destination, List<OrderItemDL> orderItems, OrderController orderController) {
         this.orderID = orderID;
         this.supplierID = supplierID;
         this.contractID = contractID;
@@ -22,62 +25,32 @@ public class OrderDL {
         this.destination = destination;
         this.orderItems = orderItems;
         this.orderStatus = OrderStatus.IN_PROGRESS;
+        this.DAO = new OrderDAO(orderID, supplierID, contractID, orderDate, destination, orderStatus, orderController);
     }
 
-    public OrderDL(int orderID, int supplierID, int contractID, Date orderDate, String destination,
-            List<OrderItemDL> orderItems, OrderStatus orderStatus) {
-        this.orderID = orderID;
-        this.supplierID = supplierID;
-        this.contractID = contractID;
-        this.orderDate = orderDate;
-        this.destination = destination;
-        this.orderItems = orderItems;
-        this.orderStatus = orderStatus;
+    public OrderDL(OrderDAO orderDAO) {
+        this.orderID = orderDAO.getOrderID();
+        this.supplierID = orderDAO.getSupplierID();
+        this.contractID = orderDAO.getContractID();
+        this.orderDate = orderDAO.getOrderDate();
+        this.destination = orderDAO.getDestination();
+        this.orderStatus = orderDAO.getOrderStatus();
+        this.DAO = orderDAO;
     }
 
-    public int getOrderID() {
-        return orderID;
-    }
-
-    public int getSupplierID() {
-        return supplierID;
-    }
-
-    public int getContractID() {
-        return contractID;
-    }
-
-    public Date getOrderDate() {
-        return orderDate;
-    }
-
-    public String getDestination() {
-        return destination;
-    }
-
-    public List<OrderItemDL> getOrderItems() {
-        return orderItems;
-    }
-
-    public OrderStatus getOrderStatus() {
-        return orderStatus;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
-
-    public void setOrderDate(Date orderDate) {
-        this.orderDate = orderDate;
-    }
-
-    public void setOrderStatus(OrderStatus orderStatus) {
-        this.orderStatus = orderStatus;
-    }
-
-    public void setOrderItems(List<OrderItemDL> orderItems) {
-        this.orderItems = orderItems;
-    }
+    public int getOrderID() {return orderID;}
+    public int getSupplierID() {return supplierID;}
+    public int getContractID() {return contractID;}
+    public Date getOrderDate() {return orderDate;}
+    public String getDestination() {return destination;}
+    public List<OrderItemDL> getOrderItems() {return orderItems;}
+    public OrderStatus getOrderStatus() {return orderStatus;}
+    public OrderDAO getDao() {return DAO;}
+    public void setDestination(String destination) {this.destination = destination;}
+    public void setOrderDate(Date orderDate) {this.orderDate = orderDate;}
+    public void setOrderStatus(OrderStatus orderStatus) {this.orderStatus = orderStatus;}
+    public void setOrderItems(List<OrderItemDL> orderItems) {this.orderItems = orderItems;}
+    public void setDao(OrderDAO dao) {this.DAO = dao;}
 
     public String toString() {
         StringBuilder sb = new StringBuilder();

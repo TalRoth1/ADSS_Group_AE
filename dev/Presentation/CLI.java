@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
+import DTOs.OrderDTO;
+import DTOs.OrderItemDTO;
 import Domain.DeliveryMethod;
 import Domain.OnOrderDelivery;
 import Domain.OrderDL;
@@ -228,7 +230,17 @@ public class CLI {
         String destination = scanner.nextLine();
         System.out.println("Order Items (Item ID and Quantity seperated by ,):");
         List<int[]> items = getOrderItems(scanner);
-        of.createOrder(supplierID, destination, contractID, orderDate, items);
+        List<OrderItemDTO> orderItems = new ArrayList<>();
+        for (int[] item : items) {
+            int itemID = item[0];
+            int quantity = item[1];
+            int catalogID = -1;
+            double totalPrice = -1;
+            OrderItemDTO orderItemDTO = new OrderItemDTO(itemID, quantity, catalogID, totalPrice);
+            orderItems.add(orderItemDTO);
+        }
+        OrderDTO orderDTO = new OrderDTO(-1,supplierID, contractID, orderDate, destination, orderItems, null);
+        of.createOrder(orderDTO);
     }
 
     public void getOrderDetails(Scanner scanner) {
@@ -297,6 +309,10 @@ public class CLI {
             String orderDateInput = scanner.nextLine();
             try {
                 orderDate = Date.valueOf(orderDateInput);
+                if(orderDate.before(new Date(System.currentTimeMillis()))) {
+                    System.out.println("Order date cannot be in the past. Please enter a valid date.");
+                    orderDate = null;
+                }
             } catch (IllegalArgumentException e) {
                 System.out.println("Invalid date format. Please enter the date in the format YYYY-MM-DD:");
             }
