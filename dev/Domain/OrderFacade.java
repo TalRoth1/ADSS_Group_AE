@@ -4,17 +4,36 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import DAL.OrderController;
+import DAL.OrderDAO;
+import DAL.OrderItemDAO;
 import Utils.OrderStatus;
 
 public class OrderFacade {
 
     private final List<OrderDL> orders;
     private final SupplierFacade sf;
+    private final OrderController orderController;
     private int nextID = 0;
 
     public OrderFacade(SupplierFacade sf) {
         this.sf = sf;
+        this.orderController = new OrderController();
         this.orders = new ArrayList<>();
+        List<OrderDAO> savedOrders = orderController.getAllOrders();
+        for(OrderDAO order: savedOrders){
+            List<OrderItemDL> items = new ArrayList<>();
+            for (OrderItemDAO item : order.getOrderItems()) {
+                items.add(new OrderItemDL(item.getItemID(), item.getQuantity(), item.getCatalogID(), item.getTotalPrice()));
+            }
+            OrderDL orderDL = new OrderDL(order.getOrderID(), order.getSupplierID(), order.getContractID(),
+                    order.getOrderDate(), order.getDestination(), items, order.getOrderStatus());
+            orders.add(orderDL);
+            if (order.getOrderID() >= nextID) {
+                nextID = order.getOrderID() + 1;
+            }
+        }
     }
 
     public void createOrder(int supplierID, String destination, int contractID, Date orderDate, List<int[]> Orders) {

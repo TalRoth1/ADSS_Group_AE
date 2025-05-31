@@ -1,6 +1,8 @@
 package DAL;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OrderController {
     private String ordersTableName = "Orders";
@@ -23,7 +25,7 @@ public class OrderController {
                             String destination = rs.getString("destination");
                             String statusStr = rs.getString("orderStatus");
                             Utils.OrderStatus orderStatus = Utils.OrderStatus.valueOf(statusStr);
-                            return new OrderDAO(orderID, supplierID, contractID, orderDate, destination, orderStatus);
+                            return new OrderDAO(orderID, supplierID, contractID, orderDate, destination, orderStatus, this);
                         } else {
                             System.out.println("Order not found.");
                         }
@@ -103,6 +105,35 @@ public class OrderController {
         }
     }
 
+    public List<OrderDAO> getAllOrders() {
+        List<OrderDAO> orders = new ArrayList<>();
+        try (var conn = java.sql.DriverManager.getConnection(url)) {
+            if (conn != null) {
+                String sql = "SELECT * FROM " + ordersTableName;
+                try (var pstmt = conn.prepareStatement(sql);
+                     var rs = pstmt.executeQuery()) {
+                    while (rs.next()) {
+                        int orderID = rs.getInt("orderID");
+                        int supplierID = rs.getInt("supplierID");
+                        int contractID = rs.getInt("contractID");
+                        java.util.Date orderDate = new java.util.Date(rs.getDate("orderDate").getTime());
+                        String destination = rs.getString("destination");
+                        String statusStr = rs.getString("orderStatus");
+                        Utils.OrderStatus orderStatus = Utils.OrderStatus.valueOf(statusStr);
+                        orders.add(new OrderDAO(orderID, supplierID, contractID, orderDate, destination, orderStatus, this));
+                    }
+                } catch (java.sql.SQLException e) {
+                    System.out.println("Query failed: " + e.getMessage());
+                }
+            } else {
+                System.out.println("Connection to database failed.");
+            }
+        } catch (java.sql.SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return orders;
+    }
+
     public OrderItemDAO getOrderItem(int orderID, int itemID) {
         try (var conn = java.sql.DriverManager.getConnection(url)) {
             if (conn != null) {
@@ -115,7 +146,7 @@ public class OrderController {
                             int quantity = rs.getInt("quantity");
                             double totalPrice = rs.getDouble("totalPrice");
                             int catalogID = rs.getInt("catalogID");
-                            return new OrderItemDAO(orderID, itemID, quantity, catalogID, totalPrice);
+                            return new OrderItemDAO(orderID, itemID, quantity, catalogID, totalPrice, this);
                         } else {
                             System.out.println("Order item not found.");
                         }

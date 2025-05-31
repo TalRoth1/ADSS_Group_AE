@@ -13,14 +13,16 @@ public class OrderDAO {
     private Date orderDate;
     private String destination;
     private OrderStatus orderStatus;
+    private final OrderController orderController;
 
-    public OrderDAO(int orderID, int supplierID, int contractID, Date orderDate, String destination, OrderStatus orderStatus) {
+    public OrderDAO(int orderID, int supplierID, int contractID, Date orderDate, String destination, OrderStatus orderStatus, OrderController orderController) {
         this.orderID = orderID;
         this.supplierID = supplierID;
         this.contractID = contractID;
         this.orderDate = orderDate;
         this.destination = destination;
-        this.orderStatus = orderStatus; // Default status
+        this.orderStatus = orderStatus;
+        this.orderController = orderController;
     }
 
     public int getOrderID() {
@@ -42,12 +44,25 @@ public class OrderDAO {
         return orderStatus;
     }
     public void setOrderDate(Date orderDate) {
-        this.orderDate = orderDate;
+        if (isPersisted) {
+            this.orderDate = orderDate;
+            orderController.updateOrder(orderID, "orderDate", orderDate.toString());
+        }
     }
     public void setDestination(String destination) {
-        this.destination = destination;
+        if (isPersisted) {
+            this.destination = destination;
+            orderController.updateOrder(orderID, "destination", destination);
+        }
     }
     public void setOrderStatus(OrderStatus orderStatus) {
-        this.orderStatus = orderStatus;
+        if (isPersisted) {
+            this.orderStatus = orderStatus;
+            orderController.updateOrder(orderID, "orderStatus", orderStatus.name());
+        }
+    }
+    public void persist(){
+        orderController.insertOrder(this);
+        isPersisted = true;
     }
 }
