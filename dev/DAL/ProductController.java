@@ -1,4 +1,4 @@
-
+package DAL;
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ public class ProductController {
             String sql = "INSERT INTO " + tableName + " (productID, productName) VALUES (?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setInt(1, product.getProductID());
-                pstmt.setString(2, product.getProductName());
+                pstmt.setString(2, product.getName());
                 pstmt.executeUpdate();
 
                 for (Map.Entry<Integer, List<Integer>> entry : product.getInventoryShelfItems().entrySet()) {

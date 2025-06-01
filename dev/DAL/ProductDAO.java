@@ -1,4 +1,4 @@
-
+package DAL;
 public class ProductDAO {
     private boolean isPersisted = false;
 
