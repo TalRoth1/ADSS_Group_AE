@@ -56,4 +56,9 @@ public class ProductService {
         }
     }
 
+    public void enterDemo() 
+    {
+        pf.enterDemo();
+    }
+
 }

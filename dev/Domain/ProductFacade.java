@@ -8,6 +8,7 @@ public class ProductFacade {
     private Map<Integer, ItemBL> items;
     private int nextProductID;
     private int nextItemID;
+    private boolean demonstrationMode = false;
 
     private ProductFacade() {
         this.products = new HashMap<>();
@@ -381,4 +382,8 @@ public class ProductFacade {
         return new ReportBL("Sales Report", body.toString());
     }
 
+    public void enterDemo() 
+    {
+        demonstrationMode = true;
+    }
 }

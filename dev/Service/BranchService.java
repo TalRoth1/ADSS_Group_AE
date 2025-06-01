@@ -77,4 +77,9 @@ public class BranchService
         }
     }
 
+    public void enterDemo() 
+    {
+        bf.enterDemo();
+    }
+
 }

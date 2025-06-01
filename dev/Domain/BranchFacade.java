@@ -14,6 +14,7 @@ public class BranchFacade
     private final Map<Integer, BranchBL> branches = new HashMap<>();
     private final BranchController controller;
     private int nextBranchID;
+    private boolean demonstrationMode = false;
 
     private BranchFacade() 
     {
@@ -38,10 +39,13 @@ public class BranchFacade
     }
 
     private void loadAllBranchesFromDB()
-    {
-        for (BranchDAO dao : controller.getAllBranches())
+    {           
+        if(!demonstrationMode)
         {
-            branches.put(dao.getBranchID(), new BranchBL(dao.getBranchID(), dao.getName(), dao.getAddress()));
+            for (BranchDAO dao : controller.getAllBranches())
+            {
+                branches.put(dao.getBranchID(), new BranchBL(dao.getBranchID(), dao.getName(), dao.getAddress()));
+            }
         }
     }
 
@@ -54,7 +58,10 @@ public class BranchFacade
 
         int id = nextBranchID++;
         BranchDAO dao = new BranchDAO(id, name, address);
-        controller.insert(dao);
+        if(!demonstrationMode)
+        {
+            controller.insert(dao);
+        }
         branches.put(id, new BranchBL(id, name, address));
         return id;
     }
@@ -69,7 +76,10 @@ public class BranchFacade
             }
 
             ProductFacade.getInstance().deleteAllItemsForBranch(branchID);
-            controller.delete(branchID);
+            if(!demonstrationMode)
+            {
+                controller.delete(branchID);
+            }
             branches.remove(branchID);
         }
     }
@@ -90,7 +100,10 @@ public class BranchFacade
             }
 
             branch.setName(newName);
-            controller.updateName(branchID, newName);
+            if(!demonstrationMode)
+            {
+                controller.updateName(branchID, newName);
+            }
         }
     }
 
@@ -110,7 +123,10 @@ public class BranchFacade
             }
 
             branch.setAddress(newAddress);
-            controller.updateAddress(branchID, newAddress);
+            if(!demonstrationMode)
+            {
+                controller.updateAddress(branchID, newAddress);
+            }
         }
     }
 
@@ -178,5 +194,11 @@ public class BranchFacade
         {
             return new HashSet<>(branches.keySet());
         }
+    }
+
+    public synchronized void enterDemo() 
+    {
+        demonstrationMode = true;
+        this.branches.clear();
     }
 }

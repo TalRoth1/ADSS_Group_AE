@@ -15,6 +15,7 @@ public class InvCLI {
     private ServiceFactory sf;
 
     private Scanner scanner;
+    private boolean demoMode = false;
 
     public InvCLI(ServiceFactory sf) {
         this.sf = sf;
@@ -23,7 +24,8 @@ public class InvCLI {
 
     public void openInterface() {
         boolean isInterrupted = false;
-        System.out.println("Welcome to inventory management system!");
+        display("Welcome to inventory management system!");
+        if(demoMode) display ("You are currently in demonstration mode, all changes here won't be saved in the database");
         while (!isInterrupted) {
             printMainMenu();
             displayControlButtons();
@@ -50,6 +52,10 @@ public class InvCLI {
                     clearScreen();
                     openReportsInterface();
                     break;
+                case "5":
+                    clearScreen();
+                    openDemoInterface();
+                    break;
                 default:
                     display("Invalid choice. Please try again.");
             }
@@ -57,15 +63,16 @@ public class InvCLI {
     }
 
     private void printMainMenu() {
-        System.out.println("1. Manage Branches.");
-        System.out.println("2. Manage Products.");
-        System.out.println("3. Manage Items.");
-        System.out.println("4. Reports.");
-        System.out.println("0. Exit.");
+        display("1. Manage Branches.");
+        display("2. Manage Products.");
+        display("3. Manage Items.");
+        display("4. Reports.");
+        display("5. Enter demonstration mode.");
+        display("0. Exit.");
     }
 
     private void displayControlButtons() {
-        System.out.println("Press number to choose option");
+        display("Press number to choose option");
     }
 
     private void display(String s) {
@@ -76,6 +83,25 @@ public class InvCLI {
         return scanner.nextLine();
     }
 
+    private void openDemoInterface()
+    {
+        display("Are you sure you want to enter demonstration mode?");
+        display("All changes in demonstration mode will not be saved.");
+        display("For enter demonstration mode press 5, else press 0");
+        String choice = getTextFromUser();
+        switch (choice) 
+        {
+            case "5":
+                demoMode = true;
+                sf.getBranchService().enterDemo();
+                sf.getProductService().enterDemo();
+                sf.activateDemo();
+                break;
+            case "0":
+                break;
+        }
+        waitForUser();
+    }
     private void openBranchesInterface() {
         BranchService BS = sf.getBranchService();
 
@@ -91,10 +117,10 @@ public class InvCLI {
                     break;
                 case "1":
                     clearScreen();
-                    System.out.print("Enter branch name: ");
+                    display("Enter branch name: ");
                     String name = getTextFromUser();
 
-                    System.out.print("Enter branch address: ");
+                    display("Enter branch address: ");
                     String address = getTextFromUser();
 
                     Response response1 = BS.AddBranch(name, address);
@@ -107,7 +133,7 @@ public class InvCLI {
 
                 case "2":
                     clearScreen();
-                    System.out.print("Enter branch ID to remove: ");
+                    display("Enter branch ID to remove: ");
                     int removeId = getValidIntegerFromUser();
 
                     Response response2 = BS.RemoveBranch(removeId);
@@ -120,9 +146,9 @@ public class InvCLI {
 
                 case "3":
                     clearScreen();
-                    System.out.print("Enter branch ID to rename: ");
+                    display("Enter branch ID to rename: ");
                     int renameId = getValidIntegerFromUser();
-                    System.out.print("Enter new name: ");
+                    display("Enter new name: ");
                     String newName = getTextFromUser();
 
                     Response response3 = BS.ChangeBranchName(newName, renameId);
@@ -135,9 +161,9 @@ public class InvCLI {
 
                 case "4":
                     clearScreen();
-                    System.out.print("Enter branch ID to change address: ");
+                    display("Enter branch ID to change address: ");
                     int addressId = getValidIntegerFromUser();
-                    System.out.print("Enter new address: ");
+                    display("Enter new address: ");
                     String newAddress = getTextFromUser();
 
                     Response response4 = BS.ChangeBranchAddress(newAddress, addressId);
@@ -167,12 +193,12 @@ public class InvCLI {
     }
 
     private void printBranchesMenu() {
-        System.out.println("1. Add new Branch.");
-        System.out.println("2. Remove Branch.");
-        System.out.println("3. Change Branch Name.");
-        System.out.println("4. Change Branch Address.");
-        System.out.println("5. Show All Branches.");
-        System.out.println("0. Return to main menu.");
+        display("1. Add new Branch.");
+        display("2. Remove Branch.");
+        display("3. Change Branch Name.");
+        display("4. Change Branch Address.");
+        display("5. Show All Branches.");
+        display("0. Return to main menu.");
     }
 
     private void openProductsInterface() {
@@ -191,22 +217,22 @@ public class InvCLI {
 
                 case "1":
                     clearScreen();
-                    System.out.print("Enter product name: ");
+                    display("Enter product name: ");
                     String name = getTextFromUser();
 
-                    // System.out.print("Enter cost price: ");
+                    // display("Enter cost price: ");
                     // double costPrice = getValidDoubleFromUser();
 
-                    System.out.print("Enter selling price: ");
+                    display("Enter selling price: ");
                     double sellingPrice = getValidDoubleFromUser();
 
-                    System.out.print("Enter discount (%): ");
+                    display("Enter discount (%): ");
                     int discount = getValidIntegerFromUser();
 
-                    System.out.print("Enter producer ID: ");
+                    display("Enter producer ID: ");
                     int producerID = getValidIntegerFromUser();
 
-                    System.out.print("Enter categories (comma-separated): ");
+                    display("Enter categories (comma-separated): ");
                     String[] categories = getTextFromUser().split(",");
 
                     Response addResponse = PS.AddProduct(name, sellingPrice, discount, producerID,
@@ -223,7 +249,7 @@ public class InvCLI {
 
                 case "2":
                     clearScreen();
-                    System.out.print("Enter product ID to remove: ");
+                    display("Enter product ID to remove: ");
                     int removeID = getValidIntegerFromUser();
 
                     Response removeResponse = PS.RemoveProduct(removeID);
@@ -236,25 +262,25 @@ public class InvCLI {
 
                 case "3":
                     clearScreen();
-                    System.out.print("Enter product ID to update: ");
+                    display("Enter product ID to update: ");
                     int productID = getValidIntegerFromUser();
 
-                    System.out.print("Enter new product name: ");
+                    display("Enter new product name: ");
                     String newName = getTextFromUser();
 
-                    System.out.print("Enter new cost price: ");
+                    display("Enter new cost price: ");
                     double newCost = getValidDoubleFromUser();
 
-                    System.out.print("Enter new selling price: ");
+                    display("Enter new selling price: ");
                     double newSelling = getValidDoubleFromUser();
 
-                    System.out.print("Enter new discount (%): ");
+                    display("Enter new discount (%): ");
                     int newDiscount = getValidIntegerFromUser();
 
-                    System.out.print("Enter new producer ID: ");
+                    display("Enter new producer ID: ");
                     int newProducer = getValidIntegerFromUser();
 
-                    System.out.print("Enter new categories (comma-separated): ");
+                    display("Enter new categories (comma-separated): ");
                     String[] newCategories = getTextFromUser().split(",");
 
                     Response updateResponse = PS.UpdateProduct(productID, newName, newCost, newSelling, newDiscount, newProducer, newCategories);
@@ -278,13 +304,13 @@ public class InvCLI {
                     break;
                 case "5":
                     clearScreen();
-                    System.out.print("Enter product ID to update minimal quantity: ");
+                    display("Enter product ID to update minimal quantity: ");
                     int productID2 = getValidIntegerFromUser();
 
-                    System.out.print("Enter branch to change minimal quantity: ");
+                    display("Enter branch to change minimal quantity: ");
                     int branchid2 = getValidIntegerFromUser();
 
-                    System.out.print("Enter new minimal quantity: ");
+                    display("Enter new minimal quantity: ");
                     int minQuantity = getValidIntegerFromUser();
 
                     Response updateQuantityResponse = PS.setMinQuantity(productID2, branchid2, minQuantity);
@@ -305,12 +331,12 @@ public class InvCLI {
     }
 
     private void printProductsMenu() {
-        System.out.println("1. Add new Product.");
-        System.out.println("2. Remove Product.");
-        System.out.println("3. Update Product.");
-        System.out.println("4. Show All Products.");
-        System.out.println("5. Update minimal quantity for Product");
-        System.out.println("0. Return to main menu.");
+        display("1. Add new Product.");
+        display("2. Remove Product.");
+        display("3. Update Product.");
+        display("4. Show All Products.");
+        display("5. Update minimal quantity for Product");
+        display("0. Return to main menu.");
     }
 
     private void openItemsInterface() {
@@ -330,16 +356,16 @@ public class InvCLI {
 
                 case "1":
                     clearScreen();
-                    System.out.print("Enter product ID: ");
+                    display("Enter product ID: ");
                     int productID = getValidIntegerFromUser();
 
-                    System.out.print("Enter item name: ");
+                    display("Enter item name: ");
                     String name = getTextFromUser();
 
-                    System.out.print("Is the item defective? (true/false): ");
+                    display("Is the item defective? (true/false): ");
                     boolean isDef = Boolean.parseBoolean(getTextFromUser());
 
-                    System.out.print("Enter expiration date (yyyy-MM-dd): ");
+                    display("Enter expiration date (yyyy-MM-dd): ");
                     Date expirationDate;
                     while (true) {
                         try {
@@ -353,10 +379,10 @@ public class InvCLI {
                         }
                     }
 
-                    System.out.print("Enter branch ID: ");
+                    display("Enter branch ID: ");
                     int branchID = getValidIntegerFromUser();
 
-                    System.out.print("Enter location segments (comma-separated): ");
+                    display("Enter location segments (comma-separated): ");
                     String[] location = getTextFromUser().split(",");
 
                     Response addResponse = IS.AddItem(productID, name, isDef, expirationDate, branchID, location);
@@ -369,7 +395,7 @@ public class InvCLI {
 
                 case "2":
                     clearScreen();
-                    System.out.print("Enter item ID to remove: ");
+                    display("Enter item ID to remove: ");
                     int removeID = getValidIntegerFromUser();
 
                     Response removeResponse = IS.RemoveItem(removeID);
@@ -382,7 +408,7 @@ public class InvCLI {
 
                 case "3":
                     clearScreen();
-                    System.out.print("Enter item ID to purchase: ");
+                    display("Enter item ID to purchase: ");
                     int purchaseID = getValidIntegerFromUser();
 
                     Response purchaseResponse = IS.PurchaseItem(purchaseID);
@@ -395,19 +421,19 @@ public class InvCLI {
 
                 case "4":
                     clearScreen();
-                    System.out.print("Enter item ID to update: ");
+                    display("Enter item ID to update: ");
                     int itemID = getValidIntegerFromUser();
 
-                    System.out.print("Enter new name: ");
+                    display("Enter new name: ");
                     String newName = getTextFromUser();
 
-                    System.out.print("Is the item defective? (true/false): ");
+                    display("Is the item defective? (true/false): ");
                     boolean newIsDef = Boolean.parseBoolean(getTextFromUser());
 
-                    System.out.print("Enter new branch ID: ");
+                    display("Enter new branch ID: ");
                     int newBranchID = getValidIntegerFromUser();
 
-                    System.out.print("Enter new location segments (comma-separated): ");
+                    display("Enter new location segments (comma-separated): ");
                     String[] newLocation = getTextFromUser().split(",");
 
                     Response updateResponse = IS.UpdateItem(itemID, newName, newIsDef, newBranchID, newLocation);
@@ -436,12 +462,12 @@ public class InvCLI {
     }
 
     private void printItemsMenu() {
-        System.out.println("1. Add new Item.");
-        System.out.println("2. Remove Item.");
-        System.out.println("3. Purchase Item.");
-        System.out.println("4. Update Item.");
-        System.out.println("5. Show All Items.");
-        System.out.println("0. Return to main menu.");
+        display("1. Add new Item.");
+        display("2. Remove Item.");
+        display("3. Purchase Item.");
+        display("4. Update Item.");
+        display("5. Show All Items.");
+        display("0. Return to main menu.");
     }
 
     private void openReportsInterface() {
@@ -508,11 +534,11 @@ public class InvCLI {
     }
 
     private void printReportsMenu() {
-        System.out.println("1. View Deficiency Report.");
-        System.out.println("2. View Sales Report.");
-        System.out.println("3. View Defected Items Report.");
-        System.out.println("4. View Expired Items Report.");
-        System.out.println("0. Return to main menu.");
+        display("1. View Deficiency Report.");
+        display("2. View Sales Report.");
+        display("3. View Defected Items Report.");
+        display("4. View Expired Items Report.");
+        display("0. Return to main menu.");
     }
 
     public void clearScreen() {
