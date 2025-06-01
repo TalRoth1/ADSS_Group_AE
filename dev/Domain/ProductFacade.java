@@ -27,20 +27,16 @@ public class ProductFacade {
         return instance;
     }
 
-    public void deleteAllItemsForBranch(int branchID)
-    {
+    public void deleteAllItemsForBranch(int branchID) {
         items.values().removeIf(item -> item.getBranchID() == branchID);
 
-        for (ProductBL product : products.values())
-        {
-            if (product.hasBranch(branchID))
-            {
+        for (ProductBL product : products.values()) {
+            if (product.hasBranch(branchID)) {
                 product.getItemsInBranch(branchID).clear();
                 product.getProfits().remove(branchID);
             }
         }
     }
-
 
     // ================== Product Management ==================
 
@@ -126,6 +122,13 @@ public class ProductFacade {
         product.setMinQuantity(branchID, minQuantity);
     }
 
+    public ProductBL getProduct(int productID) {
+        ProductBL product = products.get(productID);
+        if (product == null) {
+            throw new IllegalArgumentException("Product not found");
+        }
+        return product;
+    }
     // ================== Item Management ==================
 
     public int addItem(int productID, String name, boolean isDef,
