@@ -2,17 +2,16 @@ package Domain;
 
 import java.util.*;
 
+import org.junit.jupiter.api.Order;
+
 public class ProductFacade {
     private static ProductFacade instance = null;
     private Map<Integer, ProductBL> products;
     private Map<Integer, ItemBL> items;
     private int nextProductID;
     private int nextItemID;
-<<<<<<< HEAD
-    private OrderFacade orderFacade;
-=======
+    private OrderFacade orderFacade = OrderFacade.getInstance();
     private boolean demonstrationMode = false;
->>>>>>> a1413a3c59d96d2533d55e412a186ed00a5d68c2
 
     private ProductFacade() {
         this.products = new HashMap<>();

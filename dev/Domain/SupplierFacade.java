@@ -18,6 +18,7 @@ import DAL.SupplierDAO;
 import Utils.PaymentMethod;
 
 public class SupplierFacade {
+    private static SupplierFacade instance;
     private final List<SupplierDL> suppliers;
     private List<ProductBL> items; // Will be saved in inventory after the merge
     private int nextId = 1;
@@ -25,8 +26,9 @@ public class SupplierFacade {
     private ContractController contractController = new ContractController();
     private CatalogController catalogController = new CatalogController();
     private DiscountController discountController = new DiscountController();
+    private ProductFacade productFacade = ProductFacade.getInstance();
 
-    public SupplierFacade() {
+    private SupplierFacade() {
         this.suppliers = new ArrayList<>();
         List<SupplierDAO> sups = supplierController.getAllSuppliers();
         for (SupplierDAO sup : sups) 
@@ -39,7 +41,7 @@ public class SupplierFacade {
                 Map<ProductBL, Integer> itemCatalog = new HashMap<>();
                 List<CatalogDAO> catalogItems = catalogController.getContractSupplierCatalogs(sup.getId(), contract.getContractID());
                 for (CatalogDAO catalogItem : catalogItems) {
-                    ProductBL item = new ProductBL(catalogItem.getProductID());// need to get item from inventory based on Item id
+                    ProductBL item = productFacade.getProduct(catalogItem.getProductID());// need to get item from inventory based on Item id
                     DiscountDAO dis = discountController.getDiscount(catalogItem.getCatalogID());
                     if (dis != null) {
                         discounts.add(new DiscountDL(dis.getCatalogID(), dis.getMinimumQuantity(), dis.getDiscountPercentage()));
@@ -53,6 +55,17 @@ public class SupplierFacade {
             SupplierDL supplier = new SupplierDL(sup.getId(), sup.getCompanyID(), sup.getBankAccount(), paymentMethod, sup.getContactMail(), sup.getContactPhone(), contractList);
             suppliers.add(supplier);
         }
+    }
+
+    public static SupplierFacade getInstance() {
+        if (instance == null) {
+            synchronized (SupplierFacade.class) {
+                if (instance == null) {
+                    instance = new SupplierFacade();
+                }
+            }
+        }
+        return instance;
     }
 
     public void addSupplier(int companyID, int bankAccount, PaymentMethod paymentMethod, String contactEmail,
@@ -165,6 +178,31 @@ public class SupplierFacade {
             return suppliedItems;
         }
         return null; // Supplier not found
+    }
+
+    public Map<SupplierDL, List<ContractDL>> findItemSuppliersPeriodic(int productId)
+    {
+        Map<SupplierDL, List<ContractDL>> suppliersWithItem = new HashMap<>();
+        for(SupplierDL supp : suppliers)
+        {
+            List<ContractDL> contractsWithItem = new ArrayList<>();
+            for(ContractDL contract : supp.getContracts())
+            {
+                DeliveryMethod deliveryMethod = contract.getDeliveryMethod();
+                if(deliveryMethod instanceof PeriodicDelivery)
+                {
+                    for(PeriodicItem item : ((PeriodicDelivery) deliveryMethod).getOrderItems())
+                    {
+                        if(item.getItemID() == productId)
+                        {
+                            contractsWithItem.add(contract);
+                        }
+                    }
+                }
+            }
+            suppliersWithItem.put(supp, contractsWithItem);
+        }
+        return suppliersWithItem;
     }
 
     public void loadData() {
