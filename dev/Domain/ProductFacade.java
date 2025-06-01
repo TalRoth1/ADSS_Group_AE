@@ -8,6 +8,7 @@ public class ProductFacade {
     private Map<Integer, ItemBL> items;
     private int nextProductID;
     private int nextItemID;
+    private OrderFacade orderFacade;
 
     private ProductFacade() {
         this.products = new HashMap<>();
@@ -226,6 +227,9 @@ public class ProductFacade {
         List<Integer> branchIDs = new ArrayList<>(BranchFacade.getInstance().getAllBranchIDs());
         Collections.sort(branchIDs);
 
+        List<ProductBL> productList = new ArrayList<>();
+        List<Integer> minimumQuantities = new ArrayList<>();
+        List<Integer> currentQuantites = new ArrayList<>();
         for (Integer branchID : branchIDs) {
             String branchName = BranchFacade.getInstance().getBranchName(branchID);
             boolean hasDeficiency = false;
@@ -246,6 +250,10 @@ public class ProductFacade {
                                 .append(" (ID: ").append(branchID).append(")\n");
                         hasDeficiency = true;
                     }
+                    minimumQuantities.add(minimalQuantity);
+                    currentQuantites.add(currentQuantity);
+                    productList.add(product);
+                    orderFacade.handleLowSupply(productList, minimumQuantities, currentQuantites);
                     body.append("  Product: ").append(product.getName())
                             .append(" (Product ID: ").append(product.getProductID()).append(") ")
                             .append("Current Quantity: ").append(currentQuantity)
@@ -374,8 +382,6 @@ public class ProductFacade {
                 }
             }
         }
-
         return new ReportBL("Sales Report", body.toString());
     }
-
 }

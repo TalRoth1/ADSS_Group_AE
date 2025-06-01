@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.catalog.Catalog;
-
 import DAL.CatalogController;
 import DAL.CatalogDAO;
 import DAL.ContractController;
