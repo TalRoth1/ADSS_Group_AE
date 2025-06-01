@@ -2,6 +2,9 @@ package DTO;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import DomainLayer.Shift;
 
 public class EmployeeDTO {
 
@@ -18,13 +21,14 @@ public class EmployeeDTO {
     private String password;
     private boolean isFinishedWorking;
     private boolean isLoggedIn;
-    private List<String> roles;
-    private List<ShiftDTO> shifts;
     private List<ShiftDTO> prefShifts;
+    private Map<ShiftDTO, String> assignedShifts; // string is the role of the employee in the shift
+    private List<String> roles;
 
     public EmployeeDTO(int id, String name, LocationDTO branch, String bankAccount, int salary, Date startDate,
             int vacationDays, int sickDays, float educationFund, float socialBenefits,
-            String password, boolean isFinishedWorking, List<String> roles, List<ShiftDTO> shifts, List<ShiftDTO> prefShifts) {
+            String password, boolean isFinishedWorking, List<ShiftDTO> prefShifts,
+            Map<ShiftDTO, String> assignedShifts,List<String> roles) {
         this.id = id;
         this.name = name;
         this.branch = branch;
@@ -39,7 +43,7 @@ public class EmployeeDTO {
         this.isFinishedWorking = isFinishedWorking;
         this.isLoggedIn = false;
         this.roles = roles;
-        this.shifts = shifts;
+        this.assignedShifts = assignedShifts;
         this.prefShifts = prefShifts;
     }
 
@@ -51,7 +55,7 @@ public class EmployeeDTO {
         return name;
     }
 
-    public LocationDTO getBranchid() {
+    public LocationDTO getBranch() {
         return branch;
     }
 
@@ -111,8 +115,8 @@ public class EmployeeDTO {
         return roles;
     }
 
-    public List<ShiftDTO> getShifts() {
-        return shifts;
+    public Map<ShiftDTO, String> getAssignedShifts() {
+        return assignedShifts;
     }
 
     public List<ShiftDTO> getPrefShifts() {

@@ -48,8 +48,8 @@ public class EmployeeDAO {
         }
     }
 
-    public void addEmployee(int id, String name, LocationDL branch, String bankAccount, int salary, String startDate,
-            int vacationDays, int sickDays, double educationFund, double socialBenefits,
+    public void addEmployee(int id, String name, int locationId, String bankAccount, int salary, String startDate,
+            int vacationDays, int sickDays, float educationFund, float socialBenefits,
             String password) throws SQLException {
         String sql = "INSERT INTO employees (id, name, bankAccount, salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, password, isFired, isLoggedIn, locationId), VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -60,12 +60,11 @@ public class EmployeeDAO {
             pstmt.setString(5, startDate);
             pstmt.setInt(6, vacationDays);
             pstmt.setInt(7, sickDays);
-            pstmt.setDouble(8, educationFund);
-            pstmt.setDouble(9, socialBenefits);
+            pstmt.setFloat(8, educationFund);
+            pstmt.setFloat(9, socialBenefits);
             pstmt.setString(10, password);
             pstmt.setBoolean(11, false); // isFired
             pstmt.setBoolean(12, false); // isLoggedIn
-            int locationId = locationDAO.getLocationId(branch.getStreet(), branch.getStreetNumber(), branch.getCity());
             pstmt.setInt(13, locationId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -85,16 +84,17 @@ public class EmployeeDAO {
         }
     }
 
-    public void fireEmployee(int employeeId) throws SQLException {
-        String sql = "UPDATE employees SET isFinishedWorking=TRUE WHERE id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error firing employee: " + e.getMessage());
-            throw e;
-        }
-    }
+    //dont need because we have updateEmployeeByField
+    // public void fireEmployee(int employeeId) throws SQLException {
+    //     String sql = "UPDATE employees SET isFinishedWorking=TRUE WHERE id=?";
+    //     try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+    //         pstmt.setInt(1, employeeId);
+    //         pstmt.executeUpdate();
+    //     } catch (SQLException e) {
+    //         System.out.println("Error firing employee: " + e.getMessage());
+    //         throw e;
+    //     }
+    // }
 
     public ResultSet getEmployee(int employeeId) throws SQLException {
         String sql = "SELECT * FROM employees WHERE id=?";

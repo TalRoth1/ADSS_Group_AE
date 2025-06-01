@@ -143,10 +143,11 @@ public class ShiftDAO {
         }
     }
 
-    public void setShiftField(int id, String fieldName, String newValue) throws SQLException {
+    //erez change the type of newValue to int because it is used to update an integer field
+    public void setShiftField(int id, String fieldName, int newValue) throws SQLException {
         String sql = "UPDATE shifts SET " + fieldName + " = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, newValue);
+            pstmt.setInt(1, newValue);
             pstmt.setInt(2, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {

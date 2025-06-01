@@ -1,5 +1,7 @@
 package DataLayer.Mappers;
+import java.sql.Date;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 import DTO.DriverDTO;
@@ -17,7 +19,7 @@ public class DriverMapper {
                 LocationMapper.toDTO(dl.getBranch()), // assuming LocationDL has getId() IMPORTANT
                 dl.getBankAccount(),
                 dl.getSalary(),
-                dl.getStartDate().format(dateFormatter),
+                Date.from(dl.getStartDate().atStartOfDay(ZoneId.systemDefault()).toInstant()), 
                 dl.getVacationDays(),
                 dl.getSickDays(),
                 dl.getEducationFund(),
@@ -33,10 +35,10 @@ public class DriverMapper {
         return new DriverDL(
                 dto.getId(),
                 dto.getName(),
-                LocationMapper.toDomain(dto.getBranchid()), // Convert LocationDTO to LocationDL
+                LocationMapper.toDomain(dto.getBranch()), // Convert LocationDTO to LocationDL
                 dto.getBankAccount(),
                 dto.getSalary(),
-                LocalDate.parse(dto.getStartDate(), dateFormatter),
+                dto.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),  
                 dto.getVacationDays(),
                 dto.getSickDays(),
                 dto.getEducationFund(),

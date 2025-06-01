@@ -18,7 +18,7 @@ public class Shift {
     private int shiftManagerId;
     private Map<Role, Integer> requiredRoles; // roles and number of employees required
     private Map<Integer, Role> assignedEmployeesID;
-    private Map<Integer, Role> availableEmployeesID;
+    private Map<Integer, Role> availableEmployeesID; //preffered shifts of employees
     private boolean isShipmentShift = false; // Indicates if the shift includes a shipment
     private LocationDL branch;
 
@@ -92,6 +92,10 @@ public class Shift {
     // Getters and Setters
     public Map<Integer, Role> getAssignedEmployeesID() {
         return assignedEmployeesID;
+    }
+
+    public Map<Integer, Role> getAvailableEmployeesID() {
+        return availableEmployeesID;
     }
 
     public int getId() {

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,50 +23,29 @@ public class EmployeeMapper {
             return null;
         }
         LocationDTO branchDTO = LocationMapper.toDTO(e.getBranch());
+
         List<String> roles = new ArrayList<>();
         for (Role role : e.getRoles()) {
             roles.add(role.name());
         }
 
-        List<ShiftDTO> assignedShifts = new ArrayList<>();
-        if (e.getAssignedShifts() != null) {
-            for (Map.Entry<Shift, Role> entry : e.getAssignedShifts().entrySet()) {
-                Shift shift = entry.getKey();
-                Role role = entry.getValue();
-                assignedShifts.add(new ShiftDTO(
-                        shift.getId(),
-                        Date.from(shift.getDate().atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                        shift.getShiftType().name(),
-                        shift.getStartTime(),
-                        shift.getEndTime(),
-                        shift.getShiftManagerId(),
-                        shift.isShipmentShift(),
-                        branchDTO,
-                        shift.getRequiredRoles().entrySet().stream()
-                                .collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-                ));
-            }
-        }
-        //(int id, Date date, String shiftType, int startTime, int endTime, int shiftManagerId,
-        //   boolean isShipmentShift, LocationDTO branch, Map<Role, Integer> requiredRoles)
-
+        // Convert preferredShifts (List<Shift>) to List<ShiftDTO>
         List<ShiftDTO> preferredShifts = new ArrayList<>();
         if (e.getPrefShifts() != null) {
             for (Shift shift : e.getPrefShifts()) {
-                preferredShifts.add(new ShiftDTO(
-                        shift.getId(),
-                        Date.from(shift.getDate().atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                        shift.getShiftType().name(),
-                        shift.getStartTime(),
-                        shift.getEndTime(),
-                        shift.getShiftManagerId(),
-                        shift.isShipmentShift(),
-                        branchDTO,
-                        shift.getRequiredRoles().entrySet().stream()
-                                .collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-                ));
+                preferredShifts.add(ShiftMapper.toDTO(shift));
             }
         }
+
+        // Convert assignedShifts (Map<Shift, Role>) to Map<ShiftDTO, String>
+        Map<ShiftDTO, String> assignedShifts = new HashMap<>();
+        if (e.getAssignedShifts() != null) {
+            for (Map.Entry<Shift, Role> entry : e.getAssignedShifts().entrySet()) {
+                ShiftDTO shiftDTO = ShiftMapper.toDTO(entry.getKey());
+                assignedShifts.put(shiftDTO, entry.getValue().name());
+            }
+        }
+
         // Convert LocalDate to java.util.Date for DTO
         Date startDate = Date.from(e.getStartDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
 
@@ -82,10 +62,9 @@ public class EmployeeMapper {
                 e.getSocialBenefits(),
                 e.getPassword(),
                 e.isFinishWorking(),
-                roles,
+                preferredShifts,
                 assignedShifts,
-                preferredShifts
-        );
+                roles);
 
     }
 
@@ -96,7 +75,7 @@ public class EmployeeMapper {
         }
         LocationDL branch = null;
         for (LocationDL loc : allBranches) {
-            if (loc.getId() == dto.getBranchid().getId()) {
+            if (loc.getId() == dto.getBranch().getId()) {
                 branch = loc;
                 break;
             }
@@ -118,8 +97,7 @@ public class EmployeeMapper {
                 dto.getEducationFund(),
                 dto.getSocialBenefits(),
                 dto.getPassword(),
-                mainRole
-        );
+                mainRole);
         for (String roleStr : dto.getRoles()) {
             Role role = Role.valueOf(roleStr);
             if (!employee.getRoles().contains(role)) {
@@ -129,12 +107,16 @@ public class EmployeeMapper {
                 }
             }
         }
-        if (assignedShifts != null) {
+        if (assignedShifts != null && dto.getAssignedShifts() != null) {
             for (ShiftDTO shiftDTO : assignedShifts) {
                 Shift shift = ShiftMapper.toDomain(shiftDTO);
-                try {
-                    employee.addAssignedShift(shift, employee.getAssignedShifts().get(shift));
-                } catch (Exception ignored) {
+                String roleStr = dto.getAssignedShifts().get(shiftDTO);
+                if (roleStr != null) {
+                    try {
+                        Role role = Role.valueOf(roleStr);
+                        employee.addAssignedShift(shift, role);
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         }
