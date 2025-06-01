@@ -10,7 +10,7 @@ public class ProductFacade {
     private Map<Integer, ItemBL> items;
     private int nextProductID;
     private int nextItemID;
-    private OrderFacade orderFacade = OrderFacade.getInstance();
+    private OrderFacade orderFacade;
     private boolean demonstrationMode = false;
 
     private ProductFacade() {
@@ -256,6 +256,7 @@ public class ProductFacade {
                     minimumQuantities.add(minimalQuantity);
                     currentQuantites.add(currentQuantity);
                     productList.add(product);
+                    // need to add which destinations have low supply
                     orderFacade.handleLowSupply(productList, minimumQuantities, currentQuantites);
                     body.append("  Product: ").append(product.getName())
                             .append(" (Product ID: ").append(product.getProductID()).append(") ")

@@ -15,13 +15,14 @@ import Utils.OrderStatus;
 
 public class OrderFacade {
 
+    private static OrderFacade instance = null;
     private final List<OrderDL> orders;
     private final SupplierFacade sf;
     private final OrderController orderController;
     private int nextID = 0;
 
-    public OrderFacade(SupplierFacade sf) {
-        this.sf = sf;
+    private OrderFacade() {
+        this.sf = SupplierFacade.getInstance();
         this.orderController = new OrderController();
         this.orders = new ArrayList<>();
         List<OrderDAO> orderDAOs = orderController.getAllOrders();
@@ -39,6 +40,17 @@ public class OrderFacade {
             order.setOrderItems(items);
             orders.add(order);
         }
+    }
+
+    public static OrderFacade getInstance() {
+        if(instance == null) {
+            synchronized (OrderFacade.class) {
+                if(instance == null) {
+                    instance = new OrderFacade();
+                }
+            }
+        }
+        return instance;
     }
 
     public void createOrder(int supplierID, int contractID, Date orderDate, String destination, List<int[]> Orders) {
@@ -172,6 +184,7 @@ public class OrderFacade {
                     PeriodicItem newItem = new PeriodicItem(itemID, quantity, totalPrice);
                     items.add(newItem);
                 }
+
                 periodicDelivery.setOrderItems(items);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Error updating scheduled delivery items: " + e.getMessage());
@@ -215,9 +228,47 @@ public class OrderFacade {
         return itemMap;
     }
     
-    public void handleLowSupply(List<ProductBL> lowProducts, List<Integer> minimumQuantities, List<Integer> currentQuantites)
+    public void handleLowSupply(List<ProductBL> lowProducts, List<Integer> minimumQuantities, List<Integer> currentQuantites, List<String> destinations)
     {
-        // This method is a placeholder for handling low supply situations.
+        for(int i = 0; i < lowProducts.size(); i++) {
+            ProductBL product = lowProducts.get(i);
+            int minimumQuantity = minimumQuantities.get(i);
+            int currentQuantity = currentQuantites.get(i);
+            Map<SupplierDL, List<ContractDL>> suppliers = sf.findItemSuppliersPeriodic(product.getProductID());
+            int arrivingSoon = 0;
+            for(Entry<SupplierDL, List<ContractDL>> entry : suppliers.entrySet()) {
+                for(ContractDL contract : entry.getValue()) {
+                    PeriodicDelivery periodicDelivery = (PeriodicDelivery) contract.getDeliveryMethod();
+                    arrivingSoon += periodicDelivery.getOrderItems().stream()
+                        .filter(item -> item.getItemID() == product.getProductID())
+                        .mapToInt(PeriodicItem::getQuantity)
+                        .sum();
+                }
+            }
+            if(currentQuantity + arrivingSoon < minimumQuantity * 1.5) {
+                int requiredAmount = (int)(minimumQuantity * 1.5) - (currentQuantity + arrivingSoon);
+                double lowestPrice = Double.MAX_VALUE;
+                SupplierDL bestSupplier = null;
+                ContractDL bestContract = null;
+                for(Entry<SupplierDL, List<ContractDL>> entry : suppliers.entrySet()) {
+                    for(ContractDL contract : entry.getValue()) {
+                        double price = calculateTotalPrice(requiredAmount, product.getProductID(), entry.getKey().getSupplierID(), contract.getContractID());
+                        if(price < lowestPrice) {
+                            lowestPrice = price;
+                            bestSupplier = entry.getKey();
+                            bestContract = contract;
+                        }
+                    }
+                }
+                if(bestSupplier != null && bestContract != null) {
+                    List<int[]> orderItems = new ArrayList<>();
+                    orderItems.add(new int[]{product.getProductID(), requiredAmount});
+                    createOrder(bestSupplier.getSupplierID(), bestContract.getContractID(), new Date(), destinations.get(i), orderItems);
+                } else {
+                    System.out.println("No suitable supplier found for " + product.getName());
+                }
+            }
+        }
     }
 
     public void loadData() {
