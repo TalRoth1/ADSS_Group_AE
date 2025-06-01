@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-
 public class EmployeeController {
 
     private DBConnection dbConnection = new DBConnection();
@@ -33,7 +32,7 @@ public class EmployeeController {
         this.shiftController = shiftController;
     }
 
-    public void addEmployee(EmployeeDTO employee, String role) {
+    public void addEmployee(EmployeeDTO employee, String role) throws SQLException {
         try {
             employeeDAO.addEmployee(employee.getId(), employee.getName(), employee.getBranch().getId(),
                     employee.getBankAccount(), employee.getSalary(),
@@ -44,60 +43,67 @@ public class EmployeeController {
             employeeRoleDAO.addRole(employee.getId(), role);
         } catch (SQLException e) {
             System.out.println("Error adding employee: " + e.getMessage());
+            throw e;
         }
     }
 
-    public void addRole(int employeeId, String role) {
+    public void addRole(int employeeId, String role) throws SQLException {
         try {
             employeeRoleDAO.addRole(employeeId, role);
         } catch (SQLException e) {
             System.out.println("Error adding role: " + e.getMessage());
+            throw e;
         }
     }
 
-    public void updateEmployeeByField(int employeeId, String fieldName, Object newValue) {
+    public void updateEmployeeByField(int employeeId, String fieldName, Object newValue) throws SQLException {
         try {
             employeeDAO.updateEmployeeByField(employeeId, fieldName, newValue);
         } catch (SQLException e) {
             System.out.println("Error updating " + fieldName + ": " + e.getMessage());
+            throw e;
         }
     }
 
-    public void updateRole(int employeeId, String oldRole, String newRole) {
+    public void updateRole(int employeeId, String oldRole, String newRole) throws SQLException {
         try {
             employeeRoleDAO.updateRole(employeeId, oldRole, newRole);
         } catch (SQLException e) {
             System.out.println("Error updating role: " + e.getMessage());
+            throw e;
         }
     }
 
-    public void removeEmployee(int id) {
+    public void removeEmployee(int id) throws SQLException {
         try {
             employeeRoleDAO.removeEmployeeRoles(id);
             employeeDAO.removeEmployee(id);
         } catch (SQLException e) {
             System.out.println("Error removing employee: " + e.getMessage());
+            throw e;
         }
     }
 
-    public void removeRole(int employeeId, String role) {
+    public void removeRole(int employeeId, String role) throws SQLException {
         try {
             employeeRoleDAO.removeRole(employeeId, role);
         } catch (SQLException e) {
             System.out.println("Error removing role: " + e.getMessage());
+            throw e;
         }
     }
 
-    //not sure if we need this, but it is here for now
-    public void removeEmployeeRoles(int employeeId) {
+    // not sure if we need this, but it is here for now
+    public void removeEmployeeRoles(int employeeId) throws SQLException {
         try {
             employeeRoleDAO.removeEmployeeRoles(employeeId);
         } catch (SQLException e) {
             System.out.println("Error removing all roles: " + e.getMessage());
+            throw e;
         }
     }
 
-    public EmployeeDTO getEmployee(int employeeId) {
+    public EmployeeDTO getEmployee(int employeeId) throws SQLException {
         try {
             ResultSet rst = employeeDAO.getEmployee(employeeId);
             if (rst.next()) {
@@ -110,7 +116,7 @@ public class EmployeeController {
         }
     }
 
-    public List<EmployeeDTO> getAllEmployees() {
+    public List<EmployeeDTO> getAllEmployees() throws SQLException {
         try {
             ResultSet rst = employeeDAO.getAllEmployees();
             List<EmployeeDTO> employees = new ArrayList<>();
@@ -124,8 +130,8 @@ public class EmployeeController {
         }
     }
 
-    //not sure if we need this, but it is here for now
-    public List<String> getRolesForEmployee(int employeeId) {
+    // not sure if we need this, but it is here for now
+    public List<String> getRolesForEmployee(int employeeId) throws SQLException {
         try {
             ResultSet rs = employeeRoleDAO.getRolesForEmployee(employeeId);
             List<String> roles = new ArrayList<>();
@@ -139,45 +145,48 @@ public class EmployeeController {
         }
     }
 
-    //dont need because we have updateEmployeeByField
-    // // update employee.isFinishedWorking to true
-    // public void fireEmployee(int employeeId) {
-    //     try {
-    //         employeeDAO.fireEmployee(employeeId);
-    //     } catch (SQLException e) {
-    //         System.out.println("Error firing employee: " + e.getMessage());
-    //     }
-    // }
+    // maybe dont need because we have updateEmployeeByField
+    // update employee.isFinishedWorking to true
+    public void fireEmployee(int employeeId) {
+        try {
+        employeeDAO.fireEmployee(employeeId);
+        } catch (SQLException e) {
+        System.out.println("Error firing employee: " + e.getMessage());
+        }
+    }
 
-    
-    //not sure if we need this, but it is here for now
-    public void checkEmployee(int employeeId) {
+    // not sure if we need this, but it is here for now
+    public void checkEmployee(int employeeId) throws SQLException {
         try {
             employeeDAO.checkEmployee(employeeId);
         } catch (SQLException e) {
             System.out.println("Error checking employee: " + e.getMessage());
+            throw e;
         }
     }
 
-    //not sure if we need this, but it is here for now
-    public void getAllEmployeesInBranch(int branch) {
+    // not sure if we need this, but it is here for now
+    public void getAllEmployeesInBranch(int branch) throws SQLException {
         try {
             employeeDAO.getAllEmployeesInBranch(branch);
         } catch (SQLException e) {
             System.out.println("Error getting employees by branch: " + e.getMessage());
+            throw e;
         }
     }
 
-    public void clearAllEmployees() {
+    public void clearAllEmployees() throws SQLException {
         try {
             employeeRoleDAO.clearTable();
             employeeDAO.clearTable();
         } catch (SQLException e) {
             System.out.println("Error clearing all employees: " + e.getMessage());
+            throw e;
         }
     }
 
-    // helper function to build EmployeeDTO for getEmployee and getAllEmployees method
+    // helper function to build EmployeeDTO for getEmployee and getAllEmployees
+    // method
     private EmployeeDTO buildEmployeeDTO(ResultSet rst) throws SQLException {
         int id = rst.getInt("id");
         String name = rst.getString("name");
@@ -203,7 +212,7 @@ public class EmployeeController {
         List<ShiftDTO> prefShifts = shiftController.getAllPrefShifts(id);
 
         return new EmployeeDTO(id, name, branch, bankAccount, salary, startDate, vacationDays, sickDays,
-                educationFund, socialBenefits, password, isFinishedWorking, prefShifts , assignedShifts, rolesList);
+                educationFund, socialBenefits, password, isFinishedWorking, prefShifts, assignedShifts, rolesList);
     }
 
 }

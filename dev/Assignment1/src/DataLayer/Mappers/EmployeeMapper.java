@@ -68,7 +68,8 @@ public class EmployeeMapper {
 
     }
 
-    public static ShiftEmployee toDomain(EmployeeDTO dto, List<LocationDL> allBranches, List<ShiftDTO> assignedShifts,
+    public static ShiftEmployee toDomain(EmployeeDTO dto, List<LocationDL> allBranches,
+            Map<ShiftDTO, String> assignedShifts,
             List<ShiftDTO> preferredShifts) {
         if (dto == null) {
             return null;
@@ -107,10 +108,12 @@ public class EmployeeMapper {
                 }
             }
         }
-        if (assignedShifts != null && dto.getAssignedShifts() != null) {
-            for (ShiftDTO shiftDTO : assignedShifts) {
+
+        if (assignedShifts != null) {
+            for (Map.Entry<ShiftDTO, String> entry : assignedShifts.entrySet()) {
+                ShiftDTO shiftDTO = entry.getKey();
+                String roleStr = entry.getValue();
                 Shift shift = ShiftMapper.toDomain(shiftDTO);
-                String roleStr = dto.getAssignedShifts().get(shiftDTO);
                 if (roleStr != null) {
                     try {
                         Role role = Role.valueOf(roleStr);

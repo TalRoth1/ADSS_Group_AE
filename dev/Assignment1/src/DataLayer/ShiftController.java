@@ -37,7 +37,7 @@ public class ShiftController {
         this.locationController = locationController;
     }
 
-    public void addShiftAssigned(EmployeeDTO employeeDTO, ShiftDTO shiftDTO, String role) {
+    public void addShiftAssigned(EmployeeDTO employeeDTO, ShiftDTO shiftDTO, String role) throws SQLException {
         try {
             shiftAssignedDAO.addAssignedShift(shiftDTO.getId(), employeeDTO.getId(), role);
         } catch (Exception e) {
@@ -45,7 +45,7 @@ public class ShiftController {
         }
     }
 
-    public void addShift(ShiftDTO shiftDTO) {
+    public void addShift(ShiftDTO shiftDTO) throws SQLException {
         try {
             shiftDAO.addShift(shiftDTO.getId(), shiftDTO.getDate().toString(), shiftDTO.getShiftType(),
                     shiftDTO.getBranch().getId(),
@@ -55,7 +55,7 @@ public class ShiftController {
         }
     }
 
-    public void addPreferredShift(EmployeeDTO employeeDTO, ShiftDTO shiftDTO, String role) {
+    public void addPreferredShift(EmployeeDTO employeeDTO, ShiftDTO shiftDTO, String role) throws SQLException {
         try {
             shiftPreferredDAO.addPreferredShift(shiftDTO.getId(), employeeDTO.getId(), role);
         } catch (Exception e) {
@@ -63,7 +63,7 @@ public class ShiftController {
         }
     }
 
-    public void addShiftReqRoles(ShiftDTO shiftDTO, String role, int amount) {
+    public void addShiftReqRoles(ShiftDTO shiftDTO, String role, int amount) throws SQLException {
         try {
             shiftReqRolesDAO.addRequiredRole(shiftDTO.getId(), role, amount);
         } catch (Exception e) {
@@ -71,7 +71,7 @@ public class ShiftController {
         }
     }
 
-    public void updateShiftAssigned(EmployeeDTO employeeDTO, ShiftDTO shiftDTO, String newRole) {
+    public void updateShiftAssigned(EmployeeDTO employeeDTO, ShiftDTO shiftDTO, String newRole) throws SQLException {
         try {
             shiftAssignedDAO.addAssignedShift(shiftDTO.getId(), employeeDTO.getId(), newRole);
         } catch (Exception e) {
@@ -79,7 +79,7 @@ public class ShiftController {
         }
     }
 
-    public void updateShift(ShiftDTO shiftDTO, String fieldName, int newValue) {
+    public void updateShift(ShiftDTO shiftDTO, String fieldName, int newValue) throws SQLException {
         try {
             shiftDAO.setShiftField(shiftDTO.getId(), fieldName, newValue);
         } catch (Exception e) {
@@ -87,7 +87,7 @@ public class ShiftController {
         }
     }
 
-    public void updatePreferredShift(EmployeeDTO employeeDTO, ShiftDTO shiftDTO, String newRole) {
+    public void updatePreferredShift(EmployeeDTO employeeDTO, ShiftDTO shiftDTO, String newRole) throws SQLException {
         try {
             shiftPreferredDAO.updatePreferredShiftRole(shiftDTO.getId(), employeeDTO.getId(), newRole);
         } catch (Exception e) {
@@ -95,7 +95,7 @@ public class ShiftController {
         }
     }
 
-    public void updateShiftReqRoles(ShiftDTO shiftDTO, String role, int newAmount) {
+    public void updateShiftReqRoles(ShiftDTO shiftDTO, String role, int newAmount) throws SQLException {
         try {
             shiftReqRolesDAO.updateRequiredRoleAmount(shiftDTO.getId(), role, newAmount);
         } catch (Exception e) {
@@ -103,7 +103,7 @@ public class ShiftController {
         }
     }
 
-    public void deleteShiftAssigned(EmployeeDTO employeeDTO, ShiftDTO shiftDTO) {
+    public void deleteShiftAssigned(EmployeeDTO employeeDTO, ShiftDTO shiftDTO) throws SQLException {
         try {
             int shiftId = shiftDTO.getId();
             int employeeId = employeeDTO.getId();
@@ -124,7 +124,7 @@ public class ShiftController {
         }
     }
 
-    public void deletePreferredShift(EmployeeDTO employeeDTO, ShiftDTO shiftDTO) {
+    public void deletePreferredShift(EmployeeDTO employeeDTO, ShiftDTO shiftDTO) throws SQLException {
         try {
             int shiftId = shiftDTO.getId();
             int employeeId = employeeDTO.getId();

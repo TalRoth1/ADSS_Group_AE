@@ -23,17 +23,20 @@ import java.util.Map;
 
 import DTO.LocationDTO;
 
-public class EmployeeFacade { // employee related methods
+public class EmployeeFacade { 
 
     private EmployeeManager employeeManager;
     private Map<Integer, ShiftEmployee> shiftEmployees;
     private List<LocationDL> branches;
     private Connection connection;
     private EmployeeController empController;
-    // private EmployeeRoleController empRoleController;
     private DriverController driverController;
     private LocationController locationController;
     private ShiftController shiftController;
+    private EmployeeMapper employeeMapper;
+    private DriverMapper driverMapper;
+    private LocationMapper locationMapper;
+
 
     public EmployeeFacade() {
         this.shiftEmployees = new HashMap<>();
@@ -43,20 +46,24 @@ public class EmployeeFacade { // employee related methods
         this.locationController = new LocationController();
         this.empController = new EmployeeController(locationController, shiftController);
         try {
+            //Erez don't know what this does, Liat wrote this code
             DBConnection.connect("Employees.db");
             this.connection = DBConnection.getConnection();
             EmployeeDAO employeeDAO = new EmployeeDAO(connection);
             ShiftAssignedDAO shiftAssignedDAO = new ShiftAssignedDAO(connection);
             DriverDAO driverDAO = new DriverDAO(connection);
-            EmployeeMapper employeeMapper = new EmployeeMapper();
-            DriverMapper driverMapper = new DriverMapper();
-            empController.setEmployeeMapper(employeeMapper);
-            driverController.setDriverMapper(driverMapper);
+            this.employeeMapper = new EmployeeMapper();
+            this.driverMapper = new DriverMapper();
+            this.locationMapper = new LocationMapper();
+            //erez not sure we need the next 2 lines
+            // empController.setEmployeeMapper(employeeMapper);
+            // driverController.setDriverMapper(driverMapper);
         } catch (Exception e) {
             System.out.println("Error initializing EmployeeFacade: " + e.getMessage());
         }
     }
 
+    //Erez asked elad what need to be done in login and logout in the DB, wait for answer
     public Employee login(int id, String password) throws Exception {
         Employee e = getEmployee(id);
         if (e == null) {
@@ -91,17 +98,18 @@ public class EmployeeFacade { // employee related methods
         return shiftEmployee.isShiftManager();
     }
 
-    public void removeEmployee(int employeeId, int empManagerId) {
-        if (!isEmployeeManager(empManagerId)) {
-            throw new RuntimeException("This action is allowed only for employee manager.");
-        }
-        if (!isLoggedIn(empManagerId)) {
-            throw new RuntimeException("You are not logged in.");
-        }
-        EmployeeManager employeeManager = getEmployeeManager();
-        ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
-        employeeManager.removeEmployee(employeeId);
-    }
+    //this is old method, we have removeEmployeeFromShift now
+    // public void removeEmployee(int employeeId, int empManagerId) {
+    //     if (!isEmployeeManager(empManagerId)) {
+    //         throw new RuntimeException("This action is allowed only for employee manager.");
+    //     }
+    //     if (!isLoggedIn(empManagerId)) {
+    //         throw new RuntimeException("You are not logged in.");
+    //     }
+    //     EmployeeManager employeeManager = getEmployeeManager();
+    //     ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
+    //     employeeManager.removeEmployee(employeeId);
+    // }
 
     // check if there is a driver available for delivery and there is store kepper
     // in each branch of the delivery
@@ -117,70 +125,66 @@ public class EmployeeFacade { // employee related methods
 
     public void hireEmployee(int employeeId, int empManagerId, LocationDL b, String employeeName,
             String bankAccount,
-            int salary, LocalDate startDate, int vacationDays, int sickDays, double educationFund,
-            double socialBenefits, String employeePassword, Role role) throws Exception {
-        if (!isEmployeeManager(empManagerId)) {
-            throw new Exception("This action is allowed only for employee manager.");
-        }
-        if (!isLoggedIn(empManagerId)) {
-            throw new Exception("You are not logged in.");
-        }
-        if (branches == null || !branches.contains(b)) {
-            throw new Exception("Branch not found.");
-        }
-        EmployeeManager employeeManager = getEmployeeManager();
-        if (employeeManager.checkEmployee(employeeId)) {
-            throw new Exception("Employee with ID " + employeeId + " already hired.");
-        }
+            int salary, LocalDate startDate, int vacationDays, int sickDays, float educationFund,
+            float socialBenefits, String employeePassword, Role role) throws Exception {
+        try {
+            if (!isEmployeeManager(empManagerId)) {
+                throw new Exception("This action is allowed only for employee manager.");
+            }
+            if (!isLoggedIn(empManagerId)) {
+                throw new Exception("You are not logged in.");
+            }
+            if (branches == null || !branches.contains(b)) {
+                throw new Exception("Branch not found.");
+            }
+            EmployeeManager employeeManager = getEmployeeManager();
+            if (employeeManager.checkEmployee(employeeId)) {
+                throw new Exception("Employee with ID " + employeeId + " already hired.");
+            }
 
-        ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName, b, bankAccount,
-                salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
+            ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName, b, bankAccount,
+                    salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
+            empController.addEmployee(employeeMapper.toDTO(shiftEmployee), role.toString());
+            shiftEmployees.put(employeeId, shiftEmployee);
 
-        empController.addEmployee(employeeId, employeeName, b, bankAccount,
-                salary, startDate.toString(), vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
-        shiftEmployees.put(employeeId, shiftEmployee);
-        System.out.println("Employee hired: " + shiftEmployee.getName() + " with ID: " + employeeId);
+            System.out.println("Employee hired: " + shiftEmployee.getName() + " with ID: " + employeeId);
+        }
+        catch(Exception e) {
+            throw e;
+        }
     }
 
     public void hireDriver(int employeeId, int empManagerId, LocationDL b, String employeeName,
             String bankAccount, int salary, LocalDate startDate, int vacationDays, int sickDays,
-            double educationFund, double socialBenefits, String employeePassword, ArrayList<String> licenceType)
+            float educationFund, float socialBenefits, String employeePassword, ArrayList<String> licenceType)
             throws Exception {
-        if (!isEmployeeManager(empManagerId)) {
-            throw new Exception("This action is allowed only for employee manager.");
-        }
-        if (!isLoggedIn(empManagerId)) {
-            throw new Exception("You are not logged in.");
-        }
-        if (branches == null || !branches.contains(b)) {
-            throw new Exception("Branch not found.");
-        }
-        EmployeeManager employeeManager = getEmployeeManager();
-        if (employeeManager.checkEmployee(employeeId)) {
-            throw new Exception("Employee with ID " + employeeId + " already hired.");
-        }
+        try {
+            if (!isEmployeeManager(empManagerId)) {
+                throw new Exception("This action is allowed only for employee manager.");
+            }
+            if (!isLoggedIn(empManagerId)) {
+                throw new Exception("You are not logged in.");
+            }
+            if (branches == null || !branches.contains(b)) {
+                throw new Exception("Branch not found.");
+            }
+            EmployeeManager employeeManager = getEmployeeManager();
+            if (employeeManager.checkEmployee(employeeId)) {
+                throw new Exception("Employee with ID " + employeeId + " already hired.");
+            }
 
-        DriverDL driver = employeeManager.hireDriver(employeeId, employeeName, b, bankAccount,
-                salary, startDate, vacationDays, sickDays, educationFund, socialBenefits,
-                employeePassword, licenceType);
-        DriverDTO driverDTO = new DriverDTO(
-                driver.getId(),
-                driver.getName(),
-                driver.getBranch().toString(),
-                driver.getBankAccount(),
-                driver.getSalary(),
-                driver.getStartDate().toString(),
-                driver.getVacationDays(),
-                driver.getSickDays(),
-                driver.getEducationFund(),
-                driver.getSocialBenefits(),
-                driver.getPassword(),
-                driver.getLicenseTypes());
-        empController.addEmployee(employeeId, employeeName, b, bankAccount,
-                salary, startDate.toString(), vacationDays, sickDays, educationFund, socialBenefits, employeePassword, Role.DRIVER);
-        driverController.addDriver(driverDTO);
-        shiftEmployees.put(employeeId, driver);
-        System.out.println("Driver hired: " + driver.getName() + " with ID: " + employeeId);
+            DriverDL driver = employeeManager.hireDriver(employeeId, employeeName, b, bankAccount,
+                    salary, startDate, vacationDays, sickDays, educationFund, socialBenefits,
+                    employeePassword, licenceType);
+            
+            empController.addEmployee(driverMapper.toDTO(driver), Role.DRIVER.toString());
+            driverController.addDriver(driverMapper.toDTO(driver));
+            shiftEmployees.put(employeeId, driver);
+            System.out.println("Driver hired: " + driver.getName() + " with ID: " + employeeId);
+        }
+        catch(Exception e) {
+            throw e;
+        }
     }
 
     public void fireEmployee(int employeeId, int empManagerId) throws Exception {
@@ -208,7 +212,7 @@ public class EmployeeFacade { // employee related methods
         }
         EmployeeManager employeeManager = getEmployeeManager();
         try {
-            empRoleController.updateRole(employeeId, oldRole, newRole);
+            empController.updateRole(employeeId, oldRole.toString(), newRole.toString());
             employeeManager.changeRoleToEmployee(employeeId, oldRole, newRole);
         } catch (Exception e) {
             throw new Exception("Failed to change role: " + e.getMessage());
@@ -224,7 +228,7 @@ public class EmployeeFacade { // employee related methods
         }
         EmployeeManager employeeManager = getEmployeeManager();
         try {
-            empRoleController.addRole(employeeId, newRole);
+            empController.addRole(employeeId, newRole.toString());
             employeeManager.addRoleToEmployee(employeeId, newRole);
         } catch (Exception e) {
             throw new Exception("Failed to add role: " + e.getMessage());
@@ -240,7 +244,7 @@ public class EmployeeFacade { // employee related methods
         }
         EmployeeManager employeeManager = getEmployeeManager();
         try {
-            empRoleController.removeRole(employeeId, roleToDelete);
+            empController.removeRole(employeeId, roleToDelete.toString());
             employeeManager.deleteRoleFromEmployee(employeeId, roleToDelete);
         } catch (Exception e) {
             throw new Exception("Failed to delete role: " + e.getMessage());
@@ -257,7 +261,7 @@ public class EmployeeFacade { // employee related methods
         }
         EmployeeManager employeeManager = getEmployeeManager();
         try {
-            empController.updateSalary(employeeId, salary);
+            empController.updateEmployeeByField(employeeId, "salary", salary);
             employeeManager.updateSalaryEmployee(employeeId, salary);
         } catch (Exception e) {
             throw new Exception("Failed to update salary: " + e.getMessage());
@@ -273,7 +277,7 @@ public class EmployeeFacade { // employee related methods
         }
         EmployeeManager employeeManager = getEmployeeManager();
         try {
-            empController.updateBankAccount(employeeId, bankAccount);
+            empController.updateEmployeeByField(employeeId, "bankAccount", bankAccount);;
             employeeManager.updateBankAccountEmployee(employeeId, bankAccount);
         } catch (Exception e) {
             throw new Exception("Failed to update bank account: " + e.getMessage());
@@ -289,7 +293,7 @@ public class EmployeeFacade { // employee related methods
         }
         EmployeeManager employeeManager = getEmployeeManager();
         try {
-            empController.updateVacationDays(employeeId, vacationDays);
+            empController.updateEmployeeByField(employeeId, "vacationDays", vacationDays);
             employeeManager.updateVacationDaysEmployee(employeeId, vacationDays);
         } catch (Exception e) {
             throw new Exception("Failed to update vacation days: " + e.getMessage());
@@ -305,14 +309,14 @@ public class EmployeeFacade { // employee related methods
         }
         EmployeeManager employeeManager = getEmployeeManager();
         try {
-            empController.updateSickDays(employeeId, sickDays);
+            empController.updateEmployeeByField(employeeId, "sickDays", sickDays);
             employeeManager.updateSickDaysEmployee(employeeId, sickDays);
         } catch (Exception e) {
             throw new Exception("Failed to update sick days: " + e.getMessage());
         }
     }
 
-    public void updateEducationFund(int employeeId, int empManagerId, double educationFund) throws Exception {
+    public void updateEducationFund(int employeeId, int empManagerId, float educationFund) throws Exception {
         if (!isEmployeeManager(empManagerId)) {
             throw new Exception("This action is allowed only for employee manager.");
         }
@@ -321,14 +325,14 @@ public class EmployeeFacade { // employee related methods
         }
         EmployeeManager employeeManager = getEmployeeManager();
         try {
-            empController.updateEducationFund(employeeId, educationFund);
+            empController.updateEmployeeByField(employeeId, "educationFund", educationFund);
             employeeManager.updateEducationFund(employeeId, educationFund);
         } catch (Exception e) {
             throw new Exception("Failed to update education fund: " + e.getMessage());
         }
     }
 
-    public void updateSocialBenefits(int employeeId, int empManagerId, double socialBenefits) throws Exception {
+    public void updateSocialBenefits(int employeeId, int empManagerId, float socialBenefits) throws Exception {
         if (!isEmployeeManager(empManagerId)) {
             throw new Exception("This action is allowed only for employee manager.");
         }
@@ -337,13 +341,14 @@ public class EmployeeFacade { // employee related methods
         }
         EmployeeManager employeeManager = getEmployeeManager();
         try {
-            empController.updateSocialBenefits(employeeId, socialBenefits);
+            empController.updateEmployeeByField(employeeId, "socialBenefits", socialBenefits);
             employeeManager.updateSocialBenefits(employeeId, socialBenefits);
         } catch (Exception e) {
             throw new Exception("Failed to update social benefits: " + e.getMessage());
         }
     }
 
+    //maybe need to call the controller to get it from the DB?
     public Employee getEmployee(int id) {
         boolean manager = isEmployeeManager(id);
         if (!manager) {
@@ -364,11 +369,7 @@ public class EmployeeFacade { // employee related methods
         this.employeeManager = employeeManager;
     }
 
-    public void getAvailableEmployees(int empManagerId, LocationDL branch, Shift shift, Role role) throws Exception { // get
-        // available
-        // employees for a
-        // shift with this
-        // role
+    public void getAvailableEmployees(int empManagerId, LocationDL branch, Shift shift, Role role) throws Exception { // get available employees for a shift with this role
         if (branch == null || !branches.contains(branch)) {
             throw new Exception("Branch does not exist.");
         }
@@ -381,15 +382,12 @@ public class EmployeeFacade { // employee related methods
         if (!isLoggedIn(empManagerId)) {
             throw new Exception("You are not logged in.");
         }
-
         EmployeeManager employeeManager = getEmployeeManager();
-
         employeeManager.getAvailableEmployees(shift, role);
     }
 
     // shift employee methods
-    public String getPrefAllEmployees(int empManagerId) throws Exception { // get all employees' preferences, for
-        // employee manager
+    public String getPrefAllEmployees(int empManagerId) throws Exception { // get all employees' preferences, for employee manager
         if (!isEmployeeManager(empManagerId)) {
             throw new Exception("This action is allowed only for employee managers.");
         }
@@ -426,10 +424,8 @@ public class EmployeeFacade { // employee related methods
         }
     }
 
-    public void getAssignedEmployeeShiftsManager(int employeeId, int empManagerId) throws Exception { // employee's
-        // assigned shifts
-        // for shift
-        // employee only
+    public void getAssignedEmployeeShiftsManager(int employeeId, int empManagerId) throws Exception { // employee's assigned shifts for shift employee only
+
         if (!isEmployeeManager(empManagerId)) {
             throw new Exception("This action is allowed only for employee manager.");
         }
@@ -774,7 +770,7 @@ public class EmployeeFacade { // employee related methods
     // just for Main
     public void addFirstEmployeeManager(int id, String name, LocationDL branch, String bankAccount, int salary,
             LocalDate startDate, int vacationDays, int sickDays,
-            double educationFund, double socialBenefits, String password) {
+            float educationFund, float socialBenefits, String password) {
         employeeManager = new EmployeeManager(id, name, bankAccount, salary, startDate,
                 vacationDays, sickDays, educationFund, socialBenefits, password);
         // employeeManagers.put(id, manager);
@@ -821,15 +817,15 @@ public class EmployeeFacade { // employee related methods
 
         // Add predefined employees
         try {
-            hireEmployee(1, 1, branch1, "Alice", "123456789", 5000, LocalDate.now(), 20, 10, 1000.0, 500.0, "password123", Role.STORE_KEEPER);
-            hireEmployee(2, 1, branch2, "Bob", "987654321", 6000, LocalDate.now(), 15, 5, 1200.0, 600.0, "password456", Role.CASHIER);
-            hireEmployee(3, 1, branch1, "David", "555555555", 5500, LocalDate.now(), 18, 8, 1100.0, 550.0, "password789", Role.CASHIER);
-            hireEmployee(4, 1, branch2, "Eve", "444444444", 6500, LocalDate.now(), 22, 12, 1300.0, 650.0, "password101", Role.STORE_KEEPER);
-            hireEmployee(5, 1, branch1, "Frank", "333333333", 7000, LocalDate.now(), 25, 10, 1500.0, 700.0, "password102", Role.SHIFT_MANAGER);
-            hireEmployee(6, 1, branch2, "Grace", "222222222", 8000, LocalDate.now(), 30, 15, 1600.0, 800.0, "password103", Role.SHIFT_MANAGER);
+            hireEmployee(1, 1, branch1, "Alice", "123456789", 5000, LocalDate.now(), 20, 10, 1000f, 500f, "password123", Role.STORE_KEEPER);
+            hireEmployee(2, 1, branch2, "Bob", "987654321", 6000, LocalDate.now(), 15, 5, 1200f, 600f, "password456", Role.CASHIER);
+            hireEmployee(3, 1, branch1, "David", "555555555", 5500, LocalDate.now(), 18, 8, 1100f, 550f, "password789", Role.CASHIER);
+            hireEmployee(4, 1, branch2, "Eve", "444444444", 6500, LocalDate.now(), 22, 12, 1300f, 650f, "password101", Role.STORE_KEEPER);
+            hireEmployee(5, 1, branch1, "Frank", "333333333", 7000, LocalDate.now(), 25, 10, 1500f, 700f, "password102", Role.SHIFT_MANAGER);
+            hireEmployee(6, 1, branch2, "Grace", "222222222", 8000, LocalDate.now(), 30, 15, 1600f, 800f, "password103", Role.SHIFT_MANAGER);
 
-            hireDriver(7, 1, branch1, "Charlie", "555555555", 7000, LocalDate.now(), 25, 10, 1500.0, 700.0, "password789", new ArrayList<>(List.of("B", "C")));
-            hireDriver(8, 1, branch2, "Hannah", "666666666", 7500, LocalDate.now(), 20, 5, 1400.0, 600.0, "password104", new ArrayList<>(List.of("A", "B")));
+            hireDriver(7, 1, branch1, "Charlie", "555555555", 7000, LocalDate.now(), 25, 10, 1500f, 700f, "password789", new ArrayList<>(List.of("B", "C")));
+            hireDriver(8, 1, branch2, "Hannah", "666666666", 7500, LocalDate.now(), 20, 5, 1400f, 600f, "password104", new ArrayList<>(List.of("A", "B")));
 
         } catch (Exception e) {
             System.out.println("Error adding predefined data: " + e.getMessage());
@@ -850,7 +846,7 @@ public class EmployeeFacade { // employee related methods
             List<LocationDTO> locationDTOs = locationController.getAllLocations();
             List<LocationDL> loadedBranches = new ArrayList<>();
             for (LocationDTO locationDTO : locationDTOs) {
-                LocationDL location = LocationMapper.toDomain(locationDTO);
+                LocationDL location = locationMapper.toDomain(locationDTO);
                 loadedBranches.add(location);
             }
             this.branches = loadedBranches;
@@ -859,14 +855,14 @@ public class EmployeeFacade { // employee related methods
             List<EmployeeDTO> employeeDTOs = empController.getAllEmployees();
             shiftEmployees.clear();
             for (EmployeeDTO employeeDTO : employeeDTOs) {
-                ShiftEmployee employee = EmployeeMapper.toDomain(employeeDTO, branches, employeeDTO.getShifts(), employeeDTO.getPrefShifts());
+                ShiftEmployee employee = employeeMapper.toDomain(employeeDTO, branches, employeeDTO.getAssignedShifts(), employeeDTO.getPrefShifts());
                 shiftEmployees.put(employee.getId(), employee);
             }
 
             // Load drivers
             List<DriverDTO> driverDTOs = driverController.getAllDrivers();
             for (DriverDTO driverDTO : driverDTOs) {
-                DriverDL driver = DriverMapper.toDL(driverDTO);
+                DriverDL driver = driverMapper.toDL(driverDTO);
                 shiftEmployees.put(driver.getId(), driver);
             }
 

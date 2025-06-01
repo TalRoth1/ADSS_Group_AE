@@ -84,17 +84,17 @@ public class EmployeeDAO {
         }
     }
 
-    //dont need because we have updateEmployeeByField
-    // public void fireEmployee(int employeeId) throws SQLException {
-    //     String sql = "UPDATE employees SET isFinishedWorking=TRUE WHERE id=?";
-    //     try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-    //         pstmt.setInt(1, employeeId);
-    //         pstmt.executeUpdate();
-    //     } catch (SQLException e) {
-    //         System.out.println("Error firing employee: " + e.getMessage());
-    //         throw e;
-    //     }
-    // }
+    //maybe dont need because we have updateEmployeeByField
+    public void fireEmployee(int employeeId) throws SQLException {
+        String sql = "UPDATE employees SET isFinishedWorking=TRUE WHERE id=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, employeeId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error firing employee: " + e.getMessage());
+            throw e;
+        }
+    }
 
     public ResultSet getEmployee(int employeeId) throws SQLException {
         String sql = "SELECT * FROM employees WHERE id=?";
