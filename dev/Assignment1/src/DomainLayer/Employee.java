@@ -8,22 +8,22 @@ public class Employee {
 
     private int id;
     private String name;
+    private LocationDL branch;
     private String bankAccount;
     private int salary;
     private LocalDate startDate;
     private int vacationDays;
     private int sickDays;
-    private double educationFund; //monthly amount
-    private double socialBenefits;//monthly amount
+    private float educationFund; //monthly amount
+    private float socialBenefits;//monthly amount
     private String password;
     protected boolean finishWorking; //is fired 
     private boolean isLoggedIn;
     private Set<Training> trainings = new HashSet<>(); // Set to store unique trainings
-    private LocationDL branch;
 
     // for hiring a new employee
     public Employee(int id, String name, LocationDL branch, String bankAccount, int salary, LocalDate startDate,
-            int vacationDays, int sickDays, double educationFund, double socialBenefits,
+            int vacationDays, int sickDays, float educationFund, float socialBenefits,
             String password) {
         this.id = id;
         this.name = name;
@@ -42,7 +42,7 @@ public class Employee {
 
     //for loading an existing employee
     public Employee(int id, String name, LocationDL branch, String bankAccount, int salary, LocalDate startDate,
-            int vacationDays, int sickDays, double educationFund, double socialBenefits,
+            int vacationDays, int sickDays, float educationFund, float socialBenefits,
             String password, boolean finishWorking) {
         this(id, name, branch, bankAccount, salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, password);
         this.finishWorking = finishWorking;
@@ -155,19 +155,19 @@ public class Employee {
         this.sickDays = sickDays;
     }
 
-    public double getEducationFund() {
+    public float getEducationFund() {
         return educationFund;
     }
 
-    public void setEducationFund(double educationFund) {
+    public void setEducationFund(float educationFund) {
         this.educationFund = educationFund;
     }
 
-    public double getSocialBenefits() {
+    public float getSocialBenefits() {
         return socialBenefits;
     }
 
-    public void setSocialBenefits(double socialBenefits) {
+    public void setSocialBenefits(float socialBenefits) {
         this.socialBenefits = socialBenefits;
     }
 

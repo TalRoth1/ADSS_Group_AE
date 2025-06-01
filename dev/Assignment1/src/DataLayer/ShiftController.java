@@ -4,162 +4,119 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 
+import DTO.EmployeeDTO;
+import DTO.ShiftDTO;
+import DataLayer.DAOs.ShiftAssignedDAO;
 import DataLayer.DAOs.ShiftDAO;
+import DataLayer.DAOs.ShiftPreferredDAO;
+import DataLayer.DAOs.ShiftReqRolesDAO;
 
 public class ShiftController {
+
     private DBConnection dbConnection = new DBConnection();
-    private Connection connection;
+    private DBConnection dbConnection2 = new DBConnection();
+    private DBConnection dbConnection3 = new DBConnection();
+    private DBConnection dbConnection4 = new DBConnection();
+    private ShiftAssignedDAO shiftAssignedDAO;
     private ShiftDAO shiftDAO;
+    private ShiftPreferredDAO shiftPreferredDAO;
+    private ShiftReqRolesDAO shiftReqRolesDAO;
 
     public ShiftController() {
-        String DB_URL = "Shift.db";
-        DBConnection.connect(DB_URL);
-        this.connection = DBConnection.getConnection();
-        this.shiftDAO = new ShiftDAO(connection);
+        this.dbConnection.connect("shift_assigned.db");
+        this.dbConnection2.connect("shifts.db");
+        this.dbConnection3.connect("preferred_shifts.db");
+        this.dbConnection4.connect("shift_req_roles.db");
     }
 
-    public void addShift(String date, String shiftType, int locationId, int startTime, int endTime, int shiftManagerId) {
+    public void addShiftAssigned(EmployeeDTO employeeDTO, ShiftDTO shiftDTO, String role) {
         try {
-            shiftDAO.addShift(date, shiftType, locationId, startTime, endTime, shiftManagerId);
+            shiftAssignedDAO.addAssignedShift(shiftDTO.getId(), employeeDTO.getId(), role);
+        } catch (Exception e) {
+            System.out.println("Error adding shift assigned: " + e.getMessage());
+        }
+    }
+
+    public void addShift(ShiftDTO shiftDTO) {
+        try {
+            shiftDAO.addShift(shiftDTO.getId(), shiftDTO.getDate().toString(), shiftDTO.getShiftType(), shiftDTO.getBranch().getId(),
+                    shiftDTO.getStartTime(), shiftDTO.getEndTime(), shiftDTO.getShiftManagerId());
         } catch (Exception e) {
             System.out.println("Error adding shift: " + e.getMessage());
         }
     }
 
-    public void deleteShift(String date, String shiftType, int locationId) {
+    public void addPreferredShift(EmployeeDTO employeeDTO, ShiftDTO shiftDTO, String role) {
         try {
+            shiftPreferredDAO.addPreferredShift(shiftDTO.getId(), employeeDTO.getId(), role);
+        } catch (Exception e) {
+            System.out.println("Error adding preferred shift: " + e.getMessage());
+        }
+    }
+
+    public void addShiftReqRoles(ShiftDTO shiftDTO, String role, int amount) {
+        try {
+            shiftReqRolesDAO.addRequiredRole(shiftDTO.getId(), role, amount);
+        } catch (Exception e) {
+            System.out.println("Error adding shift required roles: " + e.getMessage());
+        }
+    }
+
+    public void updateShiftAssigned(EmployeeDTO employeeDTO, ShiftDTO shiftDTO, String role) {
+        try {
+            shiftAssignedDAO.addAssignedShift(shiftDTO.getId(), employeeDTO.getId(), role);
+        } catch (Exception e) {
+            System.out.println("Error updating shift assigned: " + e.getMessage());
+        }
+    }
+
+    public void updateShift(ShiftDTO shiftDTO) {
+        try {
+            shiftDAO.updateShift(shiftDTO.getId(), shiftDTO.getDate().toString(), shiftDTO.getShiftType(),
+                    shiftDTO.getBranch().getId(), shiftDTO.getStartTime(), shiftDTO.getEndTime(),
+                    shiftDTO.getShiftManagerId());
+        } catch (Exception e) {
+            System.out.println("Error updating shift: " + e.getMessage());
+        }
+    }
+
+    public void deleteShiftAssigned(EmployeeDTO employeeDTO, ShiftDTO shiftDTO) {
+        try {
+            int shiftId = shiftDTO.getId();
+            int employeeId = employeeDTO.getId();
+            shiftAssignedDAO.removeAssignedShift(shiftId, employeeId);
+        } catch (Exception e) {
+            System.out.println("Error deleting shift assigned: " + e.getMessage());
+        }
+    }
+
+    public void deleteShift(ShiftDTO shiftDTO) {
+        try {
+            String date = shiftDTO.getDate().toString();
+            String shiftType = shiftDTO.getShiftType();
+            int locationId = shiftDTO.getBranch().getId();
             shiftDAO.deleteShift(date, shiftType, locationId);
         } catch (Exception e) {
             System.out.println("Error deleting shift: " + e.getMessage());
         }
     }
 
-    public int getStartTime(String date, String shiftType, int locationId) {
+    public void deletePreferredShift(EmployeeDTO employeeDTO, ShiftDTO shiftDTO) {
         try {
-            ResultSet resultSet = shiftDAO.getStartTime(date, shiftType, locationId);
-            if (resultSet.next())
-                return resultSet.getInt("startTime");
-            return -1;
+            int shiftId = shiftDTO.getId();
+            int employeeId = employeeDTO.getId();
+            shiftPreferredDAO.removePreferredShift(shiftId, employeeId);
         } catch (Exception e) {
-            System.out.println("Error getting start time: " + e.getMessage());
-            return -1;
+            System.out.println("Error deleting preferred shift: " + e.getMessage());
         }
     }
 
-    public int getEndTime(String date, String shiftType, int locationId) {
+    public void deleteShiftReqRoles(ShiftDTO shiftDTO, String role) {
         try {
-            ResultSet resultSet = shiftDAO.getEndTime(date, shiftType, locationId);
-            if (resultSet.next())
-                return resultSet.getInt("endTime");
-            return -1;
+            int shiftId = shiftDTO.getId();
+            shiftReqRolesDAO.removeRequiredRole(shiftId, role);
         } catch (Exception e) {
-            System.out.println("Error getting end time: " + e.getMessage());
-            return -1;
-        }
-    }
-
-    public int getShiftManagerId(String date, String shiftType, int locationId) {
-        try {
-            ResultSet resultSet = shiftDAO.getShiftManagerId(date, shiftType, locationId);
-            if (resultSet.next())
-                return resultSet.getInt("shiftManagerId");
-            return -1;
-        } catch (Exception e) {
-            System.out.println("Error getting shift manager ID: " + e.getMessage());
-            return -1;
-        }
-    }
-
-    public void setStartTime(String date, String shiftType, int startTime, int locationId) {
-        try {
-            shiftDAO.setStartTime(date, shiftType, startTime, locationId);
-        } catch (Exception e) {
-            System.out.println("Error setting start time: " + e.getMessage());
-        }
-    }
-
-    public void setEndTime(String date, String shiftType, int endTime, int locationId) {
-        try {
-            shiftDAO.setEndTime(date, shiftType, endTime, locationId);
-        } catch (Exception e) {
-            System.out.println("Error setting end time: " + e.getMessage());
-        }
-    }
-
-    public void setShiftManagerId(String date, String shiftType, int shiftManagerId, int locationId) {
-        try {
-            shiftDAO.setShiftManagerId(date, shiftType, shiftManagerId, locationId);
-        } catch (Exception e) {
-            System.out.println("Error setting shift manager ID: " + e.getMessage());
-        }
-    }
-
-    public void setNumOfRequiredcashiers(int numOfRequiredcashiers, String date, String shiftType, int locationId) {
-        try {
-            shiftDAO.setNumOfRequiredcashiers(numOfRequiredcashiers, date, shiftType, locationId);
-        } catch (Exception e) {
-            System.out.println("Error setting number of required cashiers: " + e.getMessage());
-        }
-    }
-
-    public void setNumOfRequireddrivers(int numOfRequireddrivers, String date, String shiftType, int locationId) {
-        try {
-            shiftDAO.setNumOfRequireddrivers(numOfRequireddrivers, date, shiftType, locationId);
-        } catch (Exception e) {
-            System.out.println("Error setting number of required drivers: " + e.getMessage());
-        }
-    }
-
-    public void setNumOfRequiredstoreKeepers(int numOfRequiredstoreKeepers, String date, String shiftType, int locationId) {
-        try {
-            shiftDAO.setNumOfRequiredstoreKeepers(numOfRequiredstoreKeepers, date, shiftType, locationId);
-        } catch (Exception e) {
-            System.out.println("Error setting number of required store keepers: " + e.getMessage());
-        }
-    }
-
-    public int getNumOfRequiredcashiers(String date, String shiftType, int locationId) {
-        try {
-            ResultSet resultSet = shiftDAO.getNumOfRequiredcashiers(date, shiftType, locationId);
-            if (resultSet.next())
-                return resultSet.getInt("numOfRequiredcashiers");
-            return -1;
-        } catch (Exception e) {
-            System.out.println("Error getting number of required cashiers: " + e.getMessage());
-            return -1;
-        }
-    }
-
-    public int getNumOfRequireddrivers(String date, String shiftType, int locationId) {
-        try {
-            ResultSet resultSet = shiftDAO.getNumOfRequireddrivers(date, shiftType, locationId);
-            if (resultSet.next()) {
-                return resultSet.getInt("numOfRequireddrivers");
-            }
-            return -1;
-        } catch (Exception e) {
-            System.out.println("Error getting number of required drivers: " + e.getMessage());
-            return -1;
-        }
-    }
-
-    public int getNumOfRequiredstoreKeepers(String date, String shiftType, int locationId) {
-        try {
-            ResultSet resultSet = shiftDAO.getNumOfRequiredstoreKeepers(date, shiftType, locationId);
-            if (resultSet.next())
-                return resultSet.getInt("numOfRequiredstoreKeepers");
-            return -1;
-        } catch (Exception e) {
-            System.out.println("Error getting number of required store keepers: " + e.getMessage());
-            return -1;
-        }
-    }
-
-    public void changeShiftManager(int oldId, int newId, String date, String shiftType, int locationId) {
-        try {
-            shiftDAO.changeShiftManager(oldId, newId, date, shiftType, locationId);
-        } catch (Exception e) {
-            System.out.println("Error changing shift manager: " + e.getMessage());
+            System.out.println("Error deleting shift required roles: " + e.getMessage());
         }
     }
 

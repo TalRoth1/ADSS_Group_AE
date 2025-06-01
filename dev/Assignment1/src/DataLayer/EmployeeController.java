@@ -16,50 +16,38 @@ import DomainLayer.Role;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import DomainLayer.Employee;
 
 public class EmployeeController {
 
     private DBConnection dbConnection = new DBConnection();
     private DBConnection dbConnection2 = new DBConnection();
-    private DBConnection dbConnection3 = new DBConnection();
-    private DBConnection dbConnection4 = new DBConnection();
-    private Connection connection;
     private EmployeeDAO employeeDAO;
-    private EmployeeRoleController employeeRoleController;
+    private EmployeeRoleDAO employeeRoleDAO;
     private LocationController locationController;
-    // לקונטרולר המתאים DAO אולי להחליף כל  
-    private ShiftAssignedDAO employeeShiftDAO;
-    private ShiftPreferredDAO preferredShiftDAO;
-    private ShiftDAO shiftDAO;
+    private ShiftController shiftController;
 
-    //לוודא שהשמות האלה תואמים
-    public EmployeeController(EmployeeRoleController employeeRoleController, LocationController locationController) {
-        DBConnection.connect("employees.db");  
-        this.connection = DBConnection.getConnection();
-        this.dbConnection2.connect("employee_shifts.db");
-        this.dbConnection3.connect("preferred_shifts.db");
-        this.dbConnection4.connect("shifts.db");
-        this.employeeDAO = new EmployeeDAO(connection);
-        this.employeeRoleController = employeeRoleController;
+    public EmployeeController(LocationController locationController, ShiftController shiftController) {
+        this.dbConnection.connect("employees.db");
+        this.dbConnection2.connect("employee_role.db");
+        this.employeeDAO = new EmployeeDAO(dbConnection.getConnection());
+        this.employeeRoleDAO = new EmployeeRoleDAO(dbConnection2.getConnection());
         this.locationController = locationController;
-        this.employeeShiftDAO = new ShiftAssignedDAO(dbConnection2.getConnection());
-        this.preferredShiftDAO = new ShiftPreferredDAO(dbConnection3.getConnection());
-        this.shiftDAO = new ShiftDAO(dbConnection4.getConnection());
+        this.shiftController = shiftController;
     }
 
-    public EmployeeDAO getEmployeeDAO() {
-        return employeeDAO;
-    }
-
-    public void addEmployee(int id, String name, LocationDL b, String bankAccount, int salary, String startDate,
-            int vacationDays, int sickDays, double educationFund, double socialBenefits, String password, Role role) {
+    public void addEmployee(EmployeeDTO employee) {
         try {
-            int branchid = b.getId();
-            employeeDAO.addEmployee(id, name, branchid, bankAccount, salary, startDate, vacationDays, sickDays,
-                    educationFund, socialBenefits, password);
-            employeeRoleController.addRole(id, role);
+            employeeDAO.addEmployee(employee.getId(), employee.getName(), employee.getBranch().getId(),
+                    employee.getBankAccount(), employee.getSalary(), new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(employee.getStartDate()),
+                    employee.getVacationDays(), employee.getSickDays(), employee.getEducationFund(),
+                    employee.getSocialBenefits(), employee.getPassword());
+
+            employeeRoleDAO.addRole(employee.getId(), employee.getRoles().get(0));
         } catch (SQLException e) {
             System.out.println("Error adding employee: " + e.getMessage());
         }
@@ -67,13 +55,86 @@ public class EmployeeController {
 
     public void removeEmployee(int id) {
         try {
-            employeeRoleController.removeAllRoles(id);
-            employeeShiftDAO.removeAllEmployeeShifts(id);
-            preferredShiftDAO.removeAllPreferredShifts(id);
+            employeeRoleDAO.removeEmployeeRoles(id);
             employeeDAO.removeEmployee(id);
-            
         } catch (SQLException e) {
             System.out.println("Error removing employee: " + e.getMessage());
+        }
+    }
+
+    public void updateEmployeeByField(int employeeId, String fieldName, Object newValue) {
+        try {
+            employeeDAO.updateEmployeeByField(employeeId, fieldName, newValue);
+        } catch (SQLException e) {
+            System.out.println("Error updating " + fieldName + ": " + e.getMessage());
+        }
+    }
+
+    public void addRole(int employeeId, String role) {
+        try {
+            employeeRoleDAO.addRole(employeeId, role);
+        } catch (SQLException e) {
+            System.out.println("Error adding role: " + e.getMessage());
+        }
+    }
+
+    public void removeRole(int employeeId, String role) {
+        try {
+            employeeRoleDAO.removeRole(employeeId, role);
+        } catch (SQLException e) {
+            System.out.println("Error removing role: " + e.getMessage());
+        }
+    }
+
+    public void removeEmployeeRoles(int employeeId) {
+        try {
+            employeeRoleDAO.removeEmployeeRoles(employeeId);
+        } catch (SQLException e) {
+            System.out.println("Error removing all roles: " + e.getMessage());
+        }
+    }
+
+    public List<EmployeeRoleDTO> getAllRoles() {
+        try {
+            ResultSet rs = employeeRoleDAO.getAllRoles();
+            List<EmployeeRoleDTO> roles = new ArrayList<>();
+            while (rs.next()) {
+                int employeeId = rs.getInt("employeeId");
+                String role = rs.getString("role");
+                roles.add(new EmployeeRoleDTO(employeeId, role));
+            }
+            return roles;
+        } catch (SQLException e) {
+            System.out.println("Error getting all roles: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public List<String> getRoles(int employeeId) {
+        try {
+            ResultSet rs = employeeRoleDAO.getRolesForEmployee(employeeId);
+            List<String> roles = new ArrayList<>();
+            while (rs.next()) {
+                roles.add(rs.getString("role"));
+            }
+            return roles;
+        } catch (SQLException e) {
+            System.out.println("Error getting roles: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public List<String> getRolesForEmployee(int employeeId) {
+        try {
+            ResultSet rs = employeeRoleDAO.getRolesForEmployee(employeeId);
+            List<String> roles = new ArrayList<>();
+            while (rs.next()) {
+                roles.add(rs.getString("role"));
+            }
+            return roles;
+        } catch (SQLException e) {
+            System.out.println("Error getting roles for employee: " + e.getMessage());
+            return null;
         }
     }
 
@@ -99,70 +160,6 @@ public class EmployeeController {
         }
     }
 
-    public void updateBranch(int employeeId, String newBranch) {
-        try {
-            employeeDAO.updateBranch(employeeId, newBranch);
-        } catch (SQLException e) {
-            System.out.println("Error updating branch: " + e.getMessage());
-        }
-    }
-
-    public void updateSalary(int employeeId, int newSalary) {
-        try {
-            employeeDAO.updateSalary(employeeId, newSalary);
-        } catch (SQLException e) {
-            System.out.println("Error updating salary: " + e.getMessage());
-        }
-    }
-
-    public void updateBankAccount(int employeeId, String newBankAccount) {
-        try {
-            employeeDAO.updateBankAccount(employeeId, newBankAccount);
-        } catch (SQLException e) {
-            System.out.println("Error updating bank account: " + e.getMessage());
-        }
-    }
-
-    public void updateVacationDays(int employeeId, int newVacationDays) {
-        try {
-            employeeDAO.updateVacationDays(employeeId, newVacationDays);
-        } catch (SQLException e) {
-            System.out.println("Error updating vacation days: " + e.getMessage());
-        }
-    }
-
-    public void updateSickDays(int employeeId, int newSickDays) {
-        try {
-            employeeDAO.updateSickDays(employeeId, newSickDays);
-        } catch (SQLException e) {
-            System.out.println("Error updating sick days: " + e.getMessage());
-        }
-    }
-
-    public void updateEducationFund(int employeeId, double newEducationFund) {
-        try {
-            employeeDAO.updateEducationFund(employeeId, newEducationFund);
-        } catch (SQLException e) {
-            System.out.println("Error updating education fund: " + e.getMessage());
-        }
-    }
-
-    public void updateSocialBenefits(int employeeId, double newSocialBenefits) {
-        try {
-            employeeDAO.updateSocialBenefits(employeeId, newSocialBenefits);
-        } catch (SQLException e) {
-            System.out.println("Error updating social benefits: " + e.getMessage());
-        }
-    }
-
-    public void updatePassword(int employeeId, String newPassword) {
-        try {
-            employeeDAO.updatePassword(employeeId, newPassword);
-        } catch (SQLException e) {
-            System.out.println("Error updating password: " + e.getMessage());
-        }
-    }
-
     public List<EmployeeDTO> getAllEmployees() {
         try {
             ResultSet rst = employeeDAO.getAllEmployees();
@@ -177,31 +174,11 @@ public class EmployeeController {
         }
     }
 
-    public List<EmployeeRoleDTO> getAllEmployeeRoles() {
-        return employeeRoleController.getAllRoles();
-    }
-
     public void checkEmployee(int employeeId) {
         try {
             employeeDAO.checkEmployee(employeeId);
         } catch (SQLException e) {
             System.out.println("Error checking employee: " + e.getMessage());
-        }
-    }
-
-    public void login(int employeeId, String password) {
-        try {
-            employeeDAO.setloginEmployee(employeeId, true);
-        } catch (SQLException e) {
-            System.out.println("Error logging in: " + e.getMessage());
-        }
-    }
-
-    public void logout(int employeeId) {
-        try {
-            employeeDAO.setloginEmployee(employeeId, false);
-        } catch (SQLException e) {
-            System.out.println("Error logging out: " + e.getMessage());
         }
     }
 
@@ -224,16 +201,25 @@ public class EmployeeController {
         String startDate = rst.getString("startDate");
         int vacationDays = rst.getInt("vacationDays");
         int sickDays = rst.getInt("sickDays");
-        double educationFund = rst.getDouble("educationFund");
-        double socialBenefits = rst.getDouble("socialBenefits");
+        float educationFund = rst.getFloat("educationFund");
+        float socialBenefits = rst.getFloat("socialBenefits");
         String password = rst.getString("password");
         Boolean isFinishedWorking = rst.getBoolean("isFinishedWorking");
 
-        List<String> roles = new ArrayList<>();
-        roles = employeeRoleController.getRolesForEmployee(id);
+        //change for list of strings
+        ResultSet roles = employeeRoleDAO.getRolesForEmployee(id);
+        List<EmployeeRoleDTO> rolesList = new ArrayList<>();
+        while (roles.next()) {
+            String roleName = roles.getString("roleName");
+            int roleId = roles.getInt("roleId");
+            String role = roleName;
+            EmployeeRoleDTO roleDTO = new EmployeeRoleDTO(roleId, role);
+            rolesList.add(roleDTO);
+        }
 
+        //change so we will use the shiftcontroller to get the shifts
         ResultSet assignedResult = employeeShiftDAO.getEmployeeShifts(id);
-        List<EmployeeShiftDTO> assignedshifts = new ArrayList<>();
+        List<ShiftAssignedDTO> assignedshifts = new ArrayList<>();
         while (assignedResult.next()) {
             String date = assignedResult.getDate("date").toString();
             String shiftType = assignedResult.getString("shiftType");
@@ -243,7 +229,7 @@ public class EmployeeController {
         }
 
         ResultSet prefResult = preferredShiftDAO.getPreferredShifts(id);
-        List<PreferredShiftDTO> prefShifts = new ArrayList<>();
+        List<ShiftPreferredDTO> prefShifts = new ArrayList<>();
         while (prefResult.next()) {
             String date = prefResult.getDate("date").toString();
             String shiftType = prefResult.getString("shiftType");

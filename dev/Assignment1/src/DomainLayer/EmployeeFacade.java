@@ -9,6 +9,7 @@ import DataLayer.DAOs.EmployeeRoleDAO;
 import DataLayer.DAOs.ShiftAssignedDAO;
 import DataLayer.Mappers.DriverMapper;
 import DataLayer.Mappers.EmployeeMapper;
+import DataLayer.Mappers.LocationMapper;
 
 import java.sql.Connection;
 import java.time.DayOfWeek;
@@ -20,78 +21,42 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import DTO.LocationDTO;
+
 public class EmployeeFacade { // employee related methods
 
     private EmployeeManager employeeManager;
     private Map<Integer, ShiftEmployee> shiftEmployees;
     private List<LocationDL> branches;
     private Connection connection;
-    private EmployeeDAO empDAO;
     private EmployeeController empController;
-    private EmployeeRoleDAO empRoleDAO;
-    private EmployeeRoleController empRoleController;
-    private ShiftAssignedDAO empShiftDAO;
-    private EmployeeController empShiftController;
-    private DriverDAO driverDAO;
+    // private EmployeeRoleController empRoleController;
     private DriverController driverController;
+    private LocationController locationController;
+    private ShiftController shiftController;
 
-    // initalize employees
-    /*
-     * EmployeeManager keren = new EmployeeManager(100, "Keren", "1", "111222",
-     * 7000,
-     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100, "123");
-     * ShiftEmployee Liat = new ShiftEmployee(101, "Liat", "1", "111222", 7000,
-     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
-     * "password", Role.SHIFT_MANAGER);
-     * ShiftEmployee Erez = new ShiftEmployee(102, "Erez", "1", "111222", 7000,
-     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
-     * "password", Role.CASHIER);
-     * ShiftEmployee Elad = new ShiftEmployee(103, "Elad", "1", "111222", 7000,
-     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
-     * "password", Role.DRIVER);
-     * ShiftEmployee Eylon = new ShiftEmployee(104, "Eylon", "1", "111222", 7000,
-     * LocalDate.of(2025, 4, 10), 20, 5, 100,
-     * 100, "password", Role.DRIVER);
-     * ShiftEmployee Tal = new ShiftEmployee(105, "Tal", "1", "111222", 7000,
-     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
-     * "password", Role.CASHIER);
-     * ShiftEmployee Ofir = new ShiftEmployee(106, "Ofir", "1", "111222", 7000,
-     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
-     * "password", Role.STORE_KEEPER);
-     * ShiftEmployee Kiril = new ShiftEmployee(107, "Kiril", "1", "111222", 7000,
-     * LocalDate.of(2025, 4, 10), 20, 5, 100,
-     * 100, "password", Role.STORE_KEEPER);
-     * ShiftEmployee Ofri = new ShiftEmployee(108, "Ofri", "1", "111222", 7000,
-     * LocalDate.of(2025, 4, 10), 20, 5, 100, 100,
-     * "password", Role.SHIFT_MANAGER);
-     * 
-     * public EmployeeFacade() {
-     * this.employeeManagers = new HashMap<>();
-     * this.shiftEmployees = new HashMap<>();
-     * this.branches = Collections.emptyList(); // Initialize branches as empty list
-     * 
-     * // Add the employee manager
-     * employeeManagers.put(keren.getId(), keren);
-     * // Add shift employees
-     * shiftEmployees.put(Liat.getId(), Liat);
-     * shiftEmployees.put(Erez.getId(), Erez);
-     * shiftEmployees.put(Elad.getId(), Elad);
-     * shiftEmployees.put(Eylon.getId(), Eylon);
-     * shiftEmployees.put(Tal.getId(), Tal);
-     * shiftEmployees.put(Ofir.getId(), Ofir);
-     * shiftEmployees.put(Kiril.getId(), Kiril);
-     * shiftEmployees.put(Ofri.getId(), Ofri);
-     * 
-     * keren.addEmployee(Liat);
-     * keren.addEmployee(Erez);
-     * keren.addEmployee(Elad);
-     * keren.addEmployee(Eylon);
-     * keren.addEmployee(Tal);
-     * keren.addEmployee(Ofir);
-     * keren.addEmployee(Kiril);
-     * keren.addEmployee(Ofri);
-     * }
-     */
+    public EmployeeFacade() {
+        this.shiftEmployees = new HashMap<>();
+        this.branches = Collections.emptyList(); // Initialize branches as empty list
+
+        this.driverController = new DriverController(empController);
+        this.locationController = new LocationController();
+        this.empController = new EmployeeController(locationController, shiftController);
+        try {
+            DBConnection.connect("Employees.db");
+            this.connection = DBConnection.getConnection();
+            EmployeeDAO employeeDAO = new EmployeeDAO(connection);
+            ShiftAssignedDAO shiftAssignedDAO = new ShiftAssignedDAO(connection);
+            DriverDAO driverDAO = new DriverDAO(connection);
+            EmployeeMapper employeeMapper = new EmployeeMapper();
+            DriverMapper driverMapper = new DriverMapper();
+            empController.setEmployeeMapper(employeeMapper);
+            driverController.setDriverMapper(driverMapper);
+        } catch (Exception e) {
+            System.out.println("Error initializing EmployeeFacade: " + e.getMessage());
+        }
+    }
+
     public Employee login(int id, String password) throws Exception {
         Employee e = getEmployee(id);
         if (e == null) {
@@ -114,34 +79,6 @@ public class EmployeeFacade { // employee related methods
         empController.logout(id);
         e.logout();
         System.out.println("Employee with ID " + id + " has logged out.");
-    }
-
-    public void loadData() {
-        try {
-            connection = DBConnection.getConnection();
-            empDAO = new EmployeeDAO(connection);
-            empController = new EmployeeController();
-            empRoleDAO = new EmployeeRoleDAO(connection);
-            empRoleController = new EmployeeRoleController();
-            empShiftDAO = new ShiftAssignedDAO(connection);
-            empShiftController = new EmployeeController();
-
-            // branches = empController.getBranches(); // Load branches from the database
-            if (branches == null) {
-                branches = Collections.emptyList();
-            }
-
-            // Load employees from the database
-            List<EmployeeDTO> employeeDTOs = empController.getAllEmployees();
-            shiftEmployees = new HashMap<>();
-            for (EmployeeDTO dto : employeeDTOs) {
-                EmployeeMapper employeeMapper = new EmployeeMapper();
-                ShiftEmployee shiftEmployee = employeeMapper.toDomain(dto);
-                shiftEmployees.put(shiftEmployee.getId(), shiftEmployee);
-            }
-        } catch (Exception e) {
-            System.out.println("Error loading data: " + e.getMessage());
-        }
     }
 
     // employee manager methods
@@ -848,8 +785,7 @@ public class EmployeeFacade { // employee related methods
         return branches;
     }
 
-    public DriverController getDriverController()
-    {
+    public DriverController getDriverController() {
         return driverController;
     }
 
@@ -864,7 +800,7 @@ public class EmployeeFacade { // employee related methods
         return drivers;
     }
 
-    public void addBranch(LocationDL branch){
+    public void addBranch(LocationDL branch) {
         if (branches == null) {
             branches = new ArrayList<>();
         }
@@ -873,6 +809,78 @@ public class EmployeeFacade { // employee related methods
             employeeManager.addBranch(branch);
         } else {
             System.out.println("Branch already exists.");
+        }
+    }
+
+    public void MakePredefinedData() {
+        ClearDataBase();
+        LocationDL branch1 = new LocationDL(1, "Main St", 1, "CityA", "123456789", "Spiderman", "1");
+        LocationDL branch2 = new LocationDL(2, "Second St", 2, "CityB", "987654321", "Peter Griffin", "2");
+        addBranch(branch1);
+        addBranch(branch2);
+
+        // Add predefined employees
+        try {
+            hireEmployee(1, 1, branch1, "Alice", "123456789", 5000, LocalDate.now(), 20, 10, 1000.0, 500.0, "password123", Role.STORE_KEEPER);
+            hireEmployee(2, 1, branch2, "Bob", "987654321", 6000, LocalDate.now(), 15, 5, 1200.0, 600.0, "password456", Role.CASHIER);
+            hireEmployee(3, 1, branch1, "David", "555555555", 5500, LocalDate.now(), 18, 8, 1100.0, 550.0, "password789", Role.CASHIER);
+            hireEmployee(4, 1, branch2, "Eve", "444444444", 6500, LocalDate.now(), 22, 12, 1300.0, 650.0, "password101", Role.STORE_KEEPER);
+            hireEmployee(5, 1, branch1, "Frank", "333333333", 7000, LocalDate.now(), 25, 10, 1500.0, 700.0, "password102", Role.SHIFT_MANAGER);
+            hireEmployee(6, 1, branch2, "Grace", "222222222", 8000, LocalDate.now(), 30, 15, 1600.0, 800.0, "password103", Role.SHIFT_MANAGER);
+
+            hireDriver(7, 1, branch1, "Charlie", "555555555", 7000, LocalDate.now(), 25, 10, 1500.0, 700.0, "password789", new ArrayList<>(List.of("B", "C")));
+            hireDriver(8, 1, branch2, "Hannah", "666666666", 7500, LocalDate.now(), 20, 5, 1400.0, 600.0, "password104", new ArrayList<>(List.of("A", "B")));
+
+        } catch (Exception e) {
+            System.out.println("Error adding predefined data: " + e.getMessage());
+        }
+    }
+
+    public void ClearDataBase() {
+        // empController.rese
+        // driverController.clearDrivers();
+        shiftEmployees.clear();
+        branches.clear();
+        employeeManager = null;
+    }
+
+    public void loadData() {
+        try {
+            // Load branches (locations)
+            List<LocationDTO> locationDTOs = locationController.getAllLocations();
+            List<LocationDL> loadedBranches = new ArrayList<>();
+            for (LocationDTO locationDTO : locationDTOs) {
+                LocationDL location = LocationMapper.toDomain(locationDTO);
+                loadedBranches.add(location);
+            }
+            this.branches = loadedBranches;
+
+            // Load employees
+            List<EmployeeDTO> employeeDTOs = empController.getAllEmployees();
+            shiftEmployees.clear();
+            for (EmployeeDTO employeeDTO : employeeDTOs) {
+                ShiftEmployee employee = EmployeeMapper.toDomain(employeeDTO, branches, employeeDTO.getShifts(), employeeDTO.getPrefShifts());
+                shiftEmployees.put(employee.getId(), employee);
+            }
+
+            // Load drivers
+            List<DriverDTO> driverDTOs = driverController.getAllDrivers();
+            for (DriverDTO driverDTO : driverDTOs) {
+                DriverDL driver = DriverMapper.toDL(driverDTO);
+                shiftEmployees.put(driver.getId(), driver);
+            }
+
+            for (Employee employee : shiftEmployees.values()) {
+                if (employee instanceof EmployeeManager) {
+                    this.employeeManager = (EmployeeManager) employee;
+                    break; //there's only one manager
+                }
+            }
+
+            System.out.println("Employee data loaded from database.");
+        } catch (Exception e) {
+            System.out.println("Error loading employee data: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

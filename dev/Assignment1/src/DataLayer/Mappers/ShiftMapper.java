@@ -1,85 +1,61 @@
 package DataLayer.Mappers;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import DTO.LocationDTO;
 import DTO.ShiftDTO;
+import DomainLayer.LocationDL;
+import DomainLayer.Role;
 import DomainLayer.Shift;
-
-import java.time.LocalDate;
+import DomainLayer.ShiftType;
 
 public class ShiftMapper {
-
-
-
-    /* private String date;
-    private String shiftType;
-    private int branchid;
-    private int startTime;
-    private int endTime;
-    private int shiftManagerId;
-    private int numOfRequiredcashiers;
-    private int numOfRequireddrivers;
-    private int numOfRequiredstoreKeepers;
-    private int numOfRequiredshipmentManagers;
-    private boolean isShipmentShift;
-    private List<Integer> employees;
-
-    public ShiftDTO(String date, String shiftType, int startTime, int endTime, int shiftManagerId,
-            int numOfRequiredcashiers, int numOfRequireddrivers, int numOfRequiredstoreKeepers,
-            int numOfRequiredshipmentManagers, boolean isShipmentShift, int branchid) {
-        this.branchid = branchid;
-        this.date = date;
-        this.shiftType = shiftType;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.shiftManagerId = shiftManagerId;
-        this.numOfRequiredcashiers = numOfRequiredcashiers;
-        this.numOfRequireddrivers = numOfRequireddrivers;
-        this.numOfRequiredstoreKeepers = numOfRequiredstoreKeepers;
-        this.numOfRequiredshipmentManagers = numOfRequiredshipmentManagers;
-        this.isShipmentShift = isShipmentShift;
-    }*/
 
     public static ShiftDTO toDTO(Shift shift) {
         if (shift == null) {
             return null;
         }
-        LocationDTO branchDTO = LocationMapper.toDTO(shift.getBranch()); 
+        LocationDTO branchDTO = LocationMapper.toDTO(shift.getBranch());
         return new ShiftDTO(
-                shift.getDate(),
-                shift.getShiftType(),
+                shift.getId(),
+                Date.from(shift.getDate().atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                shift.getShiftType().name(),
                 shift.getStartTime(),
                 shift.getEndTime(),
                 shift.getShiftManagerId(),
-                shift.getNumOfRequiredcashiers(),
-                shift.getNumOfRequireddrivers(),
-                shift.getNumOfRequiredstoreKeepers(),
-                shift.getNumOfRequiredshipmentManagers(),
                 shift.isShipmentShift(),
-               branchDTO);
+                branchDTO,
+                new HashMap<>(shift.getRequiredRoles())
+        );
     }
-    // String date, String shiftType, int startTime, int endTime, int
-    // shiftManagerId,
-    // int numOfRequiredcashiers, int numOfRequireddrivers, int
-    // numOfRequiredstoreKeepers,
-    // int numOfRequiredshipmentManagers, boolean isShipmentShift, int branchid)
 
     public static Shift toDomain(ShiftDTO dto) {
+        //ShiftReqRolesDTO requiredRoles = dto.; // This should be set separately if needed
         if (dto == null) {
             return null;
         }
+        LocationDL branch = LocationMapper.toDomain(dto.getBranch());
+        ShiftType shiftType = ShiftType.valueOf(dto.getShiftType());
+        Map<Role, Integer> requiredRoles = dto.getRequiredRoles();
+
         return new Shift(
-                LocalDate.parse(dto.getDate()),
-                dto.getShiftType(),
+                dto.getId(),
+                LocalDate.from(dto.getDate().toInstant().atZone(ZoneId.systemDefault())),
+                shiftType,
                 dto.getStartTime(),
                 dto.getEndTime(),
                 dto.getShiftManagerId(),
-                dto.getNumOfRequiredcashiers(),
-                dto.getNumOfRequireddrivers(),
-                dto.getNumOfRequiredstoreKeepers(),
-                dto.getNumOfRequiredshipmentManagers(),
+                requiredRoles,
+                new HashMap<>(),
+                new HashMap<>(),
                 dto.isShipmentShift(),
-                LocationMapper.toDomain(dto.getBranch()));
+                branch
+        );
 
-        //LocalDate date, ShiftType shiftType, int shiftManagerId, LocationDL branch)
     }
+
 }

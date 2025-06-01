@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import DataLayer.DAOs.EmployeeRoleDAO;
 
 public class EmployeeRoleController {
+
     private DBConnection dbConnection = new DBConnection();
     private Connection connection;
     private EmployeeRoleDAO employeeRoleDAO;

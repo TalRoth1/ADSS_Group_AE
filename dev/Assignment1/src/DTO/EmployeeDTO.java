@@ -1,6 +1,6 @@
 package DTO;
 
-
+import java.util.Date;
 import java.util.List;
 
 public class EmployeeDTO {
@@ -10,21 +10,21 @@ public class EmployeeDTO {
     private LocationDTO branch;
     private String bankAccount;
     private int salary;
-    private String startDate;
+    private Date startDate;
     private int vacationDays;
     private int sickDays;
-    private double educationFund;
-    private double socialBenefits;
+    private float educationFund;
+    private float socialBenefits;
     private String password;
     private boolean isFinishedWorking;
     private boolean isLoggedIn;
     private List<String> roles;
-    private List<EmployeeShiftDTO> shifts;
-    private List<PreferredShiftDTO> prefShifts;
+    private List<ShiftDTO> shifts;
+    private List<ShiftDTO> prefShifts;
 
-    public EmployeeDTO(int id, String name, LocationDTO branch, String bankAccount, int salary, String startDate,
-            int vacationDays, int sickDays, double educationFund, double socialBenefits,
-            String password, boolean isFinishedWorking, List<String> roles, List<EmployeeShiftDTO> shifts, List<PreferredShiftDTO> prefShifts) {
+    public EmployeeDTO(int id, String name, LocationDTO branch, String bankAccount, int salary, Date startDate,
+            int vacationDays, int sickDays, float educationFund, float socialBenefits,
+            String password, boolean isFinishedWorking, List<String> roles, List<ShiftDTO> shifts, List<ShiftDTO> prefShifts) {
         this.id = id;
         this.name = name;
         this.branch = branch;
@@ -63,7 +63,7 @@ public class EmployeeDTO {
         return salary;
     }
 
-    public String getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
@@ -75,11 +75,11 @@ public class EmployeeDTO {
         return sickDays;
     }
 
-    public double getEducationFund() {
+    public float getEducationFund() {
         return educationFund;
     }
 
-    public double getSocialBenefits() {
+    public float getSocialBenefits() {
         return socialBenefits;
     }
 
@@ -105,6 +105,18 @@ public class EmployeeDTO {
 
     public void setRoles(List<String> roles) {
         this.roles = roles;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public List<ShiftDTO> getShifts() {
+        return shifts;
+    }
+
+    public List<ShiftDTO> getPrefShifts() {
+        return prefShifts;
     }
 
 }

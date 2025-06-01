@@ -18,7 +18,7 @@ public class EmployeeManager extends Employee {
     private static final LocationDL EMPTY_LOCATION = new LocationDL(0, "Empty", 0, "Empty", "Empty", "Empty", "Empty");
 
     public EmployeeManager(int id, String name, String bankAccount, int salary, LocalDate startDate,
-            int vacationDays, int sickDays, double educationFund, double socialBenefits,
+            int vacationDays, int sickDays, float educationFund, float socialBenefits,
             String password) {
         super(id, name, EMPTY_LOCATION, bankAccount, salary, startDate, vacationDays, sickDays, educationFund,
                 socialBenefits,
@@ -32,6 +32,25 @@ public class EmployeeManager extends Employee {
     }
 
     // methods
+    public int shiftIdCounter() {
+        int maxId = 0;
+        for (Map<LocalDate, Shift> shifts : morningShifts.values()) {
+            for (Shift shift : shifts.values()) {
+                if (shift.getId() > maxId) {
+                    maxId = shift.getId();
+                }
+            }
+        }
+        for (Map<LocalDate, Shift> shifts : eveningShifts.values()) {
+            for (Shift shift : shifts.values()) {
+                if (shift.getId() > maxId) {
+                    maxId = shift.getId();
+                }
+            }
+        }
+        return maxId + 1; // Return the next available ID
+    }
+
     public void addBranch(LocationDL branch) {
         if (branch == null) {
             throw new IllegalArgumentException("Branch cannot be null");
@@ -94,7 +113,8 @@ public class EmployeeManager extends Employee {
 
     public void addDefaultShift(LocalDate sentDate, ShiftType shiftType, int driverId, LocationDL location) {
         try {
-            Shift shift = new Shift(sentDate, shiftType, 0, location);
+            int shiftid = shiftIdCounter();
+            Shift shift = new Shift(shiftid, sentDate, shiftType, 0, location);
             shift.setShipmentShift(true);
             shift.addEmployee(driverId, Role.DRIVER);
             for (ShiftEmployee employee : allEmployees.values()) {
@@ -173,7 +193,7 @@ public class EmployeeManager extends Employee {
         employee.setSickDays(sickDays);
     }
 
-    public void updateEducationFund(int employeeId, double educationFund) throws Exception {
+    public void updateEducationFund(int employeeId, float educationFund) throws Exception {
         if (!checkEmployee(employeeId)) {
             throw new Exception(employeeId + " not exist");
         }
@@ -184,7 +204,7 @@ public class EmployeeManager extends Employee {
         employee.setEducationFund(educationFund);
     }
 
-    public void updateSocialBenefits(int employeeId, double socialBenefits) throws Exception {
+    public void updateSocialBenefits(int employeeId, float socialBenefits) throws Exception {
         if (!checkEmployee(employeeId)) {
             throw new Exception(employeeId + " not exist");
         }
@@ -219,7 +239,7 @@ public class EmployeeManager extends Employee {
 
     public ShiftEmployee hireEmployee(int employeeId, String employeeName, LocationDL branch, String bankAccount,
             int salary,
-            LocalDate startDate, int vacationDays, int sickDays, double educationFund, double socialBenefits,
+            LocalDate startDate, int vacationDays, int sickDays, float educationFund, float socialBenefits,
             String employeePassword, Role role) {
         if (!branches.contains(branch)) {
             throw new IllegalArgumentException("Branch does not exist in the system");
@@ -231,8 +251,8 @@ public class EmployeeManager extends Employee {
     }
 
     public DriverDL hireDriver(int employeeId, String employeeName, LocationDL branch, String bankAccount,
-            int salary, LocalDate startDate, int vacationDays, int sickDays, double educationFund,
-            double socialBenefits, String employeePassword, ArrayList<String> licenceType) {
+            int salary, LocalDate startDate, int vacationDays, int sickDays, float educationFund,
+            float socialBenefits, String employeePassword, ArrayList<String> licenceType) {
         if (!branches.contains(branch)) {
             throw new IllegalArgumentException("Branch does not exist in the system");
         }
@@ -404,7 +424,7 @@ public class EmployeeManager extends Employee {
         } else if (shiftType == ShiftType.EVENING && eveningShifts.containsKey(date)) {
             throw new Exception("evening shift already exists for this date");
         }
-        Shift shift = new Shift(date, shiftType, -1, null); // -1 for shift manager id, false for shipment shift
+        Shift shift = new Shift(shiftIdCounter(), date, shiftType, 0, location);
         if (shiftType == ShiftType.MORNING) {
             Map<LocalDate, Shift> dateShiftMap = new HashMap<>();
             dateShiftMap.put(date, shift);
@@ -416,7 +436,7 @@ public class EmployeeManager extends Employee {
         }
     }
 
-    public void createShift(LocationDL location, LocalDate date, ShiftType shiftType, int shiftManagerId)
+    public void createShift(int id, LocationDL location, LocalDate date, ShiftType shiftType, int shiftManagerId)
             throws Exception { // create a new shift, defining the date, type and shift manager
         if (date == null || shiftType == null) {
             throw new Exception("invalid date or shift type");
@@ -434,7 +454,7 @@ public class EmployeeManager extends Employee {
         if (shiftType == ShiftType.EVENING && eveningShifts.containsKey(date)) {
             throw new Exception("evening shift already exists for this date");
         }
-        Shift shift = new Shift(date, shiftType, shiftManagerId, location);
+        Shift shift = new Shift(id, date, shiftType, shiftManagerId, location); // -1 for shift manager id, false for shipment shift
         if (shiftType == ShiftType.MORNING) {
             Map<LocalDate, Shift> dateShiftMap = new HashMap<>();
             dateShiftMap.put(date, shift);
@@ -674,7 +694,8 @@ public class EmployeeManager extends Employee {
         // Only track missing shifts if the date is after the end of next week
         if (sentDate.isAfter(endOfNextWeek)) {
             // Create a placeholder Shift object for the missing shift
-            Shift missing = new Shift(sentDate, shiftType, -1, location);
+            int shiftId = shiftIdCounter();
+            Shift missing = new Shift(shiftId, sentDate, shiftType, -1, location);
             missingShift
                     .computeIfAbsent(location, loc -> new HashMap<>())
                     .put(sentDate, missing);

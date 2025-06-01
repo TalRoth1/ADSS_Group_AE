@@ -1,9 +1,10 @@
 package DataLayer.DAOs;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import DTO.PreferredShiftDTO;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class ShiftPreferredDAO {
 
@@ -14,34 +15,33 @@ public class ShiftPreferredDAO {
         try {
             initializeTable();
         } catch (SQLException e) {
-            System.out.println("Error initializing prefrredAssignedDAO: " + e.getMessage());
+            System.out.println("Error initializing ShiftPreferredDAO: " + e.getMessage());
         }
     }
 
-    //למחוק את כל הפעולות ולרשום אותן מחדש בהתאם לשדות האלו של הטבלה
     private void initializeTable() throws SQLException {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS preferred_shifts (" +
-                "shiftId INT NOT NULL, " +
-                "employeeId INT NOT NULL, " +
-                "role TEXT NOT NULL, " +
-                "PRIMARY KEY (employeeId, shiftId) " +
-                "FOREIGN KEY (employeeId) REFERENCES employees(id)" +
-                "FOREIGN KEY (shiftId) REFERENCES shifts(id)" +
-                ")";
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS preferred_shifts ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "employeeId INT NOT NULL, "
+                + "role TEXT NOT NULL, "
+                + "PRIMARY KEY (shiftId, employeeId), "
+                + "FOREIGN KEY (employeeId) REFERENCES employees(id), "
+                + "FOREIGN KEY (shiftId) REFERENCES shifts(id)"
+                + ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
-            System.out.println("Error creating shifts table: " + e.getMessage());
+            System.out.println("Error creating preferred_shifts table: " + e.getMessage());
             throw e;
         }
     }
 
-    public void addPreferredShift(int employeeId, String shiftDate, String shiftType) throws SQLException {
-        String sql = "INSERT INTO preferred_shifts (employeeId, shiftDate, shiftType) VALUES (?, ?, ?)";
+    public void addPreferredShift(int shiftId, int employeeId, String role) throws SQLException {
+        String sql = "INSERT INTO preferred_shifts (shiftId, employeeId, role) VALUES (?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            pstmt.setString(2, shiftDate);
-            pstmt.setString(3, shiftType);
+            pstmt.setInt(1, shiftId);
+            pstmt.setInt(2, employeeId);
+            pstmt.setString(3, role);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding preferred shift: " + e.getMessage());
@@ -49,12 +49,11 @@ public class ShiftPreferredDAO {
         }
     }
 
-    public void removePreferredShift(int employeeId, String shiftDate, String shiftType) throws SQLException {
-        String sql = "DELETE FROM preferred_shifts WHERE employeeId=? AND shiftDate=? AND shiftType=?";
+    public void removePreferredShift(int shiftId, int employeeId) throws SQLException {
+        String sql = "DELETE FROM preferred_shifts WHERE shiftId=? AND employeeId=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            pstmt.setString(2, shiftDate);
-            pstmt.setString(3, shiftType);
+            pstmt.setInt(1, shiftId);
+            pstmt.setInt(2, employeeId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error removing preferred shift: " + e.getMessage());
@@ -62,40 +61,60 @@ public class ShiftPreferredDAO {
         }
     }
 
-    public void removeAllPreferredShifts(int employeeId) throws SQLException {
-        String sql = "DELETE FROM preferred_shifts WHERE employeeId=?";
+    public void updatePreferredShiftRole(int shiftId, int employeeId, String newRole) throws SQLException {
+        String sql = "UPDATE preferred_shifts SET role=? WHERE shiftId=? AND employeeId=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
+            pstmt.setString(1, newRole);
+            pstmt.setInt(2, shiftId);
+            pstmt.setInt(3, employeeId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error removing all preferred shifts: " + e.getMessage());
+            System.out.println("Error updating preferred shift role: " + e.getMessage());
             throw e;
         }
     }
 
-    // view all preferred shifts for an employee
-    public ResultSet getPreferredShifts(int employeeId) throws SQLException {
+    public ResultSet getPreferredShift(int shiftId, int employeeId) throws SQLException {
+        String sql = "SELECT * FROM preferred_shifts WHERE shiftId=? AND employeeId=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, shiftId);
+            pstmt.setInt(2, employeeId);
+            return pstmt.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error retrieving preferred shift: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public ResultSet getPreferredShiftsForEmployee(int employeeId) throws SQLException {
         String sql = "SELECT * FROM preferred_shifts WHERE employeeId=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, employeeId);
             return pstmt.executeQuery();
         } catch (SQLException e) {
-            System.out.println("Error retrieving preferred shifts: " + e.getMessage());
+            System.out.println("Error retrieving preferred shifts for employee: " + e.getMessage());
             throw e;
         }
     }
 
-    // view all employees that chose this preferred shift
-    public ResultSet getPrefShiftEmployees(String shiftDate, String shiftType) throws SQLException {
-        String sql = "SELECT * FROM preferred_shifts WHERE shiftDate=? AND shiftType=?";
+    public ResultSet getPreferredShiftsForShift(int shiftId) throws SQLException {
+        String sql = "SELECT * FROM preferred_shifts WHERE shiftId=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, shiftDate);
-            pstmt.setString(2, shiftType);
+            pstmt.setInt(1, shiftId);
             return pstmt.executeQuery();
         } catch (SQLException e) {
-            System.out.println("Error retrieving preferred shift employees: " + e.getMessage());
+            System.out.println("Error retrieving preferred shifts for shift: " + e.getMessage());
             throw e;
         }
     }
 
+    public void clearTable() throws SQLException {
+        String sql = "DELETE FROM preferred_shifts";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            System.out.println("Error clearing preferred_shifts table: " + e.getMessage());
+            throw e;
+        }
+    }
 }

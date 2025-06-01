@@ -1,5 +1,5 @@
 package DataLayer.Mappers;
-import DTO.LocationDTO;
+
 import DTO.ShipmentDTO;
 import DomainLayer.DriverDL;
 import DomainLayer.ShipmentDL;
@@ -8,6 +8,7 @@ import DomainLayer.TruckDL;
 
 public class ShipmentMapper {
 
+    //add status to the ShipmentDL
     public static ShipmentDL toDL(ShipmentDTO dto) {
         TruckDL truckDL = TruckMapper.toDomain(dto.getTruck());
         DriverDL driverDL = DriverMapper.toDL(dto.getDriver()); //need to fix this, should get the branch from the dto
@@ -40,5 +41,5 @@ public class ShipmentMapper {
                 dl.getShiftType()
         );
     }
-    
+
 }

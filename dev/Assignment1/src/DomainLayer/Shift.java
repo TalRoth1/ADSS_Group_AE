@@ -6,6 +6,7 @@ import java.util.Map;
 
 public class Shift {
 
+    private int id; // Unique identifier for the shift
     private LocalDate date;
     private ShiftType shiftType;
     private int startTime; // 24-hour format: e.g. 9:00 AM = 900, 10:30 PM = 2230
@@ -21,7 +22,8 @@ public class Shift {
     private boolean isShipmentShift = false; // Indicates if the shift includes a shipment
     private LocationDL branch;
 
-    public Shift(LocalDate date, ShiftType shiftType, int shiftManagerId, LocationDL branch) {
+    public Shift(int id, LocalDate date, ShiftType shiftType, int shiftManagerId, LocationDL branch) {
+        this.id = id;
         this.date = date;
         this.shiftType = shiftType;
         if (shiftType == ShiftType.MORNING) {
@@ -42,7 +44,8 @@ public class Shift {
 
     }
 
-    public Shift(LocalDate date, ShiftType shiftType, int startTime, int endTime, int shiftManagerId, Map<Role, Integer> requiredRoles,Map<Integer, Role> assignedEmployeesID,Map<Integer, Role> availableEmployeesID,boolean isShipmentShift ,LocationDL branch) {
+    public Shift(int id, LocalDate date, ShiftType shiftType, int startTime, int endTime, int shiftManagerId, Map<Role, Integer> requiredRoles, Map<Integer, Role> assignedEmployeesID, Map<Integer, Role> availableEmployeesID, boolean isShipmentShift, LocationDL branch) {
+        this.id = id;
         this.date = date;
         this.shiftType = shiftType;
         this.startTime = startTime;
@@ -89,6 +92,10 @@ public class Shift {
     // Getters and Setters
     public Map<Integer, Role> getAssignedEmployeesID() {
         return assignedEmployeesID;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public LocalDate getDate() {
@@ -235,20 +242,8 @@ public class Shift {
         return date.hashCode() + shiftType.hashCode();
     }
 
-    public int getNumOfRequiredcashiers() {
-        return requiredRoles.get(Role.CASHIER);
-    }
-
-    public int getNumOfRequireddrivers() {
-        return requiredRoles.get(Role.DRIVER);
-    }
-
-    public int getNumOfRequiredstorekeepers() {
-        return requiredRoles.get(Role.STORE_KEEPER);
-    }
-
-    public int getNumOfRequiredshipmentManagers() {
-        return requiredRoles.get(Role.SHIPMENT_MANAGER);
+    public Map<Role, Integer> getRequiredRoles() {
+        return requiredRoles;
     }
 
 }

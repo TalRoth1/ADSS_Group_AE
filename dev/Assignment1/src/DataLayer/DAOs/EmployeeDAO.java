@@ -1,10 +1,19 @@
 package DataLayer.DAOs;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import DataLayer.DBConnection;
+import DomainLayer.LocationDL;
 
 public class EmployeeDAO {
 
     private Connection connection;
+    private Connection connectionLocation = DBConnection.getConnection();
+    private LocationDAO locationDAO = new LocationDAO(connectionLocation);
 
     public EmployeeDAO(Connection connection) {
         this.connection = connection;
@@ -15,8 +24,6 @@ public class EmployeeDAO {
         }
     }
 
-    //לקחת פונקציית עזר מאילון המרה בין סטרינג לבין דייט זה יהיה בקונטרולר
-    //להוסיף את כל הבוליאנים לכל הפונקציות פה
     private void initializeTable() throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS employees ("
                 + "id INT PRIMARY KEY, "
@@ -41,22 +48,25 @@ public class EmployeeDAO {
         }
     }
 
-    public void addEmployee(int id, String name, int branchid, String bankAccount, int salary, String startDate,
+    public void addEmployee(int id, String name, LocationDL branch, String bankAccount, int salary, String startDate,
             int vacationDays, int sickDays, double educationFund, double socialBenefits,
             String password) throws SQLException {
-        String sql = "INSERT INTO employees (id, name, branch, bankAccount, salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO employees (id, name, bankAccount, salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, password, isFired, isLoggedIn, locationId), VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.setString(2, name);
-            pstmt.setInt(3, branchid);
-            pstmt.setString(4, bankAccount);
-            pstmt.setInt(5, salary);
-            pstmt.setString(6, startDate);
-            pstmt.setInt(7, vacationDays);
-            pstmt.setInt(8, sickDays);
-            pstmt.setDouble(9, educationFund);
-            pstmt.setDouble(10, socialBenefits);
-            pstmt.setString(11, password);
+            pstmt.setString(3, bankAccount);
+            pstmt.setInt(4, salary);
+            pstmt.setString(5, startDate);
+            pstmt.setInt(6, vacationDays);
+            pstmt.setInt(7, sickDays);
+            pstmt.setDouble(8, educationFund);
+            pstmt.setDouble(9, socialBenefits);
+            pstmt.setString(10, password);
+            pstmt.setBoolean(11, false); // isFired
+            pstmt.setBoolean(12, false); // isLoggedIn
+            int locationId = locationDAO.getLocationId(branch.getStreet(), branch.getStreetNumber(), branch.getCity());
+            pstmt.setInt(13, locationId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding employee: " + e.getMessage());
@@ -97,98 +107,14 @@ public class EmployeeDAO {
         return rs;
     }
 
-    public void updateBranch(int employeeId, String newBranch) throws SQLException {
-        String sql = "UPDATE employees SET branch=? WHERE id=?";
+    public void updateEmployeeByField(int employeeId, String fieldName, Object newValue) throws SQLException {
+        String sql = "UPDATE employees SET " + fieldName + "=? WHERE id=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, newBranch);
+            pstmt.setObject(1, newValue);
             pstmt.setInt(2, employeeId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error updating employee branch: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    public void updateSalary(int employeeId, int newSalary) throws SQLException {
-        String sql = "UPDATE employees SET salary=? WHERE id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, newSalary);
-            pstmt.setInt(2, employeeId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error updating employee salary: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    public void updateBankAccount(int employeeId, String newBankAccount) throws SQLException {
-        String sql = "UPDATE employees SET bankAccount=? WHERE id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, newBankAccount);
-            pstmt.setInt(2, employeeId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error updating employee bank account: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    public void updateVacationDays(int employeeId, int newVacationDays) throws SQLException {
-        String sql = "UPDATE employees SET vacationDays=? WHERE id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, newVacationDays);
-            pstmt.setInt(2, employeeId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error updating employee vacation days: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    public void updateSickDays(int employeeId, int newSickDays) throws SQLException {
-        String sql = "UPDATE employees SET sickDays=? WHERE id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, newSickDays);
-            pstmt.setInt(2, employeeId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error updating employee sick days: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    public void updateEducationFund(int employeeId, double newEducationFund) throws SQLException {
-        String sql = "UPDATE employees SET educationFund=? WHERE id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setDouble(1, newEducationFund);
-            pstmt.setInt(2, employeeId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error updating employee education fund: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    public void updateSocialBenefits(int employeeId, double newSocialBenefits) throws SQLException {
-        String sql = "UPDATE employees SET socialBenefits=? WHERE id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setDouble(1, newSocialBenefits);
-            pstmt.setInt(2, employeeId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error updating employee social benefits: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    public void updatePassword(int employeeId, String newPassword) throws SQLException {
-        String sql = "UPDATE employees SET password=? WHERE id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, newPassword);
-            pstmt.setInt(2, employeeId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error updating employee password: " + e.getMessage());
+            System.out.println("Error updating employee field: " + e.getMessage());
             throw e;
         }
     }
@@ -217,18 +143,6 @@ public class EmployeeDAO {
         }
     }
 
-    public void setloginEmployee(int employeeId, boolean isLoggedIn) throws SQLException {
-        String sql = "UPDATE employees SET isLoggedIn=? WHERE id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setBoolean(1, isLoggedIn);
-            pstmt.setInt(2, employeeId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error setting employee login status: " + e.getMessage());
-            throw e;
-        }
-    }
-
     public ResultSet getAllEmployeesInBranch(int branchid) throws SQLException {
         String sql = "SELECT name FROM employees WHERE branch=? AND isFinishedWorking=FALSE";
         try (Statement stmt = connection.createStatement()) {
@@ -239,18 +153,26 @@ public class EmployeeDAO {
         }
     }
 
-    public ResultSet getEmployeeBranchId(int employeeId) throws SQLException {
-        String sql = "SELECT branch FROM employees WHERE id=?";
+    public ResultSet getEmployeeField(int employeeId, String fieldName) throws SQLException {
+        String sql = "SELECT " + fieldName + " FROM employees WHERE id=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, employeeId);
             ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs;
-            } else {
+            if (!rs.next()) {
                 throw new SQLException("Employee with ID " + employeeId + " does not exist.");
             }
+            return rs;
         } catch (SQLException e) {
-            System.out.println("Error retrieving employee branch ID: " + e.getMessage());
+            System.out.println("Error retrieving employee field: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public void clearTable() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate("DELETE FROM employees");
+        } catch (SQLException e) {
+            System.out.println("Error clearing employees table: " + e.getMessage());
             throw e;
         }
     }

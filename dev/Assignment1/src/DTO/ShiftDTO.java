@@ -1,40 +1,39 @@
 package DTO;
 
 //import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import DomainLayer.Role;
 
 public class ShiftDTO {
 
-    private String date;
+    private int id;
+    private Date date;
     private String shiftType;
     private LocationDTO branch;
     private int startTime;
     private int endTime;
     private int shiftManagerId;
-    private int numOfRequiredcashiers;
-    private int numOfRequireddrivers;
-    private int numOfRequiredstoreKeepers;
-    private int numOfRequiredshipmentManagers;
     private boolean isShipmentShift;
-    private List<Integer> employees;
+    private List<Integer> employees; //לשאול אלעד נראלי לא צריך
+    private final Map<Role, Integer> requiredRoles = null; // List of roles required for the shift
 
-    public ShiftDTO(String date, String shiftType, int startTime, int endTime, int shiftManagerId,
-            int numOfRequiredcashiers, int numOfRequireddrivers, int numOfRequiredstoreKeepers,
-            int numOfRequiredshipmentManagers, boolean isShipmentShift, LocationDTO branch) {
+    public ShiftDTO(int id, Date date, String shiftType, int startTime, int endTime, int shiftManagerId,
+            boolean isShipmentShift, LocationDTO branch, Map<Role, Integer> requiredRoles) {
+        this.id = id;
         this.branch = branch;
         this.date = date;
         this.shiftType = shiftType;
         this.startTime = startTime;
         this.endTime = endTime;
         this.shiftManagerId = shiftManagerId;
-        this.numOfRequiredcashiers = numOfRequiredcashiers;
-        this.numOfRequireddrivers = numOfRequireddrivers;
-        this.numOfRequiredstoreKeepers = numOfRequiredstoreKeepers;
-        this.numOfRequiredshipmentManagers = numOfRequiredshipmentManagers;
         this.isShipmentShift = isShipmentShift;
+        this.requiredRoles.putAll(requiredRoles);
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
@@ -54,7 +53,7 @@ public class ShiftDTO {
         return shiftManagerId;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
@@ -74,38 +73,6 @@ public class ShiftDTO {
         this.shiftManagerId = shiftManagerId;
     }
 
-    public int getNumOfRequiredcashiers() {
-        return numOfRequiredcashiers;
-    }
-
-    public int getNumOfRequireddrivers() {
-        return numOfRequireddrivers;
-    }
-
-    public int getNumOfRequiredstoreKeepers() {
-        return numOfRequiredstoreKeepers;
-    }
-
-    public int getNumOfRequiredshipmentManagers() {
-        return numOfRequiredshipmentManagers;
-    }
-
-    public void setNumOfRequiredcashiers(int numOfRequiredcashiers) {
-        this.numOfRequiredcashiers = numOfRequiredcashiers;
-    }
-
-    public void setNumOfRequireddrivers(int numOfRequireddrivers) {
-        this.numOfRequireddrivers = numOfRequireddrivers;
-    }
-
-    public void setNumOfRequiredstoreKeepers(int numOfRequiredstoreKeepers) {
-        this.numOfRequiredstoreKeepers = numOfRequiredstoreKeepers;
-    }
-
-    public void setNumOfRequiredshipmentManagers(int numOfRequiredshipmentManagers) {
-        this.numOfRequiredshipmentManagers = numOfRequiredshipmentManagers;
-    }
-
     public boolean isShipmentShift() {
         return isShipmentShift;
     }
@@ -113,8 +80,17 @@ public class ShiftDTO {
     public void setBranch(LocationDTO branch) {
         this.branch = branch;
     }
+
     public LocationDTO getBranch() {
         return branch;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public Map<Role, Integer> getRequiredRoles() {
+        return requiredRoles;
     }
 
 }

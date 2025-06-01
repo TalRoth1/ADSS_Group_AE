@@ -1,8 +1,13 @@
 package DataLayer.DAOs;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class LocationDAO {
+
     private Connection connection;
 
     public LocationDAO(Connection connection) {
@@ -15,15 +20,15 @@ public class LocationDAO {
     }
 
     public void initializeTable() throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS locations (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "street TEXT NOT NULL, " +
-                "street_number INTEGER NOT NULL, " +
-                "city TEXT NOT NULL, " +
-                "contact_number TEXT NOT NULL, " +
-                "contact_name TEXT NOT NULL, " +
-                "zone TEXT NOT NULL" +
-                ")";
+        String sql = "CREATE TABLE IF NOT EXISTS locations ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "street TEXT NOT NULL, "
+                + "street_number INTEGER NOT NULL, "
+                + "city TEXT NOT NULL, "
+                + "contact_number TEXT NOT NULL, "
+                + "contact_name TEXT NOT NULL, "
+                + "zone TEXT NOT NULL"
+                + ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
         } catch (SQLException e) {
@@ -137,6 +142,16 @@ public class LocationDAO {
         } catch (SQLException e) {
             System.out.println("Error retrieving location: " + e.getMessage());
             throw e;
+        }
+    }
+
+    public Integer getLocationId(String street, int streetNumber, String city) throws SQLException {
+        try (ResultSet rs = getLocation(street, streetNumber, city)) {
+            if (rs.next()) {
+                return rs.getInt("id");
+            } else {
+                return null;
+            }
         }
     }
 

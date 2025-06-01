@@ -1,7 +1,10 @@
 package DataLayer.DAOs;
 
-import DomainLayer.Role;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,11 +36,11 @@ public class EmployeeRoleDAO {
         }
     }
 
-    public void addRole(int employeeId, Role role) throws SQLException {
+    public void addRole(int employeeId, String role) throws SQLException {
         String sql = "INSERT INTO employee_role (employeeId, role) VALUES (?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, employeeId);
-            pstmt.setString(2, role.name());
+            pstmt.setString(2, role);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding role: " + e.getMessage());
@@ -45,25 +48,14 @@ public class EmployeeRoleDAO {
         }
     }
 
-    public void removeRole(int employeeId, Role role) throws SQLException {
+    public void removeRole(int employeeId, String role) throws SQLException {
         String sql = "DELETE FROM employee_role WHERE employeeId=? AND role=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, employeeId);
-            pstmt.setString(2, role.name());
+            pstmt.setString(2, role);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error removing role: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    public void removeAllRoles(int employeeId) throws SQLException {
-        String sql = "DELETE FROM employee_role WHERE employeeId=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error removing all roles: " + e.getMessage());
             throw e;
         }
     }
@@ -95,18 +87,38 @@ public class EmployeeRoleDAO {
 
     }
 
-    public void updateRole(int employeeId, Role oldRole, Role newRole) throws SQLException {
+    public void updateRole(int employeeId, String oldRole, String newRole) throws SQLException {
         String sql = "UPDATE employee_role SET role=? WHERE employeeId=? AND role=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, newRole.name());
+            pstmt.setString(1, newRole);
             pstmt.setInt(2, employeeId);
-            pstmt.setString(3, oldRole.name());
+            pstmt.setString(3, oldRole);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error updating role: " + e.getMessage());
             throw e;
         }
 
+    }
+
+    public void removeEmployeeRoles(int employeeId) throws SQLException {
+        String sql = "DELETE FROM employee_role WHERE employeeId=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, employeeId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error removing all roles for employee: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public void clearTable() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate("DELETE FROM employee_role");
+        } catch (SQLException e) {
+            System.out.println("Error clearing employee_role table: " + e.getMessage());
+            throw e;
+        }
     }
 
 }

@@ -1,6 +1,5 @@
 package PresentationLayer;
 
-import DomainLayer.*;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +13,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import DomainLayer.Employee;
+import DomainLayer.EmployeeFacade;
+import DomainLayer.EmployeeManager;
+import DomainLayer.LocationDL;
+import DomainLayer.Role;
+import DomainLayer.Shift;
+import DomainLayer.ShiftEmployee;
+import DomainLayer.ShiftType;
+
 public class EmployeeCLI {
 
     public static Scanner scanner = new Scanner(System.in);
@@ -23,13 +31,13 @@ public class EmployeeCLI {
     private LocalDate nowDate;
 
     private static final Integer[] MORNING_SHIFT_START_TIMES = {
-            600, 630, 700, 730, 800, 830, 900, 930, 1000 };
+        600, 630, 700, 730, 800, 830, 900, 930, 1000};
     private static final Integer[] MORNING_SHIFT_END_TIMES = {
-            1300, 1330, 1400 };
+        1300, 1330, 1400};
     private static final Integer[] EVENING_SHIFT_START_TIMES = {
-            1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800, 1830, 1900, 1930, 2000, 2030, 2100 };
+        1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800, 1830, 1900, 1930, 2000, 2030, 2100};
     private static final Integer[] EVENING_SHIFT_END_TIMES = {
-            2100, 2130, 2200 };
+        2100, 2130, 2200};
     List<LocationDL> branches = employeeFacade.getBranches();
 
     public EmployeeCLI(EmployeeFacade employeeFacade) {
@@ -62,15 +70,6 @@ public class EmployeeCLI {
                 System.out.println("Please try again.");
                 loginCLI();
             }
-        }
-    }
-
-    public void loadData() {
-        try {
-            employeeFacade.loadData();
-            System.out.println("Employee data loaded successfully.");
-        } catch (Exception e) {
-            System.out.println("Failed to load employee data: " + e.getMessage());
         }
     }
 
@@ -129,67 +128,72 @@ public class EmployeeCLI {
             System.out.println("Error retrieving Employee Manager: " + e.getMessage());
         }
 
-        String[] actions = { "Create Shifts", "Set Shifts", "Add Employee to Exist Shift",
-                "Remove Employee From Exist Shift",
-                "Fire Employee", "Hire Employee", "Change Employee's Role",
-                "Add Role to Employee", "Change Shift Manager", "Replace Employee",
-                "Delete Employee's Role", "Change Employee's Data", "Show Shift Information",
-                "Show Past Shifts", "Show Employee's shifts", "Change Shift Hours", "Logout" };
+        String[] actions = {"Create Shifts", "Set Shifts", "Add Employee to Exist Shift",
+            "Remove Employee From Exist Shift",
+            "Fire Employee", "Hire Employee", "Change Employee's Role",
+            "Add Role to Employee", "Change Shift Manager", "Replace Employee",
+            "Delete Employee's Role", "Change Employee's Data", "Show Shift Information",
+            "Show Past Shifts", "Show Employee's shifts", "Change Shift Hours", "Logout"};
         String option = selectFromList("Select Employee Manager Action (Enter the number)", actions);
         switch (option) {
-            case "Create Shifts" ->
+            case "Create Shifts":
                 autoCreateShifts();
-            case "Set Shifts" ->
+                break;
+            case "Set Shifts":
                 setShifts();
-            case "Add Employee to Exist Shift" ->
+                break;
+            case "Add Employee to Exist Shift":
                 addEmployeeToExistingShift();
-            case "Remove Employee From Exist Shift" ->
+                break;
+            case "Remove Employee From Exist Shift":
                 removeEmployeeFromShift();
-            case "Fire Employee" ->
+                break;
+            case "Fire Employee":
                 fireEmployee();
-            case "Hire Employee" ->
+                break;
+            case "Hire Employee":
                 hireEmployee();
-            case "Change Employee's Role" ->
+                break;
+            case "Change Employee's Role":
                 changeRoleToEmployee();
-            case "Add Role to Employee" ->
+                break;
+            case "Add Role to Employee":
                 addRoleToEmployee();
-            case "Change Shift Manager" ->
+                break;
+            case "Change Shift Manager":
                 changeShiftManager();
-            case "Replace Employee" ->
+                break;
+            case "Replace Employee":
                 replaceEmployee();
-            case "Delete Employee's Role" ->
+                break;
+            case "Delete Employee's Role":
                 deleteRoleFromEmployee();
-            case "Change Employee's Data" ->
+                break;
+            case "Change Employee's Data":
                 changeEmployeeData();
-            case "Show Shift Information" ->
+                break;
+            case "Show Shift Information":
                 getShiftInfo("employeeManager");
-            case "Show Past Shifts" ->
+                break;
+            case "Show Past Shifts":
                 getPastShifts();
-            // case "Show Employee's preferences" -> getPrefEmployee("employee manager");
-            case "Show Employee's shifts" ->
+                break;
+            case "Show Employee's shifts":
                 getEmployeeShiftsAsEmployeeManager();
-            case "Change Shift Hours" ->
+                break;
+            case "Change Shift Hours":
                 setTimes();
-            case "Logout" ->
+                break;
+            case "Logout":
                 logout(userId);
-            default -> {
+                break;
+            default:
                 System.out.println("This is not a valid Employee Manager action");
                 employeeManager();
-            }
+                break;
         }
     }
 
-    // we will implement this probably in the next assignment
-    // private void addEmployeeManager() {
-    // System.out.println("Enter the details of the new Employee Manager");
-    // System.out.println("ID:");
-    // int id = scanner.nextInt();
-    // System.out.println("username:");
-    // username = String.valueOf(scanner.nextInt());
-    // System.out.println("Please enter your password:");
-    // password = scanner.nextLine();
-    // //fill in the rest of the fields of Employee
-    // }
     private void autoCreateShifts() {
         try {
             System.out.println("Please select a branch from the following list:");
@@ -407,24 +411,34 @@ public class EmployeeCLI {
     }
 
     private void changeEmployeeData() {
-        String[] labels = { "Salary", "Bank Account", "Vacation Days", "Sick Days", "Education Fund",
-                "Social Benefits" };
+        String[] labels = {"Salary", "Bank Account", "Vacation Days", "Sick Days", "Education Fund",
+            "Social Benefits"};
         String option = selectFromList("Select Employee Data to change:", labels);
         switch (option) {
-            case "Salary" ->
+            case "salary":
                 updateSalary();
-            case "Bank Account" ->
+                break;
+            case "Bank Account":
                 updateBankAccount();
-            case "Vacation Days" ->
+                break;
+            case "Vacation Days":
                 updateVacationDays();
-            case "Sick Days" ->
+                break;
+            case "Sick Days":
                 updateSickDays();
-            case "Education Fund" ->
+                break;
+            case "Education Fund":
                 updateEducationFund();
-            case "Social Benefits" ->
+                break;
+            case "Social Benefits":
                 updateSocialBenefits();
-            // case "Password" -> updatePassword();
+                break;
+            default:
+                System.out.println("Invalid option selected. Please try again.");
+                employeeManager();
+                break;
         }
+
     }
 
     private void getPastShifts() {
@@ -556,31 +570,37 @@ public class EmployeeCLI {
     // EmployeeManager();
     // }
     private void shiftManager() {
-        String[] actions = { "Add Preferred Shift", "Remove Preferred Shift",
-                "Show Employee's shifts", "Show Shift Information", "Show my Preferences",
-                "Show my Assigned Shifts", "Logout" };
+        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift",
+            "Show Employee's shifts", "Show Shift Information", "Show my Preferences",
+            "Show my Assigned Shifts", "Logout"};
         String option = selectFromList("Select Shift Manager Action:", actions);
 
         switch (option) {
-            case "Add Preferred Shift" ->
+            case "Add Preferred Shift":
                 addPreferredShift("shiftManager");
-            case "Remove Preferred Shift" ->
+                break;
+            case "Remove Preferred Shift":
                 removePreferredShift("shiftManager");
-            // case "Show Employee's preferences" -> getPrefEmployee("shiftManager");
-            case "Show Employee's shifts" ->
+                break;
+            case "Show Employee's shifts":
                 getEmployeeShiftsAsShiftManager();
-            case "Show Shift Information" ->
+                break;
+            case "Show Shift Information":
                 getShiftInfo("shiftManager");
-            case "Show my Preferences" ->
+                break;
+            case "Show my Preferences":
                 getMyPreferences("shiftManager");
-            case "Show my Assigned Shifts" ->
+                break;
+            case "Show my Assigned Shifts":
                 getMyAssignedShifts("shiftManager");
-            case "Logout" ->
+                break;
+            case "Logout":
                 logout(userId);
-            default -> {
+                break;
+            default:
                 System.out.println("This is not a valid Shift Manager action");
                 shiftManager();
-            }
+                break;
         }
     }
 
@@ -637,27 +657,36 @@ public class EmployeeCLI {
     }
 
     private void shiftEmployee() {
-        String[] actions = { "Add Preferred Shift", "Remove Preferred Shift", "Show Shift Information",
-                "Show my Preferences", "Show my Assigned Shifts", "Logout" };
+        String[] actions = {"Add Preferred Shift", "Remove Preferred Shift", "Show Shift Information",
+            "Show my Preferences", "Show my Assigned Shifts", "Logout"};
         String option = selectFromList("Select Shift Employee Action:", actions);
 
         switch (option) {
-            case "Add Preferred Shift" ->
+            case "Add Preferred Shift":
                 addPreferredShift("shiftEmployee");
-            case "Remove Preferred Shift" ->
+                break;
+            case "Remove Preferred Shift":
                 removePreferredShift("shiftEmployee");
-            case "Show Shift Information" ->
+                break;
+            case "Show Employee's shifts":
+                getEmployeeShiftsAsShiftManager();
+                break;
+            case "Show Shift Information":
                 getShiftInfo("shiftEmployee");
-            case "Show my Preferences" ->
+                break;
+            case "Show my Preferences":
                 getMyPreferences("shiftEmployee");
-            case "Show my Assigned Shifts" ->
+                break;
+            case "Show my Assigned Shifts":
                 getMyAssignedShifts("shiftEmployee");
-            case "Logout" ->
+                break;
+            case "Logout":
                 logout(userId);
-            default -> {
+                break;
+            default:
                 System.out.println("This is not a valid Shift Employee action");
                 shiftEmployee();
-            }
+                break;
         }
     }
 
@@ -804,7 +833,7 @@ public class EmployeeCLI {
             endTime = selectFromList("Select end time (must be after start):", endTimeOptions);
         }
 
-        return new int[] { startTime, endTime };
+        return new int[]{startTime, endTime};
     }
 
     private <T> T selectFromList(String title, T[] options) {
@@ -982,6 +1011,33 @@ public class EmployeeCLI {
             return false;
         }
         return true;
+    }
+
+    public void MakePredefinedData() {
+        try {
+            employeeFacade.MakePredefinedData();
+            System.out.println("Predefined data created successfully.");
+        } catch (Exception e) {
+            System.out.println("Error creating predefined data: " + e.getMessage());
+        }
+    }
+
+    public void ClearDataBase() {
+        try {
+            employeeFacade.ClearDataBase();
+            System.out.println("Database cleared successfully.");
+        } catch (Exception e) {
+            System.out.println("Error clearing database: " + e.getMessage());
+        }
+    }
+
+    public void loadData() {
+        try {
+            employeeFacade.loadData();
+            System.out.println("Data loaded successfully.");
+        } catch (Exception e) {
+            System.out.println("Error loading data: " + e.getMessage());
+        }
     }
 
 }

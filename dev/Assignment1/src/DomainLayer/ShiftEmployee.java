@@ -15,7 +15,7 @@ public class ShiftEmployee extends Employee {
     private List<Role> roles;
 
     public ShiftEmployee(int id, String name, LocationDL branch, String bankAccount, int salary, LocalDate startDate,
-            int vacationDays, int sickDays, double educationFund, double socialBenefits,
+            int vacationDays, int sickDays, float educationFund, float socialBenefits,
             String password, Role role) {
         super(id, name, branch, bankAccount, salary, startDate, vacationDays, sickDays, educationFund,
                 socialBenefits, password);
