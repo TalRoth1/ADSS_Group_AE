@@ -48,7 +48,7 @@ public class SupplierFacade {
                     }
                     itemCatalog.put(item, catalogItem.getCatalogID());
                 }
-                ContractDL contractDL = new ContractDL(contract.getContractID(), itemCatalog, discounts, DeliveryMethod.valueOf(contract.getDeliveryMethod().toString().toUpperCase()));
+                ContractDL contractDL = new ContractDL(contract.getContractID(), itemCatalog, discounts, contract.getDeliveryMethod());
                 contractList.add(contractDL);
             }
             PaymentMethod paymentMethod = PaymentMethod.valueOf(sup.getPaymentMethod().toUpperCase());

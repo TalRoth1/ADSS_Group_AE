@@ -4,9 +4,9 @@ import java.util.List;
 
 public class PeriodicDelivery implements DeliveryMethod{
     private int deliveryInterval;
-    private List<OrderItemDL> orderItems;
+    private List<PeriodicItem> orderItems;
     
-    public PeriodicDelivery(int deliveryInterval, List<OrderItemDL> orderItems) {
+    public PeriodicDelivery(int deliveryInterval, List<PeriodicItem> orderItems) {
         this.deliveryInterval = deliveryInterval;
         this.orderItems = orderItems;
     }
@@ -16,10 +16,10 @@ public class PeriodicDelivery implements DeliveryMethod{
     public void setDeliveryInterval(int deliveryInterval) {
         this.deliveryInterval = deliveryInterval;
     }
-    public List<OrderItemDL> getOrderItems() {
+    public List<PeriodicItem> getOrderItems() {
         return orderItems;
     }
-    public void setOrderItems(List<OrderItemDL> orderItems) {
+    public void setOrderItems(List<PeriodicItem> orderItems) {
         this.orderItems = orderItems;
     }
     public String toString() {

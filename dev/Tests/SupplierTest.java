@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import Domain.ContractDL;
 import Domain.DeliveryMethod;
-import Domain.Item;
+import Domain.ProductBL;
 import Domain.SupplierDL;
 import Domain.SupplierFacade;
 import Utils.PaymentMethod;
@@ -17,15 +17,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class SupplierTest {
 
     private SupplierFacade supplierFacade;
-    private Item testItem;
+    private ProductBL testItem;
 
     @BeforeEach
     void setUp() {
         supplierFacade = new SupplierFacade();
 
         // Simulate adding items to the SupplierFacade's internal list
-        testItem = new Item(1, "TestItem", 3.50);
-        List<Item> itemList = new ArrayList<>();
+        testItem = new ProductBL(1, "TestItem", 3.50);
+        List<ProductBL> itemList = new ArrayList<>();
         itemList.add(testItem);
 
         // Use reflection or a setter if accessible to inject the item list

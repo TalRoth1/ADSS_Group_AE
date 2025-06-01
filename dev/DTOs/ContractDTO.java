@@ -5,15 +5,15 @@ import java.util.Map;
 
 import Domain.DeliveryMethod;
 import Domain.DiscountDL;
-import Domain.Item;
+import Domain.ProductBL;
 
 public class ContractDTO {
     private int contractID;
-    private Map<Item, Integer> itemCatalog;
+    private Map<ProductBL, Integer> itemCatalog;
     private List<DiscountDL> billOfQuantities;
     private DeliveryMethod deliveryMethod;
 
-    public ContractDTO(int contractID, Map<Item, Integer> itemCatalog, List<DiscountDL> billOfQuantities,
+    public ContractDTO(int contractID, Map<ProductBL, Integer> itemCatalog, List<DiscountDL> billOfQuantities,
             DeliveryMethod deliveryMethod) {
         this.contractID = contractID;
         this.itemCatalog = itemCatalog;

@@ -152,14 +152,14 @@ public class OrderFacade {
             if(periodicDelivery.getOrderItems() == null) {
                 periodicDelivery.setOrderItems(new ArrayList<>());
             }
-            List<OrderItemDL> items = new ArrayList<>();
+            List<PeriodicItem> items = new ArrayList<>();
             try{
                 for (int[] item : newItems) {
                     int itemID = item[0];
                     int quantity = item[1];
                     int catalogID = getCatalogID(itemID, supplierID, contractID);
                     double totalPrice = calculateTotalPrice(quantity, catalogID, supplierID, contractID);
-                    OrderItemDL newItem = new OrderItemDL(-1, itemID, quantity, catalogID, totalPrice, this.orderController);
+                    PeriodicItem newItem = new PeriodicItem(itemID, quantity, totalPrice);
                     items.add(newItem);
                 }
                 periodicDelivery.setOrderItems(items);
