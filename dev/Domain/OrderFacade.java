@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import DAL.OrderController;
 import DAL.OrderDAO;
@@ -49,16 +50,19 @@ public class OrderFacade {
             System.out.println("Can't create order, contract not found");
             return;
         }
-        Map<Integer,OrderItemDL> items = makeItemsFromArray(Orders);
+        Map<Integer,OrderItemDL> items = makeItemsFromArray(Orders, supplierID, contractID);
         OrderDL newOrder = new OrderDL(nextID++, supplierID, supplierID, orderDate, destination, items, this.orderController);
-        orderController.insertOrder(newOrder.getDao());
+        newOrder.getDao().persist();
+        for(OrderItemDL item : items.values()) {
+            orderController.insertOrderItem(item.getDAO());
+        }
         orders.add(newOrder);
     }
 
     public void changeOrder(int orderID, String destination, Date newDate, List<int[]> newItems) throws IllegalArgumentException {
         try{
             OrderDL order = getOrder(orderID);
-            if(order.getOrderStatus() != OrderStatus.CANCELLED) {
+            if(order.getOrderStatus() != OrderStatus.IN_PROGRESS) {
                 throw new IllegalArgumentException("Cannot change items of a " + order.getOrderStatus().toString().toLowerCase() + "order.");
             }
             if (!order.getDestination().equals(destination)) {
@@ -67,7 +71,7 @@ public class OrderFacade {
             if (!order.getOrderDate().equals(newDate)) {
                 changeOrderDate(orderID, newDate);
             }
-            Map<Integer,OrderItemDL> items = makeItemsFromArray(newItems);
+            Map<Integer,OrderItemDL> items = makeItemsFromArray(newItems, order.getSupplierID(), order.getContractID());
             if (!order.getOrderItems().equals(items)){
                 changeOrderItems(orderID, items);
             }
@@ -80,6 +84,7 @@ public class OrderFacade {
     private void changeOrderDestination(int orderID, String destination) throws IllegalArgumentException {
         try {
             OrderDL order = getOrder(orderID);
+            order.getDao().setDestination(destination);
             order.setDestination(destination);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Order not found: " + orderID);
@@ -89,7 +94,7 @@ public class OrderFacade {
     private void changeOrderDate(int orderID, Date orderDate) throws IllegalArgumentException {
         try {
             OrderDL order = getOrder(orderID);
-            orderController.updateOrder(orderID, "orderDate", orderDate.toString());
+            order.getDao().setOrderDate(orderDate);
             order.setOrderDate(orderDate);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Order not found: " + orderID);
@@ -99,6 +104,11 @@ public class OrderFacade {
     private void changeOrderItems(int orderID, Map<Integer,OrderItemDL> newItems) throws IllegalArgumentException {
         try { 
             OrderDL order = getOrder(orderID);
+            Map<Integer, OrderItemDAO> newItemsDaos = new HashMap<>();
+            for (Entry<Integer, OrderItemDL> entry : newItems.entrySet()) {
+                newItemsDaos.put(entry.getKey(), entry.getValue().getDAO());
+            }
+            orderController.updateOrderItems(orderID, newItemsDaos);
             order.setOrderItems(newItems);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Order not found: " + orderID);
@@ -134,7 +144,7 @@ public class OrderFacade {
         return orderHistory;
     }
 
-    
+    //TODO: Integrate with the periodic delivery system
     public void updateScheduledDeliveryItems(int supplierID, int contractID, List<int[]> newItems) throws IllegalArgumentException {
         SupplierDL supplier = sf.getSupplier(supplierID);
         if (supplier == null) {
@@ -192,14 +202,14 @@ public class OrderFacade {
         return sf.getContract(supplierID, contractID).getItemCatalogID(itemID);
     }
 
-    private Map<Integer,OrderItemDL> makeItemsFromArray(List<int[]> items) {
+    private Map<Integer,OrderItemDL> makeItemsFromArray(List<int[]> items, int supplierID, int contractID) {
         Map<Integer,OrderItemDL> itemMap = new HashMap<>();
         for (int[] item : items) {
             int itemID = item[0];
             int quantity = item[1];
-            int catalogID = getCatalogID(itemID, 1, 1); // Assuming supplierID and contractID are 1 for this example
-            double totalPrice = calculateTotalPrice(quantity, catalogID, 1, 1);
-            OrderItemDL orderItem = new OrderItemDL(nextID++, itemID, quantity, catalogID, totalPrice, this.orderController);
+            int catalogID = getCatalogID(itemID, supplierID, contractID);
+            double totalPrice = calculateTotalPrice(quantity, catalogID, supplierID, contractID);
+            OrderItemDL orderItem = new OrderItemDL(nextID++, itemID, quantity, catalogID, totalPrice);
             itemMap.put(itemID, orderItem);
         }
         return itemMap;

@@ -1,6 +1,5 @@
 package Domain;
 
-import DAL.OrderController;
 import DAL.OrderItemDAO;
 
 public class OrderItemDL 
@@ -11,13 +10,13 @@ public class OrderItemDL
     private double totalPrice;
     private OrderItemDAO DAO;
     
-    public OrderItemDL(int orderID, int itemID, int quantity, int catalogID, double totalPrice, OrderController orderController)
+    public OrderItemDL(int orderID, int itemID, int quantity, int catalogID, double totalPrice)
     {
         this.itemID = itemID;
         this.quantity = quantity;
         this.catalogID = catalogID;
         this.totalPrice = totalPrice;
-        this.DAO = new OrderItemDAO(orderID, itemID, quantity, catalogID, totalPrice, orderController);
+        this.DAO = new OrderItemDAO(orderID, itemID, quantity, catalogID, totalPrice);
     }
     
     public OrderItemDL(OrderItemDAO orderItemDAO)

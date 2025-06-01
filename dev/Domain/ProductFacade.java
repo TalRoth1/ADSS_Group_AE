@@ -8,7 +8,11 @@ public class ProductFacade {
     private Map<Integer, ItemBL> items;
     private int nextProductID;
     private int nextItemID;
+<<<<<<< HEAD
     private OrderFacade orderFacade;
+=======
+    private boolean demonstrationMode = false;
+>>>>>>> a1413a3c59d96d2533d55e412a186ed00a5d68c2
 
     private ProductFacade() {
         this.products = new HashMap<>();

@@ -1,4 +1,3 @@
-package DAL;
 
 import java.io.File;
 import java.sql.*;

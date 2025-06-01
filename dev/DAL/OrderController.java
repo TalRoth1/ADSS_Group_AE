@@ -3,6 +3,10 @@ package DAL;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import Domain.OrderItemDL;
+
 import java.sql.SQLException;
 
 import Utils.OrderStatus;
@@ -201,7 +205,7 @@ public class OrderController {
                             int quantity = rs.getInt("quantity");
                             int catalogID = rs.getInt("catalogID");
                             double totalPrice = rs.getDouble("totalPrice");
-                            orderItems.add(new OrderItemDAO(orderID, itemID, quantity, catalogID, totalPrice, this));
+                            orderItems.add(new OrderItemDAO(orderID, itemID, quantity, catalogID, totalPrice));
                         }
                     }
                 } catch (java.sql.SQLException e) {
@@ -216,7 +220,7 @@ public class OrderController {
         return orderItems;
     }
 
-    public void updateOrderItems(int orderID, List<OrderItemDAO> newItems) {
+    public void updateOrderItems(int orderID, Map<Integer,OrderItemDAO> newItems) {
         try (var conn = java.sql.DriverManager.getConnection(url)) {
             if (conn != null) {
                 conn.setAutoCommit(false);
@@ -225,7 +229,7 @@ public class OrderController {
                     var pstmt = conn.prepareStatement(deleteSql);
                     pstmt.setInt(1, orderID);
                     pstmt.executeUpdate();
-                    for (OrderItemDAO item : newItems) {
+                    for (OrderItemDAO item : newItems.values()) {
                         String insertSql = "INSERT INTO " + orderItemsTableName + " (orderID, itemID, quantity, catalogID, totalPrice) VALUES (?, ?, ?, ?, ?)";
                         var pstmt2 = conn.prepareStatement(insertSql);
                         pstmt2.setInt(1, item.getOrderID());
