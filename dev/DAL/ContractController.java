@@ -22,7 +22,7 @@ public class ContractController {
     private String periodic = "Periodics";
     private String periodicItem = "PeriodicItems";
     private String discount = "Discounts";
-    private String items = "Items";
+    private String items = "contractItems";
     String currentDir = System.getProperty("user.dir");
     String dbPath = currentDir + File.separator + "Data.db";
     String url = "jdbc:sqlite:" + dbPath;
@@ -161,7 +161,7 @@ public class ContractController {
         try (Connection conn = DriverManager.getConnection(url);
                 Statement stmt = conn.createStatement()) {
             String sql = """
-                    CREATE TABLE IF NOT EXISTS Items (
+                    CREATE TABLE IF NOT EXISTS contractItems (
                     contractID INTEGER NOT NULL,
                     supplierID INTEGER NOT NULL,
                     itemID INTEGER NOT NULL,

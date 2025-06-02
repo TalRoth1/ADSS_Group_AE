@@ -249,7 +249,7 @@ public class SupplierFacade {
         List<String[]> billOfQuantities = new ArrayList<>();
         billOfQuantities.add(new String[] { "1", "100", "10" });
         billOfQuantities.add(new String[] { "2", "150", "15" });
-        addContract(1, itemCat, billOfQuantities, new PeriodicDelivery(nextId, new ArrayList<>()));
+        addContract(1, itemCat, billOfQuantities, new PeriodicDelivery(2, new ArrayList<>()));
 
         addSupplier(2002, 444555666, PaymentMethod.CREDIT, "support@supplier2.com", "+1-555-2222", new ArrayList<>());
         Map<Integer, Integer> itemCat2 = new HashMap<>();
