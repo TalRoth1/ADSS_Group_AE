@@ -352,4 +352,23 @@ public class ContractController {
             return new ArrayList<>();
         }
     }
+
+    public void clearData()
+    {
+        String sql = "DELETE FROM " + onOrder + "; DELETE FROM " + pickup + "; DELETE FROM " + periodic + "; DELETE FROM " + periodicItem + "; DELETE FROM " + discount + ";";
+        try (Connection conn = DriverManager.getConnection(url)) {
+            if (conn != null) {
+                try (var stmt = conn.createStatement()) {
+                    stmt.executeUpdate(sql);
+                    System.out.println("All contract data cleared successfully.");
+                } catch (SQLException e) {
+                    System.out.println("Clear data failed: " + e.getMessage());
+                }
+            } else {
+                System.out.println("Connection to database failed.");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }

@@ -55,8 +55,12 @@ public class BranchFacade
         {
             throw new IllegalArgumentException("Name and address for branch can't be null");
         }
-
         int id = nextBranchID++;
+        if(!demonstrationMode)
+        {
+            id = controller.getMaxBranchID() + 1;
+            nextBranchID = id + 1;
+        }
         BranchDAO dao = new BranchDAO(id, name, address);
         if(!demonstrationMode)
         {
