@@ -2,17 +2,14 @@ package DAL;
 
 public class DiscountDAO
 {
-    private boolean isPersisted = false;
     private int catalogID;
     private int minimumQuantity;
-    private int discountPercentage;
-    private DiscountController discountController; 
-    
-    public DiscountDAO(int catalogID, int minimumQuantity, int discountPercentage, DiscountController discountController) {
+    private double discountPercentage;
+
+    public DiscountDAO(int catalogID, int minimumQuantity, double discountPercentage) {
         this.catalogID = catalogID;
         this.minimumQuantity = minimumQuantity;
         this.discountPercentage = discountPercentage;
-        this.discountController = discountController;
     }
 
     public int getCatalogID() {
@@ -23,26 +20,15 @@ public class DiscountDAO
         return minimumQuantity;
     }
 
-    public int getDiscountPercentage() {
+    public double getDiscountPercentage() {
         return discountPercentage;
     }
 
     public void setMinimumQuantity(int minimumQuantity) {
-        if (isPersisted) {
-            this.minimumQuantity = minimumQuantity;
-            discountController.update(catalogID, "minimumQuantity", String.valueOf(minimumQuantity));
-        }
-    }
-    
-    public void setDiscountPercentage(int discountPercentage) {
-        if (isPersisted) {
-            this.discountPercentage = discountPercentage;
-            discountController.update(catalogID, "discountPercentage", String.valueOf(discountPercentage));
-        }
+        this.minimumQuantity = minimumQuantity;
     }
 
-    public void persist() {
-        isPersisted = true;
-        discountController.insert(this);
+    public void setDiscountPercentage(double discountPercentage) {
+        this.discountPercentage = discountPercentage;
     }
 }

@@ -1,6 +1,7 @@
 package DAL;
 
 import java.util.List;
+import java.util.Map;
 
 import Domain.DeliveryMethod;
 
@@ -9,16 +10,16 @@ public class ContractDAO
     private boolean isPersisted = false;
     private int contractID;
     private int supplierID;
-    private List<Integer> items;
+    private Map<Integer, Integer> itemCatalog;
     private List<DiscountDAO> billOfQuantities;
     private DeliveryMethod deliveryMethod;
     private ContractController contractController;
 
-    public ContractDAO(int contractID, int supplierID, List<Integer> items, List<DiscountDAO> billOfQuantities, DeliveryMethod deliveryMethod)
+    public ContractDAO(int contractID, int supplierID, Map<Integer, Integer> items, List<DiscountDAO> billOfQuantities, DeliveryMethod deliveryMethod)
     {
         this.contractID = contractID;
         this.supplierID = supplierID;
-        this.items = items;
+        this.itemCatalog = items;
         this.billOfQuantities = billOfQuantities;
         this.deliveryMethod = deliveryMethod;
         this.contractController = new ContractController();
@@ -33,9 +34,9 @@ public class ContractDAO
     {
         return supplierID;
     }
-    public List<Integer> getItemCatalogID() 
+    public Map<Integer, Integer> getItemCatalog() 
     {
-        return items;
+        return itemCatalog;
     }
     public List<DiscountDAO> getBillOfQuantities() 
     {
@@ -52,11 +53,11 @@ public class ContractDAO
             this.deliveryMethod = deliveryMethod;
         }
     }
-    public void setItemCatalogID(List<Integer> items) 
+    public void setItemCatalog(Map<Integer, Integer> itemCatalog) 
     {
         if (isPersisted) 
         {
-            this.items = items;
+            this.itemCatalog = itemCatalog;
         }
     }
     public void setBillOfQuantities(List<DiscountDAO> billOfQuantities) 
