@@ -7,28 +7,50 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.sql.*;
 
-public class SupplierController
-{
-    private String tableName = "Suppliers";
+public class SupplierController {
+    private final String tableName = "Suppliers";
     String currentDir = System.getProperty("user.dir");
     String dbPath = currentDir + File.separator + "Data.db";
     String url = "jdbc:sqlite:" + dbPath;
 
-    public SupplierController() 
-    {
+    public SupplierController() {
         // Ensure the database connection is established
         try {
+
             Class.forName("org.sqlite.JDBC");
+            initializeTable();
         } catch (ClassNotFoundException e) {
             System.out.println("SQLite JDBC driver not found: " + e.getMessage());
         }
     }
-    public void insert(SupplierDAO supplier)
-    {
+
+    private void initializeTable() {
+        try (Connection conn = DriverManager.getConnection(url);
+                Statement stmt = conn.createStatement()) {
+            String sql = """
+                        CREATE TABLE IF NOT EXISTS Suppliers (
+                            supplierID INTEGER PRIMARY KEY,
+                            companyID INTEGER NOT NULL,
+                            bankAccount INTEGER NOT NULL,
+                            paymentMethod TEXT NOT NULL,
+                            contactMail TEXT NOT NULL,
+                            contactPhone TEXT NOT NULL
+
+                        );
+                    """;
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println("Failed to create Products table: " + e.getMessage());
+        }
+    }
+
+    public void insert(SupplierDAO supplier) {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "INSERT INTO " + tableName + " (companyID, bankAccount, paymentMethod, contactMail, contactPhone) VALUES (?, ?, ?, ?, ?)";
+                String sql = "INSERT INTO " + tableName
+                        + " (companyID, bankAccount, paymentMethod, contactMail, contactPhone) VALUES (?, ?, ?, ?, ?)";
                 try (var pstmt = conn.prepareStatement(sql)) {
                     pstmt.setInt(1, supplier.getCompanyID());
                     pstmt.setInt(2, supplier.getBankAccount());
@@ -48,8 +70,7 @@ public class SupplierController
         }
     }
 
-    public void Update(int id, String column, String value)
-    {
+    public void Update(int id, String column, String value) {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
                 String sql = "UPDATE " + tableName + " SET " + column + " = ? WHERE supplierId = ?";
@@ -69,8 +90,7 @@ public class SupplierController
         }
     }
 
-    public void delete(int id)
-    {
+    public void delete(int id) {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
                 String sql = "DELETE FROM " + tableName + " WHERE supplierId = ?";
@@ -89,8 +109,7 @@ public class SupplierController
         }
     }
 
-    public SupplierDAO getSupplier(int id)
-    {
+    public SupplierDAO getSupplier(int id) {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
                 String sql = "SELECT * FROM " + tableName + " WHERE supplierId = ?";
@@ -103,7 +122,8 @@ public class SupplierController
                             String paymentMethod = rs.getString("paymentMethod");
                             String contactMail = rs.getString("contactMail");
                             String contactPhone = rs.getString("contactPhone");
-                            return new SupplierDAO(id, companyID, bankAccount, paymentMethod, contactMail, contactPhone, this);
+                            return new SupplierDAO(id, companyID, bankAccount, paymentMethod, contactMail, contactPhone,
+                                    this);
                         }
                     }
                 } catch (SQLException e) {
@@ -118,14 +138,13 @@ public class SupplierController
         return null; // Supplier not found
     }
 
-    public List<SupplierDAO> getAllSuppliers()
-    {
+    public List<SupplierDAO> getAllSuppliers() {
         List<SupplierDAO> suppliers = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
                 String sql = "SELECT * FROM " + tableName;
                 try (var pstmt = conn.prepareStatement(sql);
-                     var rs = pstmt.executeQuery()) {
+                        var rs = pstmt.executeQuery()) {
                     while (rs.next()) {
                         int id = rs.getInt("supplierId");
                         int companyID = rs.getInt("companyID");
@@ -133,7 +152,8 @@ public class SupplierController
                         String paymentMethod = rs.getString("paymentMethod");
                         String contactMail = rs.getString("contactMail");
                         String contactPhone = rs.getString("contactPhone");
-                        suppliers.add(new SupplierDAO(id, companyID, bankAccount, paymentMethod, contactMail, contactPhone, this));
+                        suppliers.add(new SupplierDAO(id, companyID, bankAccount, paymentMethod, contactMail,
+                                contactPhone, this));
                     }
                 } catch (SQLException e) {
                     System.out.println("Get all suppliers failed: " + e.getMessage());
@@ -146,14 +166,13 @@ public class SupplierController
         }
         return suppliers;
     }
-    
-    public int getNextId()
-    {
+
+    public int getNextId() {
         String sql = "SELECT MAX(supplierId) AS maxID FROM " + tableName;
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
                 try (var pstmt = conn.prepareStatement(sql);
-                     var rs = pstmt.executeQuery()) {
+                        var rs = pstmt.executeQuery()) {
                     if (rs.next()) {
                         return rs.getInt("maxID") + 1; // Return the next ID
                     }

@@ -4,8 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import Utils.OrderStatus;
 
@@ -19,8 +21,52 @@ public class OrderController {
     public OrderController() {
         try {
             Class.forName("org.sqlite.JDBC");
+            initializeTableOrder();
+            initializeTableOrderItem();
         } catch (ClassNotFoundException e) {
             System.out.println("SQLite JDBC driver not found: " + e.getMessage());
+        }
+    }
+
+    private void initializeTableOrder() {
+        try (Connection conn = DriverManager.getConnection(url);
+                Statement stmt = conn.createStatement()) {
+            String sql = """
+                        CREATE TABLE IF NOT EXISTS Orders (
+                            orderID INTEGER PRIMARY KEY,
+                            supplierID INTEGER NOT NULL,
+                            contractID INTEGER NOT NULL,
+                            orderDate DATE NOT NULL,
+                            destination TEXT NOT NULL,
+                            orderStatus TEXT NOT NULL
+
+                        );
+                    """;
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println("Failed to create Products table: " + e.getMessage());
+        }
+    }
+
+    private void initializeTableOrderItem() {
+        try (Connection conn = DriverManager.getConnection(url);
+                Statement stmt = conn.createStatement()) {
+            String sql = """
+                        CREATE TABLE IF NOT EXISTS OrderItems (
+                            orderID INTEGER PRIMARY KEY,
+                            itemID INTEGER PRIMARY KEY,
+                            quantity INTEGER NOT NULL,
+                            catalogID INTEGER NOT NULL,
+                            totalPrice REAL NOT NULL,
+                            FOREIGN KEY (orderID) REFERENCES Orders(orderID)
+                            FOREIGN KEY (itemID) REFERENCES Items(itemID)
+
+
+                        );
+                    """;
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println("Failed to create Products table: " + e.getMessage());
         }
     }
 
@@ -38,7 +84,8 @@ public class OrderController {
                             String destination = rs.getString("destination");
                             String statusStr = rs.getString("orderStatus");
                             Utils.OrderStatus orderStatus = Utils.OrderStatus.valueOf(statusStr);
-                            return new OrderDAO(orderID, supplierID, contractID, orderDate, destination, orderStatus, this);
+                            return new OrderDAO(orderID, supplierID, contractID, orderDate, destination, orderStatus,
+                                    this);
                         } else {
                             System.out.println("Order not found.");
                         }
@@ -58,7 +105,8 @@ public class OrderController {
     public void insertOrder(OrderDAO order) {
         try (var conn = java.sql.DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "INSERT INTO " + ordersTableName + " (orderID, supplierID, contractID, orderDate, destination, orderStatus) VALUES (?, ?, ?, ?, ?, ?)";
+                String sql = "INSERT INTO " + ordersTableName
+                        + " (orderID, supplierID, contractID, orderDate, destination, orderStatus) VALUES (?, ?, ?, ?, ?, ?)";
                 try (var pstmt = conn.prepareStatement(sql)) {
                     pstmt.setInt(1, order.getOrderID());
                     pstmt.setInt(2, order.getSupplierID());
@@ -124,7 +172,7 @@ public class OrderController {
             if (conn != null) {
                 String sql = "SELECT * FROM " + ordersTableName;
                 try (var stmt = conn.createStatement();
-                     var rs = stmt.executeQuery(sql)) {
+                        var rs = stmt.executeQuery(sql)) {
                     while (rs.next()) {
                         int orderID = rs.getInt("orderID");
                         int supplierID = rs.getInt("supplierID");
@@ -133,7 +181,8 @@ public class OrderController {
                         String destination = rs.getString("destination");
                         String orderStatusStr = rs.getString("orderStatus");
                         OrderStatus orderStatus = OrderStatus.valueOf(orderStatusStr);
-                        orders.add(new OrderDAO(orderID, supplierID, contractID, orderDate, destination, orderStatus, this));
+                        orders.add(new OrderDAO(orderID, supplierID, contractID, orderDate, destination, orderStatus,
+                                this));
                     }
                 } catch (java.sql.SQLException e) {
                     System.out.println("Query failed: " + e.getMessage());
@@ -150,7 +199,8 @@ public class OrderController {
     public void insertOrderItem(OrderItemDAO orderItem) {
         try (var conn = java.sql.DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "INSERT INTO " + orderItemsTableName + " (orderID, itemID, quantity, catalogID, totalPrice) VALUES (?, ?, ?, ?, ?)";
+                String sql = "INSERT INTO " + orderItemsTableName
+                        + " (orderID, itemID, quantity, catalogID, totalPrice) VALUES (?, ?, ?, ?, ?)";
                 try (var pstmt = conn.prepareStatement(sql)) {
                     pstmt.setInt(1, orderItem.getOrderID());
                     pstmt.setInt(2, orderItem.getItemID());
@@ -218,7 +268,7 @@ public class OrderController {
         return orderItems;
     }
 
-    public void updateOrderItems(int orderID, Map<Integer,OrderItemDAO> newItems) {
+    public void updateOrderItems(int orderID, Map<Integer, OrderItemDAO> newItems) {
         try (var conn = java.sql.DriverManager.getConnection(url)) {
             if (conn != null) {
                 conn.setAutoCommit(false);
@@ -228,7 +278,8 @@ public class OrderController {
                     pstmt.setInt(1, orderID);
                     pstmt.executeUpdate();
                     for (OrderItemDAO item : newItems.values()) {
-                        String insertSql = "INSERT INTO " + orderItemsTableName + " (orderID, itemID, quantity, catalogID, totalPrice) VALUES (?, ?, ?, ?, ?)";
+                        String insertSql = "INSERT INTO " + orderItemsTableName
+                                + " (orderID, itemID, quantity, catalogID, totalPrice) VALUES (?, ?, ?, ?, ?)";
                         var pstmt2 = conn.prepareStatement(insertSql);
                         pstmt2.setInt(1, item.getOrderID());
                         pstmt2.setInt(2, item.getItemID());
@@ -236,15 +287,14 @@ public class OrderController {
                         pstmt2.setInt(4, item.getCatalogID());
                         pstmt2.setDouble(5, item.getTotalPrice());
                         pstmt2.executeUpdate();
-                        System.out.println("Order item inserted successfully.");                            
+                        System.out.println("Order item inserted successfully.");
                     }
                     conn.commit();
                     System.out.println("Transaction committed successfully.");
                 } catch (SQLException e) {
                     System.out.println("/*Rolling back transaction due to error: " + e.getMessage());
                     conn.rollback();
-                }
-                finally {
+                } finally {
                     conn.setAutoCommit(true);
                 }
             } else {
