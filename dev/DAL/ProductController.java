@@ -4,7 +4,6 @@ import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ProductController {
     private final String tableName = "Products";

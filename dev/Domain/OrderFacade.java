@@ -183,6 +183,7 @@ public class OrderFacade {
                     PeriodicItem newItem = new PeriodicItem(itemID, quantity, totalPrice);
                     items.add(newItem);
                 }
+                sf.updatePeriodicItems(supplierID, contractID, items);
                 periodicDelivery.setOrderItems(items);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Error updating scheduled delivery items: " + e.getMessage());

@@ -372,38 +372,34 @@ public class ProductFacade {
 
             for (ProductBL product : products.values()) {
                 Integer minimalQuantityObj = product.getMinQuantity(branchID);
-                if (minimalQuantityObj == null) {
-                    // No minimal quantity defined for this branch and product
-                    continue;
-                }
+                if (minimalQuantityObj != null) {
+                    int minimalQuantity = minimalQuantityObj; // safe, because minimalQuantityObj is not null
+                    int currentQuantity = product.getInventoryQuantity(branchID);
 
-                int minimalQuantity = minimalQuantityObj; // safe, because minimalQuantityObj is not null
-                int currentQuantity = product.getInventoryQuantity(branchID);
-
-                if (currentQuantity <= minimalQuantity) {
-                    if (!hasDeficiency) {
-                        body.append("Branch: ").append(branchName)
-                                .append(" (ID: ").append(branchID).append(")\n");
-                        hasDeficiency = true;
+                    if (currentQuantity <= minimalQuantity) {
+                        if (!hasDeficiency) {
+                            body.append("Branch: ").append(branchName)
+                                    .append(" (ID: ").append(branchID).append(")\n");
+                            hasDeficiency = true;
+                        }
+                        minimumQuantities.add(minimalQuantity);
+                        currentQuantites.add(currentQuantity);
+                        productList.add(product);
+                        destinations.add(branchName);
+                        // need to add which destinations have low supply
+                        orderFacade.handleLowSupply(productList, minimumQuantities, currentQuantites, destinations);
+                        body.append("  Product: ").append(product.getName())
+                                .append(" (Product ID: ").append(product.getProductID()).append(") ")
+                                .append("Current Quantity: ").append(currentQuantity)
+                                .append(", Minimal Required: ").append(minimalQuantity)
+                                .append("\n");                
                     }
-                    minimumQuantities.add(minimalQuantity);
-                    currentQuantites.add(currentQuantity);
-                    productList.add(product);
-                    destinations.add(branchName);
-                    // need to add which destinations have low supply
-                    orderFacade.handleLowSupply(productList, minimumQuantities, currentQuantites, destinations);
-                    body.append("  Product: ").append(product.getName())
-                            .append(" (Product ID: ").append(product.getProductID()).append(") ")
-                            .append("Current Quantity: ").append(currentQuantity)
-                            .append(", Minimal Required: ").append(minimalQuantity)
-                            .append("\n");
                 }
-            }
-
-            if (!hasDeficiency) {
-                body.append("Branch: ").append(branchName)
-                        .append(" (ID: ").append(branchID)
-                        .append(") - No deficiencies.\n");
+                if (!hasDeficiency) {
+                    body.append("Branch: ").append(branchName)
+                            .append(" (ID: ").append(branchID)
+                            .append(") - No deficiencies.\n");
+                }
             }
         }
 
