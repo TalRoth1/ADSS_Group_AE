@@ -1,15 +1,12 @@
 package DataLayer;
 
+import java.sql.ResultSet;
+import java.util.ArrayList;
+
 import DTO.DriverDTO;
 import DTO.EmployeeDTO;
 import DataLayer.DAOs.DriverDAO;
 import DataLayer.DAOs.DriverLicenseDAO;
-import DataLayer.DAOs.EmployeeDAO;
-import DomainLayer.Employee;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.util.ArrayList;
 
 public class DriverController {
 
@@ -33,7 +30,6 @@ public class DriverController {
         try {
             // add driver
             driverDAO.addDriver(driver.getId(), driver.isBusy() ? 1 : 0);
-
             // add all license types
             for (String licenseType : driver.getLicenseTypes()) {
                 driverLicenseDAO.addDriver(driver.getId(), licenseType);
@@ -116,6 +112,15 @@ public class DriverController {
             System.out.println("Error getting all drivers: " + e.getMessage());
         }
         return drivers;
+    }
+
+    public void clearTables() {
+        try {
+            driverDAO.clearDrivers();
+            driverLicenseDAO.clearDriverLicenses();
+        } catch (Exception e) {
+            System.out.println("Error clearing driver tables: " + e.getMessage());
+        }
     }
 
 }

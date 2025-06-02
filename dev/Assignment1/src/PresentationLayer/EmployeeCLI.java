@@ -38,12 +38,13 @@ public class EmployeeCLI {
         1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800, 1830, 1900, 1930, 2000, 2030, 2100};
     private static final Integer[] EVENING_SHIFT_END_TIMES = {
         2100, 2130, 2200};
-    List<LocationDL> branches = employeeFacade.getBranches();
+   // List<LocationDL> branches = employeeFacade.getBranches();
+    private List<LocationDL> branches = new ArrayList<>();
 
     public EmployeeCLI(EmployeeFacade employeeFacade) {
         this.employeeFacade = employeeFacade;
         nowDate = LocalDate.now();
-        loginCLI();
+        //loginCLI();
     }
 
     public void loginCLI() {
@@ -305,8 +306,8 @@ public class EmployeeCLI {
         LocalDate startDate = chooseDateForHire("Start Date: ");
         int vacationDays = readInt("Vacation Days");
         int sickDays = readInt("Sick Days");
-        double educationFund = readDouble("Education fund: ");
-        double socialBenefits = readDouble("Social Benefits: ");
+        float educationFund = readFloat("Education fund: ");
+        float socialBenefits = readFloat("Social Benefits: ");
         String employeePassword = readString("Password: ");
         LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[2]));
         branches = employeeFacade.getBranches();
@@ -538,7 +539,7 @@ public class EmployeeCLI {
 
     private void updateEducationFund() {
         int employeeId = readInt("Please enter employee ID: ");
-        double educationFund = readDouble("Enter the new Education Fund: ");
+        float educationFund = readFloat("Enter the new Education Fund: ");
         try {
             employeeFacade.updateEducationFund(employeeId, userId, educationFund);
             System.out.println("Education Fund updated successfully!");
@@ -550,7 +551,7 @@ public class EmployeeCLI {
 
     private void updateSocialBenefits() {
         int employeeId = readInt("Please enter employee ID: ");
-        double socialBenefits = readDouble("Enter the new Education Fund: ");
+        float socialBenefits = readFloat("Enter the new Education Fund: ");
         try {
             employeeFacade.updateSocialBenefits(employeeId, userId, socialBenefits);
             System.out.println("Social Benefits updated successfully!");
@@ -907,6 +908,21 @@ public class EmployeeCLI {
         }
     }
 
+    private float readFloat(String prompt) {
+        float value;
+        while (true) {
+            System.out.println(prompt);
+            if (scanner.hasNextFloat()) {
+                value = scanner.nextFloat();
+                scanner.nextLine();
+                return value;
+            } else {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine();
+            }
+        }
+    }
+
     private String readString(String prompt) {
         System.out.println(prompt);
         return scanner.nextLine();
@@ -1018,7 +1034,7 @@ public class EmployeeCLI {
             employeeFacade.MakePredefinedData();
             System.out.println("Predefined data created successfully.");
         } catch (Exception e) {
-            System.out.println("Error creating predefined data: " + e.getMessage());
+            System.out.println("Error creating predefined employee data: " + e.getMessage());
         }
     }
 

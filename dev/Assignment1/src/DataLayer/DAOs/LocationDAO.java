@@ -21,7 +21,8 @@ public class LocationDAO {
 
     public void initializeTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS locations ("
-                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                //+ "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "id INTEGER PRIMARY KEY, "
                 + "street TEXT NOT NULL, "
                 + "street_number INTEGER NOT NULL, "
                 + "city TEXT NOT NULL, "
@@ -39,7 +40,7 @@ public class LocationDAO {
 
     public void addLocation(int id, String street, int streetNumber, String city, String contactNumber,
             String contactName, String zone) throws SQLException {
-        String sql = "INSERT INTO locations (id, street, street_number, city, contact_number, contact_name, zone) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO locations (id, street, street_number, city, contact_number, contact_name, zone) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.setString(2, street);
@@ -181,7 +182,7 @@ public class LocationDAO {
         clearTable();
         String resetSql = "DELETE FROM sqlite_sequence WHERE name='locations'";
         try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate(resetSql);
+            //stmt.executeUpdate(resetSql);
         } catch (SQLException e) {
             System.out.println("Error resetting locations table sequence: " + e.getMessage());
             throw e;

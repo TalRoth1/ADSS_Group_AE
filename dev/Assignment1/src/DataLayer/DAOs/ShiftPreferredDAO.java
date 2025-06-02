@@ -21,8 +21,8 @@ public class ShiftPreferredDAO {
 
     private void initializeTable() throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS preferred_shifts ("
-                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + "employeeId INT NOT NULL, "
+                + "shiftId INTEGER , "
+                + "employeeId INT , "
                 + "role TEXT NOT NULL, "
                 + "PRIMARY KEY (shiftId, employeeId), "
                 + "FOREIGN KEY (employeeId) REFERENCES employees(id), "

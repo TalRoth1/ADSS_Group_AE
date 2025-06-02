@@ -1,8 +1,13 @@
 package DataLayer.DAOs;
 
-import DomainLayer.DriverDL;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+
+import DomainLayer.DriverDL;
 
 public class DriverLicenseDAO {
 
@@ -19,8 +24,9 @@ public class DriverLicenseDAO {
 
     public void InitializeDatabase() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS driver_license ("
-                + "id INTEGER PRIMARY KEY,"
-                + "LicenseType TEXT NOT NULL"
+                + "id INTEGER ,"
+                + "LicenseType TEXT, "
+                + "PRIMARY KEY (id, LicenseType) "
                 + ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
@@ -97,6 +103,16 @@ public class DriverLicenseDAO {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error deleting all licenses for driver: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public void clearDriverLicenses() throws SQLException {
+        String sql = "DELETE FROM driver_license";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            System.out.println("Error clearing driver licenses: " + e.getMessage());
             throw e;
         }
     }

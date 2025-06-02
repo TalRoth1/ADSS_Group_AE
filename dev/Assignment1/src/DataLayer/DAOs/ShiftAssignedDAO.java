@@ -21,7 +21,7 @@ public class ShiftAssignedDAO {
 
     private void initializeTable() throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS shift_assigned ("
-                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "shiftId INTEGER NOT NULL, "
                 + "employeeId INT NOT NULL, "
                 + "role TEXT NOT NULL, "
                 + "PRIMARY KEY (shiftId, employeeId), "

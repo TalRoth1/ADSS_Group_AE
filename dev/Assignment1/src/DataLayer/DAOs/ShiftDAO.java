@@ -12,7 +12,6 @@ public class ShiftDAO {
 
     public ShiftDAO(Connection connection) {
         this.connection = connection;
-        this.connection = connection;
         try {
             initializeTable();
         } catch (SQLException e) {
@@ -43,9 +42,9 @@ public class ShiftDAO {
         }
     }
 
-    public void addShift(int id, String date, String shiftType, int locationId, int startTime, int endTime, int shiftManagerId)
+    public void addShift(int id, String date, String shiftType, int locationId, int startTime, int endTime, int shiftManagerId, int isShipment)
             throws SQLException {
-        String sql = "INSERT INTO shifts (id, date, shiftType, startTime, endTime, shiftManagerId, locationId) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO shifts (id, date, shiftType, startTime, endTime, shiftManagerId, locationId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.setString(2, date);
@@ -54,6 +53,7 @@ public class ShiftDAO {
             pstmt.setInt(5, endTime);
             pstmt.setInt(6, shiftManagerId);
             pstmt.setInt(7, locationId);
+            pstmt.setInt(8, isShipment);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding shift: " + e.getMessage());
@@ -120,7 +120,7 @@ public class ShiftDAO {
     }
 
     public ResultSet getRole(String date, String shiftType, int employeeId) throws SQLException {
-        String sql = "SELECT role FROM shift_assignments WHERE date = ? AND shiftType = ? AND employeeId = ?";
+        String sql = "SELECT role FROM shift_assigned WHERE date = ? AND shiftType = ? AND employeeId = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, date);
             pstmt.setString(2, shiftType);

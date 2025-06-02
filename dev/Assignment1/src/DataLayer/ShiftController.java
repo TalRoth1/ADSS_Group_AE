@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-
 import DTO.EmployeeDTO;
 import DTO.LocationDTO;
 import DTO.ShiftDTO;
@@ -49,7 +48,7 @@ public class ShiftController {
         try {
             shiftDAO.addShift(shiftDTO.getId(), shiftDTO.getDate().toString(), shiftDTO.getShiftType(),
                     shiftDTO.getBranch().getId(),
-                    shiftDTO.getStartTime(), shiftDTO.getEndTime(), shiftDTO.getShiftManagerId());
+                    shiftDTO.getStartTime(), shiftDTO.getEndTime(), shiftDTO.getShiftManagerId(), shiftDTO.isShipmentShift() ? 1 : 0);
         } catch (Exception e) {
             System.out.println("Error adding shift: " + e.getMessage());
         }

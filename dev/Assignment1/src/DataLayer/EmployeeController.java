@@ -1,11 +1,5 @@
 package DataLayer;
 
-import DTO.EmployeeDTO;
-import DTO.LocationDTO;
-import DTO.ShiftDTO;
-import DataLayer.DAOs.EmployeeDAO;
-import DataLayer.DAOs.EmployeeRoleDAO;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -13,6 +7,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import DTO.EmployeeDTO;
+import DTO.LocationDTO;
+import DTO.ShiftDTO;
+import DataLayer.DAOs.EmployeeDAO;
+import DataLayer.DAOs.EmployeeRoleDAO;
 
 public class EmployeeController {
 
@@ -213,6 +213,36 @@ public class EmployeeController {
 
         return new EmployeeDTO(id, name, branch, bankAccount, salary, startDate, vacationDays, sickDays,
                 educationFund, socialBenefits, password, isFinishedWorking, prefShifts, assignedShifts, rolesList);
+    }
+
+
+    public void login (int employeeId, String password) throws SQLException {
+        try {
+            ResultSet rst = employeeDAO.getEmployee(employeeId);
+            if (rst.next()) {
+                String storedPassword = rst.getString("password");
+                if (storedPassword.equals(password)) {
+                    employeeDAO.changeEmployeeLoggedInStatus(employeeId, 1);
+                    System.out.println("Login successful for employee ID: " + employeeId);
+                } else {
+                    System.out.println("Invalid password for employee ID: " + employeeId);
+                }
+            } else {
+                System.out.println("Employee not found with ID: " + employeeId);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error during login: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public void logout(int employeeId) {
+        try {
+            employeeDAO.changeEmployeeLoggedInStatus(employeeId, 0);
+            System.out.println("Employee ID " + employeeId + " logged out successfully.");
+        } catch (SQLException e) {
+            System.out.println("Error during logout: " + e.getMessage());
+        }
     }
 
 }

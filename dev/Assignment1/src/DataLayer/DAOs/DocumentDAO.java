@@ -5,9 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-
-import javax.naming.spi.DirStateFactory.Result;
 
 public class DocumentDAO {
     private Connection connection;
@@ -23,9 +20,11 @@ public class DocumentDAO {
 
     private void initializeTable() throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS documents (" +
-                "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                "originID INT FOREIGN KEY REFERENCES locations(id), " +
+                //"id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "id INTEGER PRIMARY KEY, " +
+                "originID INT ," +
                 "weight FLOAT, " +
+                "FOREIGN KEY (originID) REFERENCES locations(id) " +
                 ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSQL);
@@ -34,9 +33,8 @@ public class DocumentDAO {
             throw e;
         }
     }
-
     public void createDocument(int docId, int originId, float weight) throws SQLException {
-        String sql = "INSERT INTO documents (id, originID) VALUES (?, ? ,?)";
+        String sql = "INSERT INTO documents (id, originID, weight) VALUES (?, ? ,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, docId);
             preparedStatement.setInt(2, originId);
@@ -107,7 +105,7 @@ public class DocumentDAO {
     public void clearTable() throws SQLException {
     try (Statement stmt = connection.createStatement()) {
         stmt.executeUpdate("DELETE FROM documents"); // clear rows
-        stmt.executeUpdate("DELETE FROM sqlite_sequence WHERE name='documents'"); // reset AUTOINCREMENT
+        //stmt.executeUpdate("DELETE FROM sqlite_sequence WHERE name='documents'"); // reset AUTOINCREMENT
     } catch (SQLException e) {
         System.out.println("Error clearing documents table: " + e.getMessage());
         throw e;

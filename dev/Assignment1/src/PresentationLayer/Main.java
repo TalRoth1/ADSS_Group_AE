@@ -1,9 +1,8 @@
 package PresentationLayer;
 
 import java.util.Scanner;
-import PresentationLayer.EmployeeCLI;
-import PresentationLayer.ShipmentCLI;
-import DomainLayer.*;
+
+import DomainLayer.EmployeeFacade;
 
 public class Main {
     public static void main(String[] args) {

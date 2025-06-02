@@ -1,13 +1,10 @@
 package DataLayer.DAOs;
 
-import java.sql.*;
-import DomainLayer.ShipmentDL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import DTO.ShipmentDTO;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class ShipmentDAO {
     private Connection connection;
@@ -27,9 +24,9 @@ public class ShipmentDAO {
                 "id INT PRIMARY KEY," +
                 "dateCreated TEXT," +
                 "dateSent TEXT," +
-                "truck_id INT NOT NULL," +
-                "driver_id INT NOT NULL," +
-                "doc_id INT NOT NULL," +
+                "truck_id INT ," +
+                "driver_id INT ," +
+                "doc_id INT ," +
                 "status TEXT NOT NULL," +
                 "shiftType TEXT NOT NULL," +
                 "FOREIGN KEY (truck_id) REFERENCES trucks(id)," +

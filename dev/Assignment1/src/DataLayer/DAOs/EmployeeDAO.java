@@ -6,14 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import DataLayer.DBConnection;
-import DomainLayer.LocationDL;
-
 public class EmployeeDAO {
 
     private Connection connection;
-    private Connection connectionLocation = DBConnection.getConnection();
-    private LocationDAO locationDAO = new LocationDAO(connectionLocation);
+
 
     public EmployeeDAO(Connection connection) {
         this.connection = connection;
@@ -35,10 +31,10 @@ public class EmployeeDAO {
                 + "sickDays INT NOT NULL, "
                 + "educationFund FLOAT NOT NULL, "
                 + "socialBenefits FLOAT NOT NULL, "
-                + "password TEXT NOT NULL"
-                + "isFired INT NOT NULL, " //false 0, true 1
+                + "password TEXT NOT NULL,"
+                + "isFired INT DEFAULT 0, " //false 0, true 1
                 + "isloggedIn INT NOT NULL, " //false 0, true 1
-                + "locationId INT NOT NULL, "
+                + "locationId INT NOT NULL "
                 + ")";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSQL);
@@ -51,7 +47,7 @@ public class EmployeeDAO {
     public void addEmployee(int id, String name, int locationId, String bankAccount, int salary, String startDate,
             int vacationDays, int sickDays, float educationFund, float socialBenefits,
             String password) throws SQLException {
-        String sql = "INSERT INTO employees (id, name, bankAccount, salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, password, isFired, isLoggedIn, locationId), VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO employees (id, name, bankAccount, salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, password, isFired, isLoggedIn, locationId) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.setString(2, name);
@@ -63,8 +59,8 @@ public class EmployeeDAO {
             pstmt.setFloat(8, educationFund);
             pstmt.setFloat(9, socialBenefits);
             pstmt.setString(10, password);
-            pstmt.setBoolean(11, false); // isFired
-            pstmt.setBoolean(12, false); // isLoggedIn
+            pstmt.setInt(11, 0); // isFired
+            pstmt.setInt(12, 0); // isLoggedIn
             pstmt.setInt(13, locationId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -86,7 +82,7 @@ public class EmployeeDAO {
 
     //maybe dont need because we have updateEmployeeByField
     public void fireEmployee(int employeeId) throws SQLException {
-        String sql = "UPDATE employees SET isFinishedWorking=TRUE WHERE id=?";
+        String sql = "UPDATE employees SET isFired=1 WHERE id=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, employeeId);
             pstmt.executeUpdate();
@@ -144,7 +140,7 @@ public class EmployeeDAO {
     }
 
     public ResultSet getAllEmployeesInBranch(int branchid) throws SQLException {
-        String sql = "SELECT name FROM employees WHERE branch=? AND isFinishedWorking=FALSE";
+        String sql = "SELECT name FROM employees WHERE locationID=? AND isFired=0";
         try (Statement stmt = connection.createStatement()) {
             return stmt.executeQuery(sql);
         } catch (SQLException e) {
@@ -173,6 +169,18 @@ public class EmployeeDAO {
             stmt.executeUpdate("DELETE FROM employees");
         } catch (SQLException e) {
             System.out.println("Error clearing employees table: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public void changeEmployeeLoggedInStatus(int employeeId, int isLoggedIn) throws SQLException {
+        String sql = "UPDATE employees SET isLoggedIn=? WHERE id=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, isLoggedIn);
+            pstmt.setInt(2, employeeId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error changing employee logged in status: " + e.getMessage());
             throw e;
         }
     }

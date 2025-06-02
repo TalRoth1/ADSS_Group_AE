@@ -26,6 +26,8 @@ public class ShipmentMapper {
         );
 
         dl.setDriver(driverDL);
+        dl.ChangeStatus(dto.getStatus());
+        
         return dl;
     }
 

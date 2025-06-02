@@ -227,6 +227,10 @@ public class ShipmentDL {
         this.ShiftType = shiftType;
     }
 
+    public void setStatus(String status) {
+        ChangeStatus(status);
+    }
+
     public void setDateSent(Date dateSent) {
         this.DateSent = dateSent;
     }

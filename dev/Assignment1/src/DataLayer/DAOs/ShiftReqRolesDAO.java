@@ -21,9 +21,9 @@ public class ShiftReqRolesDAO {
 
     private void initializeTable() throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS shift_req_roles ("
-                + "shiftId INT NOT NULL, "
+                + "shiftId INTEGER NOT NULL, "
                 + "role TEXT NOT NULL, "
-                + "amount INT NOT NULL, "
+                + "amount INTEGER NOT NULL, "
                 + "PRIMARY KEY (shiftId, role), "
                 + "FOREIGN KEY (shiftId) REFERENCES shifts(id)"
                 + ")";

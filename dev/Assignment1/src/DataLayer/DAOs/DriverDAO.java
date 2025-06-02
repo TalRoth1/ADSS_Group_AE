@@ -4,10 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.sql.Statement;
-
-import DomainLayer.DriverDL;
 
 public class DriverDAO {
     
@@ -88,6 +85,16 @@ public class DriverDAO {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error deleting driver: " + e.getMessage());
+            throw e; 
+        }
+    }
+
+    public void clearDrivers() throws SQLException {
+        String sql = "DELETE FROM drivers";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            System.out.println("Error clearing drivers: " + e.getMessage());
             throw e; 
         }
     }

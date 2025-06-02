@@ -1,27 +1,28 @@
 package DomainLayer;
 
-import DTO.DriverDTO;
-import DTO.EmployeeDTO;
-import DataLayer.*;
-import DataLayer.DAOs.DriverDAO;
-import DataLayer.DAOs.EmployeeDAO;
-import DataLayer.DAOs.EmployeeRoleDAO;
-import DataLayer.DAOs.ShiftAssignedDAO;
-import DataLayer.Mappers.DriverMapper;
-import DataLayer.Mappers.EmployeeMapper;
-import DataLayer.Mappers.LocationMapper;
-
 import java.sql.Connection;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import DTO.DriverDTO;
+import DTO.EmployeeDTO;
 import DTO.LocationDTO;
+import DataLayer.DAOs.DriverDAO;
+import DataLayer.DAOs.EmployeeDAO;
+import DataLayer.DAOs.ShiftAssignedDAO;
+import DataLayer.DBConnection;
+import DataLayer.DriverController;
+import DataLayer.EmployeeController;
+import DataLayer.LocationController;
+import DataLayer.Mappers.DriverMapper;
+import DataLayer.Mappers.EmployeeMapper;
+import DataLayer.Mappers.LocationMapper;
+import DataLayer.ShiftController;
 
 public class EmployeeFacade { 
 
@@ -40,7 +41,8 @@ public class EmployeeFacade {
 
     public EmployeeFacade() {
         this.shiftEmployees = new HashMap<>();
-        this.branches = Collections.emptyList(); // Initialize branches as empty list
+        //this.branches = Collections.emptyList(); // Initialize branches as empty list
+        this.branches = new ArrayList<>(); // Initialize branches as empty list
 
         this.driverController = new DriverController(empController);
         this.locationController = new LocationController();
@@ -812,20 +814,27 @@ public class EmployeeFacade {
         ClearDataBase();
         LocationDL branch1 = new LocationDL(1, "Main St", 1, "CityA", "123456789", "Spiderman", "1");
         LocationDL branch2 = new LocationDL(2, "Second St", 2, "CityB", "987654321", "Peter Griffin", "2");
+        this.employeeManager = new EmployeeManager(00, "Default Manager", "000000000", 10000, LocalDate.now(), 30, 10, 2000f, 1000f, "admin");
         addBranch(branch1);
         addBranch(branch2);
+        try{
+        login(00, "admin"); 
+        } catch (Exception e) {
+            System.out.println("Error logging in as default manager: " + e.getMessage());
+        }
+        
+
 
         // Add predefined employees
         try {
-            hireEmployee(1, 1, branch1, "Alice", "123456789", 5000, LocalDate.now(), 20, 10, 1000f, 500f, "password123", Role.STORE_KEEPER);
-            hireEmployee(2, 1, branch2, "Bob", "987654321", 6000, LocalDate.now(), 15, 5, 1200f, 600f, "password456", Role.CASHIER);
-            hireEmployee(3, 1, branch1, "David", "555555555", 5500, LocalDate.now(), 18, 8, 1100f, 550f, "password789", Role.CASHIER);
-            hireEmployee(4, 1, branch2, "Eve", "444444444", 6500, LocalDate.now(), 22, 12, 1300f, 650f, "password101", Role.STORE_KEEPER);
-            hireEmployee(5, 1, branch1, "Frank", "333333333", 7000, LocalDate.now(), 25, 10, 1500f, 700f, "password102", Role.SHIFT_MANAGER);
-            hireEmployee(6, 1, branch2, "Grace", "222222222", 8000, LocalDate.now(), 30, 15, 1600f, 800f, "password103", Role.SHIFT_MANAGER);
-
-            hireDriver(7, 1, branch1, "Charlie", "555555555", 7000, LocalDate.now(), 25, 10, 1500f, 700f, "password789", new ArrayList<>(List.of("B", "C")));
-            hireDriver(8, 1, branch2, "Hannah", "666666666", 7500, LocalDate.now(), 20, 5, 1400f, 600f, "password104", new ArrayList<>(List.of("A", "B")));
+            hireEmployee(1, 0, branch1, "Alice", "123456789", 5000, LocalDate.now(), 20, 10, 1000f, 500f, "password123", Role.STORE_KEEPER);
+            hireEmployee(2, 0, branch2, "Bob", "987654321", 6000, LocalDate.now(), 15, 5, 1200f, 600f, "password456", Role.CASHIER);
+            hireEmployee(3, 0, branch1, "David", "555555555", 5500, LocalDate.now(), 18, 8, 1100f, 550f, "password789", Role.CASHIER);
+            hireEmployee(4, 0, branch2, "Eve", "444444444", 6500, LocalDate.now(), 22, 12, 1300f, 650f, "password101", Role.STORE_KEEPER);
+            hireEmployee(5, 0, branch1, "Frank", "333333333", 7000, LocalDate.now(), 25, 10, 1500f, 700f, "password102", Role.SHIFT_MANAGER);
+            hireEmployee(6, 0, branch2, "Grace", "222222222", 8000, LocalDate.now(), 30, 15, 1600f, 800f, "password103", Role.SHIFT_MANAGER);
+            hireDriver(7, 0, branch1, "Charlie", "555555555", 7000, LocalDate.now(), 25, 10, 1500f, 700f, "password789", new ArrayList<>(List.of("B", "C")));
+            hireDriver(8, 0, branch2, "Hannah", "666666666", 7500, LocalDate.now(), 20, 5, 1400f, 600f, "password104", new ArrayList<>(List.of("A", "B")));
 
         } catch (Exception e) {
             System.out.println("Error adding predefined data: " + e.getMessage());
@@ -833,10 +842,15 @@ public class EmployeeFacade {
     }
 
     public void ClearDataBase() {
-        // empController.rese
-        // driverController.clearDrivers();
+        try{
+        empController.clearAllEmployees();
+        driverController.clearTables();
         shiftEmployees.clear();
         branches.clear();
+        }
+        catch(Exception e){
+            System.out.println("Error clearing database: " + e.getMessage());
+        }
         employeeManager = null;
     }
 
