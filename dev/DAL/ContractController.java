@@ -88,7 +88,7 @@ public class ContractController {
                     supplierID INTEGER NOT NULL,
                     itemID INTEGER NOT NULL,
                     catalogID INTEGER NOT NULL,
-                    day INTEGER NOT NULL,
+                    day INTEGER CHECK(day >= 1 AND day <= 7),
                     PRIMARY KEY (contractID, supplierID, itemID)
                     );
                     """;
