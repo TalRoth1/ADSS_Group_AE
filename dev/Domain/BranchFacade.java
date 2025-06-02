@@ -210,4 +210,10 @@ public class BranchFacade
         nextBranchID = controller.getMaxBranchID() + 1;
         loadAllBranchesFromDB();
     }
+
+    // This function is for TESTS ONLY, do not use in real life.
+    public static void resetInstance() 
+    {
+        instance = null;
+    }
 }
