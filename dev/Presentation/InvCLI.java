@@ -283,7 +283,7 @@ public class InvCLI {
                     display("Enter new categories (comma-separated): ");
                     String[] newCategories = getTextFromUser().split(",");
 
-                    Response updateResponse = PS.UpdateProduct(productID, newName, newCost, newSelling, newDiscount,
+                    Response updateResponse = PS.UpdateProduct(productID, newName, newSelling, newDiscount,
                             newProducer, newCategories);
                     if (updateResponse.getErrorMessage() == null) {
                         display(updateResponse.getResponseValue());
