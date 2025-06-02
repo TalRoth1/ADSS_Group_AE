@@ -102,7 +102,6 @@ public class ProductFacadeTest {
         productFacade.purchaseItem(itemId);
         ReportBL report = productFacade.salesReport();
         assertNotNull(report);
-        productFacade.removeItem(itemId);
         productFacade.removeProduct(productId);
     }
 
