@@ -1,4 +1,5 @@
 package DAL;
+
 import java.io.File;
 import java.sql.*;
 
@@ -56,12 +57,12 @@ public class ProfitAmountsController {
         }
     }
 
-    public void addProfit(int productID, int branchID, int amountToAdd) {
+    public void addProfit(int productID, int branchID, double amountToAdd) {
         try (Connection conn = DriverManager.getConnection(url)) {
             String updateSql = "UPDATE " + tableName
                     + " SET profitAmount = profitAmount + ? WHERE productID = ? AND branchID = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(updateSql)) {
-                pstmt.setInt(1, amountToAdd);
+                pstmt.setDouble(1, amountToAdd);
                 pstmt.setInt(2, productID);
                 pstmt.setInt(3, branchID);
                 pstmt.executeUpdate();
