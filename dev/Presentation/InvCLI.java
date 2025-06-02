@@ -35,7 +35,7 @@ public class InvCLI {
 
             switch (choice) {
                 case "0":
-                    display("Exiting the system. Goodbye!");
+                    display("Return to main menu. Goodbye!");
                     isInterrupted = true;
                     return;
                 case "1":
