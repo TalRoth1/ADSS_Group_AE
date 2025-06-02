@@ -7,11 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import DAL.CatalogController;
-import DAL.CatalogDAO;
 import DAL.ContractController;
 import DAL.ContractDAO;
-import DAL.DiscountController;
 import DAL.DiscountDAO;
 import DAL.SupplierController;
 import DAL.SupplierDAO;
@@ -21,12 +18,10 @@ public class SupplierFacade {
     private static SupplierFacade instance;
     private final List<SupplierDL> suppliers;
     private List<ProductBL> items; // Will be saved in inventory after the merge
-    private int nextId = 1;
     private SupplierController supplierController = new SupplierController();
     private ContractController contractController = new ContractController();
-    private CatalogController catalogController = new CatalogController();
-    private DiscountController discountController = new DiscountController();
     private ProductFacade productFacade = ProductFacade.getInstance();
+    private int nextId = supplierController.getNextId();
 
     private SupplierFacade() {
         this.suppliers = new ArrayList<>();
@@ -35,18 +30,24 @@ public class SupplierFacade {
         {
             List<ContractDAO> contracts = contractController.getSupplierContracts(sup.getId());
             List<ContractDL> contractList = new ArrayList<>();
-            List<DiscountDL> discounts = new ArrayList<>();
             for (ContractDAO contract : contracts)
             {
                 Map<ProductBL, Integer> itemCatalog = new HashMap<>();
-                List<CatalogDAO> catalogItems = catalogController.getContractSupplierCatalogs(sup.getId(), contract.getContractID());
-                for (CatalogDAO catalogItem : catalogItems) {
-                    ProductBL item = productFacade.getProduct(catalogItem.getProductID());
-                    DiscountDAO dis = discountController.getDiscount(catalogItem.getCatalogID());
-                    if (dis != null) {
-                        discounts.add(new DiscountDL(dis.getCatalogID(), dis.getMinimumQuantity(), dis.getDiscountPercentage()));
+                List<DiscountDL> discounts = new ArrayList<>();
+                for (ContractDAO cont : contracts)
+                {
+                    Map<Integer, Integer> items = cont.getItemCatalog();
+                    for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
+                        ProductBL product = productFacade.getProduct(entry.getKey());
+                        if (product != null) {
+                            itemCatalog.put(product, entry.getValue());
+                        }
                     }
-                    itemCatalog.put(item, catalogItem.getCatalogID());
+                    List<DiscountDAO> billOfQuantities = cont.getBillOfQuantities();
+                    for (DiscountDAO discount : billOfQuantities) {
+                        DiscountDL discountDL = new DiscountDL(discount.getCatalogID(), discount.getMinimumQuantity(), discount.getDiscountPercentage());
+                        discounts.add(discountDL);
+                    }
                 }
                 ContractDL contractDL = new ContractDL(contract.getContractID(), itemCatalog, discounts, contract.getDeliveryMethod());
                 contractList.add(contractDL);
@@ -68,11 +69,12 @@ public class SupplierFacade {
         return instance;
     }
 
-    public void addSupplier(int companyID, int bankAccount, PaymentMethod paymentMethod, String contactEmail,
-            String contactPhone, List<ContractDL> contracts) {
-        SupplierDL newSupplier = new SupplierDL(nextId++, companyID, bankAccount, paymentMethod, contactEmail,
-                contactPhone, contracts);
+    public void addSupplier(int companyID, int bankAccount, PaymentMethod paymentMethod, String contactEmail, String contactPhone, List<ContractDL> contracts)
+    {
+        SupplierDL newSupplier = new SupplierDL(nextId++, companyID, bankAccount, paymentMethod, contactEmail, contactPhone, contracts);
+        SupplierDAO supplierDAO = new SupplierDAO(newSupplier.getSupplierID(), companyID, bankAccount, paymentMethod.toString(), contactEmail, contactPhone, supplierController);
         suppliers.add(newSupplier);
+        supplierDAO.persist();
     }
 
     public SupplierDL getSupplier(int supplierID) {
@@ -84,17 +86,19 @@ public class SupplierFacade {
         return null; // Supplier not found
     }
 
-    public void addContract(int supplierID, Map<Integer, Integer> itemCat, List<String[]> billOfQuantities, 
-            DeliveryMethod deliveryMethod) {
+    public void addContract(int supplierID, Map<Integer, Integer> itemCat, List<String[]> billOfQuantities, DeliveryMethod deliveryMethod) {
         SupplierDL supplier = getSupplier(supplierID);
         int contractID = supplier.getNextContractID();
         List<DiscountDL> discounts = new ArrayList<>();
+        List<DiscountDAO> discountDAOs = new ArrayList<>();
         for (String[] item : billOfQuantities) {
             int itemID = Integer.parseInt(item[0]);
             int minimumQuantity = Integer.parseInt(item[1]);
-            int discountPercentage = Integer.parseInt(item[2]);
+            double discountPercentage = Double.parseDouble(item[2]);
             DiscountDL discount = new DiscountDL(itemID, minimumQuantity, discountPercentage);
             discounts.add(discount);
+            DiscountDAO discountDAO = new DiscountDAO(itemID, minimumQuantity, discountPercentage);
+            discountDAOs.add(discountDAO);
         }
         Map<ProductBL, Integer> itemCatalog = new HashMap<>();
         for (Map.Entry<Integer, Integer> entry : itemCat.entrySet()) {
@@ -107,12 +111,15 @@ public class SupplierFacade {
         }
         if (supplier != null) {
             ContractDL newContract = new ContractDL(contractID, itemCatalog, discounts, deliveryMethod);
+            ContractDAO contractDAO = new ContractDAO(newContract.getContractID(), supplierID, itemCat, discountDAOs, deliveryMethod);
             supplier.addContract(newContract);
+            contractDAO.persist();
         }
     }
 
-    public void changeContract(int supplierID, int contractID, List<String[]> newBill) {
+    public void updateContract(int supplierID, int contractID, List<String[]> newBill) {
         List<DiscountDL> newBoQ = new ArrayList<>();
+        List<DiscountDAO> newBoQDAO = new ArrayList<>();
         SupplierDL supplier = getSupplier(supplierID);
         if (supplier != null) {
             for (ContractDL contract : supplier.getContracts()) {
@@ -120,21 +127,25 @@ public class SupplierFacade {
                     for (String[] item : newBill) {
                         int itemID = Integer.parseInt(item[0]);
                         int minimumQuantity = Integer.parseInt(item[1]);
-                        int discountPercentage = Integer.parseInt(item[2]);
+                        double discountPercentage = Double.parseDouble(item[2]);
                         DiscountDL discount = new DiscountDL(itemID, minimumQuantity, discountPercentage);
+                        DiscountDAO discountDAO = new DiscountDAO(itemID, minimumQuantity, discountPercentage);
                         newBoQ.add(discount);
+                        newBoQDAO.add(discountDAO);
                     }
                     contract.setBillOfQuantities(newBoQ);
+                    contractController.updateContact(contractID, supplierID, newBoQDAO);
                     break;
                 }
             }
-        }
+        }   
     }
 
     public void removeContract(int supplierID, int contractID) {
         SupplierDL supplier = getSupplier(supplierID);
         if (supplier != null) {
             supplier.removeContract(contractID);
+            contractController.delete(supplierID, contractID);
         }
     }
 
@@ -178,6 +189,12 @@ public class SupplierFacade {
             return suppliedItems;
         }
         return null; // Supplier not found
+    }
+
+    public void updatePeriodicItems(int supplierID, int contractID, List<PeriodicItem> newItems) {
+        ContractDL contract = getContract(supplierID, contractID);
+        contract.setDeliveryMethod(new PeriodicDelivery(((PeriodicDelivery)contract.getDeliveryMethod()).getDay(), newItems));
+        contractController.updatePeriodic(supplierID, contractID, newItems);
     }
 
     public Map<SupplierDL, List<ContractDL>> findItemSuppliersPeriodic(int productId)

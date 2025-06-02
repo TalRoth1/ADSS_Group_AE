@@ -146,4 +146,26 @@ public class SupplierController
         }
         return suppliers;
     }
+    
+    public int getNextId()
+    {
+        String sql = "SELECT MAX(supplierId) AS maxID FROM " + tableName;
+        try (Connection conn = DriverManager.getConnection(url)) {
+            if (conn != null) {
+                try (var pstmt = conn.prepareStatement(sql);
+                     var rs = pstmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt("maxID") + 1; // Return the next ID
+                    }
+                } catch (SQLException e) {
+                    System.out.println("Get next ID failed: " + e.getMessage());
+                }
+            } else {
+                System.out.println("Connection to database failed.");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return -1;
+    }
 }

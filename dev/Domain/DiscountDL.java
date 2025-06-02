@@ -4,9 +4,9 @@ public class DiscountDL
 {
     private int catalogID;
     private int minimumQuantity;
-    private int discountPercentage;
-    
-    public DiscountDL(int catalogID, int minimumQuantity, int discountPercentage)
+    private double discountPercentage;
+
+    public DiscountDL(int catalogID, int minimumQuantity, double discountPercentage)
     {
         this.catalogID = catalogID;
         this.minimumQuantity = minimumQuantity;
@@ -28,12 +28,12 @@ public class DiscountDL
         this.minimumQuantity = minimumQuantity;
     }
 
-    public int getDiscountPercentage()
+    public double getDiscountPercentage()
     {
         return discountPercentage;
     }
 
-    public void setDiscountPercentage(int discountPercentage)
+    public void setDiscountPercentage(double discountPercentage)
     {
         this.discountPercentage = discountPercentage;
     }

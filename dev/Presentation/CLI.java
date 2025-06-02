@@ -177,7 +177,7 @@ public class CLI {
             System.out.println("Do you want to add another item? (Y/N):");
             cont = scanner.nextLine().toUpperCase();
         }
-        sf.changeContract(supplierID, contractID, billOfQuantities);
+        sf.updateContract(supplierID, contractID, billOfQuantities);
     }
 
     public void removeContract(Scanner scanner) {
