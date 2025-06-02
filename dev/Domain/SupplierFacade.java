@@ -274,5 +274,13 @@ public class SupplierFacade {
         billOfQuantities.add(new String[] { "10", "100", "8" });
         addContract(3, itemCat4, billOfQuantities4, new PickupDelivery());
     }
+    
+    public void clearData() {
+        suppliers.clear();
+        items.clear();
+        nextId = supplierController.getNextId();
+        supplierController.clearData();
+        contractController.clearData();
+    }
 
 }

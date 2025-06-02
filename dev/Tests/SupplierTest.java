@@ -1,12 +1,11 @@
 package Tests;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import Domain.ContractDL;
-import Domain.DeliveryMethod;
 import Domain.DiscountDL;
-import Domain.ItemBL;
 import Domain.OnOrderDelivery;
 import Domain.ProductBL;
 import Domain.SupplierDL;
@@ -39,6 +38,11 @@ class SupplierTest {
         } catch (Exception e) {
             fail("Failed to set item list using reflection");
         }
+    }
+
+    @AfterEach
+    void tearDown() {
+        supplierFacade.clearData();
     }
 
     @Test
@@ -124,7 +128,7 @@ class SupplierTest {
         DiscountDL discount = new DiscountDL(1, 5, 10);
         boq.add(discount);
         ContractDL contract = new ContractDL(1, itemCat, boq, new OnOrderDelivery());
-        supplierFacade.getSupplier(123).addContract(contract);
+        supplierFacade.getSupplier(1).addContract(contract);
 
         Map<Integer, Integer> items = supplierFacade.getSuppliedCatalogItems(1);
         assertEquals(20, items.get(1));

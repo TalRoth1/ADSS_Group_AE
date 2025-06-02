@@ -28,13 +28,14 @@ public class SupplierController
     {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "INSERT INTO " + tableName + " (companyID, bankAccount, paymentMethod, contactMail, contactPhone) VALUES (?, ?, ?, ?, ?)";
+                String sql = "INSERT INTO " + tableName + " (supplierID, companyID, bankAccount, paymentMethod, contactMail, contactPhone) VALUES (?, ?, ?, ?, ?, ?)";
                 try (var pstmt = conn.prepareStatement(sql)) {
-                    pstmt.setInt(1, supplier.getCompanyID());
-                    pstmt.setInt(2, supplier.getBankAccount());
-                    pstmt.setString(3, supplier.getPaymentMethod());
-                    pstmt.setString(4, supplier.getContactMail());
-                    pstmt.setString(5, supplier.getContactPhone());
+                    pstmt.setInt(1, supplier.getId());
+                    pstmt.setInt(2, supplier.getCompanyID());
+                    pstmt.setInt(3, supplier.getBankAccount());
+                    pstmt.setString(4, supplier.getPaymentMethod());
+                    pstmt.setString(5, supplier.getContactMail());
+                    pstmt.setString(6, supplier.getContactPhone());
                     pstmt.executeUpdate();
                     System.out.println("Supplier inserted successfully.");
                 } catch (SQLException e) {
@@ -73,7 +74,7 @@ public class SupplierController
     {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "DELETE FROM " + tableName + " WHERE supplierId = ?";
+                String sql = "DELETE FROM " + tableName + " WHERE supplierID = ?";
                 try (var pstmt = conn.prepareStatement(sql)) {
                     pstmt.setInt(1, id);
                     pstmt.executeUpdate();
@@ -93,7 +94,7 @@ public class SupplierController
     {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
-                String sql = "SELECT * FROM " + tableName + " WHERE supplierId = ?";
+                String sql = "SELECT * FROM " + tableName + " WHERE supplierID = ?";
                 try (var pstmt = conn.prepareStatement(sql)) {
                     pstmt.setInt(1, id);
                     try (var rs = pstmt.executeQuery()) {
@@ -127,7 +128,7 @@ public class SupplierController
                 try (var pstmt = conn.prepareStatement(sql);
                      var rs = pstmt.executeQuery()) {
                     while (rs.next()) {
-                        int id = rs.getInt("supplierId");
+                        int id = rs.getInt("supplierID");
                         int companyID = rs.getInt("companyID");
                         int bankAccount = rs.getInt("bankAccount");
                         String paymentMethod = rs.getString("paymentMethod");
@@ -149,13 +150,13 @@ public class SupplierController
     
     public int getNextId()
     {
-        String sql = "SELECT MAX(supplierId) AS maxID FROM " + tableName;
+        String sql = "SELECT MAX(supplierID) AS maxID FROM " + tableName;
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
                 try (var pstmt = conn.prepareStatement(sql);
                      var rs = pstmt.executeQuery()) {
                     if (rs.next()) {
-                        return rs.getInt("maxID") + 1; // Return the next ID
+                        return Math.max(1,rs.getInt("maxID") + 1); // Return the next ID
                     }
                 } catch (SQLException e) {
                     System.out.println("Get next ID failed: " + e.getMessage());
@@ -166,6 +167,24 @@ public class SupplierController
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return -1;
+        return 1;
+    }
+
+    public void clearData()
+    {
+        String sql = "DELETE FROM " + tableName;
+        try (Connection conn = DriverManager.getConnection(url)) {
+            if (conn != null) {
+                try (var pstmt = conn.prepareStatement(sql)) {
+                    pstmt.executeUpdate();
+                } catch (SQLException e) {
+                    System.out.println("Clear data failed: " + e.getMessage());
+                }
+            } else {
+                System.out.println("Connection to database failed.");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
