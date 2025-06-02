@@ -54,13 +54,12 @@ public class ContractController {
                     supplierID INTEGER NOT NULL,
                     FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
                     PRIMARY KEY (contractID, supplierID)
-
                     );
                     """;
 
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Failed to create Products table: " + e.getMessage());
+            System.out.println("Failed to create OnOrders table: " + e.getMessage());
         }
     }
 
@@ -73,13 +72,13 @@ public class ContractController {
                     contractID INTEGER NOT NULL,
                     supplierID INTEGER NOT NULL,
                     FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE
-                    PRIMARY KEY (contractID, supplierID),
+                    PRIMARY KEY (contractID, supplierID)
                     );
                     """;
 
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Failed to create Products table: " + e.getMessage());
+            System.out.println("Failed to create Pickups table: " + e.getMessage());
         }
     }
 
@@ -93,15 +92,13 @@ public class ContractController {
                     supplierID INTEGER NOT NULL,
                     day INTEGER CHECK(day >= 1 AND day <= 7),
                     FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
-
                     PRIMARY KEY (contractID, supplierID)
-
                     );
                     """;
 
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Failed to create Products table: " + e.getMessage());
+            System.out.println("Failed to create Periodics table: " + e.getMessage());
         }
     }
 
@@ -124,7 +121,7 @@ public class ContractController {
 
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Failed to create Products table: " + e.getMessage());
+            System.out.println("Failed to create PeriodicItems table: " + e.getMessage());
         }
     }
 
@@ -166,7 +163,7 @@ public class ContractController {
 
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Failed to create Products table: " + e.getMessage());
+            System.out.println("Failed to create contractItems table: " + e.getMessage());
         }
     }
 

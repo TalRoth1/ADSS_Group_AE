@@ -44,7 +44,7 @@ public class OrderController {
                     """;
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Failed to create Products table: " + e.getMessage());
+            System.out.println("Failed to create Orders table: " + e.getMessage());
         }
     }
 
@@ -67,7 +67,7 @@ public class OrderController {
                     """;
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Failed to create Products table: " + e.getMessage());
+            System.out.println("Failed to create OrderItems table: " + e.getMessage());
         }
     }
 
