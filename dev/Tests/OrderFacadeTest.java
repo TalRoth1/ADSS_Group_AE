@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import Domain.OrderDL;
 import Domain.OrderFacade;
+import Domain.ProductBL;
 import Domain.SupplierFacade;
 import Utils.OrderStatus;
 
@@ -16,12 +17,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class OrderFacadeTest {
     private OrderFacade orderFacade;
+    private SupplierFacade supplierFacade;
 
     @BeforeEach
     public void setUp() {
-        SupplierFacade supplierFacade = new SupplierFacade();
+        supplierFacade = SupplierFacade.getInstance();
         supplierFacade.loadData();
-        orderFacade = new OrderFacade(supplierFacade);
+        orderFacade = OrderFacade.getInstance();
         orderFacade.loadData();
     }
 
@@ -29,7 +31,7 @@ class OrderFacadeTest {
     void testCreateOrder_AddsOrderCorrectly() {
         int initialSize = orderFacade.getOrderHistory(1).size();
 
-        orderFacade.createOrder(1, "Test Branch", 1, Date.valueOf("2025-05-01"), Arrays.asList(
+        orderFacade.createOrder(1, 1, Date.valueOf("2025-05-01"), "Test Branch", Arrays.asList(
                 new int[]{1, 10},
                 new int[]{2, 20}
         ));
@@ -46,22 +48,22 @@ class OrderFacadeTest {
     void testChangeOrder_UpdatesOrderCorrectly() {
         OrderDL order = orderFacade.getOrder(0);
         assertNotNull(order);
-        int oldAgreementID = order.getAgreementID();
+        int oldAgreementID = order.getContractID();
 
         List<int[]> newItems = List.of(new int[]{1, 200});
-        orderFacade.changeOrder(0, "New Branch", Date.valueOf("2025-05-01"), 1, newItems);
+        orderFacade.changeOrder(0, "New Branch", Date.valueOf("2025-05-01"), newItems);
 
         OrderDL updatedOrder = orderFacade.getOrder(0);
         assertEquals("New Branch", updatedOrder.getDestination());
         assertEquals(1, updatedOrder.getOrderItems().size());
         assertEquals(Date.valueOf("2025-05-01"), updatedOrder.getOrderDate());
-        assertNotEquals(oldAgreementID, -1);  // Just to make sure it existed
+        assertNotEquals(oldAgreementID, -1);
     }
 
     @Test
     void testChangeOrder_OrderNotFound_ThrowsException() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            orderFacade.changeOrder(999, "Nowhere", Date.valueOf("2025-05-01"), 1, List.of(new int[]{1, 50}));
+            orderFacade.changeOrder(999, "Nowhere", Date.valueOf("2025-05-01"), List.of(new int[]{1, 50}));
         });
         assertEquals("Order not found: 999", exception.getMessage());
     }
@@ -103,5 +105,41 @@ class OrderFacadeTest {
         System.out.println(history);
         assertFalse(history.isEmpty());
         assertTrue(history.stream().allMatch(o -> o.getSupplierID() == 1));
+    }
+
+    @Test
+    public void testUpdateScheduledDeliveryItems_validInput() {
+        List<int[]> newItems = Arrays.asList(new int[]{1, 50});
+        assertDoesNotThrow(() ->
+            orderFacade.updateScheduledDeliveryItems(1, 1, newItems)
+        );
+    }
+
+    @Test
+    public void testUpdateScheduledDeliveryItems_wrongDeliveryMethod() {
+        List<int[]> newItems = Arrays.asList(new int[]{6, 20});
+        Exception e = assertThrows(IllegalArgumentException.class, () ->
+            orderFacade.updateScheduledDeliveryItems(2, 1, newItems)
+        );
+        assertTrue(e.getMessage().contains("Delivery method for contract is not periodic: "));
+    }
+
+    @Test
+    public void testHandleLowSupply_createsOrderWhenStockIsLow() {
+        List<int[]> newItems = Arrays.asList(new int[]{1, 30});
+        orderFacade.updateScheduledDeliveryItems(1, 1, newItems);
+        // Set up low stock for Carrot (ID 6)
+        ProductBL product = new ProductBL(1, "Milk", 3.70, 10, 155, new String[]{"dairy", "beverages"});
+        List<ProductBL> lowProducts = Arrays.asList(product);
+        List<Integer> minQtys = Arrays.asList(100);
+        List<Integer> currentQtys = Arrays.asList(50);
+        List<String> destinations = Arrays.asList("Branch A");
+        orderFacade.handleLowSupply(lowProducts, minQtys, currentQtys, destinations);
+        // Expecting one more order to be added
+        List<OrderDL> orderHistory = orderFacade.getOrderHistory(1);
+        assertTrue(orderHistory.stream().anyMatch(order ->
+            order.getDestination().equals("Branch A") &&
+            order.getOrderItems().values().stream().anyMatch(item -> item.getItemID() == 1)
+        ));
     }
 }

@@ -156,7 +156,6 @@ public class OrderFacade {
         return orderHistory;
     }
 
-    //TODO: Integrate with the periodic delivery system
     public void updateScheduledDeliveryItems(int supplierID, int contractID, List<int[]> newItems) throws IllegalArgumentException {
         SupplierDL supplier = sf.getSupplier(supplierID);
         if (supplier == null) {
@@ -184,7 +183,6 @@ public class OrderFacade {
                     PeriodicItem newItem = new PeriodicItem(itemID, quantity, totalPrice);
                     items.add(newItem);
                 }
-
                 periodicDelivery.setOrderItems(items);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Error updating scheduled delivery items: " + e.getMessage());
@@ -222,7 +220,7 @@ public class OrderFacade {
             int quantity = item[1];
             int catalogID = getCatalogID(itemID, supplierID, contractID);
             double totalPrice = calculateTotalPrice(quantity, catalogID, supplierID, contractID);
-            OrderItemDL orderItem = new OrderItemDL(nextID++, itemID, quantity, catalogID, totalPrice);
+            OrderItemDL orderItem = new OrderItemDL(nextID, itemID, quantity, catalogID, totalPrice);
             itemMap.put(itemID, orderItem);
         }
         return itemMap;
