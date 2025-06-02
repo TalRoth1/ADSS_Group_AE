@@ -53,11 +53,12 @@ public class OrderController {
                 Statement stmt = conn.createStatement()) {
             String sql = """
                         CREATE TABLE IF NOT EXISTS OrderItems (
-                            orderID INTEGER PRIMARY KEY,
-                            itemID INTEGER PRIMARY KEY,
+                            orderID INTEGER NOT NULL,
+                            itemID INTEGER NOT NULL,
                             quantity INTEGER NOT NULL,
                             catalogID INTEGER NOT NULL,
                             totalPrice REAL NOT NULL,
+                            PRIMARY KEY (orderID, itemID),
                             FOREIGN KEY (orderID) REFERENCES Orders(orderID)
                             FOREIGN KEY (itemID) REFERENCES Items(itemID)
 

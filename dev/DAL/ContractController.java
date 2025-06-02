@@ -147,7 +147,7 @@ public class ContractController {
                     minimumQuantity INTEGER NOT NULL,
                     discountPercentage REAL NOT NULL,
                     PRIMARY KEY (contractID, supplierID, catalogID),
-                    FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
+                    FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE
                     );
                     """;
 
