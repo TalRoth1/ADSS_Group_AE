@@ -3,10 +3,12 @@ package DAL;
 import java.io.File;
 import java.sql.*;
 
+import Utils.Globals;
+
 public class MinQuantitiesController {
     private final String tableName = "MinQuantities";
     String currentDir = System.getProperty("user.dir");
-    String dbPath = currentDir + File.separator + "Data.db";
+    private final String dbPath = (Globals.useFakeData) ? currentDir + File.separator + "FakeData.db" : currentDir + File.separator + "Data.db";
     String url = "jdbc:sqlite:" + dbPath;
 
     public MinQuantitiesController() {

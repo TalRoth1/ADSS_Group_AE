@@ -15,6 +15,7 @@ import Domain.OnOrderDelivery;
 import Domain.PeriodicDelivery;
 import Domain.PeriodicItem;
 import Domain.PickupDelivery;
+import Utils.Globals;
 
 public class ContractController {
     private String onOrder = "OnOrders";
@@ -24,7 +25,7 @@ public class ContractController {
     private String discount = "Discounts";
     private String items = "contractItems";
     String currentDir = System.getProperty("user.dir");
-    String dbPath = currentDir + File.separator + "Data.db";
+    private final String dbPath = (Globals.useFakeData) ? currentDir + File.separator + "FakeData.db" : currentDir + File.separator + "Data.db";
     String url = "jdbc:sqlite:" + dbPath;
 
     public ContractController() {
@@ -54,13 +55,12 @@ public class ContractController {
                     supplierID INTEGER NOT NULL,
                     FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
                     PRIMARY KEY (contractID, supplierID)
-
                     );
                     """;
 
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Failed to create Products table: " + e.getMessage());
+            System.out.println("Failed to create OnOrders table: " + e.getMessage());
         }
     }
 
@@ -73,13 +73,13 @@ public class ContractController {
                     contractID INTEGER NOT NULL,
                     supplierID INTEGER NOT NULL,
                     FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE
-                    PRIMARY KEY (contractID, supplierID),
+                    PRIMARY KEY (contractID, supplierID)
                     );
                     """;
 
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Failed to create Products table: " + e.getMessage());
+            System.out.println("Failed to create Pickups table: " + e.getMessage());
         }
     }
 
@@ -93,15 +93,13 @@ public class ContractController {
                     supplierID INTEGER NOT NULL,
                     day INTEGER CHECK(day >= 1 AND day <= 7),
                     FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
-
                     PRIMARY KEY (contractID, supplierID)
-
                     );
                     """;
 
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Failed to create Products table: " + e.getMessage());
+            System.out.println("Failed to create Periodics table: " + e.getMessage());
         }
     }
 
@@ -124,7 +122,7 @@ public class ContractController {
 
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Failed to create Products table: " + e.getMessage());
+            System.out.println("Failed to create PeriodicItems table: " + e.getMessage());
         }
     }
 
@@ -166,7 +164,7 @@ public class ContractController {
 
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Failed to create Products table: " + e.getMessage());
+            System.out.println("Failed to create contractItems table: " + e.getMessage());
         }
     }
 
