@@ -207,7 +207,7 @@ public class CLI {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
         int supplierID = Integer.parseInt(scanner.nextLine());
 
-        Map<Integer, Integer> catalogItems = sf.getSuppliedCatlogItems(supplierID);
+        Map<Integer, Integer> catalogItems = sf.getSuppliedCatalogItems(supplierID);
         if (catalogItems.isEmpty()) {
             System.out.println("No items in the catalog for this supplier.");
         } else {

@@ -41,7 +41,7 @@ public class SupplierFacade {
                 Map<ProductBL, Integer> itemCatalog = new HashMap<>();
                 List<CatalogDAO> catalogItems = catalogController.getContractSupplierCatalogs(sup.getId(), contract.getContractID());
                 for (CatalogDAO catalogItem : catalogItems) {
-                    ProductBL item = productFacade.getProduct(catalogItem.getProductID());// need to get item from inventory based on Item id
+                    ProductBL item = productFacade.getProduct(catalogItem.getProductID());
                     DiscountDAO dis = discountController.getDiscount(catalogItem.getCatalogID());
                     if (dis != null) {
                         discounts.add(new DiscountDL(dis.getCatalogID(), dis.getMinimumQuantity(), dis.getDiscountPercentage()));
