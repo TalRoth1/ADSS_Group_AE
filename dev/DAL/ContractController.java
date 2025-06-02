@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.sql.Statement;
+
 import Domain.OnOrderDelivery;
 import Domain.PeriodicDelivery;
 import Domain.PeriodicItem;
@@ -28,30 +30,114 @@ public class ContractController {
         // Ensure the database connection is established
         try {
             Class.forName("org.sqlite.JDBC");
+            initializeTableOnOrder();
+            initializeTablePickup();
+            initializeTablePeriodics();
+            initializeTablePeriodicItems();
+            initializeTableDiscounts();
+
         } catch (ClassNotFoundException e) {
             System.out.println("SQLite JDBC driver not found: " + e.getMessage());
         }
     }
 
-    // private void initializeTable() {
-    // try (Connection conn = DriverManager.getConnection(url);
-    // Statement stmt = conn.createStatement()) {
-    // String sql = """
-    // CREATE TABLE IF NOT EXISTS Contracts (
-    // supplierID INTEGER,
-    // companyID INTEGER NOT NULL,
-    // bankAccount INTEGER NOT NULL,
-    // paymentMethod TEXT NOT NULL,
-    // contactMail TEXT NOT NULL,
-    // contactPhone TEXT NOT NULL
+    private void initializeTableOnOrder() {
+        try (Connection conn = DriverManager.getConnection(url);
+                Statement stmt = conn.createStatement()) {
+            String sql = """
+                    CREATE TABLE IF NOT EXISTS OnOrders (
+                    contractID INTEGER NOT NULL,
+                    supplierID INTEGER NOT NULL,
+                    itemID INTEGER NOT NULL,
+                    catalogID INTEGER NOT NULL,
+                    PRIMARY KEY (contractID, supplierID, itemID)
+                    );
+                    """;
 
-    // );
-    // """;
-    // stmt.execute(sql);
-    // } catch (SQLException e) {
-    // System.out.println("Failed to create Products table: " + e.getMessage());
-    // }
-    // }
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println("Failed to create Products table: " + e.getMessage());
+        }
+    }
+
+    private void initializeTablePickup() {
+        try (Connection conn = DriverManager.getConnection(url);
+                Statement stmt = conn.createStatement()) {
+            String sql = """
+                    CREATE TABLE IF NOT EXISTS Pickups (
+                    contractID INTEGER NOT NULL,
+                    supplierID INTEGER NOT NULL,
+                    itemID INTEGER NOT NULL,
+                    catalogID INTEGER NOT NULL,
+                    PRIMARY KEY (contractID, supplierID, itemID)
+                    );
+                    """;
+
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println("Failed to create Products table: " + e.getMessage());
+        }
+    }
+
+    private void initializeTablePeriodics() {
+        try (Connection conn = DriverManager.getConnection(url);
+                Statement stmt = conn.createStatement()) {
+            String sql = """
+                    CREATE TABLE IF NOT EXISTS Periodics (
+                    contractID INTEGER NOT NULL,
+                    supplierID INTEGER NOT NULL,
+                    itemID INTEGER NOT NULL,
+                    catalogID INTEGER NOT NULL,
+                    day INTEGER NOT NULL,
+                    PRIMARY KEY (contractID, supplierID, itemID)
+                    );
+                    """;
+
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println("Failed to create Products table: " + e.getMessage());
+        }
+    }
+
+    private void initializeTablePeriodicItems() {
+        try (Connection conn = DriverManager.getConnection(url);
+                Statement stmt = conn.createStatement()) {
+            String sql = """
+                    CREATE TABLE IF NOT EXISTS PeriodicItems (
+                    contractID INTEGER NOT NULL,
+                    supplierID INTEGER NOT NULL,
+                    productID INTEGER NOT NULL,
+                    quantity INTEGER NOT NULL,
+                    price REAL NOT NULL,
+                    PRIMARY KEY (contractID, supplierID, productID)
+                    );
+                    """;
+
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println("Failed to create Products table: " + e.getMessage());
+        }
+    }
+
+    private void initializeTableDiscounts() {
+        try (Connection conn = DriverManager.getConnection(url);
+                Statement stmt = conn.createStatement()) {
+            String sql = """
+                    CREATE TABLE IF NOT EXISTS Discounts (
+                    contractID INTEGER NOT NULL,
+                    supplierID INTEGER NOT NULL,
+                    catalogID INTEGER NOT NULL,
+                    minimumQuantity INTEGER NOT NULL,
+                    discountPercentage REAL NOT NULL,
+                    PRIMARY KEY (contractID, supplierID, catalogID)
+                    );
+                    """;
+
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println("Failed to create Discounts table: " + e.getMessage());
+        }
+    }
 
     public void insert(ContractDAO contract) {
         try (Connection conn = DriverManager.getConnection(url)) {
@@ -353,9 +439,9 @@ public class ContractController {
         }
     }
 
-    public void clearData()
-    {
-        String sql = "DELETE FROM " + onOrder + "; DELETE FROM " + pickup + "; DELETE FROM " + periodic + "; DELETE FROM " + periodicItem + "; DELETE FROM " + discount + ";";
+    public void clearData() {
+        String sql = "DELETE FROM " + onOrder + "; DELETE FROM " + pickup + "; DELETE FROM " + periodic
+                + "; DELETE FROM " + periodicItem + "; DELETE FROM " + discount + ";";
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
                 try (var stmt = conn.createStatement()) {
