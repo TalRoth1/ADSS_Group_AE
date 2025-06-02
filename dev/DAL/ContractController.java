@@ -72,8 +72,8 @@ public class ContractController {
                     CREATE TABLE IF NOT EXISTS Pickups (
                     contractID INTEGER NOT NULL,
                     supplierID INTEGER NOT NULL,
-                    PRIMARY KEY (contractID, supplierID),
                     FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE
+                    PRIMARY KEY (contractID, supplierID),
                     );
                     """;
 
@@ -199,8 +199,7 @@ public class ContractController {
                         }
                         break;
                     case "Periodic Delivery":
-                        sql = "INSERT INTO " + periodic
-                                + " (contractID, supplierID, day) VALUES (?, ?, ?)";
+                        sql = "INSERT INTO " + periodic + " (contractID, supplierID, day) VALUES (?, ?, ?)";
                         try (var pstmt = conn.prepareStatement(sql)) {
                             pstmt.setInt(1, contract.getContractID());
                             pstmt.setInt(2, contract.getSupplierID());
@@ -243,8 +242,7 @@ public class ContractController {
                     System.out.println("Insert discounts failed: " + e.getMessage());
                 }
 
-                String itemSql = "INSERT INTO " + items
-                        + " (contractID, supplierID, itemID, catalogID) VALUES (?, ?, ?, ?)";
+                String itemSql = "INSERT INTO " + items + " (contractID, supplierID, itemID, catalogID) VALUES (?, ?, ?, ?)";
                 try (var pstmt = conn.prepareStatement(itemSql)) {
                     for (Map.Entry<Integer, Integer> entry : contract.getItemCatalog().entrySet()) {
                         pstmt.setInt(1, contract.getContractID());
@@ -522,8 +520,12 @@ public class ContractController {
     }
 
     public void clearData() {
-        String sql = "DELETE FROM " + onOrder + "; DELETE FROM " + pickup + "; DELETE FROM " + periodic
-                + "; DELETE FROM " + periodicItem + "; DELETE FROM " + discount + ";";
+        String sql = "DELETE FROM " + onOrder + ";"
+                + "DELETE FROM " + pickup + ";"
+                + "DELETE FROM " + periodic + ";"
+                + "DELETE FROM " + periodicItem + ";"
+                + "DELETE FROM " + discount + ";"
+                + "DELETE FROM " + items + ";";
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
                 try (var stmt = conn.createStatement()) {
