@@ -10,7 +10,6 @@ public class EmployeeDAO {
 
     private Connection connection;
 
-
     public EmployeeDAO(Connection connection) {
         this.connection = connection;
         try {
@@ -32,8 +31,8 @@ public class EmployeeDAO {
                 + "educationFund FLOAT NOT NULL, "
                 + "socialBenefits FLOAT NOT NULL, "
                 + "password TEXT NOT NULL,"
-                + "isFired INT DEFAULT 0, " //false 0, true 1
-                + "isloggedIn INT NOT NULL, " //false 0, true 1
+                + "isFired INT DEFAULT 0, " // false 0, true 1
+                + "isloggedIn INT NOT NULL, " // false 0, true 1
                 + "locationId INT NOT NULL "
                 + ")";
         try (Statement stmt = connection.createStatement()) {
@@ -80,7 +79,7 @@ public class EmployeeDAO {
         }
     }
 
-    //maybe dont need because we have updateEmployeeByField
+    // maybe dont need because we have updateEmployeeByField
     public void fireEmployee(int employeeId) throws SQLException {
         String sql = "UPDATE employees SET isFired=1 WHERE id=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -94,13 +93,13 @@ public class EmployeeDAO {
 
     public ResultSet getEmployee(int employeeId) throws SQLException {
         String sql = "SELECT * FROM employees WHERE id=?";
-        PreparedStatement pstmt = connection.prepareStatement(sql);
-        pstmt.setInt(1, employeeId);
-        ResultSet rs = pstmt.executeQuery();
-        if (!rs.next()) {
-            throw new SQLException("Employee with ID " + employeeId + " does not exist.");
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, employeeId);
+            return pstmt.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error retrieving employee: " + e.getMessage());
+            throw e;
         }
-        return rs;
     }
 
     public void updateEmployeeByField(int employeeId, String fieldName, Object newValue) throws SQLException {
@@ -117,12 +116,8 @@ public class EmployeeDAO {
 
     public ResultSet getAllEmployees() throws SQLException {
         String sql = "SELECT * FROM employees";
-        try (Statement stmt = connection.createStatement()) {
-            return stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println("Error retrieving all employees: " + e.getMessage());
-            throw e;
-        }
+        Statement stmt = connection.createStatement();
+        return stmt.executeQuery(sql);
     }
 
     public void checkEmployee(int employeeId) throws SQLException {

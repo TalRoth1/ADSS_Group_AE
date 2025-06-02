@@ -11,6 +11,7 @@ import java.util.Map;
 import DTO.EmployeeDTO;
 import DTO.LocationDTO;
 import DTO.ShiftDTO;
+import DomainLayer.EmployeeManager;
 import DomainLayer.LocationDL;
 import DomainLayer.Role;
 import DomainLayer.Shift;
@@ -66,6 +67,36 @@ public class EmployeeMapper {
                 assignedShifts,
                 roles);
 
+    }
+
+    public static EmployeeDTO toDTO(EmployeeManager e) {
+        if (e == null) {
+            return null;
+        }
+        LocationDTO branchDTO = LocationMapper.toDTO(e.getBranch());
+        List<String> roles = new ArrayList<>();
+        List<ShiftDTO> preferredShifts = new ArrayList<>();
+        Map<ShiftDTO, String> assignedShifts = new HashMap<>();
+
+        // Convert LocalDate to java.util.Date for DTO
+        Date startDate = Date.from(e.getStartDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        return new EmployeeDTO(
+                e.getId(),
+                e.getName(),
+                branchDTO,
+                e.getBankAccount(),
+                e.getSalary(),
+                startDate,
+                e.getVacationDays(),
+                e.getSickDays(),
+                e.getEducationFund(),
+                e.getSocialBenefits(),
+                e.getPassword(),
+                e.isFinishWorking(),
+                preferredShifts,
+                assignedShifts,
+                roles);
     }
 
     public static ShiftEmployee toDomain(EmployeeDTO dto, List<LocationDL> allBranches,

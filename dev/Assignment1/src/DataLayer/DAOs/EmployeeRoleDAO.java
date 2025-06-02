@@ -62,15 +62,11 @@ public class EmployeeRoleDAO {
 
     public ResultSet getAllRoles() throws SQLException {
         String sql = "SELECT * FROM employee_role";
-        try (Statement stmt = connection.createStatement()) {
-            return stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println("Error getting all roles: " + e.getMessage());
-            throw e;
-        }
+        Statement stmt = connection.createStatement();
+        return stmt.executeQuery(sql);
     }
 
-    public ResultSet getRolesForEmployee(int employeeId) throws SQLException { //get roles of a specific employee
+    public ResultSet getRolesForEmployee(int employeeId) throws SQLException { // get roles of a specific employee
         String sql = "SELECT role FROM employee_role WHERE employeeId=?";
         List<String> roles = new ArrayList<>();
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {

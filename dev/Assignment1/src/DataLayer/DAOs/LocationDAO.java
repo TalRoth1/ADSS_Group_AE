@@ -21,7 +21,7 @@ public class LocationDAO {
 
     public void initializeTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS locations ("
-                //+ "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                // + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "id INTEGER PRIMARY KEY, "
                 + "street TEXT NOT NULL, "
                 + "street_number INTEGER NOT NULL, "
@@ -159,13 +159,8 @@ public class LocationDAO {
     // also return id for each location?
     public ResultSet getAllLocations() throws SQLException {
         String sql = "SELECT * FROM locations";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving all locations: " + e.getMessage());
-            throw e;
-        }
-
+        Statement stmt = connection.createStatement();
+        return stmt.executeQuery(sql);
     }
 
     public void clearTable() throws SQLException {
@@ -182,7 +177,7 @@ public class LocationDAO {
         clearTable();
         String resetSql = "DELETE FROM sqlite_sequence WHERE name='locations'";
         try (Statement stmt = connection.createStatement()) {
-            //stmt.executeUpdate(resetSql);
+            // stmt.executeUpdate(resetSql);
         } catch (SQLException e) {
             System.out.println("Error resetting locations table sequence: " + e.getMessage());
             throw e;

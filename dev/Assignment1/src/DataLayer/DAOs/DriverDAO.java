@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DriverDAO {
-    
+
     Connection connection;
 
     public DriverDAO(Connection connection) {
@@ -29,7 +29,7 @@ public class DriverDAO {
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println("Error initializing database: " + e.getMessage());
-            throw e; 
+            throw e;
         }
     }
 
@@ -41,7 +41,7 @@ public class DriverDAO {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding driver: " + e.getMessage());
-            throw e; 
+            throw e;
         }
     }
 
@@ -52,18 +52,14 @@ public class DriverDAO {
             return pstmt.executeQuery();
         } catch (SQLException e) {
             System.out.println("Error retrieving driver: " + e.getMessage());
-            throw e; 
+            throw e;
         }
     }
 
     public ResultSet getAllDrivers() throws SQLException {
         String sql = "SELECT * FROM drivers";
-        try (Statement stmt = connection.createStatement()) {
-            return stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println("Error retrieving all drivers: " + e.getMessage());
-            throw e; 
-        }
+        Statement stmt = connection.createStatement();
+        return stmt.executeQuery(sql);
     }
 
     public void updateDriver(int id, int isBusy) throws SQLException {
@@ -74,7 +70,7 @@ public class DriverDAO {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error updating driver: " + e.getMessage());
-            throw e; 
+            throw e;
         }
     }
 
@@ -85,7 +81,7 @@ public class DriverDAO {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error deleting driver: " + e.getMessage());
-            throw e; 
+            throw e;
         }
     }
 
@@ -95,7 +91,7 @@ public class DriverDAO {
             stmt.executeUpdate(sql);
         } catch (SQLException e) {
             System.out.println("Error clearing drivers: " + e.getMessage());
-            throw e; 
+            throw e;
         }
     }
 }

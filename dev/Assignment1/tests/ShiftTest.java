@@ -1,116 +1,113 @@
-package DomainLayer;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+package tests;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
 
-class ShiftTest {
+import DomainLayer.LocationDL;
+import DomainLayer.Role;
+import DomainLayer.Shift;
+import DomainLayer.ShiftType;
+
+public class ShiftTest {
+
     private Shift shift;
     private final int MANAGER_ID = 999;
     private final int EMPLOYEE_ID = 200;
     private final LocalDate SHIFT_DATE = LocalDate.now();
+    private LocationDL testBranch;
 
-    @BeforeEach
-    void setUp() {
-        // Initialize a new shift before each test
-        shift = new Shift(SHIFT_DATE, ShiftType.MORNING, MANAGER_ID);
-
-        // Set some roles required for tests (can be adjusted in each test too)
-        shift.setRequiredRoles(Role.CASHIER, 1);
-        shift.setRequiredRoles(Role.STORE_KEEPER, 1);
+    @Before
+    public void setUp() {
+        testBranch = new LocationDL(1, "Test Branch", 1, "Test Street", "1234567890", "Test Contact", "Zone1");
+        shift = new Shift(1, SHIFT_DATE, ShiftType.MORNING, MANAGER_ID, testBranch);
+        try {
+            shift.setRequiredRoles(Role.CASHIER, 1);
+            shift.setRequiredRoles(Role.STORE_KEEPER, 1);
+        } catch (Exception e) {
+            fail("Failed to set up test: " + e.getMessage());
+        }
     }
 
-    @AfterEach
-    void tearDown() {
-        // Clear data to ensure a clean state between tests
+    @After
+    public void tearDown() {
         shift = null;
     }
 
     @Test
-    void addEmployee_shouldSucceed() {
-        Shift shift = new Shift(LocalDate.now(), ShiftType.MORNING, MANAGER_ID);
+    public void addEmployee_shouldSucceed() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now(), ShiftType.MORNING, MANAGER_ID, testBranch);
         shift.setRequiredRoles(Role.CASHIER, 1);
-        String result = shift.addEmployee(EMPLOYEE_ID, Role.CASHIER);
-
-        assertNull(result);
+        shift.addEmployee(EMPLOYEE_ID, Role.CASHIER);
         assertTrue(shift.getAssignedEmployeesID().containsKey(EMPLOYEE_ID));
         assertEquals(Role.CASHIER, shift.getAssignedEmployeesID().get(EMPLOYEE_ID));
     }
 
-    @Test
-    void addEmployee_shouldFail_AlreadyAssigned() {
-        Shift shift = new Shift(LocalDate.now(), ShiftType.MORNING, MANAGER_ID);
+    @Test(expected = Exception.class)
+    public void addEmployee_shouldFail_AlreadyAssigned() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now(), ShiftType.MORNING, MANAGER_ID, testBranch);
         shift.setRequiredRoles(Role.CASHIER, 1);
         shift.addEmployee(EMPLOYEE_ID, Role.CASHIER);
-        String result = shift.addEmployee(EMPLOYEE_ID, Role.CASHIER);
-
-        assertEquals("Employee already assigned to this shift.", result);
+        shift.addEmployee(EMPLOYEE_ID, Role.CASHIER);
     }
 
-    @Test
-    void addEmployee_shouldFail_NoRequiredRoles() {
-        Shift shift = new Shift(LocalDate.now(), ShiftType.MORNING, MANAGER_ID);
+    @Test(expected = Exception.class)
+    public void addEmployee_shouldFail_NoRequiredRoles() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now(), ShiftType.MORNING, MANAGER_ID, testBranch);
         shift.setRequiredRoles(Role.CASHIER, 0);
-        String result = shift.addEmployee(EMPLOYEE_ID, Role.CASHIER);
-        assertEquals("No more employees required for this role.", result);
+        shift.addEmployee(EMPLOYEE_ID, Role.CASHIER);
     }
 
-
     @Test
-    void removeEmployee_shouldSucceed() {
-        Shift shift = new Shift(LocalDate.now(), ShiftType.EVENING, MANAGER_ID);
+    public void removeEmployee_shouldSucceed() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now(), ShiftType.EVENING, MANAGER_ID, testBranch);
         shift.setRequiredRoles(Role.STORE_KEEPER, 1);
         shift.addEmployee(EMPLOYEE_ID, Role.STORE_KEEPER);
-        String result = shift.removeEmployee(EMPLOYEE_ID);
-
-        assertNull(result);
+        shift.removeEmployee(EMPLOYEE_ID);
         assertFalse(shift.getAssignedEmployeesID().containsKey(EMPLOYEE_ID));
     }
 
-    @Test
-    void removeEmployee_shouldFail_NotAssigned() {
-        Shift shift = new Shift(LocalDate.now(), ShiftType.EVENING, MANAGER_ID);
-        String result = shift.removeEmployee(EMPLOYEE_ID);
-
-        assertEquals("Employee not assigned to this shift.", result);
-    }
-
-
-    @Test
-    void addPrefemployee_shouldSucceed() {
-        Shift shift = new Shift(LocalDate.now(), ShiftType.MORNING, MANAGER_ID);
-        shift.setRequiredRoles(Role.CASHIER, 1);
-        String result = shift.addPrefemployee(EMPLOYEE_ID, Role.CASHIER);
-        assertNull(result);
+    @Test(expected = Exception.class)
+    public void removeEmployee_shouldFail_NotAssigned() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now(), ShiftType.EVENING, MANAGER_ID, testBranch);
+        shift.removeEmployee(EMPLOYEE_ID);
     }
 
     @Test
-    void addPrefemployee_shouldFail_AlreadyAvailable() {
-        Shift shift = new Shift(LocalDate.now(), ShiftType.MORNING, MANAGER_ID);
+    public void addPrefemployee_shouldSucceed() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now(), ShiftType.MORNING, MANAGER_ID, testBranch);
         shift.setRequiredRoles(Role.CASHIER, 1);
         shift.addPrefemployee(EMPLOYEE_ID, Role.CASHIER);
-        String result = shift.addPrefemployee(EMPLOYEE_ID, Role.CASHIER);
-        assertEquals("already available for this shift.", result);
+        assertTrue(shift.getAvailableEmployeesID().containsKey(EMPLOYEE_ID));
+        assertEquals(Role.CASHIER, shift.getAvailableEmployeesID().get(EMPLOYEE_ID));
     }
 
-
-    @Test
-    void removePrefemployee_shouldSucceed() {
-        Shift shift = new Shift(LocalDate.now(), ShiftType.EVENING, MANAGER_ID);
+    @Test(expected = Exception.class)
+    public void addPrefemployee_shouldFail_AlreadyAvailable() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now(), ShiftType.MORNING, MANAGER_ID, testBranch);
         shift.setRequiredRoles(Role.CASHIER, 1);
         shift.addPrefemployee(EMPLOYEE_ID, Role.CASHIER);
-        String result = shift.removePrefemployee(EMPLOYEE_ID);
-        assertNull(result);
+        shift.addPrefemployee(EMPLOYEE_ID, Role.CASHIER);
     }
 
     @Test
-    void removePrefemployee_shouldFail_NotAvailable() {
-        Shift shift = new Shift(LocalDate.now(), ShiftType.EVENING, MANAGER_ID);
-        String result = shift.removePrefemployee(EMPLOYEE_ID);
-        assertEquals("Employee not assigned to this shift.", result);
+    public void removePrefemployee_shouldSucceed() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now(), ShiftType.EVENING, MANAGER_ID, testBranch);
+        shift.setRequiredRoles(Role.CASHIER, 1);
+        shift.addPrefemployee(EMPLOYEE_ID, Role.CASHIER);
+        shift.removePrefemployee(EMPLOYEE_ID);
+        assertFalse(shift.getAvailableEmployeesID().containsKey(EMPLOYEE_ID));
+    }
+
+    @Test(expected = Exception.class)
+    public void removePrefemployee_shouldFail_NotAvailable() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now(), ShiftType.EVENING, MANAGER_ID, testBranch);
+        shift.removePrefemployee(EMPLOYEE_ID);
     }
 }

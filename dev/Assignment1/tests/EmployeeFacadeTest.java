@@ -1,28 +1,39 @@
-package DomainLayer;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
+package tests;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
 
-class EmployeeFacadeTest {
+import DomainLayer.Employee;
+import DomainLayer.EmployeeFacade;
+import DomainLayer.LocationDL;
+import DomainLayer.Role;
+
+public class EmployeeFacadeTest {
 
     private EmployeeFacade employeeFacade;
     private final int MANAGER_ID = 100;
     private final String MANAGER_PASSWORD = "123";
     private final LocalDate START_DATE = LocalDate.now();
+    private LocationDL testBranch;
 
-    @BeforeEach
-    void setUp() {
+    @Before
+    public void setUp() throws Exception {
         employeeFacade = new EmployeeFacade();
+        testBranch = new LocationDL(1, "Test Branch", 1, "Test Street", "1234567890", "Test Contact", "Zone1");
+        employeeFacade.addBranch(testBranch);
+
         // Add a manager for testing
         employeeFacade.addFirstEmployeeManager(
                 MANAGER_ID,
                 "Keren",
-                "Branch1",
+                testBranch,
                 "111222",
                 7000,
                 START_DATE,
@@ -30,31 +41,34 @@ class EmployeeFacadeTest {
                 5,
                 100,
                 100,
-                MANAGER_PASSWORD
-        );
+                MANAGER_PASSWORD);
     }
 
-    @AfterEach
-    void tearDown() {
+    @After
+    public void tearDown() {
         if (employeeFacade != null) {
             // Make sure any logged in users are logged out
-            if (employeeFacade.getEmployee(MANAGER_ID) != null) {
-                employeeFacade.logout(MANAGER_ID);
+            Employee emp = employeeFacade.getEmployee(MANAGER_ID);
+            if (emp != null) {
+                try {
+                    employeeFacade.logout(MANAGER_ID);
+                } catch (Exception e) {
+                    // Ignore logout errors during cleanup
+                }
             }
             employeeFacade = null;
         }
-
     }
 
     @Test
-    void hireEmployee_SuccessfulHire() {
+    public void hireEmployee_SuccessfulHire() throws Exception {
         // Login manager first
         employeeFacade.login(MANAGER_ID, MANAGER_PASSWORD);
 
-        String result = employeeFacade.hireEmployee(
+        employeeFacade.hireEmployee(
                 101, // employeeId
                 MANAGER_ID, // managerId
-                "Branch1", // branch
+                testBranch, // branch
                 "John Doe", // name
                 "333444", // bankAccount
                 5000, // salary
@@ -67,15 +81,17 @@ class EmployeeFacadeTest {
                 Role.CASHIER // role
         );
 
-        assertEquals("Employee: 101 hired successfully", result);
+        Employee employee = employeeFacade.getEmployee(101);
+        assertNotNull(employee);
+        assertEquals(101, employee.getId());
     }
 
-    @Test
-    void hireEmployee_ManagerNotLoggedIn() {
-        String result = employeeFacade.hireEmployee(
+    @Test(expected = Exception.class)
+    public void hireEmployee_ManagerNotLoggedIn() throws Exception {
+        employeeFacade.hireEmployee(
                 101,
                 MANAGER_ID,
-                "Branch1",
+                testBranch,
                 "John Doe",
                 "333444",
                 5000,
@@ -85,54 +101,68 @@ class EmployeeFacadeTest {
                 80,
                 90,
                 "pass123",
-                Role.CASHIER
-        );
-
-        assertEquals("You are not logged in", result);
+                Role.CASHIER);
     }
 
     @Test
-    void login_SuccessfulLogin() {
+    public void login_SuccessfulLogin() throws Exception {
         Employee result = employeeFacade.login(MANAGER_ID, MANAGER_PASSWORD);
         assertNotNull(result);
     }
 
     @Test
-    void login_FailedLogin() {
-        Employee result = employeeFacade.login(MANAGER_ID, "wrongPassword");
-        assertNull(result);
+    public void login_FailedLogin() throws Exception {
+        try {
+            employeeFacade.login(MANAGER_ID, "wrongPassword");
+            fail("Expected login to fail with wrong password");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Login failed"));
+        }
     }
 
     @Test
-    void logout_SuccessfulLogout() {
+    public void logout_SuccessfulLogout() throws Exception {
         employeeFacade.login(MANAGER_ID, MANAGER_PASSWORD);
-        String result = employeeFacade.logout(MANAGER_ID);
-        assertNull(result);
+        employeeFacade.logout(MANAGER_ID);
+        try {
+            employeeFacade.logout(MANAGER_ID);
+            fail("Expected second logout to fail");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("not logged in"));
+        }
+    }
+
+    @Test(expected = Exception.class)
+    public void logout_NotLoggedIn() throws Exception {
+        employeeFacade.logout(MANAGER_ID);
     }
 
     @Test
-    void logout_NotLoggedIn() {
-        String result = employeeFacade.logout(MANAGER_ID);
-        assertEquals("You are not logged in", result);
-    }
-
-    @Test
-    void updateSickDays_Success() {
+    public void updateSickDays_Success() throws Exception {
         // First login and hire an employee
         employeeFacade.login(MANAGER_ID, MANAGER_PASSWORD);
-        employeeFacade.hireEmployee(101, MANAGER_ID, "Branch1", "John Doe", "333444",
-                5000, START_DATE, 15, 10, 80, 90, "pass123", Role.CASHIER);
+        employeeFacade.hireEmployee(
+                101,
+                MANAGER_ID,
+                testBranch,
+                "John Doe",
+                "333444",
+                5000,
+                START_DATE,
+                15,
+                10,
+                80,
+                90,
+                "pass123",
+                Role.CASHIER);
 
-        String result = employeeFacade.updateSickDays(101, MANAGER_ID, 15);
-        assertNull(result); // Successful update returns null
+        employeeFacade.updateSickDays(101, MANAGER_ID, 15);
+        Employee employee = employeeFacade.getEmployee(101);
+        assertEquals(15, employee.getSickDays());
     }
 
-    @Test
-    void updateSickDays_ManagerNotLoggedIn() {
-        String result = employeeFacade.updateSickDays(101, MANAGER_ID, 15);
-        assertEquals("You are not logged in", result);
+    @Test(expected = Exception.class)
+    public void updateSickDays_ManagerNotLoggedIn() throws Exception {
+        employeeFacade.updateSickDays(101, MANAGER_ID, 15);
     }
-
-
 }
-

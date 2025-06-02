@@ -1,14 +1,23 @@
-package DomainLayer;
+package tests;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
 
+import DomainLayer.EmployeeManager;
+import DomainLayer.LocationDL;
+import DomainLayer.Role;
+import DomainLayer.Shift;
+import DomainLayer.ShiftEmployee;
+import DomainLayer.ShiftType;
 
-class ShiftEmployeeTest {
+public class ShiftEmployeeTest {
+
     private ShiftEmployee employee;
     private Shift shift;
     private LocalDate testDate;
@@ -18,13 +27,15 @@ class ShiftEmployeeTest {
     private final int EMPLOYEE_ID = 101;
     private final int EMPLOYEE_ID2 = 102;
     private final LocalDate START_DATE = LocalDate.now();
+    private LocationDL testBranch;
 
-    @BeforeEach
-    void setUp() {
+    @Before
+    public void setUp() {
+        testBranch = new LocationDL(1, "Test Branch", 1, "Test Street", "1234567890", "Test Contact", "Zone1");
+
         manager = new EmployeeManager(
                 MANAGER_ID,
                 "Test Manager",
-                "Branch1",
                 "111222",
                 7000,
                 START_DATE,
@@ -32,29 +43,12 @@ class ShiftEmployeeTest {
                 5,
                 100,
                 100,
-                "password123"
-        );
+                "password123");
 
-        testEmployee = manager.hireEmployee(
-                EMPLOYEE_ID2,
-                "Test Employee2",
-                "Branch1",
-                "333555",
-                5000,
-                START_DATE,
-                15,
-                10,
-                80,
-                90,
-                "emp123",
-                Role.SHIFT_MANAGER
-        );
-
-        // Create a test employee that we can use in multiple tests
-        testEmployee = manager.hireEmployee(
+        testEmployee = new ShiftEmployee(
                 EMPLOYEE_ID,
                 "Test Employee",
-                "Branch1",
+                testBranch,
                 "333444",
                 5000,
                 START_DATE,
@@ -63,82 +57,82 @@ class ShiftEmployeeTest {
                 80,
                 90,
                 "emp123",
-                Role.CASHIER
-        );
+                Role.CASHIER);
     }
 
-    @AfterEach
-    void tearDown() {
-        // Clear any assigned shifts
+    @After
+    public void tearDown() {
         if (employee != null && employee.getAssignedShifts() != null) {
             employee.getAssignedShifts().clear();
         }
-
-        // Clear any preferred shifts
         if (employee != null && employee.getPrefShifts() != null) {
             employee.getPrefShifts().clear();
         }
-
-        // Set objects to null to help garbage collection
         employee = null;
         shift = null;
         testDate = null;
     }
 
     @Test
-    void getAssignedEmployeesInfo() {
+    public void addRole_shouldSucceed() throws Exception {
+        testEmployee.addRole(Role.STORE_KEEPER);
+        assertTrue(testEmployee.getRoles().contains(Role.STORE_KEEPER));
+    }
 
+    @Test(expected = Exception.class)
+    public void addRole_shouldThrowException_WhenRoleExists() throws Exception {
+        testEmployee.addRole(Role.CASHIER);
     }
 
     @Test
-    void changeRole_shouldChangeSuccessfully() {
-        Role oldRole = Role.CASHIER;
-        Role newRole = Role.STORE_KEEPER;
-        String result = testEmployee.changeRole(oldRole, newRole);
-
-        assertNull(result); // No error message = success
-        assertTrue(testEmployee.getRoles().contains(newRole));
-        assertFalse(testEmployee.getRoles().contains(oldRole));
+    public void changeRole_shouldSucceed() throws Exception {
+        testEmployee.changeRole(Role.CASHIER, Role.STORE_KEEPER);
+        assertTrue(testEmployee.getRoles().contains(Role.STORE_KEEPER));
+        assertFalse(testEmployee.getRoles().contains(Role.CASHIER));
     }
 
     @Test
-    void addPreferredShift_shouldAddSuccessfully() {
-        Shift shift = new Shift(LocalDate.now().plusDays(1), ShiftType.MORNING, EMPLOYEE_ID2);
-        String result = testEmployee.addPreferredShift(shift);
-        assertNull(result);
+    public void addPreferredShift_shouldSucceed() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now().plusDays(1), ShiftType.MORNING, 0, testBranch);
+        testEmployee.addPreferredShift(shift);
         assertTrue(testEmployee.getPrefShifts().contains(shift));
     }
 
     @Test
-    void removePreferredShift_shouldRemoveSuccessfully() {
-        Shift shift = new Shift(LocalDate.now().plusDays(2), ShiftType.EVENING, EMPLOYEE_ID2);
-        testEmployee.addPreferredShift(shift); // Precondition
-        String result = testEmployee.removePreferredShift(shift);
-
-        assertNull(result);
+    public void removePreferredShift_shouldSucceed() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now().plusDays(2), ShiftType.EVENING, 0, testBranch);
+        testEmployee.addPreferredShift(shift);
+        testEmployee.removePreferredShift(shift);
         assertFalse(testEmployee.getPrefShifts().contains(shift));
     }
 
     @Test
-    void addAssignedShift() {
-        Shift shift = new Shift(LocalDate.now().plusDays(3), ShiftType.EVENING, EMPLOYEE_ID2);
-        Role role = Role.CASHIER;
-        String result = testEmployee.addAssignedShift(shift, role);
-
-        assertNull(result);
+    public void addAssignedShift_shouldSucceed() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now().plusDays(3), ShiftType.EVENING, 0, testBranch);
+        testEmployee.addAssignedShift(shift, Role.CASHIER);
         assertTrue(testEmployee.getAssignedShifts().containsKey(shift));
-        assertEquals(role, testEmployee.getAssignedShifts().get(shift));
+        assertEquals(Role.CASHIER, testEmployee.getAssignedShifts().get(shift));
     }
 
     @Test
-    void removeAssignedShift_shouldRemoveSuccessfully() {
-        Shift shift = new Shift(LocalDate.now().plusDays(4), ShiftType.MORNING, EMPLOYEE_ID2);
-        Role role = Role.CASHIER;
-        testEmployee.addAssignedShift(shift, role); // Precondition
-
-        String result = testEmployee.removeAssignedShift(shift);
-
-        assertNull(result);
+    public void removeAssignedShift_shouldSucceed() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now().plusDays(4), ShiftType.MORNING, 0, testBranch);
+        testEmployee.addAssignedShift(shift, Role.CASHIER);
+        testEmployee.removeAssignedShift(shift);
         assertFalse(testEmployee.getAssignedShifts().containsKey(shift));
+    }
+
+    @Test
+    public void isAvailable_shouldReturnTrue_WhenShiftInPreferred() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now().plusDays(5), ShiftType.MORNING, 0, testBranch);
+        testEmployee.addPreferredShift(shift);
+        assertTrue(testEmployee.isAvailable(shift));
+    }
+
+    @Test(expected = Exception.class)
+    public void isAvailable_shouldThrowException_WhenEmployeeFinished() throws Exception {
+        Shift shift = new Shift(1, LocalDate.now().plusDays(6), ShiftType.MORNING, 0, testBranch);
+        testEmployee.setFinishWorking(true);
+        testEmployee.isAvailable(shift);
     }
 }

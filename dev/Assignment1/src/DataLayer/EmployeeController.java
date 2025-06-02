@@ -3,6 +3,7 @@ package DataLayer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -149,9 +150,9 @@ public class EmployeeController {
     // update employee.isFinishedWorking to true
     public void fireEmployee(int employeeId) {
         try {
-        employeeDAO.fireEmployee(employeeId);
+            employeeDAO.fireEmployee(employeeId);
         } catch (SQLException e) {
-        System.out.println("Error firing employee: " + e.getMessage());
+            System.out.println("Error firing employee: " + e.getMessage());
         }
     }
 
@@ -190,17 +191,18 @@ public class EmployeeController {
     private EmployeeDTO buildEmployeeDTO(ResultSet rst) throws SQLException {
         int id = rst.getInt("id");
         String name = rst.getString("name");
-        int branchid = rst.getInt("branchid");
+        int branchid = rst.getInt("locationId");
         LocationDTO branch = locationController.getLocation(branchid);
         String bankAccount = rst.getString("bankAccount");
         int salary = rst.getInt("salary");
-        Date startDate = rst.getDate("startDate");
+        String startDateStr = rst.getString("startDate");
+        Date startDate = parseIsoDateToUtilDate(startDateStr); // helper method: Convert ISO date string to Date object
         int vacationDays = rst.getInt("vacationDays");
         int sickDays = rst.getInt("sickDays");
         float educationFund = rst.getFloat("educationFund");
         float socialBenefits = rst.getFloat("socialBenefits");
         String password = rst.getString("password");
-        Boolean isFinishedWorking = rst.getBoolean("isFinishedWorking");
+        Boolean isFinishedWorking = rst.getBoolean("isFired");
 
         ResultSet rolesResult = employeeRoleDAO.getRolesForEmployee(id);
         List<String> rolesList = new ArrayList<>();
@@ -215,8 +217,7 @@ public class EmployeeController {
                 educationFund, socialBenefits, password, isFinishedWorking, prefShifts, assignedShifts, rolesList);
     }
 
-
-    public void login (int employeeId, String password) throws SQLException {
+    public void login(int employeeId, String password) throws SQLException {
         try {
             ResultSet rst = employeeDAO.getEmployee(employeeId);
             if (rst.next()) {
@@ -243,6 +244,10 @@ public class EmployeeController {
         } catch (SQLException e) {
             System.out.println("Error during logout: " + e.getMessage());
         }
+    }
+
+    private Date parseIsoDateToUtilDate(String dateStr) {
+        return Date.from(OffsetDateTime.parse(dateStr).toInstant());
     }
 
 }

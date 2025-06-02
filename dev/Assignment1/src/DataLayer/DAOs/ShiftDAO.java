@@ -28,7 +28,7 @@ public class ShiftDAO {
                 + "endTime INT NOT NULL, "
                 + "shiftManagerId INT NOT NULL, "
                 + "isShipment INT NOT NULL, "
-                + //0 false, 1 for true
+                + // 0 false, 1 for true
                 "locationId INT NOT NULL, "
                 + "PRIMARY KEY (id), "
                 + "FOREIGN KEY (shiftManagerId) REFERENCES employees(id), "
@@ -42,7 +42,8 @@ public class ShiftDAO {
         }
     }
 
-    public void addShift(int id, String date, String shiftType, int locationId, int startTime, int endTime, int shiftManagerId, int isShipment)
+    public void addShift(int id, String date, String shiftType, int locationId, int startTime, int endTime,
+            int shiftManagerId, int isShipment)
             throws SQLException {
         String sql = "INSERT INTO shifts (id, date, shiftType, startTime, endTime, shiftManagerId, locationId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -111,12 +112,8 @@ public class ShiftDAO {
 
     public ResultSet getAllShifts() throws SQLException {
         String sql = "SELECT * FROM shifts";
-        try (Statement stmt = connection.createStatement()) {
-            return stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println("Error retrieving all shifts: " + e.getMessage());
-            throw e;
-        }
+        Statement stmt = connection.createStatement();
+        return stmt.executeQuery(sql);
     }
 
     public ResultSet getRole(String date, String shiftType, int employeeId) throws SQLException {
@@ -143,7 +140,8 @@ public class ShiftDAO {
         }
     }
 
-    //erez change the type of newValue to int because it is used to update an integer field
+    // erez change the type of newValue to int because it is used to update an
+    // integer field
     public void setShiftField(int id, String fieldName, int newValue) throws SQLException {
         String sql = "UPDATE shifts SET " + fieldName + " = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
