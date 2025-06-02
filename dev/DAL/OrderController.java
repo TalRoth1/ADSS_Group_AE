@@ -9,13 +9,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import Utils.Globals;
 import Utils.OrderStatus;
 
 public class OrderController {
     private String ordersTableName = "Orders";
     private String orderItemsTableName = "OrderItems";
     String currentDir = System.getProperty("user.dir");
-    String dbPath = currentDir + File.separator + "Data.db";
+    private final String dbPath = (Globals.useFakeData) ? currentDir + File.separator + "FakeData.db" : currentDir + File.separator + "Data.db";
     String url = "jdbc:sqlite:" + dbPath;
 
     public OrderController() {

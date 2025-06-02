@@ -15,6 +15,7 @@ import Domain.OnOrderDelivery;
 import Domain.PeriodicDelivery;
 import Domain.PeriodicItem;
 import Domain.PickupDelivery;
+import Utils.Globals;
 
 public class ContractController {
     private String onOrder = "OnOrders";
@@ -24,7 +25,7 @@ public class ContractController {
     private String discount = "Discounts";
     private String items = "contractItems";
     String currentDir = System.getProperty("user.dir");
-    String dbPath = currentDir + File.separator + "Data.db";
+    private final String dbPath = (Globals.useFakeData) ? currentDir + File.separator + "FakeData.db" : currentDir + File.separator + "Data.db";
     String url = "jdbc:sqlite:" + dbPath;
 
     public ContractController() {

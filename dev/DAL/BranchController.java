@@ -5,6 +5,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import Utils.Globals;
+
 public class BranchController 
 {
     private final String tableName = "Branches";
@@ -14,6 +16,10 @@ public class BranchController
 
     public BranchController() 
     {
+        if(Globals.useFakeData) 
+        {
+            return; // Skip initialization if using fake data
+        }
         try 
         {
             Class.forName("org.sqlite.JDBC");

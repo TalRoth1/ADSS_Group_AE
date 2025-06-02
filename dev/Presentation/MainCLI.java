@@ -5,6 +5,7 @@ import java.util.Scanner;
 import Domain.OrderFacade;
 import Domain.SupplierFacade;
 import Service.ServiceFactory;
+import Utils.Globals;
 
 public class MainCLI 
 {
@@ -24,6 +25,24 @@ public class MainCLI
     {
         isInterrupted = false;
         while (!isInterrupted) {
+            printFalseChoice();
+            String useFakeData = getTextFromUser();
+            while(!useFakeData.equalsIgnoreCase("yes") && !useFakeData.equalsIgnoreCase("no")) 
+            {
+                display("Invalid input. Please enter 'yes' or 'no'.");
+                useFakeData = getTextFromUser();
+            }
+            switch (useFakeData.toLowerCase()) 
+            {
+                case "yes":
+                    display("Using false data.");
+                    Globals.useFakeData = true;
+                    break;
+                case "no":
+                    display("Using real data.");
+                    Globals.useFakeData = false; 
+                    break;
+            }
             printMainMenu();
             displayControlButtons();
             String choice = getTextFromUser();
@@ -46,7 +65,10 @@ public class MainCLI
             }
         }
     }
-
+    private void printFalseChoice()
+    {
+        display("Would you like to use false data? (yes/no)");
+    }
     private void printMainMenu() 
     {
         display("1. Enter as supply manager.");

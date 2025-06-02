@@ -1,18 +1,17 @@
 package DAL;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import Utils.Globals;
 
 import java.sql.*;
 
 public class SupplierController {
     private final String tableName = "Suppliers";
     String currentDir = System.getProperty("user.dir");
-    String dbPath = currentDir + File.separator + "Data.db";
+    private final String dbPath = (Globals.useFakeData) ? currentDir + File.separator + "FakeData.db" : currentDir + File.separator + "Data.db";
     String url = "jdbc:sqlite:" + dbPath;
 
     public SupplierController() {

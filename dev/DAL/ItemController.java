@@ -5,10 +5,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import Utils.Globals;
+
 public class ItemController {
     private final String tableName = "Items";
     String currentDir = System.getProperty("user.dir");
-    String dbPath = currentDir + File.separator + "Data.db";
+    private final String dbPath = (Globals.useFakeData) ? currentDir + File.separator + "FakeData.db" : currentDir + File.separator + "Data.db";
     String url = "jdbc:sqlite:" + dbPath;
     InventoryShelfItemsController inventoryController = new InventoryShelfItemsController();
     MinQuantitiesController minQuantitiesController = new MinQuantitiesController();
