@@ -72,8 +72,6 @@ public class ContractController {
                     CREATE TABLE IF NOT EXISTS Pickups (
                     contractID INTEGER NOT NULL,
                     supplierID INTEGER NOT NULL,
-
-                    catalogID INTEGER NOT NULL,
                     PRIMARY KEY (contractID, supplierID, itemID),
                     FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
 
