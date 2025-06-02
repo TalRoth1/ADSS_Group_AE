@@ -22,6 +22,7 @@ public class ContractController {
     private String periodic = "Periodics";
     private String periodicItem = "PeriodicItems";
     private String discount = "Discounts";
+    private String items = "Items";
     String currentDir = System.getProperty("user.dir");
     String dbPath = currentDir + File.separator + "Data.db";
     String url = "jdbc:sqlite:" + dbPath;
@@ -35,6 +36,7 @@ public class ContractController {
             initializeTablePeriodics();
             initializeTablePeriodicItems();
             initializeTableDiscounts();
+            initializeTableItems();
 
         } catch (ClassNotFoundException e) {
             System.out.println("SQLite JDBC driver not found: " + e.getMessage());
@@ -50,11 +52,9 @@ public class ContractController {
                     CREATE TABLE IF NOT EXISTS OnOrders (
                     contractID INTEGER NOT NULL,
                     supplierID INTEGER NOT NULL,
-                    itemID INTEGER NOT NULL,
-                    catalogID INTEGER NOT NULL,
-                    PRIMARY KEY (contractID, supplierID, itemID),
                     FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
-                    FOREIGN KEY (itemID) REFERENCES Items(itemID) ON DELETE CASCADE
+                    PRIMARY KEY (contractID, supplierID)
+
                     );
                     """;
 
@@ -72,11 +72,14 @@ public class ContractController {
                     CREATE TABLE IF NOT EXISTS Pickups (
                     contractID INTEGER NOT NULL,
                     supplierID INTEGER NOT NULL,
-                    itemID INTEGER NOT NULL,
+
                     catalogID INTEGER NOT NULL,
                     PRIMARY KEY (contractID, supplierID, itemID),
                     FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
-                    FOREIGN KEY (itemID) REFERENCES Items(itemID) ON DELETE CASCADE
+
+
+                    PRIMARY KEY (contractID, supplierID)
+
                     );
                     """;
 
@@ -94,12 +97,11 @@ public class ContractController {
                     CREATE TABLE IF NOT EXISTS Periodics (
                     contractID INTEGER NOT NULL,
                     supplierID INTEGER NOT NULL,
-                    itemID INTEGER NOT NULL,
-                    catalogID INTEGER NOT NULL,
                     day INTEGER NOT NULL,
-                    PRIMARY KEY (contractID, supplierID, itemID),
                     FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
-                    FOREIGN KEY (itemID) REFERENCES Items(itemID) ON DELETE CASCADE
+
+                    PRIMARY KEY (contractID, supplierID)
+
                     );
                     """;
 
@@ -155,21 +157,36 @@ public class ContractController {
         }
     }
 
+    private void initializeTableItems() {
+        try (Connection conn = DriverManager.getConnection(url);
+                Statement stmt = conn.createStatement()) {
+            String sql = """
+                    CREATE TABLE IF NOT EXISTS Items (
+                    contractID INTEGER NOT NULL,
+                    supplierID INTEGER NOT NULL,
+                    itemID INTEGER NOT NULL,
+                    catalogID INTEGER NOT NULL,
+                    PRIMARY KEY (contractID, supplierID, itemID)
+                    );
+                    """;
+
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println("Failed to create Products table: " + e.getMessage());
+        }
+    }
+
     public void insert(ContractDAO contract) {
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
                 switch (contract.getDeliveryMethod().toString()) {
                     case "On Order Delivery":
                         String sql = "INSERT INTO " + onOrder
-                                + " (contractID, supplierID, itemID, catalogID) VALUES (?, ?, ?, ?)";
+                                + " (contractID, supplierID) VALUES (?, ?)";
                         try (var pstmt = conn.prepareStatement(sql)) {
-                            for (Map.Entry<Integer, Integer> entry : contract.getItemCatalog().entrySet()) {
-                                pstmt.setInt(1, contract.getContractID());
-                                pstmt.setInt(2, contract.getSupplierID());
-                                pstmt.setInt(3, entry.getKey());
-                                pstmt.setInt(4, entry.getValue());
-                                pstmt.executeUpdate();
-                            }
+                            pstmt.setInt(1, contract.getContractID());
+                            pstmt.setInt(2, contract.getSupplierID());
+                            pstmt.executeUpdate();
                             System.out.println("Contract inserted successfully.");
                         } catch (SQLException e) {
                             System.out.println("Insert failed: " + e.getMessage());
@@ -177,15 +194,11 @@ public class ContractController {
                         break;
                     case "Pickup Delivery":
                         sql = "INSERT INTO " + pickup
-                                + " (contractID, supplierID, itemID, catalogID) VALUES (?, ?, ?, ?)";
+                                + " (contractID, supplierID) VALUES (?, ?)";
                         try (var pstmt = conn.prepareStatement(sql)) {
-                            for (Map.Entry<Integer, Integer> entry : contract.getItemCatalog().entrySet()) {
-                                pstmt.setInt(1, contract.getContractID());
-                                pstmt.setInt(2, contract.getSupplierID());
-                                pstmt.setInt(3, entry.getKey());
-                                pstmt.setInt(4, entry.getValue());
-                                pstmt.executeUpdate();
-                            }
+                            pstmt.setInt(1, contract.getContractID());
+                            pstmt.setInt(2, contract.getSupplierID());
+                            pstmt.executeUpdate();
                             System.out.println("Contract inserted successfully.");
                         } catch (SQLException e) {
                             System.out.println("Insert failed: " + e.getMessage());
@@ -193,16 +206,12 @@ public class ContractController {
                         break;
                     case "Periodic Delivery":
                         sql = "INSERT INTO " + periodic
-                                + " (contractID, supplierID, ItemID, catalogID, day) VALUES (?, ?, ?, ?, ?)";
+                                + " (contractID, supplierID, day) VALUES (?, ?, ?)";
                         try (var pstmt = conn.prepareStatement(sql)) {
-                            for (Map.Entry<Integer, Integer> entry : contract.getItemCatalog().entrySet()) {
-                                pstmt.setInt(1, contract.getContractID());
-                                pstmt.setInt(2, contract.getSupplierID());
-                                pstmt.setInt(3, entry.getKey());
-                                pstmt.setInt(4, entry.getValue());
-                                pstmt.setInt(5, ((PeriodicDelivery) contract.getDeliveryMethod()).getDay());
-                                pstmt.executeUpdate();
-                            }
+                            pstmt.setInt(1, contract.getContractID());
+                            pstmt.setInt(2, contract.getSupplierID());
+                            pstmt.setInt(3, ((PeriodicDelivery) contract.getDeliveryMethod()).getDay());
+                            pstmt.executeUpdate();
                             List<PeriodicItem> orderItems = ((PeriodicDelivery) contract.getDeliveryMethod())
                                     .getOrderItems();
                             sql = "INSERT INTO " + periodicItem
@@ -238,6 +247,21 @@ public class ContractController {
                     System.out.println("Discounts inserted successfully.");
                 } catch (SQLException e) {
                     System.out.println("Insert discounts failed: " + e.getMessage());
+                }
+
+                String itemSql = "INSERT INTO " + items
+                        + " (contractID, supplierID, itemID, catalogID) VALUES (?, ?, ?, ?)";
+                try (var pstmt = conn.prepareStatement(itemSql)) {
+                    for (Map.Entry<Integer, Integer> entry : contract.getItemCatalog().entrySet()) {
+                        pstmt.setInt(1, contract.getContractID());
+                        pstmt.setInt(2, contract.getSupplierID());
+                        pstmt.setInt(3, entry.getKey());
+                        pstmt.setInt(4, entry.getValue());
+                        pstmt.executeUpdate();
+                    }
+                    System.out.println("Items inserted successfully.");
+                } catch (SQLException e) {
+                    System.out.println("Insert items failed: " + e.getMessage());
                 }
             } else {
                 System.out.println("Connection to database failed.");
@@ -327,6 +351,16 @@ public class ContractController {
                 } catch (SQLException e) {
                     System.out.println("Delete discounts failed: " + e.getMessage());
                 }
+
+                sql = "DELETE FROM " + items + " WHERE contractID = ? AND supplierID = ?";
+                try (var pstmt = conn.prepareStatement(sql)) {
+                    pstmt.setInt(1, contractId);
+                    pstmt.setInt(2, supplierId);
+                    pstmt.executeUpdate();
+                    System.out.println("Items deleted successfully.");
+                } catch (SQLException e) {
+                    System.out.println("Delete items failed: " + e.getMessage());
+                }
             } else {
                 System.out.println("Connection to database failed.");
             }
@@ -360,27 +394,41 @@ public class ContractController {
         try (Connection conn = DriverManager.getConnection(url)) {
             List<ContractDAO> contracts = new ArrayList<>();
             if (conn != null) {
+                List<Integer> contractIds = new ArrayList<>();
+                Map<Integer, Integer> contractDays = new HashMap<>();
                 String sql = "SELECT * FROM " + onOrder + " WHERE supplierID = ?";
                 try (var pstmt = conn.prepareStatement(sql)) {
                     pstmt.setInt(1, suppId);
                     var rs = pstmt.executeQuery();
-                    int contractId = rs.getInt("contractID");
-                    int supplierId = rs.getInt("supplierID");
-                    Map<Integer, Integer> items = new HashMap<>();
+                    int supplierId = suppId;
                     while (rs.next()) {
-                        items.put(rs.getInt("itemID"), rs.getInt("catalogID"));
+                        int contractId = rs.getInt("contractID");
+                        if (!contractIds.contains(contractId)) {
+                            contractIds.add(contractId);
+                        }
                     }
-                    List<DiscountDAO> discounts = new ArrayList<>();
-                    String discountSql = "SELECT * FROM " + discount + " WHERE contractID = ? AND supplierID = ?";
-                    var discountPstmt = conn.prepareStatement(discountSql);
-                    discountPstmt.setInt(1, contractId);
-                    discountPstmt.setInt(2, supplierId);
-                    var discountRs = discountPstmt.executeQuery();
-                    while (discountRs.next()) {
-                        discounts.add(new DiscountDAO(discountRs.getInt("CatalogID"),
-                                discountRs.getInt("minimumQuantity"), discountRs.getDouble("discountPercentage")));
+                    for (int contractId : contractIds) {
+                        Map<Integer, Integer> items = new HashMap<>();
+                        sql = "SELECT * FROM " + items + " WHERE contractID = ? AND supplierID = ?";
+                        var itemPstmt = conn.prepareStatement(sql);
+                        itemPstmt.setInt(1, contractId);
+                        itemPstmt.setInt(2, supplierId);
+                        var itemRs = itemPstmt.executeQuery();
+                        while (itemRs.next()) {
+                            items.put(itemRs.getInt("itemID"), itemRs.getInt("catalogID"));
+                        }
+                        List<DiscountDAO> discounts = new ArrayList<>();
+                        String discountSql = "SELECT * FROM " + discount + " WHERE contractID = ? AND supplierID = ?";
+                        var discountPstmt = conn.prepareStatement(discountSql);
+                        discountPstmt.setInt(1, contractId);
+                        discountPstmt.setInt(2, supplierId);
+                        var discountRs = discountPstmt.executeQuery();
+                        while (discountRs.next()) {
+                            discounts.add(new DiscountDAO(discountRs.getInt("CatalogID"),
+                                    discountRs.getInt("minimumQuantity"), discountRs.getDouble("discountPercentage")));
+                        }
+                        contracts.add(new ContractDAO(contractId, supplierId, items, discounts, new OnOrderDelivery()));
                     }
-                    contracts.add(new ContractDAO(contractId, supplierId, items, discounts, new OnOrderDelivery()));
                 } catch (SQLException e) {
                     System.out.println(e.getMessage());
                     return new ArrayList<>();
@@ -389,23 +437,35 @@ public class ContractController {
                 try (var pstmt = conn.prepareStatement(sql)) {
                     pstmt.setInt(1, suppId);
                     var rs = pstmt.executeQuery();
-                    int contractId = rs.getInt("contractID");
-                    int supplierId = rs.getInt("supplierID");
-                    Map<Integer, Integer> items2 = new HashMap<>();
+                    int supplierId = suppId;
                     while (rs.next()) {
-                        items2.put(rs.getInt("itemID"), rs.getInt("catalogID"));
+                        int contractId = rs.getInt("contractID");
+                        if (!contractIds.contains(contractId)) {
+                            contractIds.add(contractId);
+                        }
                     }
-                    List<DiscountDAO> discounts = new ArrayList<>();
-                    String discountSql = "SELECT * FROM " + discount + " WHERE contractID = ? AND supplierID = ?";
-                    var discountPstmt = conn.prepareStatement(discountSql);
-                    discountPstmt.setInt(1, contractId);
-                    discountPstmt.setInt(2, supplierId);
-                    var discountRs = discountPstmt.executeQuery();
-                    while (discountRs.next()) {
-                        discounts.add(new DiscountDAO(discountRs.getInt("CatalogID"),
-                                discountRs.getInt("minimumQuantity"), discountRs.getDouble("discountPercentage")));
+                    for (int contractId : contractIds) {
+                        Map<Integer, Integer> items = new HashMap<>();
+                        sql = "SELECT * FROM " + items + " WHERE contractID = ? AND supplierID = ?";
+                        var itemPstmt = conn.prepareStatement(sql);
+                        itemPstmt.setInt(1, contractId);
+                        itemPstmt.setInt(2, supplierId);
+                        var itemRs = itemPstmt.executeQuery();
+                        while (itemRs.next()) {
+                            items.put(itemRs.getInt("itemID"), itemRs.getInt("catalogID"));
+                        }
+                        List<DiscountDAO> discounts = new ArrayList<>();
+                        String discountSql = "SELECT * FROM " + discount + " WHERE contractID = ? AND supplierID = ?";
+                        var discountPstmt = conn.prepareStatement(discountSql);
+                        discountPstmt.setInt(1, contractId);
+                        discountPstmt.setInt(2, supplierId);
+                        var discountRs = discountPstmt.executeQuery();
+                        while (discountRs.next()) {
+                            discounts.add(new DiscountDAO(discountRs.getInt("CatalogID"),
+                                    discountRs.getInt("minimumQuantity"), discountRs.getDouble("discountPercentage")));
+                        }
+                        contracts.add(new ContractDAO(contractId, supplierId, items, discounts, new PickupDelivery()));
                     }
-                    contracts.add(new ContractDAO(contractId, supplierId, items2, discounts, new PickupDelivery()));
                 } catch (SQLException e1) {
                     System.out.println("Get supplier contracts failed: " + e1.getMessage());
                 }
@@ -414,34 +474,46 @@ public class ContractController {
                 try (var pstmt = conn.prepareStatement(sql)) {
                     pstmt.setInt(1, suppId);
                     var rs = pstmt.executeQuery();
-                    int contractId = rs.getInt("contractID");
-                    int supplierId = rs.getInt("supplierID");
-                    Map<Integer, Integer> items3 = new HashMap<>();
-                    List<PeriodicItem> orderItems = new ArrayList<>();
+                    int supplierId = suppId;
                     while (rs.next()) {
-                        items3.put(rs.getInt("itemID"), rs.getInt("catalogID"));
+                        int contractId = rs.getInt("contractID");
+                        if (!contractDays.containsKey(contractId)) {
+                            contractDays.put(contractId, rs.getInt("day"));
+                        }
                     }
-                    List<DiscountDAO> discounts = new ArrayList<>();
-                    String discountSql = "SELECT * FROM " + discount + " WHERE contractID = ? AND supplierID = ?";
-                    var discountPstmt = conn.prepareStatement(discountSql);
-                    discountPstmt.setInt(1, contractId);
-                    discountPstmt.setInt(2, supplierId);
-                    var discountRs = discountPstmt.executeQuery();
-                    while (discountRs.next()) {
-                        discounts.add(new DiscountDAO(discountRs.getInt("CatalogID"),
-                                discountRs.getInt("minimumQuantity"), discountRs.getDouble("discountPercentage")));
+                    for (int contractId : contractDays.keySet()) {
+                        Map<Integer, Integer> items = new HashMap<>();
+                        sql = "SELECT * FROM " + items + " WHERE contractID = ? AND supplierID = ?";
+                        var itemPstmt = conn.prepareStatement(sql);
+                        itemPstmt.setInt(1, contractId);
+                        itemPstmt.setInt(2, supplierId);
+                        var itemRs = itemPstmt.executeQuery();
+                        while (itemRs.next()) {
+                            items.put(itemRs.getInt("itemID"), itemRs.getInt("catalogID"));
+                        }
+                        List<DiscountDAO> discounts = new ArrayList<>();
+                        String discountSql = "SELECT * FROM " + discount + " WHERE contractID = ? AND supplierID = ?";
+                        var discountPstmt = conn.prepareStatement(discountSql);
+                        discountPstmt.setInt(1, contractId);
+                        discountPstmt.setInt(2, supplierId);
+                        var discountRs = discountPstmt.executeQuery();
+                        while (discountRs.next()) {
+                            discounts.add(new DiscountDAO(discountRs.getInt("CatalogID"),
+                                    discountRs.getInt("minimumQuantity"), discountRs.getDouble("discountPercentage")));
+                        }
+                        String subsql = "SELECT * FROM " + periodicItem + " WHERE supplierID = ? AND contractID = ?";
+                        var subpstmt = conn.prepareStatement(subsql);
+                        subpstmt.setInt(1, supplierId);
+                        subpstmt.setInt(2, contractId);
+                        var subrs = subpstmt.executeQuery();
+                        List<PeriodicItem> orderItems = new ArrayList<>();
+                        while (subrs.next()) {
+                            orderItems.add(new PeriodicItem(subrs.getInt("productID"), subrs.getInt("quantity"),
+                                    subrs.getInt("price")));
+                        }
+                        contracts.add(new ContractDAO(contractId, supplierId, items, discounts,
+                                new PeriodicDelivery(contractDays.get(contractId), orderItems)));
                     }
-                    String subsql = "SELECT * FROM " + periodicItem + " WHERE supplierID = ? AND contractID = ?";
-                    var subpstmt = conn.prepareStatement(subsql);
-                    subpstmt.setInt(1, contractId);
-                    var subrs = subpstmt.executeQuery();
-                    while (subrs.next()) {
-                        orderItems.add(new PeriodicItem(subrs.getInt("productID"), subrs.getInt("quantity"),
-                                subrs.getInt("price")));
-                    }
-
-                    contracts.add(new ContractDAO(contractId, supplierId, items3, discounts,
-                            new PeriodicDelivery(rs.getInt("day"), orderItems)));
                 } catch (SQLException e) {
                     System.out.println("Get supplier contracts failed: " + e.getMessage());
                 }
