@@ -2,11 +2,12 @@ package Domain;
 
 import java.util.*;
 
-import org.junit.jupiter.api.Order;
 import DAL.ItemController;
 import DAL.ItemDAO;
+import DAL.MinQuantitiesController;
 import DAL.ProductController;
 import DAL.ProductDAO;
+import DAL.ProfitAmountsController;
 
 public class ProductFacade {
     private static ProductFacade instance = null;
@@ -18,6 +19,8 @@ public class ProductFacade {
     private boolean demonstrationMode = false;
     private ProductController productController;
     private ItemController itemController;
+    private ProfitAmountsController profitAmountsController;
+    private MinQuantitiesController minQuantitiesController;
 
     private ProductFacade() {
         this.products = new HashMap<>();
@@ -26,6 +29,8 @@ public class ProductFacade {
         this.nextItemID = 1;
         this.productController = new ProductController();
         this.itemController = new ItemController();
+        this.profitAmountsController = new ProfitAmountsController();
+        this.minQuantitiesController = new MinQuantitiesController();
         loadFromDatabase();
     }
 
@@ -48,6 +53,14 @@ public class ProductFacade {
                 product.getItemsInBranch(branchID).clear();
                 product.getProfits().remove(branchID);
             }
+        }
+        if (!demonstrationMode) {
+            for (ItemBL item : new ArrayList<>(items.values())) {
+                if (item.getBranchID() == branchID) {
+                    itemController.delete(item.getItemID());
+                }
+            }
+            // productController.deleteAllBranchData(branchID);
         }
     }
 
@@ -98,6 +111,10 @@ public class ProductFacade {
         int id = nextProductID++;
         ProductBL product = new ProductBL(id, name, sellingPrice, discount, producerID, categories);
         products.put(id, product);
+        if (!demonstrationMode) {
+            ProductDAO dao = new ProductDAO(id, name, sellingPrice, discount, producerID, categories);
+            productController.insert(dao);
+        }
         return id;
     }
 
@@ -108,6 +125,14 @@ public class ProductFacade {
 
         items.values().removeIf(item -> item.getProductID() == productID);
         products.remove(productID);
+        if (!demonstrationMode) {
+            productController.delete(productID);
+            for (ItemBL item : new ArrayList<>(items.values())) {
+                if (item.getProductID() == productID) {
+                    itemController.delete(item.getItemID());
+                }
+            }
+        }
     }
 
     public void updateProduct(int productID, String name, double costPrice, double sellingPrice, int discount,
@@ -135,6 +160,10 @@ public class ProductFacade {
         product.setSellingPrice(sellingPrice);
         product.setDiscount(discount);
         product.setCategories(categories);
+        if (!demonstrationMode) {
+            ProductDAO dao = new ProductDAO(productID, name, sellingPrice, discount, producerID, categories);
+            productController.update(dao);
+        }
     }
 
     public String getListOfAllProducts() {
@@ -162,6 +191,10 @@ public class ProductFacade {
             throw new IllegalArgumentException("Product not found");
         }
         product.setMinQuantity(branchID, minQuantity);
+        if (!demonstrationMode) {
+            minQuantitiesController.ensureMinQuantityExists(productID, branchID);
+            minQuantitiesController.updateMinQuantity(productID, branchID, minQuantity);
+        }
     }
 
     public ProductBL getProduct(int productID) {
@@ -199,6 +232,19 @@ public class ProductFacade {
         ItemBL item = new ItemBL(itemID, productID, name, isDef, expirationDate, branchID, location);
         product.addItemToBranch(branchID, item);
         items.put(itemID, item);
+        if (!demonstrationMode) {
+            ItemDAO dao = new ItemDAO(
+                    itemID,
+                    productID,
+                    name,
+                    isDef,
+                    item.isExpired(),
+                    expirationDate,
+                    branchID,
+                    0,
+                    location);
+            itemController.insert(dao);
+        }
         return itemID;
     }
 
@@ -213,6 +259,9 @@ public class ProductFacade {
 
         product.removeItemFromBranch(item.getBranchID(), itemID);
         items.remove(itemID);
+        if (!demonstrationMode) {
+            itemController.delete(itemID);
+        }
     }
 
     public void purchaseItem(int itemID) {
@@ -226,6 +275,10 @@ public class ProductFacade {
 
         product.addProfit(item.getBranchID(), product.getSellingPrice());
         removeItem(itemID);
+        if (!demonstrationMode) {
+            profitAmountsController.ensureProfitAmountExists(item.getProductID(), item.getBranchID());
+            profitAmountsController.addProfit(item.getProductID(), item.getBranchID(), product.getSellingPrice());
+        }
     }
 
     public void updateItem(int itemID, String name, boolean isDef,
@@ -249,6 +302,19 @@ public class ProductFacade {
         item.setName(name);
         item.setDef(isDef);
         item.setLocation(location);
+        if (!demonstrationMode) {
+            ItemDAO dao = new ItemDAO(
+                    item.getItemID(),
+                    item.getProductID(),
+                    name,
+                    isDef,
+                    item.isExpired(),
+                    item.getExpirationDate(),
+                    newBranchID,
+                    0,
+                    location);
+            itemController.update(dao);
+        }
     }
 
     public String getListOfAllItems() {
