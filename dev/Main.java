@@ -10,6 +10,7 @@ public class Main {
         OrderFacade of = OrderFacade.getInstance();
         ServiceFactory invSF = ServiceFactory.getFactory();
         MainCLI mainCli = new MainCLI(of, sf, invSF);
+        sf.clearData();
         mainCli.run();
     }
 }

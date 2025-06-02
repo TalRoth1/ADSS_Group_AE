@@ -26,16 +26,13 @@ public class SupplierFacade {
     private SupplierFacade() {
         this.suppliers = new ArrayList<>();
         List<SupplierDAO> sups = supplierController.getAllSuppliers();
-        for (SupplierDAO sup : sups) 
-        {
+        for (SupplierDAO sup : sups) {
             List<ContractDAO> contracts = contractController.getSupplierContracts(sup.getId());
             List<ContractDL> contractList = new ArrayList<>();
-            for (ContractDAO contract : contracts)
-            {
+            for (ContractDAO contract : contracts) {
                 Map<ProductBL, Integer> itemCatalog = new HashMap<>();
                 List<DiscountDL> discounts = new ArrayList<>();
-                for (ContractDAO cont : contracts)
-                {
+                for (ContractDAO cont : contracts) {
                     Map<Integer, Integer> items = cont.getItemCatalog();
                     for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
                         ProductBL product = productFacade.getProduct(entry.getKey());
@@ -45,15 +42,18 @@ public class SupplierFacade {
                     }
                     List<DiscountDAO> billOfQuantities = cont.getBillOfQuantities();
                     for (DiscountDAO discount : billOfQuantities) {
-                        DiscountDL discountDL = new DiscountDL(discount.getCatalogID(), discount.getMinimumQuantity(), discount.getDiscountPercentage());
+                        DiscountDL discountDL = new DiscountDL(discount.getCatalogID(), discount.getMinimumQuantity(),
+                                discount.getDiscountPercentage());
                         discounts.add(discountDL);
                     }
                 }
-                ContractDL contractDL = new ContractDL(contract.getContractID(), itemCatalog, discounts, contract.getDeliveryMethod());
+                ContractDL contractDL = new ContractDL(contract.getContractID(), itemCatalog, discounts,
+                        contract.getDeliveryMethod());
                 contractList.add(contractDL);
             }
             PaymentMethod paymentMethod = PaymentMethod.valueOf(sup.getPaymentMethod().toUpperCase());
-            SupplierDL supplier = new SupplierDL(sup.getId(), sup.getCompanyID(), sup.getBankAccount(), paymentMethod, sup.getContactMail(), sup.getContactPhone(), contractList);
+            SupplierDL supplier = new SupplierDL(sup.getId(), sup.getCompanyID(), sup.getBankAccount(), paymentMethod,
+                    sup.getContactMail(), sup.getContactPhone(), contractList);
             suppliers.add(supplier);
         }
     }
@@ -69,10 +69,12 @@ public class SupplierFacade {
         return instance;
     }
 
-    public void addSupplier(int companyID, int bankAccount, PaymentMethod paymentMethod, String contactEmail, String contactPhone, List<ContractDL> contracts)
-    {
-        SupplierDL newSupplier = new SupplierDL(nextId++, companyID, bankAccount, paymentMethod, contactEmail, contactPhone, contracts);
-        SupplierDAO supplierDAO = new SupplierDAO(newSupplier.getSupplierID(), companyID, bankAccount, paymentMethod.toString(), contactEmail, contactPhone, supplierController);
+    public void addSupplier(int companyID, int bankAccount, PaymentMethod paymentMethod, String contactEmail,
+            String contactPhone, List<ContractDL> contracts) {
+        SupplierDL newSupplier = new SupplierDL(nextId++, companyID, bankAccount, paymentMethod, contactEmail,
+                contactPhone, contracts);
+        SupplierDAO supplierDAO = new SupplierDAO(newSupplier.getSupplierID(), companyID, bankAccount,
+                paymentMethod.toString(), contactEmail, contactPhone, supplierController);
         suppliers.add(newSupplier);
         supplierDAO.persist();
     }
@@ -86,7 +88,8 @@ public class SupplierFacade {
         return null; // Supplier not found
     }
 
-    public void addContract(int supplierID, Map<Integer, Integer> itemCat, List<String[]> billOfQuantities, DeliveryMethod deliveryMethod) {
+    public void addContract(int supplierID, Map<Integer, Integer> itemCat, List<String[]> billOfQuantities,
+            DeliveryMethod deliveryMethod) {
         SupplierDL supplier = getSupplier(supplierID);
         int contractID = supplier.getNextContractID();
         List<DiscountDL> discounts = new ArrayList<>();
@@ -111,7 +114,8 @@ public class SupplierFacade {
         }
         if (supplier != null) {
             ContractDL newContract = new ContractDL(contractID, itemCatalog, discounts, deliveryMethod);
-            ContractDAO contractDAO = new ContractDAO(newContract.getContractID(), supplierID, itemCat, discountDAOs, deliveryMethod);
+            ContractDAO contractDAO = new ContractDAO(newContract.getContractID(), supplierID, itemCat, discountDAOs,
+                    deliveryMethod);
             supplier.addContract(newContract);
             contractDAO.persist();
         }
@@ -138,7 +142,7 @@ public class SupplierFacade {
                     break;
                 }
             }
-        }   
+        }
     }
 
     public void removeContract(int supplierID, int contractID) {
@@ -193,25 +197,20 @@ public class SupplierFacade {
 
     public void updatePeriodicItems(int supplierID, int contractID, List<PeriodicItem> newItems) {
         ContractDL contract = getContract(supplierID, contractID);
-        contract.setDeliveryMethod(new PeriodicDelivery(((PeriodicDelivery)contract.getDeliveryMethod()).getDay(), newItems));
+        contract.setDeliveryMethod(
+                new PeriodicDelivery(((PeriodicDelivery) contract.getDeliveryMethod()).getDay(), newItems));
         contractController.updatePeriodic(supplierID, contractID, newItems);
     }
 
-    public Map<SupplierDL, List<ContractDL>> findItemSuppliersPeriodic(int productId)
-    {
+    public Map<SupplierDL, List<ContractDL>> findItemSuppliersPeriodic(int productId) {
         Map<SupplierDL, List<ContractDL>> suppliersWithItem = new HashMap<>();
-        for(SupplierDL supp : suppliers)
-        {
+        for (SupplierDL supp : suppliers) {
             List<ContractDL> contractsWithItem = new ArrayList<>();
-            for(ContractDL contract : supp.getContracts())
-            {
+            for (ContractDL contract : supp.getContracts()) {
                 DeliveryMethod deliveryMethod = contract.getDeliveryMethod();
-                if(deliveryMethod instanceof PeriodicDelivery)
-                {
-                    for(PeriodicItem item : ((PeriodicDelivery) deliveryMethod).getOrderItems())
-                    {
-                        if(item.getItemID() == productId)
-                        {
+                if (deliveryMethod instanceof PeriodicDelivery) {
+                    for (PeriodicItem item : ((PeriodicDelivery) deliveryMethod).getOrderItems()) {
+                        if (item.getItemID() == productId) {
                             contractsWithItem.add(contract);
                         }
                     }
@@ -224,24 +223,24 @@ public class SupplierFacade {
 
     public void loadData() {
         items = new ArrayList<>();
-        items.add(new ProductBL(1, "Milk", 3.70, 10, 155, new String[]{"dairy", "beverages"}));
-        items.add(new ProductBL(2, "Eggs", 3.00, 5, 156, new String[]{"dairy", "proteins"}));
-        items.add(new ProductBL(3, "Butter", 5.30, 8, 157, new String[]{"dairy", "fats"}));
-        items.add(new ProductBL(4, "Tomato", 1.10, 2, 158, new String[]{"vegetables"}));
-        items.add(new ProductBL(5, "Cucumber", 2.10, 3, 159, new String[]{"vegetables"}));
-        items.add(new ProductBL(6, "Carrot", 3.10, 4, 160, new String[]{"vegetables"}));
-        items.add(new ProductBL(7, "Chicken", 4.70, 12, 161, new String[]{"meat", "proteins"}));
-        items.add(new ProductBL(8, "Beef", 5.50, 15, 162, new String[]{"meat", "proteins"}));
-        items.add(new ProductBL(9, "Rice", 2.60, 6, 163, new String[]{"grains"}));
-        items.add(new ProductBL(10, "Pasta", 6.20, 7, 164, new String[]{"grains"}));
-        items.add(new ProductBL(11, "Cheese", 4.00, 9, 165, new String[]{"dairy", "fats"}));
-        items.add(new ProductBL(12, "Yogurt", 1.50, 11, 166, new String[]{"dairy", "beverages"}));
-        items.add(new ProductBL(13, "Juice", 2.80, 4, 167, new String[]{"beverages"}));
-        items.add(new ProductBL(14, "Bread", 1.90, 6, 168, new String[]{"bakery"}));
-        items.add(new ProductBL(15, "Salt", 0.70, 2, 169, new String[]{"spices"}));
+        items.add(new ProductBL(1, "Milk", 3.70, 10, 155, new String[] { "dairy", "beverages" }));
+        items.add(new ProductBL(2, "Eggs", 3.00, 5, 156, new String[] { "dairy", "proteins" }));
+        items.add(new ProductBL(3, "Butter", 5.30, 8, 157, new String[] { "dairy", "fats" }));
+        items.add(new ProductBL(4, "Tomato", 1.10, 2, 158, new String[] { "vegetables" }));
+        items.add(new ProductBL(5, "Cucumber", 2.10, 3, 159, new String[] { "vegetables" }));
+        items.add(new ProductBL(6, "Carrot", 3.10, 4, 160, new String[] { "vegetables" }));
+        items.add(new ProductBL(7, "Chicken", 4.70, 12, 161, new String[] { "meat", "proteins" }));
+        items.add(new ProductBL(8, "Beef", 5.50, 15, 162, new String[] { "meat", "proteins" }));
+        items.add(new ProductBL(9, "Rice", 2.60, 6, 163, new String[] { "grains" }));
+        items.add(new ProductBL(10, "Pasta", 6.20, 7, 164, new String[] { "grains" }));
+        items.add(new ProductBL(11, "Cheese", 4.00, 9, 165, new String[] { "dairy", "fats" }));
+        items.add(new ProductBL(12, "Yogurt", 1.50, 11, 166, new String[] { "dairy", "beverages" }));
+        items.add(new ProductBL(13, "Juice", 2.80, 4, 167, new String[] { "beverages" }));
+        items.add(new ProductBL(14, "Bread", 1.90, 6, 168, new String[] { "bakery" }));
+        items.add(new ProductBL(15, "Salt", 0.70, 2, 169, new String[] { "spices" }));
 
         addSupplier(2001, 111222333, PaymentMethod.CASH, "contact@supplierone.com", "+1-555-1111",
-                 new ArrayList<>());
+                new ArrayList<>());
         Map<Integer, Integer> itemCat = new HashMap<>();
         itemCat.put(1, 1);
         itemCat.put(2, 2);
@@ -274,10 +273,9 @@ public class SupplierFacade {
         billOfQuantities.add(new String[] { "10", "100", "8" });
         addContract(3, itemCat4, billOfQuantities4, new PickupDelivery());
     }
-    
+
     public void clearData() {
-        suppliers.clear();
-        items.clear();
+
         nextId = supplierController.getNextId();
         supplierController.clearData();
         contractController.clearData();
