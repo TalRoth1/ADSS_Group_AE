@@ -1,7 +1,6 @@
 package Domain;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import DAL.OrderController;
@@ -14,11 +13,12 @@ public class OrderDL {
     private final int contractID;
     private Date orderDate;
     private String destination;
-    private Map<Integer,OrderItemDL> orderItems;
+    private Map<Integer, OrderItemDL> orderItems;
     private OrderStatus orderStatus;
     private OrderDAO DAO;
 
-    public OrderDL(int orderID, int supplierID, int contractID, Date orderDate, String destination, Map<Integer,OrderItemDL> orderItems, OrderController orderController) {
+    public OrderDL(int orderID, int supplierID, int contractID, Date orderDate, String destination,
+            Map<Integer, OrderItemDL> orderItems, OrderController orderController) {
         this.orderID = orderID;
         this.supplierID = supplierID;
         this.contractID = contractID;
@@ -39,19 +39,57 @@ public class OrderDL {
         this.DAO = orderDAO;
     }
 
-    public int getOrderID() {return orderID;}
-    public int getSupplierID() {return supplierID;}
-    public int getContractID() {return contractID;}
-    public Date getOrderDate() {return orderDate;}
-    public String getDestination() {return destination;}
-    public Map<Integer,OrderItemDL> getOrderItems() {return orderItems;}
-    public OrderStatus getOrderStatus() {return orderStatus;}
-    public OrderDAO getDao() {return DAO;}
-    public void setDestination(String destination) {this.destination = destination;}
-    public void setOrderDate(Date orderDate) {this.orderDate = orderDate;}
-    public void setOrderStatus(OrderStatus orderStatus) {this.orderStatus = orderStatus;}
-    public void setOrderItems(Map<Integer,OrderItemDL> orderItems) {this.orderItems = orderItems;}
-    public void setDao(OrderDAO dao) {this.DAO = dao;}
+    public int getOrderID() {
+        return orderID;
+    }
+
+    public int getSupplierID() {
+        return supplierID;
+    }
+
+    public int getContractID() {
+        return contractID;
+    }
+
+    public Date getOrderDate() {
+        return orderDate;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public Map<Integer, OrderItemDL> getOrderItems() {
+        return orderItems;
+    }
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public OrderDAO getDao() {
+        return DAO;
+    }
+
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
+
+    public void setOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public void setOrderItems(Map<Integer, OrderItemDL> orderItems) {
+        this.orderItems = orderItems;
+    }
+
+    public void setDao(OrderDAO dao) {
+        this.DAO = dao;
+    }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();

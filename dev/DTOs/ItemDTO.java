@@ -1,7 +1,6 @@
 package DTOs;
 
 import java.util.Date;
-import java.util.List;
 
 public class ItemDTO {
     private final int itemID;

@@ -3,6 +3,10 @@ package Domain;
 import java.util.*;
 
 import org.junit.jupiter.api.Order;
+import DAL.ItemController;
+import DAL.ItemDAO;
+import DAL.ProductController;
+import DAL.ProductDAO;
 
 public class ProductFacade {
     private static ProductFacade instance = null;
@@ -12,12 +16,17 @@ public class ProductFacade {
     private int nextItemID;
     private OrderFacade orderFacade;
     private boolean demonstrationMode = false;
+    private ProductController productController;
+    private ItemController itemController;
 
     private ProductFacade() {
         this.products = new HashMap<>();
         this.items = new HashMap<>();
         this.nextProductID = 1;
         this.nextItemID = 1;
+        this.productController = new ProductController();
+        this.itemController = new ItemController();
+        loadFromDatabase();
     }
 
     public static ProductFacade getInstance() {
@@ -31,22 +40,47 @@ public class ProductFacade {
         return instance;
     }
 
-    public void deleteAllItemsForBranch(int branchID)
-    {
+    public void deleteAllItemsForBranch(int branchID) {
         items.values().removeIf(item -> item.getBranchID() == branchID);
 
-        for (ProductBL product : products.values())
-        {
-            if (product.hasBranch(branchID))
-            {
+        for (ProductBL product : products.values()) {
+            if (product.hasBranch(branchID)) {
                 product.getItemsInBranch(branchID).clear();
                 product.getProfits().remove(branchID);
             }
         }
     }
 
-
     // ================== Product Management ==================
+    public void loadFromDatabase() {
+        List<ProductDAO> productDAOs = productController.getAllProducts();
+        List<ItemDAO> itemDAOs = itemController.getAllItems();
+
+        for (ProductDAO productDAO : productDAOs) {
+            ProductBL product = convertProductDAOtoProductBL(productDAO);
+            products.put(product.getProductID(), product);
+        }
+
+        for (ItemDAO itemDAO : itemDAOs) {
+            ItemBL item = ItemDAOtoProductBL(itemDAO);
+            items.put(item.getItemID(), item);
+            ProductBL product = products.get(item.getProductID());
+            if (product != null) {
+                product.initializeBranch(item.getBranchID());
+                product.addItemToBranch(item.getBranchID(), item);
+            }
+        }
+    }
+
+    public ProductBL convertProductDAOtoProductBL(ProductDAO productDAO) {
+        return new ProductBL(
+                productDAO.getProductID(),
+                productDAO.getName(),
+                productDAO.getSellingPrice(),
+                productDAO.getDiscount(),
+                productDAO.getProducerID(),
+                productDAO.getCategories());
+    }
 
     public synchronized int addProduct(String name, double sellingPrice, int discount,
             int producerID, String[] categories) {
@@ -130,7 +164,25 @@ public class ProductFacade {
         product.setMinQuantity(branchID, minQuantity);
     }
 
+    public ProductBL getProduct(int productID) {
+        ProductBL product = products.get(productID);
+        if (product == null) {
+            throw new IllegalArgumentException("Product not found");
+        }
+        return product;
+    }
+
     // ================== Item Management ==================
+    public ItemBL ItemDAOtoProductBL(ItemDAO itemDAO) {
+        return new ItemBL(
+                itemDAO.getItemID(),
+                itemDAO.getProductID(),
+                itemDAO.getName(),
+                itemDAO.isDef(),
+                itemDAO.getExpirationDate(),
+                itemDAO.getBranchID(),
+                itemDAO.getLocation());
+    }
 
     public int addItem(int productID, String name, boolean isDef,
             Date expirationDate, int branchID, String[] location) {
@@ -257,7 +309,7 @@ public class ProductFacade {
                     minimumQuantities.add(minimalQuantity);
                     currentQuantites.add(currentQuantity);
                     productList.add(product);
-                    destinations.add(branchName); 
+                    destinations.add(branchName);
                     // need to add which destinations have low supply
                     orderFacade.handleLowSupply(productList, minimumQuantities, currentQuantites, destinations);
                     body.append("  Product: ").append(product.getName())

@@ -1,10 +1,9 @@
+package DAL;
 
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import DAL.ItemDAO;
 
 public class ItemController {
     private final String tableName = "Items";

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import DAL.ProductDAO;
+
 public class ProductBL {
     private int productID;
     private String name;
@@ -19,7 +21,8 @@ public class ProductBL {
     private final Object nameLock = new Object();
     private final Object priceLock = new Object();
 
-    public ProductBL(int productID, String name, double sellingPrice, int discount, int producerID, String[] categories) {
+    public ProductBL(int productID, String name, double sellingPrice, int discount, int producerID,
+            String[] categories) {
         this.productID = productID;
         this.name = name;
         this.sellingPrice = sellingPrice;

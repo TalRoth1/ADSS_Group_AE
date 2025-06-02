@@ -1,4 +1,5 @@
 package DTOs;
+
 public class ProductDTO {
     private final int productID;
     private final String name;
