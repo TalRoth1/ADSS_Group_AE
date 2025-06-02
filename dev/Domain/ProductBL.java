@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import DAL.ProductDAO;
-
 public class ProductBL {
     private int productID;
     private String name;

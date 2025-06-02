@@ -1,6 +1,7 @@
 package Domain;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import DAL.ItemController;
 import DAL.ItemDAO;
@@ -25,12 +26,12 @@ public class ProductFacade {
     private ProductFacade() {
         this.products = new HashMap<>();
         this.items = new HashMap<>();
-        this.nextProductID = 1;
-        this.nextItemID = 1;
         this.productController = new ProductController();
         this.itemController = new ItemController();
         this.profitAmountsController = new ProfitAmountsController();
         this.minQuantitiesController = new MinQuantitiesController();
+        this.nextProductID = productController.getMaxProductID() + 1;
+        this.nextItemID = itemController.getMaxItemID() + 1;
         loadFromDatabase();
     }
 
@@ -43,25 +44,6 @@ public class ProductFacade {
             }
         }
         return instance;
-    }
-
-    public void deleteAllItemsForBranch(int branchID) {
-        items.values().removeIf(item -> item.getBranchID() == branchID);
-
-        for (ProductBL product : products.values()) {
-            if (product.hasBranch(branchID)) {
-                product.getItemsInBranch(branchID).clear();
-                product.getProfits().remove(branchID);
-            }
-        }
-        if (!demonstrationMode) {
-            for (ItemBL item : new ArrayList<>(items.values())) {
-                if (item.getBranchID() == branchID) {
-                    itemController.delete(item.getItemID());
-                }
-            }
-            // productController.deleteAllBranchData(branchID);
-        }
     }
 
     // ================== Product Management ==================
@@ -123,19 +105,25 @@ public class ProductFacade {
         if (product == null)
             throw new IllegalArgumentException("Product not found");
 
-        items.values().removeIf(item -> item.getProductID() == productID);
+        List<ItemBL> itemsToDelete = items.values().stream()
+                .filter(item -> item.getProductID() == productID)
+                .collect(Collectors.toList());
+
+        for (ItemBL item : itemsToDelete) {
+            items.remove(item.getItemID());
+        }
+
         products.remove(productID);
+
         if (!demonstrationMode) {
             productController.delete(productID);
-            for (ItemBL item : new ArrayList<>(items.values())) {
-                if (item.getProductID() == productID) {
-                    itemController.delete(item.getItemID());
-                }
+            for (ItemBL item : itemsToDelete) {
+                itemController.delete(item.getItemID());
             }
         }
     }
 
-    public void updateProduct(int productID, String name, double costPrice, double sellingPrice, int discount,
+    public void updateProduct(int productID, String name, double sellingPrice, int discount,
             int producerID, String[] categories) {
         ProductBL product = products.get(productID);
         if (product == null)
@@ -147,8 +135,8 @@ public class ProductFacade {
         if (categories == null)
             throw new IllegalArgumentException("Categories cannot be null");
 
-        if (costPrice <= 0)
-            throw new IllegalArgumentException("Cost price must be positive");
+        // if (costPrice <= 0)
+        // throw new IllegalArgumentException("Cost price must be positive");
 
         if (sellingPrice <= 0)
             throw new IllegalArgumentException("Selling price must be positive");
@@ -338,6 +326,32 @@ public class ProductFacade {
         return sb.toString();
     }
 
+    public void deleteAllItemsForBranch(int branchID) {
+
+        List<ItemBL> itemsToDelete = new ArrayList<>();
+        for (ItemBL item : items.values()) {
+            if (item.getBranchID() == branchID) {
+                itemsToDelete.add(item);
+            }
+        }
+
+        for (ItemBL item : itemsToDelete) {
+            items.remove(item.getItemID());
+        }
+
+        for (ProductBL product : products.values()) {
+            if (product.hasBranch(branchID)) {
+                product.getItemsInBranch(branchID).clear();
+                // product.getProfits().remove(branchID);
+            }
+        }
+        if (!demonstrationMode) {
+            for (ItemBL item : itemsToDelete) {
+                itemController.delete(item.getItemID());
+            }
+        }
+    }
+
     // ================== Reports ==================
 
     public ReportBL deficiencyReport() {
@@ -509,10 +523,25 @@ public class ProductFacade {
         return new ReportBL("Sales Report", body.toString());
     }
 
+    public synchronized void enterDemo() {
+        demonstrationMode = true;
+        this.items.clear();
+        this.products.clear();
+        this.nextItemID = 1;
+        this.nextProductID = 1;
+    }
+
+    public synchronized void deactivateDemo() {
+        demonstrationMode = false;
+        this.items.clear();
+        this.products.clear();
+        this.nextItemID = itemController.getMaxItemID() + 1;
+        this.nextProductID = productController.getMaxProductID() + 1;
+        loadFromDatabase();
+    }
 
     // This function is for TESTS ONLY, do not use in real life.
-    public static void resetInstance() 
-    {
+    public static void resetInstance() {
         instance = null;
     }
 }

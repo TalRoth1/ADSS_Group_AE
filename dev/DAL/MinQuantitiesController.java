@@ -34,6 +34,20 @@ public class MinQuantitiesController {
         }
     }
 
+    public void insert(int productID, int branchID, int minQuantity) {
+        try (Connection conn = DriverManager.getConnection(url)) {
+            String sql = "INSERT INTO " + tableName + " (productID, branchID, minQuantity) VALUES (?, ?, ?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, productID);
+                pstmt.setInt(2, branchID);
+                pstmt.setInt(3, minQuantity);
+                pstmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            System.out.println("Insert to MinQuantities failed: " + e.getMessage());
+        }
+    }
+
     public void ensureMinQuantityExists(int productID, int branchID) {
         try (Connection conn = DriverManager.getConnection(url)) {
             String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE productID = ? AND branchID = ?";
@@ -70,4 +84,17 @@ public class MinQuantitiesController {
             System.out.println("updateMinQuantity failed: " + e.getMessage());
         }
     }
+
+    public void deleteByProductID(int productID) {
+        String sql = "DELETE FROM MinQuantities WHERE productID = ?";
+        try (Connection conn = DriverManager.getConnection(url);
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, productID);
+            pstmt.executeUpdate();
+            System.out.println("MinQuantities deleted for productID: " + productID);
+        } catch (SQLException e) {
+            System.out.println("Failed to delete MinQuantities for productID " + productID + ": " + e.getMessage());
+        }
+    }
+
 }

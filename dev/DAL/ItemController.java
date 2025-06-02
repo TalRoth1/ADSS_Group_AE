@@ -169,4 +169,23 @@ public class ItemController {
         }
         return items;
     }
+
+    public int getMaxItemID() {
+        int maxID = 0;
+        String sql = "SELECT MAX(itemID) as maxID FROM Items";
+
+        try (Connection conn = DriverManager.getConnection(url);
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            if (rs.next()) {
+                maxID = rs.getInt("maxID");
+            }
+        } catch (SQLException e) {
+            System.out.println("getMaxItemID failed: " + e.getMessage());
+        }
+
+        return maxID;
+    }
+
 }

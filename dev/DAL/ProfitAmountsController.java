@@ -57,6 +57,20 @@ public class ProfitAmountsController {
         }
     }
 
+    public void insert(int productID, int branchID, int profitAmount) {
+        try (Connection conn = DriverManager.getConnection(url)) {
+            String sql = "INSERT INTO " + tableName + " (productID, branchID, profitAmount) VALUES (?, ?, ?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, productID);
+                pstmt.setInt(2, branchID);
+                pstmt.setInt(3, profitAmount);
+                pstmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            System.out.println("Insert to ProfitAmounts failed: " + e.getMessage());
+        }
+    }
+
     public void addProfit(int productID, int branchID, double amountToAdd) {
         try (Connection conn = DriverManager.getConnection(url)) {
             String updateSql = "UPDATE " + tableName
@@ -71,4 +85,17 @@ public class ProfitAmountsController {
             System.out.println("addProfit failed: " + e.getMessage());
         }
     }
+
+    public void deleteByProductID(int productID) {
+        String sql = "DELETE FROM ProfitAmounts WHERE productID = ?";
+        try (Connection conn = DriverManager.getConnection(url);
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, productID);
+            pstmt.executeUpdate();
+            System.out.println("ProfitAmounts deleted for productID: " + productID);
+        } catch (SQLException e) {
+            System.out.println("Failed to delete ProfitAmounts for productID " + productID + ": " + e.getMessage());
+        }
+    }
+
 }

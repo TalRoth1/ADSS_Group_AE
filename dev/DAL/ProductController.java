@@ -1,4 +1,5 @@
 package DAL;
+
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class ProductController {
             String sql = """
                         CREATE TABLE IF NOT EXISTS Products (
                             productID INTEGER PRIMARY KEY,
-                            name TEXT NOT NULL,
+                            name  TEXT NOT NULL,
                             sellingPrice REAL NOT NULL,
                             discount INTEGER,
                             producerID INTEGER,
@@ -44,25 +45,38 @@ public class ProductController {
 
     public void insert(ProductDAO product) {
         try (Connection conn = DriverManager.getConnection(url)) {
-            String sql = "INSERT INTO " + tableName + " (productID, productName) VALUES (?, ?)";
+            String sql = "INSERT INTO " + tableName
+                    + " (productID, name, sellingPrice, discount, producerID, categories) VALUES (?, ?, ?, ?, ?, ?)";
+
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setInt(1, product.getProductID());
                 pstmt.setString(2, product.getName());
+                pstmt.setDouble(3, product.getSellingPrice());
+                pstmt.setInt(4, product.getDiscount());
+                pstmt.setInt(5, product.getProducerID());
+                pstmt.setString(6, String.join(",", product.getCategories()));
+
                 pstmt.executeUpdate();
 
-                for (Map.Entry<Integer, List<Integer>> entry : product.getInventoryShelfItems().entrySet()) {
-                    int branchID = entry.getKey();
-                    int quantity = entry.getValue().size();
-                    inventoryShelfItemsController.insert(product.getProductID(), branchID, quantity);
-                }
+                // for (Map.Entry<Integer, List<Integer>> entry :
+                // product.getInventoryShelfItems().entrySet()) {
+                // int branchID = entry.getKey();
+                // int quantity = entry.getValue().size();
+                // inventoryShelfItemsController.insertInventoryShelfItem(product.getProductID(),
+                // branchID, quantity);
+                // }
 
-                for (Map.Entry<Integer, Integer> entry : product.getMinQuantity().entrySet()) {
-                    minQuantitiesController.insert(product.getProductID(), entry.getKey(), entry.getValue());
-                }
+                // for (Map.Entry<Integer, Integer> entry : product.getMinQuantity().entrySet())
+                // {
+                // minQuantitiesController.insert(product.getProductID(), entry.getKey(),
+                // entry.getValue());
+                // }
 
-                for (Map.Entry<Integer, Integer> entry : product.getProfitAmount().entrySet()) {
-                    profitAmountsController.insert(product.getProductID(), entry.getKey(), entry.getValue());
-                }
+                // for (Map.Entry<Integer, Integer> entry :
+                // product.getProfitAmount().entrySet()) {
+                // profitAmountsController.insert(product.getProductID(), entry.getKey(),
+                // entry.getValue());
+                // }
 
                 product.persist();
                 System.out.println("Product inserted successfully.");
@@ -73,33 +87,41 @@ public class ProductController {
     }
 
     public void update(ProductDAO product) {
-        if (!product.isPersisted())
-            return;
-
         try (Connection conn = DriverManager.getConnection(url)) {
-            String sql = "UPDATE " + tableName + " SET productName = ? WHERE productID = ?";
+            String sql = "UPDATE " + tableName
+                    + " SET name = ?, sellingPrice = ?, discount = ?, producerID = ?, categories = ? WHERE productID = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setString(1, product.getProductName());
-                pstmt.setInt(2, product.getProductID());
+                pstmt.setString(1, product.getName());
+                pstmt.setDouble(2, product.getSellingPrice());
+                pstmt.setInt(3, product.getDiscount());
+                pstmt.setInt(4, product.getProducerID());
+                pstmt.setString(5, String.join(",", product.getCategories()));
+                pstmt.setInt(6, product.getProductID());
                 pstmt.executeUpdate();
 
-                inventoryShelfItemsController.deleteByProductID(product.getProductID());
-                minQuantitiesController.deleteByProductID(product.getProductID());
-                profitAmountsController.deleteByProductID(product.getProductID());
+                // inventoryShelfItemsController.deleteByProductID(product.getProductID());
+                // minQuantitiesController.deleteByProductID(product.getProductID());
+                // profitAmountsController.deleteByProductID(product.getProductID());
 
-                for (Map.Entry<Integer, List<Integer>> entry : product.getInventoryShelfItems().entrySet()) {
-                    int branchID = entry.getKey();
-                    int quantity = entry.getValue().size();
-                    inventoryShelfItemsController.insert(product.getProductID(), branchID, quantity);
-                }
+                // for (Map.Entry<Integer, List<Integer>> entry :
+                // product.getInventoryShelfItems().entrySet()) {
+                // int branchID = entry.getKey();
+                // int quantity = entry.getValue().size();
+                // inventoryShelfItemsController.insert(product.getProductID(), branchID,
+                // quantity);
+                // }
 
-                for (Map.Entry<Integer, Integer> entry : product.getMinQuantity().entrySet()) {
-                    minQuantitiesController.insert(product.getProductID(), entry.getKey(), entry.getValue());
-                }
+                // for (Map.Entry<Integer, Integer> entry : product.getMinQuantity().entrySet())
+                // {
+                // minQuantitiesController.insert(product.getProductID(), entry.getKey(),
+                // entry.getValue());
+                // }
 
-                for (Map.Entry<Integer, Integer> entry : product.getProfitAmount().entrySet()) {
-                    profitAmountsController.insert(product.getProductID(), entry.getKey(), entry.getValue());
-                }
+                // for (Map.Entry<Integer, Integer> entry :
+                // product.getProfitAmount().entrySet()) {
+                // profitAmountsController.insert(product.getProductID(), entry.getKey(),
+                // entry.getValue());
+                // }
 
                 System.out.println("Product updated successfully.");
             }
@@ -173,4 +195,23 @@ public class ProductController {
         }
         return products;
     }
+
+    public int getMaxProductID() {
+        int maxID = 0;
+        String sql = "SELECT MAX(productID) as maxID FROM Products";
+
+        try (Connection conn = DriverManager.getConnection(url);
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            if (rs.next()) {
+                maxID = rs.getInt("maxID");
+            }
+        } catch (SQLException e) {
+            System.out.println("getMaxProductID failed: " + e.getMessage());
+        }
+
+        return maxID;
+    }
+
 }

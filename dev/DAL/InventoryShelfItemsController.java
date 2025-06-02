@@ -48,6 +48,19 @@ public class InventoryShelfItemsController {
         }
     }
 
+    public void deleteByProductID(int productID) {
+        String sql = "DELETE FROM InventoryShelfItems WHERE productID = ?";
+        try (Connection conn = DriverManager.getConnection(url);
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, productID);
+            pstmt.executeUpdate();
+            System.out.println("InventoryShelfItems deleted for productID: " + productID);
+        } catch (SQLException e) {
+            System.out
+                    .println("Failed to delete InventoryShelfItems for productID " + productID + ": " + e.getMessage());
+        }
+    }
+
     public void deleteByItemID(int itemID) {
         try (Connection conn = DriverManager.getConnection(url)) {
             String sql = "DELETE FROM " + tableName + " WHERE itemID = ?";

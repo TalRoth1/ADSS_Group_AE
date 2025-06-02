@@ -65,7 +65,8 @@ public class InvCLI {
     }
 
     private void printMainMenu() {
-        if(demoMode) display ("You are currently in demonstration mode, all changes here won't be saved in the database");
+        if (demoMode)
+            display("You are currently in demonstration mode, all changes here won't be saved in the database");
         display("1. Manage Branches.");
         display("2. Manage Products.");
         display("3. Manage Items.");
@@ -86,14 +87,12 @@ public class InvCLI {
         return scanner.nextLine();
     }
 
-    private void openDemoInterface()
-    {
+    private void openDemoInterface() {
         display("Are you sure you want to enter demonstration mode?");
         display("All changes in demonstration mode will not be saved.");
         display("For enter demonstration mode press 5, else press 0");
         String choice = getTextFromUser();
-        switch (choice) 
-        {
+        switch (choice) {
             case "5":
                 demoMode = true;
                 sf.getBranchService().enterDemo();
@@ -105,6 +104,7 @@ public class InvCLI {
         }
         waitForUser();
     }
+
     private void openBranchesInterface() {
         BranchService BS = sf.getBranchService();
 
@@ -240,12 +240,9 @@ public class InvCLI {
 
                     Response addResponse = PS.AddProduct(name, sellingPrice, discount, producerID,
                             categories);
-                    if (addResponse.getErrorMessage() == null) 
-                    {
+                    if (addResponse.getErrorMessage() == null) {
                         display("Product added successfully. ID: " + addResponse.getResponseValue());
-                    } 
-                    else 
-                    {
+                    } else {
                         display("Error: " + addResponse.getErrorMessage());
                     }
                     break;
@@ -286,12 +283,11 @@ public class InvCLI {
                     display("Enter new categories (comma-separated): ");
                     String[] newCategories = getTextFromUser().split(",");
 
-                    Response updateResponse = PS.UpdateProduct(productID, newName, newCost, newSelling, newDiscount, newProducer, newCategories);
+                    Response updateResponse = PS.UpdateProduct(productID, newName, newCost, newSelling, newDiscount,
+                            newProducer, newCategories);
                     if (updateResponse.getErrorMessage() == null) {
                         display(updateResponse.getResponseValue());
-                    }
-                    else
-                    {
+                    } else {
                         display("Error: " + updateResponse.getErrorMessage());
                     }
                     break;
@@ -317,13 +313,11 @@ public class InvCLI {
                     int minQuantity = getValidIntegerFromUser();
 
                     Response updateQuantityResponse = PS.setMinQuantity(productID2, branchid2, minQuantity);
-                    if (updateQuantityResponse.getErrorMessage() == null)
-                    {
+                    if (updateQuantityResponse.getErrorMessage() == null) {
                         display(updateQuantityResponse.getResponseValue());
-                    }
-                    else
-                    {
-                        display("Oops, something went wrong and cake is a lie. Error: " + updateQuantityResponse.getErrorMessage());
+                    } else {
+                        display("Oops, something went wrong and cake is a lie. Error: "
+                                + updateQuantityResponse.getErrorMessage());
                     }
                     break;
                 default:

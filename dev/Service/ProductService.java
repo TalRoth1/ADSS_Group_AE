@@ -28,10 +28,10 @@ public class ProductService {
         }
     }
 
-    public Response UpdateProduct(int productID, String name, double costPrice, double sellingPrice, int discount,
+    public Response UpdateProduct(int productID, String name, double sellingPrice, int discount,
             int producerID, String[] categories) {
         try {
-            pf.updateProduct(productID, name, costPrice, sellingPrice, discount, producerID, categories);
+            pf.updateProduct(productID, name, sellingPrice, discount, producerID, categories);
             return new Response("Product updated successfully", null);
         } catch (Exception e) {
             return new Response(null, e.getMessage());
@@ -56,13 +56,17 @@ public class ProductService {
         }
     }
 
-    public void enterDemo() 
-    {
-        pf.enterDemo();
+    public void enterDemo() {
+        try {
+            pf.enterDemo();
+            ;
+        } catch (Exception e) {
+            System.out.println("Enter demo failed: " + e.getMessage());
+        }
+
     }
 
-    public void deactivateDemo()
-    {
+    public void deactivateDemo() {
         pf.deactivateDemo();
     }
 
