@@ -124,34 +124,48 @@ public class CLI {
 
     public void addContract(Scanner Scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
-        int supplierID = Integer.parseInt(Scanner.nextLine());
+        String supplierIDInput = Scanner.nextLine();
+        while(supplierIDInput.isEmpty() || !supplierIDInput.matches("\\d+")) {
+            System.out.println("Invalid Supplier ID. Please enter a valid numeric Supplier ID:");
+            supplierIDInput = Scanner.nextLine();
+        }
+        int supplierID = Integer.parseInt(supplierIDInput);
         List<String[]> billOfQuantities = new ArrayList<>();
         String cont = "Y";
         Map<Integer, Integer> itemCat = new HashMap<>();
         System.out.println("Please enter the Item ID and Catalog ID seperated by ,:");
         while (cont.equals("Y"))
         {
+
             String[] item = Scanner.nextLine().split(",");
-            if (item.length != 2) {
+            if (item.length != 2 || !item[0].matches("\\d+") || !item[1].matches("\\d+")) {
                 System.out.println("Invalid input. Please enter the Item ID and Catalog ID in the format: Item ID, Catalog ID");
                 continue;
             }
             itemCat.put(Integer.parseInt(item[0]), Integer.parseInt(item[1]));
             System.out.println("Do you want to add another item? (Y/N):");
             cont = Scanner.nextLine().toUpperCase();
+            while(!cont.equals("Y") && !cont.equals("N")) {
+                System.out.println("Invalid input. Please enter 'Y' to add another item or 'N' to finish:");
+                cont = Scanner.nextLine().toUpperCase();
+            }
         }
         System.out.println("Bill of Quantities (Item ID, Minimum quantity and Discount seperated by ,):");
         cont = "Y";
         while (cont.equals("Y")) {
             String[] discount = Scanner.nextLine().split(",");
-            if (discount.length != 3) {
+            while(discount.length != 3 || !discount[0].matches("\\d+") || !discount[1].matches("\\d+") || !discount[2].matches("\\d+")) {
                 System.out.println(
                         "Invalid input. Please enter the Bill of Quantities in the format: Item ID, Minimum quantity, Discount");
-                continue;
+                discount = Scanner.nextLine().split(",");
             }
             billOfQuantities.add(discount);
             System.out.println("Do you want to add another item? (Y/N):");
             cont = Scanner.nextLine().toUpperCase();
+            while(!cont.equals("Y") && !cont.equals("N")) {
+                System.out.println("Invalid input. Please enter 'Y' to add another item or 'N' to finish:");
+                cont = Scanner.nextLine().toUpperCase();
+            }
         }
         System.out.println("Delivery Method (periodic, on order or pickup):");
         DeliveryMethod deliveryMethod = parseDeliveryMethod(Scanner);
@@ -160,37 +174,66 @@ public class CLI {
 
     public void changeContract(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
-        int supplierID = Integer.parseInt(scanner.nextLine());
+        String supplierIDInput = scanner.nextLine();
+        while(supplierIDInput.isEmpty() || !supplierIDInput.matches("\\d+")) {
+            System.out.println("Invalid Supplier ID. Please enter a valid numeric Supplier ID:");
+            supplierIDInput = scanner.nextLine();
+        }
+        int supplierID = Integer.parseInt(supplierIDInput);
         System.out.println("contract ID:");
-        int contractID = Integer.parseInt(scanner.nextLine());
+        String contractIDInput = scanner.nextLine();
+        while (contractIDInput.isEmpty() || !contractIDInput.matches("\\d+")) {
+            System.out.println("Invalid Contract ID. Please enter a valid numeric Contract ID:");
+            contractIDInput = scanner.nextLine();
+        }
+        int contractID = Integer.parseInt(contractIDInput);
         System.out.println("New Bill of Quantities (Item ID, Minimum quantity and Discount seperated by ,):");
         List<String[]> billOfQuantities = new ArrayList<>();
         String cont = "Y";
         while (cont.equals("Y")) {
             String[] discount = scanner.nextLine().split(",");
-            if (discount.length != 3) {
+            while(discount.length != 3 || !discount[0].matches("\\d+") || !discount[1].matches("\\d+") || !discount[2].matches("\\d+")) {
                 System.out.println(
                         "Invalid input. Please enter the Bill of Quantities in the format: Item ID, Minimum quantity, Discount");
-                continue;
+                discount = scanner.nextLine().split(",");
             }
             billOfQuantities.add(discount);
             System.out.println("Do you want to add another item? (Y/N):");
             cont = scanner.nextLine().toUpperCase();
+            while(!cont.equals("Y") && !cont.equals("N")) {
+                System.out.println("Invalid input. Please enter 'Y' to add another item or 'N' to finish:");
+                cont = scanner.nextLine().toUpperCase();
+            }
         }
         sf.updateContract(supplierID, contractID, billOfQuantities);
     }
 
     public void removeContract(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
-        int supplierID = Integer.parseInt(scanner.nextLine());
+        String supplierIDInput = scanner.nextLine();
+        while(supplierIDInput.isEmpty() || !supplierIDInput.matches("\\d+")) {
+            System.out.println("Invalid Supplier ID. Please enter a valid numeric Supplier ID:");
+            supplierIDInput = scanner.nextLine();
+        }
+        int supplierID = Integer.parseInt(supplierIDInput);
         System.out.println("Contract ID:");
-        int contractID = Integer.parseInt(scanner.nextLine());
+        String contractIDInput = scanner.nextLine();
+        while (contractIDInput.isEmpty() || !contractIDInput.matches("\\d+")) {
+            System.out.println("Invalid Contract ID. Please enter a valid numeric Contract ID:");
+            contractIDInput = scanner.nextLine();
+        }
+        int contractID = Integer.parseInt(contractIDInput);
         sf.removeContract(supplierID, contractID);
     }
 
     public void getSuppliedItems(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
-        int supplierID = Integer.parseInt(scanner.nextLine());
+        String supplierIDInput = scanner.nextLine();
+        while(supplierIDInput.isEmpty() || !supplierIDInput.matches("\\d+")) {
+            System.out.println("Invalid Supplier ID. Please enter a valid numeric Supplier ID:");
+            supplierIDInput = scanner.nextLine();
+        }
+        int supplierID = Integer.parseInt(supplierIDInput);
         Set<String> suppliedItems = sf.getSuppliedItems(supplierID);
         if (suppliedItems.isEmpty()) {
             System.out.println("No items supplied by this supplier.");
@@ -205,7 +248,12 @@ public class CLI {
 
     public void getCatalogItems(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
-        int supplierID = Integer.parseInt(scanner.nextLine());
+        String supplierIDInput = scanner.nextLine();
+        while(supplierIDInput.isEmpty() || !supplierIDInput.matches("\\d+")) {
+            System.out.println("Invalid Supplier ID. Please enter a valid numeric Supplier ID:");
+            supplierIDInput = scanner.nextLine();
+        }
+        int supplierID = Integer.parseInt(supplierIDInput);
 
         Map<Integer, Integer> catalogItems = sf.getSuppliedCatalogItems(supplierID);
         if (catalogItems.isEmpty()) {
@@ -220,9 +268,19 @@ public class CLI {
 
     public void createOrder(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nSupplier ID:");
-        int supplierID = Integer.parseInt(scanner.nextLine());
+        String supplierIDInput = scanner.nextLine();
+        while(supplierIDInput.isEmpty() || !supplierIDInput.matches("\\d+")) {
+            System.out.println("Invalid Supplier ID. Please enter a valid numeric Supplier ID:");
+            supplierIDInput = scanner.nextLine();
+        }
+        int supplierID = Integer.parseInt(supplierIDInput);
         System.out.println("Contract ID:");
-        int contractID = Integer.parseInt(scanner.nextLine());
+        String contractIDInput = scanner.nextLine();
+        while (contractIDInput.isEmpty() || !contractIDInput.matches("\\d+")) {
+            System.out.println("Invalid Contract ID. Please enter a valid numeric Contract ID:");
+            contractIDInput = scanner.nextLine();
+        }
+        int contractID = Integer.parseInt(contractIDInput);
         Date orderDate = parseOrderDate(scanner);
         System.out.println("Destination:");
         String destination = scanner.nextLine();
@@ -238,7 +296,12 @@ public class CLI {
 
     public void getOrderDetails(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nOrder ID:");
-        int orderID = Integer.parseInt(scanner.nextLine());
+        String orderIDInput = scanner.nextLine();
+        while (orderIDInput.isEmpty() || !orderIDInput.matches("\\d+")) {
+            System.out.println("Invalid Order ID. Please enter a valid numeric Order ID:");
+            orderIDInput = scanner.nextLine();
+        }
+        int orderID = Integer.parseInt(orderIDInput);
         try {
             System.out.println(of.getOrder(orderID));
         } catch (IllegalArgumentException e) {
@@ -248,7 +311,12 @@ public class CLI {
 
     public void changeOrder(Scanner scanner) {
         System.out.println("Please enter the Following Information:\nOrder ID:");
-        int orderID = Integer.parseInt(scanner.nextLine());
+        String orderIDInput = scanner.nextLine();
+        while (orderIDInput.isEmpty() || !orderIDInput.matches("\\d+")) {
+            System.out.println("Invalid Order ID. Please enter a valid numeric Order ID:");
+            orderIDInput = scanner.nextLine();
+        }
+        int orderID = Integer.parseInt(orderIDInput);
         System.out.println("New Destination:");
         String destination = scanner.nextLine();
         Date orderDate = parseOrderDate(scanner);
@@ -264,7 +332,7 @@ public class CLI {
     private DeliveryMethod parseDeliveryMethod(Scanner scanner) {
         String input = scanner.nextLine();
         DeliveryMethod deliveryMethod = null;
-        while (deliveryMethod == null) {
+        while (deliveryMethod == null || input.isEmpty() || (!input.equalsIgnoreCase("Scheduled") && !input.equalsIgnoreCase("On Order") && !input.equalsIgnoreCase("Pickup"))) {
             switch (input.toLowerCase()) {
                 case "periodic":{
                     System.err.println("Please enter the delivery interval in days:");
@@ -289,8 +357,6 @@ public class CLI {
                     System.out.println("Invalid delivery method. Please enter 'Scheduled', 'On Order' or 'Pickup':");
                     input = scanner.nextLine();
             }
-            System.out.println("Invalid delivery method. Please enter 'Scheduled', 'On Order' or 'Pickup':");
-            input = scanner.nextLine();
         }
         return deliveryMethod;
     }
@@ -300,14 +366,19 @@ public class CLI {
         do{
             System.out.println("Order Date (YYYY-MM-DD):");
             String orderDateInput = scanner.nextLine();
-            try {
-                orderDate = Date.valueOf(orderDateInput);
-                if(orderDate.before(new Date(System.currentTimeMillis()))) {
-                    System.out.println("Order date cannot be in the past. Please enter a valid date.");
+            while(orderDateInput.isEmpty() || !orderDateInput.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                System.out.println("Invalid date format. Please enter the date in the format YYYY-MM-DD:");
+                orderDateInput = scanner.nextLine();
+                try {
+                    orderDate = Date.valueOf(orderDateInput);
+                    if(orderDate.before(new Date(System.currentTimeMillis()))) {
+                        System.out.println("Order date cannot be in the past. Please enter a valid date.");
+                        orderDate = null;
+                    }
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Invalid date format. Please enter the date in the format YYYY-MM-DD:");
                     orderDate = null;
                 }
-            } catch (IllegalArgumentException e) {
-                System.out.println("Invalid date format. Please enter the date in the format YYYY-MM-DD:");
             }
         }
         while (orderDate == null);
@@ -359,7 +430,7 @@ public class CLI {
         String cont = "Y";
         while (cont.equals("Y")) {
             String[] item = scanner.nextLine().split(", ");
-            if (item.length != 2) {
+            if (item.length != 2 || !item[0].matches("\\d+") || !item[1].matches("\\d+")) {
                 System.out.println("Invalid input. Please enter the Order Items in the format: Item ID, Quantity");
                 continue;
             }
