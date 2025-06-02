@@ -48,6 +48,19 @@ public class EmployeeController {
         }
     }
 
+    public void addFirstEmployeeManager(EmployeeDTO employee) throws SQLException {
+        try {
+            employeeDAO.addEmployee(employee.getId(), employee.getName(), employee.getBranch().getId(),
+                    employee.getBankAccount(), employee.getSalary(),
+                    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(employee.getStartDate()),
+                    employee.getVacationDays(), employee.getSickDays(), employee.getEducationFund(),
+                    employee.getSocialBenefits(), employee.getPassword());
+        } catch (SQLException e) {
+            System.out.println("Error adding first employee manager: " + e.getMessage());
+            throw e;
+        }
+    }
+
     public void addRole(int employeeId, String role) throws SQLException {
         try {
             employeeRoleDAO.addRole(employeeId, role);

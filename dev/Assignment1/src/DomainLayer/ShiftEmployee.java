@@ -193,4 +193,13 @@ public class ShiftEmployee extends Employee {
     public List<Role> getRoles() {
         return roles;
     }
+
+    @Override
+    public ShiftEmployee clone() {
+        try {
+            return (ShiftEmployee) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

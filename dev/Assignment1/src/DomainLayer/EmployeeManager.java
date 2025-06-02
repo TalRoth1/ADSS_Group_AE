@@ -1,5 +1,7 @@
 package DomainLayer;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -736,5 +738,84 @@ public class EmployeeManager extends Employee {
     public Map<LocationDL, Map<LocalDate, Shift>> getToCompleteShifts() {
         return toCompleteShifts;
     }
+
+    public void loadEmployeesFromResultSet(ResultSet rs) throws SQLException {
+        while (rs.next()) {
+            try {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String bankAccount = rs.getString("bankAccount");
+                int salary = rs.getInt("salary");
+                LocalDate startDate = LocalDate.parse(rs.getString("startDate"));
+                int vacationDays = rs.getInt("vacationDays");
+                int sickDays = rs.getInt("sickDays");
+                float educationFund = rs.getFloat("educationFund");
+                float socialBenefits = rs.getFloat("socialBenefits");
+                String password = rs.getString("password");
+                boolean isFired = rs.getInt("isFired") == 1;
+                int locationId = rs.getInt("locationId");
+
+                // Get or create the branch
+                LocationDL branch = getBranchById(locationId);
+                if (branch == null) {
+                    // If branch doesn't exist, create a temporary one
+                    branch = new LocationDL(locationId, "Branch " + locationId, locationId,
+                            "Unknown Street", "Unknown", "Unknown", "Unknown");
+                    branches.add(branch);
+                }
+
+                // Check if this is a driver by looking at license_type
+                String licenseType = rs.getString("license_type");
+                String role = rs.getString("role");
+
+                ShiftEmployee employee;
+                if (licenseType != null) {
+                    // Create driver with initial license type
+                    ArrayList<String> licenseTypes = new ArrayList<>();
+                    licenseTypes.add(licenseType);
+                    employee = new DriverDL(id, name, branch, bankAccount, salary, startDate,
+                            vacationDays, sickDays, educationFund, socialBenefits, password,
+                            licenseTypes);
+                } else {
+                    // Create regular employee with initial role
+                    employee = new ShiftEmployee(id, name, branch, bankAccount, salary, startDate,
+                            vacationDays, sickDays, educationFund, socialBenefits, password,
+                            Role.valueOf(role != null ? role : "CASHIER")); // Default to CASHIER if no role specified
+                }
+
+                // Set fired status
+                employee.setFinishWorking(isFired);
+
+                // Add to allEmployees map
+                allEmployees.put(id, employee);
+
+            } catch (Exception e) {
+                System.out.println("Error loading employee: " + e.getMessage());
+                // Continue loading other employees even if one fails
+            }
+        }
+    }
+
+    private LocationDL getBranchById(int locationId) {
+        for (LocationDL branch : branches) {
+            if (branch.getId() == locationId) {
+                return branch;
+            }
+        }
+        return null;
+    }
+
+    //  public void refreshEmployees() {
+    //    try {
+
+///        DataLayer.DAOs.EmployeeDAO employeeDAO = new DataLayer.DAOs.EmployeeDAO(
+     //               DataLayer.ConnectionHandler.getInstance().connect());
+    //        ResultSet rs = employeeDAO.getAllEmployees();
+   //         loadEmployeesFromResultSet(rs);
+    //        rs.close();
+    //    } catch (Exception e) {
+     //       System.out.println("Error refreshing employees: " + e.getMessage());
+    //    }
+   // }
 
 }

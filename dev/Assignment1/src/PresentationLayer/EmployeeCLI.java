@@ -38,7 +38,7 @@ public class EmployeeCLI {
         1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800, 1830, 1900, 1930, 2000, 2030, 2100};
     private static final Integer[] EVENING_SHIFT_END_TIMES = {
         2100, 2130, 2200};
-   // List<LocationDL> branches = employeeFacade.getBranches();
+    // List<LocationDL> branches = employeeFacade.getBranches();
     private List<LocationDL> branches = new ArrayList<>();
 
     public EmployeeCLI(EmployeeFacade employeeFacade) {
@@ -1041,6 +1041,7 @@ public class EmployeeCLI {
     public void ClearDataBase() {
         try {
             employeeFacade.ClearDataBase();
+            employeeFacade.addFirstEmployeeManager();
             System.out.println("Database cleared successfully.");
         } catch (Exception e) {
             System.out.println("Error clearing database: " + e.getMessage());
@@ -1050,6 +1051,7 @@ public class EmployeeCLI {
     public void loadData() {
         try {
             employeeFacade.loadData();
+            employeeFacade.addFirstEmployeeManager();
             System.out.println("Data loaded successfully.");
         } catch (Exception e) {
             System.out.println("Error loading data: " + e.getMessage());

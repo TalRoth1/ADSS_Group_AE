@@ -1,6 +1,5 @@
 package DomainLayer;
 
-import java.sql.Connection;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -12,10 +11,6 @@ import java.util.Map;
 import DTO.DriverDTO;
 import DTO.EmployeeDTO;
 import DTO.LocationDTO;
-import DataLayer.DAOs.DriverDAO;
-import DataLayer.DAOs.EmployeeDAO;
-import DataLayer.DAOs.ShiftAssignedDAO;
-import DataLayer.DBConnection;
 import DataLayer.DriverController;
 import DataLayer.EmployeeController;
 import DataLayer.LocationController;
@@ -103,7 +98,6 @@ public class EmployeeFacade {
     // ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
     // employeeManager.removeEmployee(employeeId);
     // }
-
     // check if there is a driver available for delivery and there is store kepper
     // in each branch of the delivery
     public DriverDL assignCheck(LocalDate sentDate, String shiftType, LocationDL origin, List<LocationDL> destinations,
@@ -202,10 +196,16 @@ public class EmployeeFacade {
             throw new Exception("You are not logged in.");
         }
         EmployeeManager employeeManager = getEmployeeManager();
+        ShiftEmployee employee = shiftEmployees.get(employeeId);
+        if (employee == null) {
+            throw new Exception("Employee not found.");
+        }
+        ShiftEmployee backup = (ShiftEmployee) employee.clone(); // backup before change
         try {
             empController.updateRole(employeeId, oldRole.toString(), newRole.toString());
             employeeManager.changeRoleToEmployee(employeeId, oldRole, newRole);
         } catch (Exception e) {
+            shiftEmployees.put(employeeId, backup); // restore previous state
             throw new Exception("Failed to change role: " + e.getMessage());
         }
     }
@@ -251,10 +251,17 @@ public class EmployeeFacade {
             throw new Exception("You are not logged in.");
         }
         EmployeeManager employeeManager = getEmployeeManager();
+        ShiftEmployee employee = shiftEmployees.get(employeeId);
+        if (employee == null) {
+            throw new Exception("Employee not found.");
+        }
+        ShiftEmployee backup = (ShiftEmployee) employee.clone();
         try {
             empController.updateEmployeeByField(employeeId, "salary", salary);
             employeeManager.updateSalaryEmployee(employeeId, salary);
+            employee.setSalary(salary);
         } catch (Exception e) {
+            shiftEmployees.put(employeeId, backup);
             throw new Exception("Failed to update salary: " + e.getMessage());
         }
     }
@@ -267,11 +274,17 @@ public class EmployeeFacade {
             throw new Exception("You are not logged in.");
         }
         EmployeeManager employeeManager = getEmployeeManager();
+        ShiftEmployee employee = shiftEmployees.get(employeeId);
+        if (employee == null) {
+            throw new Exception("Employee not found.");
+        }
+        ShiftEmployee backup = (ShiftEmployee) employee.clone();
         try {
             empController.updateEmployeeByField(employeeId, "bankAccount", bankAccount);
-            ;
             employeeManager.updateBankAccountEmployee(employeeId, bankAccount);
+            employee.setBankAccount(bankAccount);
         } catch (Exception e) {
+            shiftEmployees.put(employeeId, backup);
             throw new Exception("Failed to update bank account: " + e.getMessage());
         }
     }
@@ -284,10 +297,17 @@ public class EmployeeFacade {
             throw new Exception("You are not logged in.");
         }
         EmployeeManager employeeManager = getEmployeeManager();
+        ShiftEmployee employee = shiftEmployees.get(employeeId);
+        if (employee == null) {
+            throw new Exception("Employee not found.");
+        }
+        ShiftEmployee backup = (ShiftEmployee) employee.clone();
         try {
             empController.updateEmployeeByField(employeeId, "vacationDays", vacationDays);
             employeeManager.updateVacationDaysEmployee(employeeId, vacationDays);
+            employee.setVacationDays(vacationDays);
         } catch (Exception e) {
+            shiftEmployees.put(employeeId, backup);
             throw new Exception("Failed to update vacation days: " + e.getMessage());
         }
     }
@@ -300,10 +320,17 @@ public class EmployeeFacade {
             throw new Exception("You are not logged in.");
         }
         EmployeeManager employeeManager = getEmployeeManager();
+        ShiftEmployee employee = shiftEmployees.get(employeeId);
+        if (employee == null) {
+            throw new Exception("Employee not found.");
+        }
+        ShiftEmployee backup = (ShiftEmployee) employee.clone();
         try {
             empController.updateEmployeeByField(employeeId, "sickDays", sickDays);
             employeeManager.updateSickDaysEmployee(employeeId, sickDays);
+            employee.setSickDays(sickDays);
         } catch (Exception e) {
+            shiftEmployees.put(employeeId, backup);
             throw new Exception("Failed to update sick days: " + e.getMessage());
         }
     }
@@ -316,10 +343,17 @@ public class EmployeeFacade {
             throw new Exception("You are not logged in.");
         }
         EmployeeManager employeeManager = getEmployeeManager();
+        ShiftEmployee employee = shiftEmployees.get(employeeId);
+        if (employee == null) {
+            throw new Exception("Employee not found.");
+        }
+        ShiftEmployee backup = (ShiftEmployee) employee.clone();
         try {
             empController.updateEmployeeByField(employeeId, "educationFund", educationFund);
             employeeManager.updateEducationFund(employeeId, educationFund);
+            employee.setEducationFund(educationFund);
         } catch (Exception e) {
+            shiftEmployees.put(employeeId, backup);
             throw new Exception("Failed to update education fund: " + e.getMessage());
         }
     }
@@ -332,10 +366,17 @@ public class EmployeeFacade {
             throw new Exception("You are not logged in.");
         }
         EmployeeManager employeeManager = getEmployeeManager();
+        ShiftEmployee employee = shiftEmployees.get(employeeId);
+        if (employee == null) {
+            throw new Exception("Employee not found.");
+        }
+        ShiftEmployee backup = (ShiftEmployee) employee.clone();
         try {
             empController.updateEmployeeByField(employeeId, "socialBenefits", socialBenefits);
             employeeManager.updateSocialBenefits(employeeId, socialBenefits);
+            employee.setSocialBenefits(socialBenefits);
         } catch (Exception e) {
+            shiftEmployees.put(employeeId, backup);
             throw new Exception("Failed to update social benefits: " + e.getMessage());
         }
     }
@@ -365,14 +406,14 @@ public class EmployeeFacade {
     }
 
     public void getAvailableEmployees(int empManagerId, LocationDL branch, Shift shift, Role role) throws Exception { // get
-                                                                                                                      // available
-                                                                                                                      // employees
-                                                                                                                      // for
-                                                                                                                      // a
-                                                                                                                      // shift
-                                                                                                                      // with
-                                                                                                                      // this
-                                                                                                                      // role
+        // available
+        // employees
+        // for
+        // a
+        // shift
+        // with
+        // this
+        // role
         if (branch == null || !branches.contains(branch)) {
             throw new Exception("Branch does not exist.");
         }
@@ -391,7 +432,7 @@ public class EmployeeFacade {
 
     // shift employee methods
     public String getPrefAllEmployees(int empManagerId) throws Exception { // get all employees' preferences, for
-                                                                           // employee manager
+        // employee manager
         if (!isEmployeeManager(empManagerId)) {
             throw new Exception("This action is allowed only for employee managers.");
         }
@@ -429,9 +470,9 @@ public class EmployeeFacade {
     }
 
     public void getAssignedEmployeeShiftsManager(int employeeId, int empManagerId) throws Exception { // employee's
-                                                                                                      // assigned shifts
-                                                                                                      // for shift
-                                                                                                      // employee only
+        // assigned shifts
+        // for shift
+        // employee only
 
         if (!isEmployeeManager(empManagerId)) {
             throw new Exception("This action is allowed only for employee manager.");
@@ -902,6 +943,18 @@ public class EmployeeFacade {
         } catch (Exception e) {
             System.out.println("Error loading employee data: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    public void addFirstEmployeeManager() {
+        if (employeeManager == null) {
+            employeeManager = new EmployeeManager(0, "keren", "000000000", 10000, LocalDate.now(), 30, 10,
+                    2000f, 1000f, "admin");
+            try {
+                empController.addFirstEmployeeManager(employeeMapper.toDTO(employeeManager));
+            } catch (Exception e) {
+                System.out.println("Error logging in as default manager: " + e.getMessage());
+            }
         }
     }
 
