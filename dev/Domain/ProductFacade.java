@@ -233,6 +233,7 @@ public class ProductFacade {
         List<ProductBL> productList = new ArrayList<>();
         List<Integer> minimumQuantities = new ArrayList<>();
         List<Integer> currentQuantites = new ArrayList<>();
+        List<String> destinations = new ArrayList<>();
         for (Integer branchID : branchIDs) {
             String branchName = BranchFacade.getInstance().getBranchName(branchID);
             boolean hasDeficiency = false;
@@ -256,8 +257,9 @@ public class ProductFacade {
                     minimumQuantities.add(minimalQuantity);
                     currentQuantites.add(currentQuantity);
                     productList.add(product);
+                    destinations.add(branchName); 
                     // need to add which destinations have low supply
-                    orderFacade.handleLowSupply(productList, minimumQuantities, currentQuantites);
+                    orderFacade.handleLowSupply(productList, minimumQuantities, currentQuantites, destinations);
                     body.append("  Product: ").append(product.getName())
                             .append(" (Product ID: ").append(product.getProductID()).append(") ")
                             .append("Current Quantity: ").append(currentQuantity)

@@ -165,7 +165,7 @@ public class SupplierFacade {
         return null; // Supplier not found
     }
 
-    public Map<Integer, Integer> getSuppliedCatlogItems(int supplierID) {
+    public Map<Integer, Integer> getSuppliedCatalogItems(int supplierID) {
         SupplierDL supplier = getSupplier(supplierID);
         if (supplier != null) {
             Map<Integer, Integer> suppliedItems = new HashMap<>();
