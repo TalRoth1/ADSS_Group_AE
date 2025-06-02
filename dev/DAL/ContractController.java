@@ -43,14 +43,18 @@ public class ContractController {
 
     private void initializeTableOnOrder() {
         try (Connection conn = DriverManager.getConnection(url);
+
                 Statement stmt = conn.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
             String sql = """
                     CREATE TABLE IF NOT EXISTS OnOrders (
                     contractID INTEGER NOT NULL,
                     supplierID INTEGER NOT NULL,
                     itemID INTEGER NOT NULL,
                     catalogID INTEGER NOT NULL,
-                    PRIMARY KEY (contractID, supplierID, itemID)
+                    PRIMARY KEY (contractID, supplierID, itemID),
+                    FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
+                    FOREIGN KEY (itemID) REFERENCES Items(itemID) ON DELETE CASCADE
                     );
                     """;
 
@@ -63,13 +67,16 @@ public class ContractController {
     private void initializeTablePickup() {
         try (Connection conn = DriverManager.getConnection(url);
                 Statement stmt = conn.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
             String sql = """
                     CREATE TABLE IF NOT EXISTS Pickups (
                     contractID INTEGER NOT NULL,
                     supplierID INTEGER NOT NULL,
                     itemID INTEGER NOT NULL,
                     catalogID INTEGER NOT NULL,
-                    PRIMARY KEY (contractID, supplierID, itemID)
+                    PRIMARY KEY (contractID, supplierID, itemID),
+                    FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
+                    FOREIGN KEY (itemID) REFERENCES Items(itemID) ON DELETE CASCADE
                     );
                     """;
 
@@ -82,6 +89,7 @@ public class ContractController {
     private void initializeTablePeriodics() {
         try (Connection conn = DriverManager.getConnection(url);
                 Statement stmt = conn.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
             String sql = """
                     CREATE TABLE IF NOT EXISTS Periodics (
                     contractID INTEGER NOT NULL,
@@ -89,7 +97,9 @@ public class ContractController {
                     itemID INTEGER NOT NULL,
                     catalogID INTEGER NOT NULL,
                     day INTEGER NOT NULL,
-                    PRIMARY KEY (contractID, supplierID, itemID)
+                    PRIMARY KEY (contractID, supplierID, itemID),
+                    FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
+                    FOREIGN KEY (itemID) REFERENCES Items(itemID) ON DELETE CASCADE
                     );
                     """;
 
@@ -102,6 +112,7 @@ public class ContractController {
     private void initializeTablePeriodicItems() {
         try (Connection conn = DriverManager.getConnection(url);
                 Statement stmt = conn.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
             String sql = """
                     CREATE TABLE IF NOT EXISTS PeriodicItems (
                     contractID INTEGER NOT NULL,
@@ -109,7 +120,9 @@ public class ContractController {
                     productID INTEGER NOT NULL,
                     quantity INTEGER NOT NULL,
                     price REAL NOT NULL,
-                    PRIMARY KEY (contractID, supplierID, productID)
+                    PRIMARY KEY (contractID, supplierID, productID),
+                    FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
+                    FOREIGN KEY (productID) REFERENCES Products(productID) ON DELETE CASCADE
                     );
                     """;
 
@@ -122,6 +135,8 @@ public class ContractController {
     private void initializeTableDiscounts() {
         try (Connection conn = DriverManager.getConnection(url);
                 Statement stmt = conn.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
+
             String sql = """
                     CREATE TABLE IF NOT EXISTS Discounts (
                     contractID INTEGER NOT NULL,
@@ -129,7 +144,8 @@ public class ContractController {
                     catalogID INTEGER NOT NULL,
                     minimumQuantity INTEGER NOT NULL,
                     discountPercentage REAL NOT NULL,
-                    PRIMARY KEY (contractID, supplierID, catalogID)
+                    PRIMARY KEY (contractID, supplierID, catalogID),
+                    FOREIGN KEY (supplierID) REFERENCES Suppliers(supplierID) ON DELETE CASCADE,
                     );
                     """;
 
