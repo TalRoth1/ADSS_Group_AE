@@ -26,7 +26,8 @@ public class ProductFacadeTest {
     // Test for part 1 (Only domain logic without checking persistance)
 
     @Test
-    public void testRemoveNonExistentProduct() {
+    public void testRemoveNonExistentProduct() 
+    {
         int invalidId = Integer.MAX_VALUE;
         assertThrows(RuntimeException.class, () -> productFacade.removeProduct(invalidId));
     }
