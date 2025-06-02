@@ -24,8 +24,10 @@ public class InvCLI {
 
     public void openInterface() {
         boolean isInterrupted = false;
+        sf.getBranchService().deactivateDemo();
+        sf.getProductService().deactivateDemo();
+        demoMode = false;
         display("Welcome to inventory management system!");
-        if(demoMode) display ("You are currently in demonstration mode, all changes here won't be saved in the database");
         while (!isInterrupted) {
             printMainMenu();
             displayControlButtons();
@@ -63,6 +65,7 @@ public class InvCLI {
     }
 
     private void printMainMenu() {
+        if(demoMode) display ("You are currently in demonstration mode, all changes here won't be saved in the database");
         display("1. Manage Branches.");
         display("2. Manage Products.");
         display("3. Manage Items.");

@@ -82,4 +82,10 @@ public class BranchService
         bf.enterDemo();
     }
 
+    public void deactivateDemo()
+    {
+        bf.deactivateDemo();
+    }
+
+
 }

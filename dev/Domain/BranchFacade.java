@@ -200,5 +200,14 @@ public class BranchFacade
     {
         demonstrationMode = true;
         this.branches.clear();
+        nextBranchID = 0;
+    }
+
+    public synchronized void deactivateDemo()
+    {
+        demonstrationMode = false;
+        this.branches.clear();
+        nextBranchID = controller.getMaxBranchID() + 1;
+        loadAllBranchesFromDB();
     }
 }

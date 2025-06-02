@@ -61,4 +61,9 @@ public class ProductService {
         pf.enterDemo();
     }
 
+    public void deactivateDemo()
+    {
+        pf.deactivateDemo();
+    }
+
 }

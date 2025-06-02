@@ -1,12 +1,15 @@
 import Domain.OrderFacade;
 import Domain.SupplierFacade;
-import Presentation.CLI;
+import Presentation.MainCLI;
+import Service.ServiceFactory;
 
 public class Main {
-    public static void main(String[] args) {
-        SupplierFacade sf = new SupplierFacade();
-        OrderFacade of = new OrderFacade(sf);
-        CLI cli = new CLI(sf, of);
-        cli.run();
+    public static void main(String[] args) 
+    {
+        SupplierFacade sf = SupplierFacade.getInstance();
+        OrderFacade of = OrderFacade.getInstance();
+        ServiceFactory invSF = ServiceFactory.getFactory();
+        MainCLI mainCli = new MainCLI(of, sf, invSF);
+        mainCli.run();
     }
 }
