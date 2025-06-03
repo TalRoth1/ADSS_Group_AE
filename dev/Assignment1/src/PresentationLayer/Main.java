@@ -21,19 +21,23 @@ public class Main {
             String choice = scanner.nextLine();
             switch (choice) {
                 case "1":
-                    // Continue from previous session - should just continue with what we already had
+                    // Continue from previous session - should just continue with what we already
+                    // had
                     flag = false;
                     break;
                 case "2":
-                    //Load predefined data - use a method on both CLIs to load predefined data
+                    // Load predefined data - use a method on both CLIs to load predefined data
                     flag = false;
-                    employeeCLI.MakePredefinedData();
+                    employeeFacade.ClearDataBase();
+                    employeeFacade.addFirstEmployeeManager();
                     shipmentCLI.MakePredefinedData();
+                    employeeCLI.MakePredefinedData();
                     break;
                 case "3":
-                    //No data - use a method on both CLIs to delete all data
+                    // No data - use a method on both CLIs to delete all data
                     shipmentCLI.ClearDataBase();
                     employeeCLI.ClearDataBase();
+                    employeeFacade.addFirstEmployeeManager();
                     flag = false;
                     break;
                 default:
@@ -41,19 +45,22 @@ public class Main {
             }
         }
 
-        /*System.out.println("Hello! load data? answer y / n");
-        String loadData = scanner.nextLine();
-        if (loadData.equalsIgnoreCase("y")) {*/
+        /*
+         * System.out.println("Hello! load data? answer y / n");
+         * String loadData = scanner.nextLine();
+         * if (loadData.equalsIgnoreCase("y")) {
+         */
 
-        //loading data from the choice made above
-            shipmentCLI.loadData();
-            employeeCLI.loadData();
+        // loading data from the choice made above
+        shipmentCLI.loadData();
+        employeeCLI.loadData();
 
-
-        /*} else if (!loadData.equalsIgnoreCase("n")) {
-            System.out.println("Invalid input, please restart the application.");
-            return;
-        }*/
+        /*
+         * } else if (!loadData.equalsIgnoreCase("n")) {
+         * System.out.println("Invalid input, please restart the application.");
+         * return;
+         * }
+         */
 
         boolean running = true;
         while (running) {

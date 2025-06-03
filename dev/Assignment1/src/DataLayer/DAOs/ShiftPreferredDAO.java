@@ -76,36 +76,27 @@ public class ShiftPreferredDAO {
 
     public ResultSet getPreferredShift(int shiftId, int employeeId) throws SQLException {
         String sql = "SELECT * FROM preferred_shifts WHERE shiftId=? AND employeeId=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, shiftId);
-            pstmt.setInt(2, employeeId);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving preferred shift: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, shiftId);
+        pstmt.setInt(2, employeeId);
+        return pstmt.executeQuery();
+        
     }
 
     public ResultSet getPreferredShiftsForEmployee(int employeeId) throws SQLException {
         String sql = "SELECT * FROM preferred_shifts WHERE employeeId=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving preferred shifts for employee: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, employeeId);
+        return pstmt.executeQuery();
+        
     }
 
     public ResultSet getPreferredShiftsForShift(int shiftId) throws SQLException {
         String sql = "SELECT * FROM preferred_shifts WHERE shiftId=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, shiftId);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving preferred shifts for shift: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, shiftId);
+        return pstmt.executeQuery();
+        
     }
 
     public void clearTable() throws SQLException {

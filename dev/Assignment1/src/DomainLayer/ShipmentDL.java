@@ -171,11 +171,12 @@ public class ShipmentDL {
 
     public String toString() {
         return "Truck: " + Truck.GetNumber()
-                + ", Driver: " + DriverName.getName()
-                + ", Origin: " + Document.getOrigin().toString()
-                + ", Destinations: " + Document.getLocations().toString()
-                + ", Date Created: " + DateCreated.toString()
-                + (DateSent != null ? ", Date Sent: " + DateSent.toString() : "");
+                + ", Driver: " + DriverName == null ? "Not Assigned"
+                        : DriverName.getName()
+                                + ", Origin: " + Document.getOrigin().toString()
+                                + ", Destinations: " + Document.getLocations().toString()
+                                + ", Date Created: " + DateCreated.toString()
+                                + (DateSent != null ? ", Date Sent: " + DateSent.toString() : "");
     }
 
     public void ChangeAvailablity() {

@@ -13,6 +13,9 @@ public class DriverMapper {
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static DriverDTO toDTO(DriverDL dl) {
+        if (dl == null) {
+            return null;
+        }
         return new DriverDTO(
                 dl.getId(),
                 dl.getName(),
@@ -32,6 +35,9 @@ public class DriverMapper {
     }
 
     public static DriverDL toDL(DriverDTO dto) {// this should get the branch from the dto
+        if (dto == null) {
+            return null;
+        }
         return new DriverDL(
                 dto.getId(),
                 dto.getName(),

@@ -10,7 +10,8 @@ public class LocationDL {
     public String ContactName;
     public String Zone;
 
-    public LocationDL(int id, String street, int streetNumber, String city, String contactNumber, String contactName, String zone) {
+    public LocationDL(int id, String street, int streetNumber, String city, String contactNumber, String contactName,
+            String zone) {
         this.id = id;
         this.Street = street;
         this.StreetNumber = streetNumber;
@@ -21,7 +22,8 @@ public class LocationDL {
     }
 
     public String toString() {
-        return Street + " " + StreetNumber + ", " + City + ", " + Zone + ", Contact: " + ContactName + ", Phone: " + ContactNumber;
+        return Street + " " + StreetNumber + ", " + City + ", " + Zone + ", Contact: " + ContactName + ", Phone: "
+                + ContactNumber;
     }
 
     public int getId() {
@@ -52,6 +54,7 @@ public class LocationDL {
         return City;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -60,9 +63,13 @@ public class LocationDL {
             return false;
         }
         LocationDL that = (LocationDL) obj;
-        return StreetNumber == that.StreetNumber && ContactNumber == that.ContactNumber && Street.equals(that.Street) && City.equals(that.City) && ContactName.equals(that.ContactName) && Zone.equals(that.Zone);
+        return StreetNumber == that.StreetNumber && ContactNumber == that.ContactNumber && Street.equals(that.Street)
+                && City.equals(that.City) && ContactName.equals(that.ContactName) && Zone.equals(that.Zone);
     }
 
-
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id); // or use Objects.hash(id, otherFields)
+    }
 
 }

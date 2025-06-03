@@ -49,13 +49,9 @@ public class DocumentDAO {
 
     public ResultSet getDocument(int documentId) throws SQLException {
         String sql = "SELECT * FROM documents WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, documentId);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving document: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, documentId);
+        return pstmt.executeQuery();
     }
 
     public void updateDocument(int documentId, int originId, float weight) {
@@ -94,12 +90,8 @@ public class DocumentDAO {
 
     public ResultSet getAllDocuments() throws SQLException {
         String sql = "SELECT * FROM documents";
-        try (Statement stmt = connection.createStatement()) {
-            return stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println("Error retrieving all documents: " + e.getMessage());
-            throw e;
-        }
+        Statement stmt = connection.createStatement();
+        return stmt.executeQuery(sql);
     }
 
     public void clearTable() throws SQLException {

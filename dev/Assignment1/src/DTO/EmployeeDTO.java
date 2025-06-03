@@ -47,6 +47,8 @@ public class EmployeeDTO {
         this.prefShifts = prefShifts;
     }
 
+    
+
     public int getId() {
         return id;
     }

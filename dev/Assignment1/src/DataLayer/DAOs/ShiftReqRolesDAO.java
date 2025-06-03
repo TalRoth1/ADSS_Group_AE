@@ -75,25 +75,19 @@ public class ShiftReqRolesDAO {
 
     public ResultSet getRequiredRole(int shiftId, String role) throws SQLException {
         String sql = "SELECT * FROM shift_req_roles WHERE shiftId=? AND role=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, shiftId);
-            pstmt.setString(2, role);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving required role: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, shiftId);
+        pstmt.setString(2, role);
+        return pstmt.executeQuery();
+        
     }
 
     public ResultSet getRequiredRolesForShift(int shiftId) throws SQLException {
         String sql = "SELECT * FROM shift_req_roles WHERE shiftId=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, shiftId);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving required roles for shift: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, shiftId);
+        return pstmt.executeQuery();
+        
     }
 
     public void clearTable() throws SQLException {

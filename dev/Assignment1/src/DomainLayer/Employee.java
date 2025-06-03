@@ -199,4 +199,13 @@ public class Employee {
         this.branch = branchId;
     }
 
+
+    public Employee clone() {
+        Employee res =  new Employee(id, name, branch, bankAccount, salary, startDate, vacationDays, sickDays,
+                educationFund, socialBenefits, password, finishWorking);
+        res.isLoggedIn = this.isLoggedIn;
+        res.trainings = new HashSet<>(this.trainings); // Clone the trainings set
+        return res;
+    }
+
 }

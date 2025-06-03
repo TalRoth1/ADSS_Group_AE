@@ -124,26 +124,19 @@ public class LocationDAO {
 
     public ResultSet getLocation(String street, int streetNumber, String city) throws SQLException {
         String sql = "SELECT * FROM locations WHERE street = ? AND street_number = ? AND city = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, street);
-            pstmt.setInt(2, streetNumber);
-            pstmt.setString(3, city);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving location: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, street);
+        pstmt.setInt(2, streetNumber);
+        pstmt.setString(3, city);
+        return pstmt.executeQuery();
+        
     }
 
     public ResultSet getLocation(int id) throws SQLException {
         String sql = "SELECT * FROM locations WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving location: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, id);
+        return pstmt.executeQuery(); // pstmt remains open
     }
 
     public Integer getLocationId(String street, int streetNumber, String city) throws SQLException {

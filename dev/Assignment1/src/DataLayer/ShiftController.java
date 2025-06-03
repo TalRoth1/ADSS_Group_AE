@@ -1,6 +1,5 @@
 package DataLayer;
 
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,6 +33,10 @@ public class ShiftController {
         this.dbConnection3.connect("preferred_shifts.db");
         this.dbConnection4.connect("shift_req_roles.db");
         this.locationController = locationController;
+        this.shiftAssignedDAO = new ShiftAssignedDAO(dbConnection.getConnection());
+        this.shiftDAO = new ShiftDAO(dbConnection2.getConnection());
+        this.shiftPreferredDAO = new ShiftPreferredDAO(dbConnection3.getConnection());
+        this.shiftReqRolesDAO = new ShiftReqRolesDAO(dbConnection4.getConnection());
     }
 
     public void addShiftAssigned(EmployeeDTO employeeDTO, ShiftDTO shiftDTO, String role) throws SQLException {
@@ -48,7 +51,8 @@ public class ShiftController {
         try {
             shiftDAO.addShift(shiftDTO.getId(), shiftDTO.getDate().toString(), shiftDTO.getShiftType(),
                     shiftDTO.getBranch().getId(),
-                    shiftDTO.getStartTime(), shiftDTO.getEndTime(), shiftDTO.getShiftManagerId(), shiftDTO.isShipmentShift() ? 1 : 0);
+                    shiftDTO.getStartTime(), shiftDTO.getEndTime(), shiftDTO.getShiftManagerId(),
+                    shiftDTO.isShipmentShift() ? 1 : 0);
         } catch (Exception e) {
             System.out.println("Error adding shift: " + e.getMessage());
         }
@@ -79,6 +83,14 @@ public class ShiftController {
     }
 
     public void updateShift(ShiftDTO shiftDTO, String fieldName, int newValue) throws SQLException {
+        try {
+            shiftDAO.setShiftField(shiftDTO.getId(), fieldName, newValue);
+        } catch (Exception e) {
+            System.out.println("Error updating shift: " + e.getMessage());
+        }
+    }
+
+    public void updateShift(ShiftDTO shiftDTO, String fieldName, String newValue) throws SQLException {
         try {
             shiftDAO.setShiftField(shiftDTO.getId(), fieldName, newValue);
         } catch (Exception e) {
@@ -133,7 +145,7 @@ public class ShiftController {
         }
     }
 
-    public void deleteShiftReqRoles(ShiftDTO shiftDTO, String role) {
+    public void deleteShiftReqRoles(ShiftDTO shiftDTO, String role) throws SQLException {
         try {
             int shiftId = shiftDTO.getId();
             shiftReqRolesDAO.removeRequiredRole(shiftId, role);
@@ -145,7 +157,7 @@ public class ShiftController {
     public ShiftDTO getShift(int id) throws SQLException {
         ResultSet rs = shiftDAO.getShift(id);
         if (rs.next()) {
-            return buildShiftDTO(rs); //helper method to build ShiftDTO from ResultSet
+            return buildShiftDTO(rs); // helper method to build ShiftDTO from ResultSet
         } else
             throw new SQLException("Shift not found with id: " + id);
     }
@@ -154,7 +166,7 @@ public class ShiftController {
         ArrayList<ShiftDTO> shifts = new ArrayList<>();
         ResultSet rs = shiftDAO.getAllShifts();
         while (rs.next()) {
-            shifts.add(buildShiftDTO(rs)); //helper method to build ShiftDTO from ResultSet
+            shifts.add(buildShiftDTO(rs)); // helper method to build ShiftDTO from ResultSet
         }
         return shifts;
     }
@@ -162,10 +174,14 @@ public class ShiftController {
     public ArrayList<ShiftDTO> getAllPrefShifts(int id) {
         ArrayList<ShiftDTO> shifts = new ArrayList<>();
         try {
-            ResultSet rs = shiftPreferredDAO.getPreferredShiftsForEmployee(id);
-            while (rs.next()) {
-                ResultSet shiftResult = shiftDAO.getShift(rs.getInt("shiftId"));
-                shifts.add(buildShiftDTO(shiftResult)); //helper method to build ShiftDTO from ResultSet
+            if (shiftPreferredDAO != null) {
+                ResultSet rs = shiftPreferredDAO.getPreferredShiftsForEmployee(id);
+                while (rs.next()) {
+                    ResultSet shiftResult = shiftDAO.getShift(rs.getInt("shiftId"));
+                    shifts.add(buildShiftDTO(shiftResult)); // helper method to build ShiftDTO from ResultSet
+                }
+            } else {
+                return new ArrayList<>(); // Return empty list if shiftPreferredDAO is not initialized
             }
         } catch (SQLException e) {
             System.out.println("Error getting all preferred shifts: " + e.getMessage());
@@ -173,15 +189,19 @@ public class ShiftController {
         return shifts;
     }
 
-    public Map<ShiftDTO, String> getAssignedShiftsForEmployee(int employeeId) {
+    public Map<ShiftDTO, String> getAssignedShiftsForEmployee(int employeeId) throws SQLException {
         Map<ShiftDTO, String> assignedShifts = new HashMap<>();
         try {
-            ResultSet rs = shiftAssignedDAO.getAssignedShifts(employeeId);
-            while (rs.next()) {
-                ResultSet shiftResult = shiftDAO.getShift(rs.getInt("shiftId"));
-                ShiftDTO shiftDTO = buildShiftDTO(shiftResult); //helper method to build ShiftDTO from ResultSet
-                String role = rs.getString("role");
-                assignedShifts.put(shiftDTO, role);
+            if (shiftAssignedDAO != null) {
+                ResultSet rs = shiftAssignedDAO.getAssignedShifts(employeeId);
+                while (rs.next()) {
+                    ResultSet shiftResult = shiftDAO.getShift(rs.getInt("shiftId"));
+                    ShiftDTO shiftDTO = buildShiftDTO(shiftResult); // helper method to build ShiftDTO from ResultSet
+                    String role = rs.getString("role");
+                    assignedShifts.put(shiftDTO, role);
+                }
+            } else {
+                return new HashMap<>(); // Return empty map if shiftAssignedDAO is not initialized
             }
         } catch (SQLException e) {
             System.out.println("Error getting assigned shifts for employee: " + e.getMessage());
@@ -189,8 +209,7 @@ public class ShiftController {
         return assignedShifts;
     }
 
-
-    //helper method to build ShiftDTO from ResultSet
+    // helper method to build ShiftDTO from ResultSet
     private ShiftDTO buildShiftDTO(ResultSet rst) throws SQLException {
         int id = rst.getInt("id");
         Date date = rst.getDate("date");
@@ -229,7 +248,7 @@ public class ShiftController {
                 branch, requiredRoles, assignedEmployeesID, availableEmployeesID);
     }
 
-    public void clearAllShifts() {
+    public void clearAllShifts() throws SQLException {
         try {
             shiftAssignedDAO.clearTable();
             shiftPreferredDAO.clearTable();

@@ -66,21 +66,17 @@ public class EmployeeRoleDAO {
         return stmt.executeQuery(sql);
     }
 
-    public ResultSet getRolesForEmployee(int employeeId) throws SQLException { // get roles of a specific employee
+    public List<String> getRolesForEmployee(int employeeId) throws SQLException { // get roles of a specific employee
         String sql = "SELECT role FROM employee_role WHERE employeeId=?";
         List<String> roles = new ArrayList<>();
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                roles.add(rs.getString("role"));
-            }
-            return rs;
-        } catch (SQLException e) {
-            System.out.println("Error getting roles: " + e.getMessage());
-            throw e;
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, employeeId);
+        ResultSet rs = pstmt.executeQuery();
+        while (rs.next()) {
+            roles.add(rs.getString("role"));
         }
-
+        //return rs;
+        return roles;
     }
 
     public void updateRole(int employeeId, String oldRole, String newRole) throws SQLException {

@@ -38,7 +38,7 @@ public class ShipmentFacade {
     public List<TruckDL> trucks = new ArrayList<>();
     public Map<String, Float> Items = new HashMap<>();
 
-    public ShipmentFacade(EmployeeFacade employeeFacade){
+    public ShipmentFacade(EmployeeFacade employeeFacade) {
         this.employeeFacade = employeeFacade;
         this.locationController = new LocationController();
         this.truckController = new TruckController();
@@ -53,19 +53,19 @@ public class ShipmentFacade {
 
     public void CreateShipment(TruckDL truck, LocationDL origin, List<LocationDL> destinations,
             Map<LocationDL, Map<String, Integer>> items, String shiftTime, Date datetoSend) throws Exception {
-        ShipmentDL shipment = new ShipmentDL(getHighestShipmentId() ,truck, origin, destinations, items, shiftTime, datetoSend);
+        ShipmentDL shipment = new ShipmentDL(getHighestShipmentId(), truck, origin, destinations, items, shiftTime,
+                datetoSend);
         if (!shipment.WeightCheck(Items)) {
             throw new Exception("Truck is overweight");
         }
-        
+
         shipment.setWeight(Items);
 
         DriverDL driverToSend;
         // assign driver
-        try{
+        try {
             driverToSend = tryToAssignShifts(shipment);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             driverToSend = null; // No driver assigned, handle accordingly
         }
         try {
@@ -81,7 +81,7 @@ public class ShipmentFacade {
         ShipmentDL temp = shipment.clone();
         if (stat.equals("SENT")) {
             ShipmentStatus currentStatus = shipment.getStatus();
-            DriverDL driverToSend = tryToAssignShifts(shipment);        
+            DriverDL driverToSend = tryToAssignShifts(shipment);
             if (shipment.DriverBusyCheck()) {
                 throw new Exception("Driver is busy");
             }
@@ -121,14 +121,15 @@ public class ShipmentFacade {
             shipmentController.deleteShipment(shipmentMapper.toDTO(shipment));
         } catch (Exception e) {
             e.printStackTrace();
-            return; 
+            return;
         }
         shipments.remove(shipment);
     }
 
     public LocationDL AddLocation(String street, int streetNumber, String city, String contactNumber,
-        String contactName, String zone) {
-        LocationDL location = new LocationDL(getHighestLocationId() ,street, streetNumber, city, contactNumber, contactName, zone);
+            String contactName, String zone) {
+        LocationDL location = new LocationDL(getHighestLocationId(), street, streetNumber, city, contactNumber,
+                contactName, zone);
         try {
             locationController.addLocation(locationMapper.toDTO(location));
         } catch (Exception e) {
@@ -142,10 +143,9 @@ public class ShipmentFacade {
 
     public TruckDL AddTruck(int number, String model, String type, float maxWeight) {
         TruckDL truck = new TruckDL(number, model, type, maxWeight);
-        try{
+        try {
             truckController.addTruck(truckMapper.toDTO(truck));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -154,7 +154,7 @@ public class ShipmentFacade {
     }
 
     public void AddItem(String itemName, float weight) {
-        try{
+        try {
             itemsController.addItem(new ItemDTO(itemName, weight));
         } catch (Exception e) {
             e.printStackTrace();
@@ -182,51 +182,51 @@ public class ShipmentFacade {
     }
 
     public void EditShipement(ShipmentDL shipment, TruckDL truck, DriverDL driver, LocationDL origin,
-        List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items, Date dateToSend,
-        String shiftTime) throws Exception {
+            List<LocationDL> destinations, Map<LocationDL, Map<String, Integer>> items, Date dateToSend,
+            String shiftTime) throws Exception {
         // assuming that the shipment exists in the list
         int index = shipments.indexOf(shipment);
         ShipmentDL shipmentToEdit = shipments.get(index);
         ShipmentDL temp = shipmentToEdit.clone();
-        try{
-        if (truck != null) {
-            if (!shipmentToEdit.EditTruck(truck.GetNumber(), trucks, Items)) {
-                throw new Exception("Truck is overweight or the driver does not have the right license for this truck");
-            }
-            
-        }
-        if (driver != null) {
-            Boolean check = shipmentToEdit.EditDriver(driver);
-            if (!check) {
-                throw new Exception("Driver does not have the right license for this truck");
-            }
-        }
-        if (origin != null) {
-            shipmentToEdit.EditOrigin(origin, locations);
-        }
-        if (destinations != null) {
-            Boolean check = shipmentToEdit.EditDestinations(items, Items);
-            if (!check) {
-                throw new Exception("Truck cannot support the new weight");
-            }
-        }
-        if (items != null) {
-            Boolean check = shipmentToEdit.EditDestinations(items, Items);
-            if (!check) {
-                throw new Exception("Truck cannot support the new weight");
-            }
-        }
-        if (shiftTime != null) {
-            shipmentToEdit.setShiftType(shiftTime);
+        try {
+            if (truck != null) {
+                if (!shipmentToEdit.EditTruck(truck.GetNumber(), trucks, Items)) {
+                    throw new Exception(
+                            "Truck is overweight or the driver does not have the right license for this truck");
+                }
 
-        }
-        if (dateToSend != null) {
-            shipmentToEdit.setDateSent(dateToSend);
-        }
-        tryToAssignShifts(shipmentToEdit);
-        shipmentController.updateShipment(ShipmentMapper.toDTO(shipmentToEdit));
-        }
-        catch (Exception e) {
+            }
+            if (driver != null) {
+                Boolean check = shipmentToEdit.EditDriver(driver);
+                if (!check) {
+                    throw new Exception("Driver does not have the right license for this truck");
+                }
+            }
+            if (origin != null) {
+                shipmentToEdit.EditOrigin(origin, locations);
+            }
+            if (destinations != null) {
+                Boolean check = shipmentToEdit.EditDestinations(items, Items);
+                if (!check) {
+                    throw new Exception("Truck cannot support the new weight");
+                }
+            }
+            if (items != null) {
+                Boolean check = shipmentToEdit.EditDestinations(items, Items);
+                if (!check) {
+                    throw new Exception("Truck cannot support the new weight");
+                }
+            }
+            if (shiftTime != null) {
+                shipmentToEdit.setShiftType(shiftTime);
+
+            }
+            if (dateToSend != null) {
+                shipmentToEdit.setDateSent(dateToSend);
+            }
+            tryToAssignShifts(shipmentToEdit);
+            shipmentController.updateShipment(ShipmentMapper.toDTO(shipmentToEdit));
+        } catch (Exception e) {
             e.printStackTrace();
             shipmentToEdit = temp; // revert to original shipment
             throw new Exception("Error editing shipment: " + e.getMessage());
@@ -258,7 +258,7 @@ public class ShipmentFacade {
     }
 
     public void LoadData() {
-        try{
+        try {
             List<LocationDTO> locationDTOs = locationController.getAllLocations();
             for (LocationDTO locationDTO : locationDTOs) {
                 LocationDL location = locationMapper.toDomain(locationDTO);
@@ -278,9 +278,8 @@ public class ShipmentFacade {
                 ShipmentDL shipment = shipmentMapper.toDL(shipmentDTO);
                 shipments.add(shipment);
             }
-            
-        }
-        catch (Exception e) {
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -298,18 +297,31 @@ public class ShipmentFacade {
 
     public void MakePredefinedData() {
         ClearDataBase();
-        AddLocation("Main St", 1, "CityA", "123456789", "Spiderman", "1");
-        AddLocation("Second St", 2, "CityB", "987654321", "Peter Griffin", "2");
-        AddTruck(1, "ModelX", "A", 10f);
-        AddTruck(2, "ModelY", "B", 15f);
-        AddTruck(3, "ModelZ", "C", 20f);
-        AddItem("1L milk", 1f);
-        AddItem("12 eggs", 1.5f);
-        AddItem("0.5L water", 0.5f);
+        LocationDL loc1 = new LocationDL(1, "First St", 1, "CityA", "123456789", "John Doe", "1");
+        LocationDL loc2 = new LocationDL(2, "Main St", 1, "CityA", "123456789", "Spiderman", "1");
+        LocationDL loc3 = new LocationDL(3, "Second St", 2, "CityB", "987654321", "Peter Griffin", "2");
+        TruckDL truck1 = new TruckDL(1, "ModelX", "A", 10f);
+        TruckDL truck2 = new TruckDL(2, "ModelY", "B", 15f);
+        TruckDL truck3 = new TruckDL(3, "ModelZ", "C", 20f);
+        try {
+            locationController.addLocation(locationMapper.toDTO(loc1));
+            locationController.addLocation(locationMapper.toDTO(loc2));
+            locationController.addLocation(locationMapper.toDTO(loc3));
+            truckController.addTruck(truckMapper.toDTO(truck1));
+            truckController.addTruck(truckMapper.toDTO(truck2));
+            truckController.addTruck(truckMapper.toDTO(truck3));
+            employeeFacade.addBranch(loc1);
+            employeeFacade.addBranch(loc2);
+            employeeFacade.addBranch(loc3);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
     }
 
     public int getHighestLocationId() {
-        int maxId = 0;
+        int maxId = -1;
         for (LocationDL location : locations) {
             if (location.getId() > maxId) {
                 maxId = location.getId();

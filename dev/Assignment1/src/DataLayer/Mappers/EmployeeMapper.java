@@ -99,6 +99,25 @@ public class EmployeeMapper {
                 roles);
     }
 
+    public static EmployeeManager toDomain(EmployeeDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+        LocalDate startDate = dto.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        EmployeeManager employee = new EmployeeManager(
+                dto.getId(),
+                dto.getName(),
+                dto.getBankAccount(),
+                dto.getSalary(),
+                startDate,
+                dto.getVacationDays(),
+                dto.getSickDays(),
+                dto.getEducationFund(),
+                dto.getSocialBenefits(),
+                dto.getPassword());
+        return employee;
+    }
+
     public static ShiftEmployee toDomain(EmployeeDTO dto, List<LocationDL> allBranches,
             Map<ShiftDTO, String> assignedShifts,
             List<ShiftDTO> preferredShifts) {

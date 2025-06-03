@@ -38,17 +38,17 @@ public class EmployeeCLI {
         1400, 1430, 1500, 1530, 1600, 1630, 1700, 1730, 1800, 1830, 1900, 1930, 2000, 2030, 2100};
     private static final Integer[] EVENING_SHIFT_END_TIMES = {
         2100, 2130, 2200};
-    // List<LocationDL> branches = employeeFacade.getBranches();
+    //private List<LocationDL> branches = employeeFacade.getBranches();
     private List<LocationDL> branches = new ArrayList<>();
 
     public EmployeeCLI(EmployeeFacade employeeFacade) {
         this.employeeFacade = employeeFacade;
+        this.branches = employeeFacade.getBranches();
         nowDate = LocalDate.now();
         //loginCLI();
     }
 
     public void loginCLI() {
-        while (true) {
             System.out.println("LOGIN:");
             userId = readInt("Please enter your ID:");
             password = readString("Please enter your password:");
@@ -58,10 +58,10 @@ public class EmployeeCLI {
                 if (emp instanceof EmployeeManager) {
                     employeeManager();
                 }
-                if (employeeFacade.isShiftManager(userId)) {
+                else if (employeeFacade.isShiftManager(userId)) {
                     shiftManager();
                 }
-                if (emp instanceof ShiftEmployee) {
+                else if (emp instanceof ShiftEmployee) {
                     shiftEmployee();
                 } else {
                     employeeManager();
@@ -69,9 +69,9 @@ public class EmployeeCLI {
             } catch (Exception e) {
                 System.out.println("Login failed: " + e.getMessage());
                 System.out.println("Please try again.");
-                loginCLI();
+                
             }
-        }
+        
     }
 
     private void employeeManager() {
@@ -198,7 +198,9 @@ public class EmployeeCLI {
     private void autoCreateShifts() {
         try {
             System.out.println("Please select a branch from the following list:");
-            LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
+            List<LocationDL> branches = employeeFacade.getBranches();
+            LocationDL branch = locationSelector(branches);
+            System.out.println("You chose:" + branch);
             employeeFacade.autoCreateShiftsForNextWeek(userId, branch);
             System.out.println("Shifts for next week created successfully.");
         } catch (Exception e) {
@@ -214,10 +216,12 @@ public class EmployeeCLI {
             employeeManager();
         }
         System.out.println("Please select a branch from the following list:");
-        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
+         List<LocationDL> branches = employeeFacade.getBranches();
+            LocationDL branch = locationSelector(branches);
+            System.out.println("You chose:" + branch);
         LocalDate dateOfShift = chooseDateForManager("please enter start date"); // choose date with helper method
         System.out.println("Shift morning hours: 06:00 - 14:00");
-        System.out.println("Evening morning hours: 14:00 - 22:00");
+        System.out.println("Shift evening hours: 14:00 - 22:00");
         System.out.println("if you want to change shift hours, you have option for this in the main menu");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         if (employeeFacade.checkPendingShipment(branch, dateOfShift, shiftType)) {
@@ -246,7 +250,9 @@ public class EmployeeCLI {
         ShowPrefAllEmployees();
         LocalDate dateOfShift = chooseDateForAddEmployee("Please enter Date");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
-        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
+        List<LocationDL> branches = employeeFacade.getBranches();
+        LocationDL branch = locationSelector(branches);
+        System.out.println("You chose:" + branch);
         try {
             Shift shift = employeeFacade.getShift(branch, dateOfShift, shiftType, userId);
             int newEmployeeId = selectEmployeeForExistingShift(shift);
@@ -271,7 +277,9 @@ public class EmployeeCLI {
         int employeeId = readInt("Please enter Employee's ID to remove: ");
         LocalDate dateOfShift = chooseDate("Please enter the date of the shift");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
-        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[2]));
+        List<LocationDL> branches = employeeFacade.getBranches();
+        LocationDL branch = locationSelector(branches);
+        System.out.println("You chose:" + branch);
         try {
             Shift shift = employeeFacade.getShift(branch, dateOfShift, shiftType, userId);
             if (shift.getShiftManagerId() == employeeId) {
@@ -309,12 +317,15 @@ public class EmployeeCLI {
         float educationFund = readFloat("Education fund: ");
         float socialBenefits = readFloat("Social Benefits: ");
         String employeePassword = readString("Password: ");
-        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[2]));
-        branches = employeeFacade.getBranches();
-        if (branches.isEmpty()) {
-            System.out.println("No branches available. Please create a branch first.");
-            employeeManager();
-        }
+        //LocationDL branch = selectFromList("Select the Branch you want: ", employeeFacade.getBranches().toArray(new LocationDL[2]));
+        //branches = employeeFacade.getBranches();
+        // if (branches.isEmpty()) {
+        //     System.out.println("No branches available. Please create a branch first.");
+        //     employeeManager();
+        // }
+        List<LocationDL> branches = employeeFacade.getBranches();
+        LocationDL branch = locationSelector(branches);
+        System.out.println("You chose: " + branch);
 
         // choose role
         Role selectedRole = selectFromList("Choose a role:", Role.values());
@@ -334,9 +345,11 @@ public class EmployeeCLI {
                 employeeFacade.hireDriver(employeeID, userId, branch, name, bankAccount, salary, startDate,
                         vacationDays, sickDays, educationFund, socialBenefits, employeePassword, licenses);
             }
+            else {
             employeeFacade.hireEmployee(employeeID, userId, branch, name, bankAccount, salary, startDate,
                     vacationDays, sickDays, educationFund, socialBenefits, employeePassword, selectedRole);
-        } catch (Exception e) {
+        }
+            } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
         employeeManager();
@@ -367,8 +380,9 @@ public class EmployeeCLI {
 
     private void changeShiftManager() {
         int oldShiftManagerId = readInt("Please enter old shift manager ID: ");
-        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
-        LocalDate dateOfShift = chooseDate("Please enter the date of the shift");
+        List<LocationDL> branches = employeeFacade.getBranches();
+        LocationDL branch = locationSelector(branches);
+        System.out.println("You chose:" + branch);        LocalDate dateOfShift = chooseDate("Please enter the date of the shift");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         try {
             Shift shift = employeeFacade.getShift(branch, dateOfShift, shiftType, userId);
@@ -382,7 +396,9 @@ public class EmployeeCLI {
 
     private void replaceEmployee() {
         ShowPrefAllEmployees();
-        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
+        List<LocationDL> branches = employeeFacade.getBranches();
+        LocationDL branch = locationSelector(branches);
+        System.out.println("You chose:" + branch);
         int oldEmployeeId = readInt("Please enter the ID of the employee you want to replace: ");
         LocalDate dateOfShift = chooseDate("Please enter the date of the shift");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
@@ -467,7 +483,9 @@ public class EmployeeCLI {
     }
 
     private void setTimes() {
-        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
+        List<LocationDL> branches = employeeFacade.getBranches();
+        LocationDL branch = locationSelector(branches);
+        System.out.println("You chose:" + branch);
         LocalDate date = chooseDate("Please enter the date of the shift");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         int[] times = getValidShiftTimes(shiftType);
@@ -640,7 +658,9 @@ public class EmployeeCLI {
     }
 
     private void getShiftInfo(String type) { // for shift manager OR shift employee OR shift manager
-        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
+        List<LocationDL> branches = employeeFacade.getBranches();
+        LocationDL branch = locationSelector(branches);
+        System.out.println("You chose:" + branch);
         LocalDate dateOfShift = chooseDate("Please enter the date of the shift");
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         try {
@@ -692,7 +712,9 @@ public class EmployeeCLI {
     }
 
     private void addPreferredShift(String type) {
-        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
+        List<LocationDL> branches = employeeFacade.getBranches();
+        LocationDL branch = locationSelector(branches);
+        System.out.println("You chose:" + branch);
         LocalDate dateOfShift = chooseDateForEmployee("please enter start date"); // choose date with helper method
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         try {
@@ -709,7 +731,9 @@ public class EmployeeCLI {
     }
 
     private void removePreferredShift(String type) {
-        LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
+        List<LocationDL> branches = employeeFacade.getBranches();
+        LocationDL branch = locationSelector(branches);
+        System.out.println("You chose:" + branch);
         LocalDate dateOfShift = chooseDateForEmployee("please enter start date"); // choose date with helper method
         ShiftType shiftType = selectFromList("Select Shift Type: ", ShiftType.values());
         try {
@@ -794,8 +818,9 @@ public class EmployeeCLI {
         while (true) {
             System.out.println("Please choose " + role + " for the shift from the following available employees:");
             try {
-                LocationDL branch = selectFromList("Select the Branch you want: ", branches.toArray(new LocationDL[0]));
-
+List<LocationDL> branches = employeeFacade.getBranches();
+        LocationDL branch = locationSelector(branches);
+        System.out.println("You chose:" + branch);
                 employeeFacade.getAvailableEmployees(userId, branch, shift, role);
                 int employeeId = readInt("Please enter the ID of the employee: ");
 
@@ -1041,7 +1066,7 @@ public class EmployeeCLI {
     public void ClearDataBase() {
         try {
             employeeFacade.ClearDataBase();
-            employeeFacade.addFirstEmployeeManager();
+            //employeeFacade.addFirstEmployeeManager();
             System.out.println("Database cleared successfully.");
         } catch (Exception e) {
             System.out.println("Error clearing database: " + e.getMessage());
@@ -1051,11 +1076,37 @@ public class EmployeeCLI {
     public void loadData() {
         try {
             employeeFacade.loadData();
-            employeeFacade.addFirstEmployeeManager();
+            //employeeFacade.addFirstEmployeeManager();
             System.out.println("Data loaded successfully.");
         } catch (Exception e) {
             System.out.println("Error loading data: " + e.getMessage());
         }
+    }
+
+    private LocationDL locationSelector(List<LocationDL> branches) {
+         Scanner scanner = new Scanner(System.in);
+
+        if (branches.isEmpty()) {
+            System.out.println("No branches available.");
+            return null;
+        }
+
+        System.out.println("Select the Branch you want:");
+        for (int i = 0; i < branches.size(); i++) {
+            System.out.println((i + 1) + ". " + branches.get(i));
+        }
+
+        int choice = -1;
+        while (choice < 1 || choice > branches.size()) {
+            System.out.print("Enter choice (1-" + branches.size() + "): ");
+            try {
+                choice = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+
+        return branches.get(choice - 1);
     }
 
 }

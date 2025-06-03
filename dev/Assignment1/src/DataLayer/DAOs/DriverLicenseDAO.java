@@ -76,24 +76,16 @@ public class DriverLicenseDAO {
     public ResultSet getDriver(int id) throws SQLException {
         String sql = "SELECT * FROM driver_license WHERE id = ?";
         ArrayList<DriverDL> drivers = new ArrayList<>();
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error getting driver: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, id);
+        return pstmt.executeQuery();
     }
 
     public ResultSet getAllDrivers() throws SQLException {
         String sql = "SELECT * FROM driver_license";
         ArrayList<DriverDL> drivers = new ArrayList<>();
-        try (Statement stmt = connection.createStatement()) {
-            return stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println("Error getting all drivers: " + e.getMessage());
-            throw e;
-        }
+        Statement stmt = connection.createStatement();
+        return stmt.executeQuery(sql);
     }
 
     public void deleteAllLicenses(int id) throws SQLException {

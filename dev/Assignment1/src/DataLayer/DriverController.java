@@ -78,7 +78,7 @@ public class DriverController {
                     return new DriverDTO(rs.getInt("id"), employee.getName(), employee.getBranch(),
                             employee.getBankAccount(), employee.getSalary(), employee.getStartDate(),
                             employee.getVacationDays(), employee.getSickDays(), employee.getEducationFund(),
-                            employee.getSocialBenefits(), employee.getPassword(), rs.getBoolean("isFinishedWorking"),
+                            employee.getSocialBenefits(), employee.getPassword(), employee.isFinishedWorking(),
                             licenseTypes, rs.getInt("isBusy") == 1);
                 }
             }
@@ -104,7 +104,7 @@ public class DriverController {
                     drivers.add(new DriverDTO(rs.getInt("id"), employee.getName(), employee.getBranch(),
                             employee.getBankAccount(), employee.getSalary(), employee.getStartDate(),
                             employee.getVacationDays(), employee.getSickDays(), employee.getEducationFund(),
-                            employee.getSocialBenefits(), employee.getPassword(), rs.getBoolean("isFinishedWorking"),
+                            employee.getSocialBenefits(), employee.getPassword(), employee.isFinishedWorking(),
                             licenseTypes, rs.getInt("isBusy") == 1));
                 }
             }

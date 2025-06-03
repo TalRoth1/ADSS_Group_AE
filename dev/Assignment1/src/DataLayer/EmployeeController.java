@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -147,11 +148,11 @@ public class EmployeeController {
     // not sure if we need this, but it is here for now
     public List<String> getRolesForEmployee(int employeeId) throws SQLException {
         try {
-            ResultSet rs = employeeRoleDAO.getRolesForEmployee(employeeId);
-            List<String> roles = new ArrayList<>();
-            while (rs.next()) {
-                roles.add(rs.getString("role"));
-            }
+            List<String> roles = employeeRoleDAO.getRolesForEmployee(employeeId);
+            //List<String> roles = new ArrayList<>();
+            // while (rs.next()) {
+            //     roles.add(rs.getString("role"));
+            // }
             return roles;
         } catch (SQLException e) {
             System.out.println("Error getting roles for employee: " + e.getMessage());
@@ -215,14 +216,13 @@ public class EmployeeController {
         float educationFund = rst.getFloat("educationFund");
         float socialBenefits = rst.getFloat("socialBenefits");
         String password = rst.getString("password");
-        Boolean isFinishedWorking = rst.getBoolean("isFired");
+        Boolean isFinishedWorking = rst.getInt("isFired") == 1;
 
-        ResultSet rolesResult = employeeRoleDAO.getRolesForEmployee(id);
-        List<String> rolesList = new ArrayList<>();
-        while (rolesResult.next()) {
-            rolesList.add(rolesResult.getString("role"));
-        }
-
+        //ResultSet rolesResult = employeeRoleDAO.getRolesForEmployee(id);
+        List<String> rolesList = employeeRoleDAO.getRolesForEmployee(id);
+        // while (rolesResult.next()) {
+        //     rolesList.add(rolesResult.getString("role"));
+        // }
         Map<ShiftDTO, String> assignedShifts = shiftController.getAssignedShiftsForEmployee(id);
         List<ShiftDTO> prefShifts = shiftController.getAllPrefShifts(id);
 

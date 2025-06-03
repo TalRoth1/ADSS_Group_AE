@@ -53,13 +53,9 @@ public class DocumentItemDAO {
 
     public ResultSet getDocumentItems(int documentID) throws SQLException {
         String selectSQL = "SELECT * FROM document_item WHERE documentID = ?";
-        try (var preparedStatement = connection.prepareStatement(selectSQL)) {
-            preparedStatement.setInt(1, documentID);
-            return preparedStatement.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving document items: " + e.getMessage());
-            throw e;
-        }
+        var preparedStatement = connection.prepareStatement(selectSQL);
+        preparedStatement.setInt(1, documentID);
+        return preparedStatement.executeQuery();
     }
 
     public void deleteDocumentItem(int documentID, int locationID, String itemName) throws SQLException {

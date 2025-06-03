@@ -93,13 +93,10 @@ public class EmployeeDAO {
 
     public ResultSet getEmployee(int employeeId) throws SQLException {
         String sql = "SELECT * FROM employees WHERE id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving employee: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, employeeId);
+        return pstmt.executeQuery();
+
     }
 
     public void updateEmployeeByField(int employeeId, String fieldName, Object newValue) throws SQLException {
@@ -136,27 +133,20 @@ public class EmployeeDAO {
 
     public ResultSet getAllEmployeesInBranch(int branchid) throws SQLException {
         String sql = "SELECT name FROM employees WHERE locationID=? AND isFired=0";
-        try (Statement stmt = connection.createStatement()) {
-            return stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println("Error retrieving all employees in branch: " + e.getMessage());
-            throw e;
-        }
+        Statement stmt = connection.createStatement();
+        return stmt.executeQuery(sql);
     }
 
     public ResultSet getEmployeeField(int employeeId, String fieldName) throws SQLException {
         String sql = "SELECT " + fieldName + " FROM employees WHERE id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            ResultSet rs = pstmt.executeQuery();
-            if (!rs.next()) {
-                throw new SQLException("Employee with ID " + employeeId + " does not exist.");
-            }
-            return rs;
-        } catch (SQLException e) {
-            System.out.println("Error retrieving employee field: " + e.getMessage());
-            throw e;
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, employeeId);
+        ResultSet rs = pstmt.executeQuery();
+        if (!rs.next()) {
+            throw new SQLException("Employee with ID " + employeeId + " does not exist.");
         }
+        return rs;
+        
     }
 
     public void clearTable() throws SQLException {

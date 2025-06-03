@@ -22,7 +22,7 @@ public class DriverDAO {
     public void InitializeDatabase() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS drivers ("
                 + "id INTEGER PRIMARY KEY,"
-                + "isBusy INT NOT NULL" // 0 = false, 1 = true
+                + "isBusy INT" // 0 = false, 1 = true
                 + ", FOREIGN KEY (id) REFERENCES employees(id)"
                 + ")";
         try (Statement stmt = connection.createStatement()) {
@@ -47,13 +47,9 @@ public class DriverDAO {
 
     public ResultSet getDriver(int id) throws SQLException {
         String sql = "SELECT * FROM drivers WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving driver: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, id);
+        return pstmt.executeQuery();
     }
 
     public ResultSet getAllDrivers() throws SQLException {

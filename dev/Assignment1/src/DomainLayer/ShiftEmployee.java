@@ -194,12 +194,29 @@ public class ShiftEmployee extends Employee {
         return roles;
     }
 
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }   
+
     @Override
     public ShiftEmployee clone() {
-        try {
-            return (ShiftEmployee) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
+        ShiftEmployee res = new ShiftEmployee(
+                this.getId(),
+                this.getName(),
+                this.getBranch(),
+                this.getBankAccount(),
+                this.getSalary(),
+                this.getStartDate(),
+                this.getVacationDays(),
+                this.getSickDays(),
+                this.getEducationFund(),
+                this.getSocialBenefits(),
+                this.getPassword(),
+                this.roles.isEmpty() ? Role.CASHIER : this.roles.get(0)
+        );
+        res.setRoles(new ArrayList<>(this.roles));
+        res.setAssignedShifts(new HashMap<>(this.assignedShifts));
+        res.setPrefShifts(new ArrayList<>(this.preferredShifts));
+        return res;
     }
 }

@@ -86,13 +86,10 @@ public class TruckDAO {
 
     public ResultSet getTruck(int id) throws SQLException {
         String sql = "SELECT * FROM trucks WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error getting truck: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, id);
+        return pstmt.executeQuery();
+        
     }
 
     public ResultSet getAllTrucks() throws SQLException {

@@ -45,7 +45,7 @@ public class ShiftDAO {
     public void addShift(int id, String date, String shiftType, int locationId, int startTime, int endTime,
             int shiftManagerId, int isShipment)
             throws SQLException {
-        String sql = "INSERT INTO shifts (id, date, shiftType, startTime, endTime, shiftManagerId, locationId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO shifts (id, date, shiftType, startTime, endTime, shiftManagerId, isShipment, locationId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.setString(2, date);
@@ -53,8 +53,8 @@ public class ShiftDAO {
             pstmt.setInt(4, startTime);
             pstmt.setInt(5, endTime);
             pstmt.setInt(6, shiftManagerId);
-            pstmt.setInt(7, locationId);
-            pstmt.setInt(8, isShipment);
+            pstmt.setInt(7, isShipment);
+            pstmt.setInt(8, locationId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error adding shift: " + e.getMessage());
@@ -88,26 +88,19 @@ public class ShiftDAO {
 
     public ResultSet getShift(String date, String shiftType, int locationId) throws SQLException {
         String sql = "SELECT * FROM shifts WHERE date = ? AND shiftType = ? AND locationId = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, date);
-            pstmt.setString(2, shiftType);
-            pstmt.setInt(3, locationId);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error getting shift: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, date);
+        pstmt.setString(2, shiftType);
+        pstmt.setInt(3, locationId);
+        return pstmt.executeQuery();
+
     }
 
     public ResultSet getShift(int id) throws SQLException {
         String sql = "SELECT * FROM shifts WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error getting shift by ID: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, id);
+        return pstmt.executeQuery();
     }
 
     public ResultSet getAllShifts() throws SQLException {
@@ -118,26 +111,20 @@ public class ShiftDAO {
 
     public ResultSet getRole(String date, String shiftType, int employeeId) throws SQLException {
         String sql = "SELECT role FROM shift_assigned WHERE date = ? AND shiftType = ? AND employeeId = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, date);
-            pstmt.setString(2, shiftType);
-            pstmt.setInt(3, employeeId);
-            return pstmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println("Error retrieving role: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, date);
+        pstmt.setString(2, shiftType);
+        pstmt.setInt(3, employeeId);
+        return pstmt.executeQuery(sql);
+
     }
 
     public ResultSet getShiftField(int id, String fieldName) throws SQLException {
         String sql = "SELECT " + fieldName + " FROM shifts WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving shift field: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, id);
+        return pstmt.executeQuery();
+
     }
 
     // erez change the type of newValue to int because it is used to update an
@@ -146,6 +133,18 @@ public class ShiftDAO {
         String sql = "UPDATE shifts SET " + fieldName + " = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, newValue);
+            pstmt.setInt(2, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error updating shift field: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public void setShiftField(int id, String fieldName, String newValue) throws SQLException {
+        String sql = "UPDATE shifts SET " + fieldName + " = ? WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, newValue);
             pstmt.setInt(2, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {

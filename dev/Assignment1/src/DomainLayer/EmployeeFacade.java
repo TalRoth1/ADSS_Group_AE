@@ -17,6 +17,7 @@ import DataLayer.LocationController;
 import DataLayer.Mappers.DriverMapper;
 import DataLayer.Mappers.EmployeeMapper;
 import DataLayer.Mappers.LocationMapper;
+import DataLayer.Mappers.ShiftMapper;
 import DataLayer.ShiftController;
 
 public class EmployeeFacade {
@@ -31,6 +32,7 @@ public class EmployeeFacade {
     private EmployeeMapper employeeMapper;
     private DriverMapper driverMapper;
     private LocationMapper locationMapper;
+    private ShiftMapper shiftMapper;
 
     public EmployeeFacade() {
         this.shiftEmployees = new HashMap<>();
@@ -43,6 +45,7 @@ public class EmployeeFacade {
         this.employeeMapper = new EmployeeMapper();
         this.driverMapper = new DriverMapper();
         this.locationMapper = new LocationMapper();
+        this.shiftMapper = new ShiftMapper();
         // empController.setEmployeeMapper(employeeMapper);
         // driverController.setDriverMapper(driverMapper);
     }
@@ -130,7 +133,8 @@ public class EmployeeFacade {
             }
 
             ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName, b, bankAccount,
-                    salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role);
+                    salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role,
+                    branches);
             empController.addEmployee(employeeMapper.toDTO(shiftEmployee), role.toString());
             shiftEmployees.put(employeeId, shiftEmployee);
 
@@ -161,7 +165,7 @@ public class EmployeeFacade {
 
             DriverDL driver = employeeManager.hireDriver(employeeId, employeeName, b, bankAccount,
                     salary, startDate, vacationDays, sickDays, educationFund, socialBenefits,
-                    employeePassword, licenceType);
+                    employeePassword, licenceType, branches);
 
             empController.addEmployee(driverMapper.toDTO(driver), Role.DRIVER.toString());
             driverController.addDriver(driverMapper.toDTO(driver));
@@ -548,6 +552,7 @@ public class EmployeeFacade {
             // empController.changeShiftManager(oldShiftManagerId, newShiftManagerId,
             // shift.getDate(), shift.getShiftType(), shift.getBranch());
             employeeManager.changeShiftManager(shift, oldShiftManagerId, newShiftManagerId);
+            shiftController.updateShift(shiftMapper.toDTO(shift), "shiftManagerId", newShiftManagerId);
         } catch (Exception e) {
             throw new Exception("Failed to change shift manager: " + e.getMessage());
         }
@@ -562,8 +567,10 @@ public class EmployeeFacade {
         }
         EmployeeManager employeeManager = getEmployeeManager();
         try {
-            employeeManager.shiftReplacement(shift.getBranch(), shift, employeeId, newEmployeeId); // add getBranch to
-            // the map
+            Role role = shift.getAssignedEmployeesID().get(employeeId);
+            employeeManager.shiftReplacement(shift.getBranch(), shift, employeeId, newEmployeeId);
+            ShiftEmployee em = employeeManager.getAllEmployeesInBranch(shift.getBranch()).get(employeeId);
+            shiftController.addShiftAssigned(EmployeeMapper.toDTO(em), shiftMapper.toDTO(shift), role.toString());
         } catch (Exception e) {
             throw new Exception("Failed to replace shift: " + e.getMessage());
         }
@@ -593,9 +600,11 @@ public class EmployeeFacade {
 
         for (int i = 0; i < 6; i++) {
             LocalDate date = nextSunday.plusDays(i);
+            System.out.println("Creating shifts for date: " + date);
             for (ShiftType type : ShiftType.values()) {
                 try {
                     manager.createDefaultShift(branch, date, type);
+                    shiftController.addShift(shiftMapper.toDTO(manager.getShift(branch, date, type)));
                 } catch (Exception e) {
                     if (!e.getMessage().contains("already exists")) {
                         System.out.println("Failed to create shift for " + date + " " + type + ": " + e.getMessage());
@@ -615,6 +624,11 @@ public class EmployeeFacade {
         EmployeeManager employeeManager = getEmployeeManager();
         try {
             employeeManager.addEmployeeToShift(shift.getBranch(), employeeId, shift, role);
+            shiftController.addShiftAssigned(employeeMapper.toDTO(shiftEmployees.get(employeeId)),
+                    shiftMapper.toDTO(shift), role.toString());
+            shiftController.updateShiftReqRoles(shiftMapper.toDTO(shift), role.toString(),
+                    shift.getRequiredRoles().get(role));
+            // no need of -1 because employeeManager.addEmployeeToShift already does that
         } catch (Exception e) {
             throw new Exception("Failed to add employee to shift: " + e.getMessage());
         }
@@ -630,6 +644,11 @@ public class EmployeeFacade {
         EmployeeManager employeeManager = getEmployeeManager();
         try {
             employeeManager.removeEmployeeFromShift(employeeId, shift);
+            shiftController.deleteShiftAssigned(employeeMapper.toDTO(shiftEmployees.get(employeeId)),
+                    shiftMapper.toDTO(shift));
+            String role = shift.getAssignedEmployeesID().get(employeeId).toString();
+            shiftController.updateShiftReqRoles(shiftMapper.toDTO(shift),
+                    role, shift.getRequiredRoles().get(role));
         } catch (Exception e) {
             throw new Exception("Failed to remove employee from shift: " + e.getMessage());
         }
@@ -681,6 +700,7 @@ public class EmployeeFacade {
         }
         try {
             shift.setRequiredRoles(role, num);
+            shiftController.updateShiftReqRoles(shiftMapper.toDTO(shift), role.toString(), num);
         } catch (Exception e) {
             throw new Exception("Failed to set required roles: " + e.getMessage());
         }
@@ -721,6 +741,11 @@ public class EmployeeFacade {
         }
         try {
             addAssignedShift(managerIdToAssign, shift, Role.SHIFT_MANAGER);
+            ShiftEmployee emp = employeeManager.getEmployee(id);
+            // shiftController.addShiftAssigned(employeeMapper.toDTO(emp),
+            // shiftMapper.toDTO(shift),
+            // Role.SHIFT_MANAGER.toString());
+            shiftController.updateShiftReqRoles(shiftMapper.toDTO(shift), Role.SHIFT_MANAGER.toString(), 0);
         } catch (Exception e) {
             throw new Exception("Failed to set shift manager: " + e.getMessage());
         }
@@ -730,6 +755,8 @@ public class EmployeeFacade {
         ShiftEmployee shiftEmployee = shiftEmployees.get(id);
         try {
             shiftEmployee.addPreferredShift(shift);
+            String role = shift.getAssignedEmployeesID().get(id).toString();
+            shiftController.addPreferredShift(employeeMapper.toDTO(shiftEmployee), shiftMapper.toDTO(shift), role);
         } catch (Exception e) {
             throw new Exception("Failed to add preferred shift: " + e.getMessage());
         }
@@ -739,6 +766,7 @@ public class EmployeeFacade {
         ShiftEmployee shiftEmployee = shiftEmployees.get(id);
         try {
             shiftEmployee.removePreferredShift(shift);
+            shiftController.deletePreferredShift(employeeMapper.toDTO(shiftEmployee), shiftMapper.toDTO(shift));
         } catch (Exception e) {
             throw new Exception("Failed to remove preferred shift: " + e.getMessage());
         }
@@ -753,7 +781,14 @@ public class EmployeeFacade {
         }
         ShiftEmployee shiftEmployee = shiftEmployees.get(id);
         try {
-            shiftEmployee.addAssignedShift(shift, role);
+            if (!shiftEmployee.getAssignedShifts().containsKey(shift)) {
+                shiftEmployee.addAssignedShift(shift, role);
+                shiftController.addShiftAssigned(employeeMapper.toDTO(shiftEmployee), shiftMapper.toDTO(shift),
+                        role.toString());
+            } else {
+                return; // Shift already assigned, no need to add again
+            }
+
         } catch (Exception e) {
             throw new Exception("Failed to add assigned shift: " + e.getMessage());
         }
@@ -850,27 +885,32 @@ public class EmployeeFacade {
             branches.add(branch);
             employeeManager.addBranch(branch);
         } else {
-            System.out.println("Branch already exists.");
+            // System.out.println("Branch already exists.");
         }
     }
 
     public void MakePredefinedData() {
-        ClearDataBase();
-        LocationDL branch1 = new LocationDL(1, "Main St", 1, "CityA", "123456789", "Spiderman", "1");
-        LocationDL branch2 = new LocationDL(2, "Second St", 2, "CityB", "987654321", "Peter Griffin", "2");
-        this.employeeManager = new EmployeeManager(0, "Default Manager", "000000000", 10000, LocalDate.now(), 30, 10,
-                2000f, 1000f, "admin");
+        // ClearDataBase();
+        // this.employeeManager = new EmployeeManager(0, "Default Manager", "000000000",
+        // 10000, LocalDate.now(), 30, 10,
+        // 2000f, 1000f, "admin");
+        LocationDL branch1 = branches.get(1);
+        LocationDL branch2 = branches.get(2);
         addBranch(branch1);
         addBranch(branch2);
-        try {
-            empController.addEmployee(employeeMapper.toDTO(employeeManager), "EmployeeManager");
-            login(00, "admin");
-        } catch (Exception e) {
-            System.out.println("Error logging in as default manager: " + e.getMessage());
-        }
+        // try {
+        // empController.addEmployee(employeeMapper.toDTO(employeeManager),
+        // "EmployeeManager");
+        // login(0, "admin");
+        // } catch (Exception e) {
+        // System.out.println("Error logging in as default manager: " + e.getMessage());
+        // }
+
+        // Add predefined branches
 
         // Add predefined employees
         try {
+            login(0, "admin");
             hireEmployee(1, 0, branch1, "Alice", "123456789", 5000, LocalDate.now(), 20, 10, 1000f, 500f, "password123",
                     Role.STORE_KEEPER);
             hireEmployee(2, 0, branch2, "Bob", "987654321", 6000, LocalDate.now(), 15, 5, 1200f, 600f, "password456",
@@ -897,6 +937,7 @@ public class EmployeeFacade {
         try {
             empController.clearAllEmployees();
             driverController.clearTables();
+            shiftController.clearAllShifts();
             shiftEmployees.clear();
             branches.clear();
         } catch (Exception e) {
@@ -920,9 +961,15 @@ public class EmployeeFacade {
             List<EmployeeDTO> employeeDTOs = empController.getAllEmployees();
             shiftEmployees.clear();
             for (EmployeeDTO employeeDTO : employeeDTOs) {
-                ShiftEmployee employee = employeeMapper.toDomain(employeeDTO, branches, employeeDTO.getAssignedShifts(),
-                        employeeDTO.getPrefShifts());
-                shiftEmployees.put(employee.getId(), employee);
+                if (employeeDTO.getId() == 0) {
+                    employeeManager = employeeMapper.toDomain(employeeDTO);
+                } else {
+                    ShiftEmployee employee = employeeMapper.toDomain(employeeDTO, branches,
+                            employeeDTO.getAssignedShifts(),
+                            employeeDTO.getPrefShifts());
+                    shiftEmployees.put(employee.getId(), employee);
+                    employeeManager.addEmployeeToAllEmployees(employee);
+                }
             }
 
             // Load drivers

@@ -76,54 +76,42 @@ public class ShiftAssignedDAO {
 
     public ResultSet getAssignedShift(int shiftId, int employeeId) throws SQLException {
         String sql = "SELECT * FROM shift_assigned WHERE shiftId=? AND employeeId=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, shiftId);
-            pstmt.setInt(2, employeeId);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving assigned shift: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, shiftId);
+        pstmt.setInt(2, employeeId);
+        return pstmt.executeQuery();
+        
     }
 
     public ResultSet getAssignedShifts(int employeeId) throws SQLException {
         String sql = "SELECT * FROM shift_assigned WHERE employeeId=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employeeId);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving assigned shifts for employee: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, employeeId);
+        return pstmt.executeQuery();
+        
     }
 
     // view all employees of a shift
     public ResultSet getShiftEmployees(int id) throws SQLException {
         String sql = "SELECT * FROM shift_assigned WHERE shiftId=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error retrieving employees for shift: " + e.getMessage());
-            throw e;
-        }
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, id);
+        return pstmt.executeQuery();
+        
     }
 
     public String getRole(int shiftId, int employeeId) throws SQLException {
         String sql = "SELECT role FROM shift_assigned WHERE shiftId=? AND employeeId=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, shiftId);
-            pstmt.setInt(2, employeeId);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getString("role");
-            } else {
-                return null; // No role found
-            }
-        } catch (SQLException e) {
-            System.out.println("Error retrieving role: " + e.getMessage());
-            throw e;
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setInt(1, shiftId);
+        pstmt.setInt(2, employeeId);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) {
+            return rs.getString("role");
+        } else {
+            return null; // No role found
         }
+        
     }
 
     public void clearTable() throws SQLException {

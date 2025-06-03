@@ -53,7 +53,7 @@ public class ShipmentController {
     public void addShipment(ShipmentDTO shipment) throws SQLException {
         // add shipment
         shipmentDAO.addShipment(shipment.getId(), new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(shipment.getDateCreated()), new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(shipment.getDateSent()),
-                shipment.getTruck().getId(), shipment.getDriver().getId(), shipment.getDocument().getId(),
+                shipment.getTruck().getId(), shipment.getDriver() == null ? -100 : shipment.getDriver().getId(), shipment.getDocument().getId(),
                 shipment.getStatus(), shipment.getShiftType());
 
         // add shipment's document
