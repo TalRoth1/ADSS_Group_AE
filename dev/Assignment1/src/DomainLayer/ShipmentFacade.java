@@ -237,7 +237,7 @@ public class ShipmentFacade {
         if (shipment.getStatus().equals(ShipmentStatus.PENDING)) {
             DriverDL driverToSend = employeeFacade.assignCheck(DatetoLocalDate(shipment.getDateSent()),
                     shipment.getShiftType().toString(), shipment.getDocument().getOrigin(),
-                    shipment.getDocument().getLocations(), shipment.getTruck().GetType());
+                    shipment.getDocument().getLocations(), shipment.getTruck().GetType(), locations);
             if (driverToSend == null) {
                 throw new Exception("No available driver for this shipment");
             }
@@ -310,6 +310,9 @@ public class ShipmentFacade {
             truckController.addTruck(truckMapper.toDTO(truck1));
             truckController.addTruck(truckMapper.toDTO(truck2));
             truckController.addTruck(truckMapper.toDTO(truck3));
+            itemsController.addItem(new ItemDTO("Milk", 0.5f));
+            itemsController.addItem(new ItemDTO("Cola", 1.0f));
+            itemsController.addItem(new ItemDTO("Bread", 1.5f));
             employeeFacade.addBranch(loc1);
             employeeFacade.addBranch(loc2);
             employeeFacade.addBranch(loc3);

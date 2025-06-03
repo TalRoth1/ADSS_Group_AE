@@ -2,9 +2,13 @@ package DataLayer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import DTO.EmployeeDTO;
@@ -208,11 +212,30 @@ public class ShiftController {
         }
         return assignedShifts;
     }
+    
+private Date parseAnyDateToUtilDate(String dateStr) {
+    // Try ISO first
+    try {
+        return Date.from(OffsetDateTime.parse(dateStr).toInstant());
+    } catch (Exception e) {
+        // Try legacy Java Date.toString() format
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+            return sdf.parse(dateStr);
+        } catch (ParseException ex) {
+            throw new RuntimeException("Failed to parse date: " + dateStr, ex);
+        }
+    }
+}
+
+
+    
 
     // helper method to build ShiftDTO from ResultSet
     private ShiftDTO buildShiftDTO(ResultSet rst) throws SQLException {
         int id = rst.getInt("id");
-        Date date = rst.getDate("date");
+        String dateStr = rst.getString("date");
+        Date date = parseAnyDateToUtilDate(dateStr);
         String shiftType = rst.getString("shiftType");
         LocationDTO branch = locationController.getLocation(rst.getInt("locationId"));
         int startTime = rst.getInt("startTime");
@@ -246,6 +269,10 @@ public class ShiftController {
 
         return new ShiftDTO(id, date, shiftType, startTime, endTime, shiftManagerId, isShipmentShift,
                 branch, requiredRoles, assignedEmployeesID, availableEmployeesID);
+    }
+
+    private Date parseIsoDateToUtilDate(String dateStr) {
+        return Date.from(OffsetDateTime.parse(dateStr).toInstant());
     }
 
     public void clearAllShifts() throws SQLException {

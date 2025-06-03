@@ -1,6 +1,7 @@
 package DomainLayer;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -9,7 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import DataLayer.DriverController;
 import DataLayer.ShiftController;
+import DataLayer.Mappers.DriverMapper;
 
 public class EmployeeManager extends Employee {
 
@@ -67,7 +70,7 @@ public class EmployeeManager extends Employee {
 
     public DriverDL assignCheck(LocalDate sentDate, ShiftType shiftType, LocationDL origin,
             List<LocationDL> destinations,
-            String licenceType) {
+            String licenceType, List<LocationDL> branches, DriverController driverController) {
         List<LocationDL> allLocations = new ArrayList<>(destinations);
         allLocations.add(origin);
 
@@ -79,11 +82,13 @@ public class EmployeeManager extends Employee {
                 System.out.println("Unknown location: " + location);
                 return null;
             }
-
+            System.out.println("Checking location: " + location);
+            System.out.println("Shift type: " + shiftType);
+            System.out.println("Sent date: " + sentDate);
             Shift shift = getValidShift(location, shiftType, sentDate);
             if (shift != null) { // shift alredy exists
                 boolean hasStorekeeper = checkStorekeeperExistInShift(shift, location);
-                DriverDL candidate = checkDriverExistInShift(shift, licenceType, location);
+                DriverDL candidate = checkDriverExistInShift(shift, licenceType, location, driverController);
                 if (hasStorekeeper && candidate != null) {
                     selectedDriver = candidate;
                     shift.setShipmentShift(true);
@@ -682,6 +687,9 @@ public class EmployeeManager extends Employee {
     }
 
     private Shift getValidShift(LocationDL location, ShiftType shiftType, LocalDate sentDate) {
+        System.out.println("Morning shifts map: " + morningShifts);
+        System.out.println("Evening shifts map: " + eveningShifts);
+
         Map<LocalDate, Shift> shiftMap = (shiftType == ShiftType.MORNING)
                 ? morningShifts.get(location)
                 : eveningShifts.get(location);
@@ -742,14 +750,39 @@ public class EmployeeManager extends Employee {
                 .anyMatch(role -> role == Role.STORE_KEEPER);
     }
 
-    public DriverDL checkDriverExistInShift(Shift shift, String licenceType, LocationDL branch) { // check if there is
+    public DriverDL checkDriverExistInShift(Shift shift, String licenceType, LocationDL branch,
+    DriverController driverController) { // check if there is
                                                                                                   // at least one driver
-        return (DriverDL) shift.getAssignedEmployeesID().keySet().stream()
-                .map(allEmployees::get)
-                .filter(e -> e instanceof DriverDL && e.getBranch().equals(branch)
-                        && ((DriverDL) e).getLicenceType().contains(licenceType) && !e.isFinishWorking())
-                .findFirst()
-                .orElse(null);
+        for (Map.Entry<Integer, Role> entry : shift.getAssignedEmployeesID().entrySet()) {
+            int employeeId = entry.getKey();
+            Role role = entry.getValue();
+
+            if (role == Role.DRIVER) {
+                // Get the driver
+                DriverMapper driverMapper = new DriverMapper();
+                DriverDL driver = driverMapper.toDL(driverController.getDriver(employeeId));
+
+                if (driver != null && driver.getLicenceType().contains(licenceType)) {
+                    return driver;
+                }
+            }
+        }
+        return null; // no matching driver found
+        // return (DriverDL) shift.getAssignedEmployeesID().keySet().stream()
+        // .map(allEmployees::get)
+        // .filter(e -> e instanceof DriverDL && e.getBranch().equals(branch)
+        // && ((DriverDL) e).getLicenceType().contains(licenceType) &&
+        // !e.isFinishWorking())
+        // .findFirst()
+        // .orElse(null);
+    }
+
+    public DriverDL getDriverById(int id) {
+        DriverDL emp = (DriverDL) allEmployees.get(id);
+        if (emp instanceof DriverDL) {
+            return  emp;
+        }
+        return null;
     }
 
     public Map<LocationDL, Map<LocalDate, Shift>> getMissingShift() {

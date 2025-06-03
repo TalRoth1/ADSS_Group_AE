@@ -104,9 +104,12 @@ public class EmployeeFacade {
     // check if there is a driver available for delivery and there is store kepper
     // in each branch of the delivery
     public DriverDL assignCheck(LocalDate sentDate, String shiftType, LocationDL origin, List<LocationDL> destinations,
-            String licenceType) {
+            String licenceType, List<LocationDL> branches) {
         try {
-            return employeeManager.assignCheck(sentDate, parseShiftType(shiftType), origin, destinations, licenceType);
+
+
+         return employeeManager.assignCheck(sentDate, parseShiftType(shiftType),
+                    origin, destinations, licenceType, branches, driverController);
         } catch (Exception e) {
             System.out.println("Error in assignCheck: " + e.getMessage());
             return null;
@@ -928,6 +931,11 @@ public class EmployeeFacade {
             hireDriver(8, 0, branch2, "Hannah", "666666666", 7500, LocalDate.now(), 20, 5, 1400f, 600f, "password104",
                     new ArrayList<>(List.of("A", "B")));
 
+            // Shift shift1 = new Shift(1, 08-06-2022, ShiftType.MORNING, 5, branch1);
+            // public Shift(int id, LocalDate date, ShiftType shiftType, int shiftManagerId,
+            // LocationDL branch) {
+            // addEmployeeToShift(1, null, null, 0);
+            // addEmployeeToShift(int employeeId, Shift shift, Role role, int empManagerId)
         } catch (Exception e) {
             System.out.println("Error adding predefined data: " + e.getMessage());
         }

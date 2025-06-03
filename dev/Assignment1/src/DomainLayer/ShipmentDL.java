@@ -45,6 +45,9 @@ public class ShipmentDL {
             case "PENDING":
                 this.Status = ShipmentStatus.PENDING;
                 break;
+            case "APPROVED":
+                this.Status = ShipmentStatus.APPROVED;
+                break;
             case "SENT":
                 this.Status = ShipmentStatus.SENT;
                 this.DateSent = new Date();
@@ -171,8 +174,8 @@ public class ShipmentDL {
 
     public String toString() {
         return "Truck: " + Truck.GetNumber()
-                + ", Driver: " + DriverName == null ? "Not Assigned"
-                        : DriverName.getName()
+                + ", Driver: " + ((DriverName == null) ? "Not Assigned"
+                        : DriverName.getName())
                                 + ", Origin: " + Document.getOrigin().toString()
                                 + ", Destinations: " + Document.getLocations().toString()
                                 + ", Date Created: " + DateCreated.toString()

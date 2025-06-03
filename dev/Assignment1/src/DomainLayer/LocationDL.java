@@ -63,8 +63,8 @@ public class LocationDL {
             return false;
         }
         LocationDL that = (LocationDL) obj;
-        return StreetNumber == that.StreetNumber && ContactNumber == that.ContactNumber && Street.equals(that.Street)
-                && City.equals(that.City) && ContactName.equals(that.ContactName) && Zone.equals(that.Zone);
+        return id == that.id;
+
     }
 
     @Override
