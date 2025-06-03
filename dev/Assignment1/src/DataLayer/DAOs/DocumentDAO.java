@@ -18,6 +18,7 @@ public class DocumentDAO {
         }
     }
 
+
     private void initializeTable() throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS documents (" +
                 //"id INTEGER PRIMARY KEY AUTOINCREMENT, " +
