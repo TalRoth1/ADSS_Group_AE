@@ -1,4 +1,4 @@
-package tests;
+package DomainLayer;
 
 import java.time.LocalDate;
 
@@ -9,11 +9,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-
-import DomainLayer.Employee;
-import DomainLayer.EmployeeFacade;
-import DomainLayer.LocationDL;
-import DomainLayer.Role;
 
 public class EmployeeFacadeTest {
 

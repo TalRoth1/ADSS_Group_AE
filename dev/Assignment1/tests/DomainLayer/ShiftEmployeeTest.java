@@ -1,4 +1,4 @@
-package tests;
+package DomainLayer;
 
 import java.time.LocalDate;
 
@@ -8,13 +8,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-
-import DomainLayer.EmployeeManager;
-import DomainLayer.LocationDL;
-import DomainLayer.Role;
-import DomainLayer.Shift;
-import DomainLayer.ShiftEmployee;
-import DomainLayer.ShiftType;
 
 public class ShiftEmployeeTest {
 

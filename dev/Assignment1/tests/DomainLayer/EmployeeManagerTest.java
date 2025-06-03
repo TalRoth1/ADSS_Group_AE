@@ -1,22 +1,16 @@
-package tests;
+package DomainLayer;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import DataLayer.DriverController;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-
-import DomainLayer.DriverDL;
-import DomainLayer.EmployeeManager;
-import DomainLayer.LocationDL;
-import DomainLayer.Role;
-import DomainLayer.Shift;
-import DomainLayer.ShiftEmployee;
-import DomainLayer.ShiftType;
 
 public class EmployeeManagerTest {
 
@@ -27,10 +21,12 @@ public class EmployeeManagerTest {
     private final int EMPLOYEE_ID = 101;
     private LocationDL testBranch;
 
+
     @Before
     public void setUp() {
         testBranch = new LocationDL(1, "Test Branch", 1, "Test Street", "1234567890", "Test Contact", "Zone1");
-
+        List<LocationDL> branches = new ArrayList<>();
+        branches.add(testBranch);
         manager = new EmployeeManager(
                 MANAGER_ID,
                 "Test Manager",
@@ -55,7 +51,7 @@ public class EmployeeManagerTest {
                 80,
                 90,
                 "emp123",
-                Role.CASHIER);
+                Role.CASHIER, branches );
     }
 
     @After
@@ -66,6 +62,9 @@ public class EmployeeManagerTest {
 
     @Test
     public void hireEmployee_Success() throws Exception {
+        testBranch = new LocationDL(1, "Test Branch", 1, "Test Street", "1234567890", "Test Contact", "Zone1");
+        List<LocationDL> branches = new ArrayList<>();
+        branches.add(testBranch);
         ShiftEmployee newEmployee = manager.hireEmployee(
                 102,
                 "New Employee",
@@ -78,7 +77,7 @@ public class EmployeeManagerTest {
                 80,
                 90,
                 "pass123",
-                Role.CASHIER);
+                Role.CASHIER, branches);
 
         assertNotNull(newEmployee);
         assertTrue(manager.checkEmployee(102));
@@ -158,6 +157,7 @@ public class EmployeeManagerTest {
         ShiftType shiftType = ShiftType.MORNING;
         String licenceType = "B";
 
+
         manager.addBranch(origin);
         manager.addBranch(destination1);
 
@@ -186,7 +186,9 @@ public class EmployeeManagerTest {
         manager.addEmployee(destDriver);
         manager.addEmployee(destStorekeeper);
 
-        DriverDL assignedDriver = manager.assignCheck(date, shiftType, origin, destinations, licenceType);
+        EmployeeFacade employeeFacade = new EmployeeFacade();
+
+        DriverDL assignedDriver = manager.assignCheck(date, shiftType, origin, destinations, licenceType, destinations, employeeFacade.getDriverController());
 
         assertNotNull(assignedDriver);
         assertEquals("Yossi", assignedDriver.getName());
