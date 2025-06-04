@@ -243,7 +243,7 @@ public class EmployeeCLI {
             employeeFacade.setShiftManager(userId, shift, shiftManagerId);
             // choose number of employees for each role
             for (Role role : Role.values()) {
-                if (role != Role.SHIFT_MANAGER && role != Role.CASHIER) {
+                if (role != Role.SHIFT_MANAGER) {
                     chooseNumOfEmployeesForShift(role, shift, userId);
                 }
             }

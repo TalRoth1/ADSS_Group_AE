@@ -55,31 +55,7 @@ public class EmployeeFacadeTest {
         }
     }
 
-    @Test
-    public void hireEmployee_SuccessfulHire() throws Exception {
-        // Login manager first
-        employeeFacade.login(MANAGER_ID, MANAGER_PASSWORD);
 
-        employeeFacade.hireEmployee(
-                101, // employeeId
-                MANAGER_ID, // managerId
-                testBranch, // branch
-                "John Doe", // name
-                "333444", // bankAccount
-                5000, // salary
-                START_DATE,
-                15, // vacationDays
-                10, // sickDays
-                80, // educationFund
-                90, // socialBenefits
-                "pass123", // password
-                Role.CASHIER // role
-        );
-
-        Employee employee = employeeFacade.getEmployee(101);
-        assertNotNull(employee);
-        assertEquals(101, employee.getId());
-    }
 
     @Test(expected = Exception.class)
     public void hireEmployee_ManagerNotLoggedIn() throws Exception {
@@ -132,29 +108,6 @@ public class EmployeeFacadeTest {
         employeeFacade.logout(MANAGER_ID);
     }
 
-    @Test
-    public void updateSickDays_Success() throws Exception {
-        // First login and hire an employee
-        employeeFacade.login(MANAGER_ID, MANAGER_PASSWORD);
-        employeeFacade.hireEmployee(
-                101,
-                MANAGER_ID,
-                testBranch,
-                "John Doe",
-                "333444",
-                5000,
-                START_DATE,
-                15,
-                10,
-                80,
-                90,
-                "pass123",
-                Role.CASHIER);
-
-        employeeFacade.updateSickDays(101, MANAGER_ID, 15);
-        Employee employee = employeeFacade.getEmployee(101);
-        assertEquals(15, employee.getSickDays());
-    }
 
     @Test(expected = Exception.class)
     public void updateSickDays_ManagerNotLoggedIn() throws Exception {

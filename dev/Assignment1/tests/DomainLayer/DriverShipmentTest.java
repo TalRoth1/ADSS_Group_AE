@@ -14,9 +14,11 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+
 public class DriverShipmentTest {
 
     private EmployeeManager employeeManager;
+    private EmployeeFacade employeeFacade;
     private DriverDL driverTypeB;
     private DriverDL driverTypeC;
     private ShiftEmployee originStorekeeper;
@@ -32,6 +34,7 @@ public class DriverShipmentTest {
     @Before
     public void setUp() throws Exception {
         // Initialize manager
+        employeeFacade = new EmployeeFacade();
         employeeManager = new EmployeeManager(
                 MANAGER_ID,
                 "Test Manager",
@@ -43,14 +46,16 @@ public class DriverShipmentTest {
                 100,
                 100,
                 "password123");
+        employeeFacade.setEmployeeManager(employeeManager);
 
         // Create test locations
         origin = new LocationDL(1, "Haifa", 1, "Haifa Street", "1234567890", "Test Contact", "Zone1");
         destination = new LocationDL(2, "Tel Aviv", 2, "Tel Aviv Street", "0987654321", "Test Contact", "Zone2");
-
+        employeeFacade.addBranch(origin);
         // Add locations to manager
-        employeeManager.addBranch(origin);
-        employeeManager.addBranch(destination);
+        //employee.addBranch(origin);
+        //employeeManager.addBranch(destination);
+        employeeFacade.addBranch(destination);
         List<LocationDL> branches = new ArrayList<>();
         branches.add(origin);
         branches.add(destination);
@@ -118,6 +123,7 @@ public class DriverShipmentTest {
     @Test
     public void testSuccessfulShipmentAssignmentWithMatchingLicense() throws Exception {
         // Create shifts at both locations
+
         employeeManager.createShift(1, origin, TODAY, ShiftType.MORNING, MANAGER_ID);
         employeeManager.createShift(2, destination, TODAY, ShiftType.MORNING, MANAGER_ID);
 
@@ -273,18 +279,24 @@ public class DriverShipmentTest {
         // Create another destination
         LocationDL destination2 = new LocationDL(3, "Jerusalem", 3, "Jerusalem Street", "5555555", "Test Contact",
                 "Zone3");
-        employeeManager.addBranch(destination2);
+        //employeeManager.addBranch(destination2);
+        employeeFacade.addBranch(destination2);
 
         // Create shifts at all locations
-        employeeManager.createShift(1, origin, TODAY, ShiftType.MORNING, MANAGER_ID);
-        employeeManager.createShift(2, destination, TODAY, ShiftType.MORNING, MANAGER_ID);
-        employeeManager.createShift(3, destination2, TODAY, ShiftType.MORNING, MANAGER_ID);
+        ShiftEmployee shiftEmployee = new ShiftEmployee(0 , "admin", destination2, "1", 1, TODAY, 1, 1, 0f, 0f, "pass", Role.SHIFT_MANAGER);
+        employeeManager.addEmployee(shiftEmployee);
+
+        employeeManager.createShift(1, origin, TODAY, ShiftType.MORNING, 0);
+        employeeManager.createShift(2, destination, TODAY, ShiftType.MORNING, 0);
+        employeeManager.createShift(3, destination2, TODAY, ShiftType.MORNING, 0);
 
         Shift originShift = employeeManager.getShift(origin, TODAY, ShiftType.MORNING);
+        employeeFacade.setRequiredRoles(employeeManager.getId(), originShift, Role.SHIFT_MANAGER, 1);
         Shift destShift1 = employeeManager.getShift(destination, TODAY, ShiftType.MORNING);
         Shift destShift2 = employeeManager.getShift(destination2, TODAY, ShiftType.MORNING);
 
         // Add driver and storekeeper to origin shift
+        originShift.addEmployee(0, Role.SHIFT_MANAGER);
         originShift.addEmployee(driverTypeB.getId(), Role.DRIVER);
         originShift.addEmployee(originStorekeeper.getId(), Role.STORE_KEEPER);
 

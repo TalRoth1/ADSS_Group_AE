@@ -780,7 +780,7 @@ public class EmployeeFacade {
         ShiftEmployee shiftEmployee = shiftEmployees.get(id);
         try {
             shiftEmployee.addPreferredShift(shift);
-            String role = shift.getAssignedEmployeesID().get(id).toString();
+            String role = shiftEmployee.getRoles().get(0).toString();
             shiftController.openConnection();
             shiftController.addPreferredShift(employeeMapper.toDTO(shiftEmployee), shiftMapper.toDTO(shift), role);
         } catch (Exception e) {

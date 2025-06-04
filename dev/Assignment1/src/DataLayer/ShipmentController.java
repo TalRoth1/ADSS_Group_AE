@@ -13,11 +13,12 @@ import DomainLayer.ShipmentDL;
 import DataLayer.DAOs.DocumentDAO;
 import DataLayer.DAOs.DocumentItemDAO;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.sql.*;
-
+//import java.util.Date;
 import javax.naming.spi.DirStateFactory.Result;
 import javax.print.Doc;
 
@@ -140,8 +141,14 @@ public class ShipmentController {
             DocumentDTO document = new DocumentDTO(documentId,
                     locationController.getLocation(docRst.getInt("originID")),
                     items, docRst.getFloat("weight"));
+            String createdStr = rst.getString("dateCreated");
+            String sentStr = rst.getString("dateSent");
+
+            java.util.Date dateCreated = Date.from(OffsetDateTime.parse(createdStr).toInstant());
+            java.util.Date dateSent = Date.from(OffsetDateTime.parse(sentStr).toInstant());
+
             ShipmentDTO shipment = new ShipmentDTO(rst.getInt("id"),
-                    rst.getDate("dateCreated"), rst.getDate("dateSent"),
+                    dateCreated, dateSent,
                     truck, driver, rst.getString("status"), document, rst.getString("shiftType"));
             return shipment;
         } else {
@@ -176,8 +183,14 @@ public class ShipmentController {
             DocumentDTO document = new DocumentDTO(documentId,
                     locationController.getLocation(docRst.getInt("originID")),
                     items, docRst.getFloat("weight"));
+            String createdStr = rst.getString("dateCreated");
+            String sentStr = rst.getString("dateSent");
+
+            java.util.Date dateCreated = Date.from(OffsetDateTime.parse(createdStr).toInstant());
+            java.util.Date dateSent = Date.from(OffsetDateTime.parse(sentStr).toInstant());
+
             ShipmentDTO shipment = new ShipmentDTO(rst.getInt("id"),
-                    rst.getDate("dateCreated"), rst.getDate("dateSent"),
+                    dateCreated, dateSent,
                     truck, driver, rst.getString("status"), document, rst.getString("shiftType"));
             shipments.add(shipment);
         }
