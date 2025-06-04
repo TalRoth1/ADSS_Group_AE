@@ -27,4 +27,5 @@ public class DriverDL extends ShiftEmployee {
     public List<String> getLicenceType() {
         return LicenseType;
     }
+
 }

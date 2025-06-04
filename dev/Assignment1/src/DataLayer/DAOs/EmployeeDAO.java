@@ -20,25 +20,27 @@ public class EmployeeDAO {
     }
 
     private void initializeTable() throws SQLException {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS employees ("
-                + "id INT PRIMARY KEY, "
-                + "name TEXT NOT NULL, "
-                + "bankAccount TEXT NOT NULL, "
-                + "salary INT NOT NULL, "
-                + "startDate TEXT NOT NULL, "
-                + "vacationDays INT NOT NULL, "
-                + "sickDays INT NOT NULL, "
-                + "educationFund FLOAT NOT NULL, "
-                + "socialBenefits FLOAT NOT NULL, "
-                + "password TEXT NOT NULL,"
-                + "isFired INT DEFAULT 0, " // false 0, true 1
-                + "isloggedIn INT NOT NULL, " // false 0, true 1
-                + "locationId INT NOT NULL "
-                + ")";
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS employees (" +
+                "id INT PRIMARY KEY, " +
+                "name TEXT NOT NULL, " +
+                "bankAccount TEXT NOT NULL, " +
+                "salary INT NOT NULL, " +
+                "startDate TEXT NOT NULL, " +
+                "vacationDays INT NOT NULL, " +
+                "sickDays INT NOT NULL, " +
+                "educationFund FLOAT NOT NULL, " +
+                "socialBenefits FLOAT NOT NULL, " +
+                "password TEXT NOT NULL, " +
+                "isFired INT DEFAULT 0, " + // false 0, true 1
+                "isloggedIn INT NOT NULL, " + // false 0, true 1
+                "locationId INT NOT NULL, " +
+                "FOREIGN KEY (locationId) REFERENCES locations(id) ON DELETE CASCADE" +
+                ")";
         try (Statement stmt = connection.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
-            System.out.println("Error creating shifts table: " + e.getMessage());
+            System.out.println("Error creating employees table: " + e.getMessage());
             throw e;
         }
     }
@@ -146,7 +148,7 @@ public class EmployeeDAO {
             throw new SQLException("Employee with ID " + employeeId + " does not exist.");
         }
         return rs;
-        
+
     }
 
     public void clearTable() throws SQLException {

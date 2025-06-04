@@ -28,15 +28,17 @@ public class Main {
                 case "2":
                     // Load predefined data - use a method on both CLIs to load predefined data
                     flag = false;
-                    employeeFacade.ClearDataBase();
-                    employeeFacade.addFirstEmployeeManager();
+                    shipmentCLI.ClearDataBase();
+                    employeeCLI.ClearDataBase();
                     shipmentCLI.MakePredefinedData();
+                    employeeFacade.addFirstEmployeeManager();
                     employeeCLI.MakePredefinedData();
                     break;
                 case "3":
                     // No data - use a method on both CLIs to delete all data
                     shipmentCLI.ClearDataBase();
                     employeeCLI.ClearDataBase();
+                    shipmentCLI.addFirstLocation();
                     employeeFacade.addFirstEmployeeManager();
                     flag = false;
                     break;

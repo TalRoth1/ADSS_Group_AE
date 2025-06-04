@@ -11,19 +11,19 @@ import DataLayer.DAOs.DriverLicenseDAO;
 public class DriverController {
 
     private DBConnection dbConnection = new DBConnection();
-    private DBConnection dbConnection2 = new DBConnection();
+    // private DBConnection dbConnection2 = new DBConnection();
     DriverLicenseDAO driverLicenseDAO;
     EmployeeController employeeController;
     DriverDAO driverDAO;
 
     public DriverController(EmployeeController employeeController) {
         this.employeeController = employeeController;
-        String DB_URL = "drivers.db";
+        String DB_URL = "main.db";
         dbConnection.connect(DB_URL);
-        String DB_URL2 = "driver_license.db";
-        dbConnection2.connect(DB_URL2);
-        this.driverLicenseDAO = new DriverLicenseDAO(dbConnection2.getConnection());
+        // String DB_URL2 = "driver_license.db";
+        // dbConnection2.connect(DB_URL2);
         this.driverDAO = new DriverDAO(dbConnection.getConnection());
+        this.driverLicenseDAO = new DriverLicenseDAO(dbConnection.getConnection());
     }
 
     public void addDriver(DriverDTO driver) {
@@ -121,6 +121,20 @@ public class DriverController {
         } catch (Exception e) {
             System.out.println("Error clearing driver tables: " + e.getMessage());
         }
+    }
+
+    public void closeConnection() {
+        dbConnection.close();
+        // dbConnection2.close();
+        employeeController.closeConnection();
+    }
+
+    public void openConnection() {
+        dbConnection.open("main.db");
+        // dbConnection2.open("driver_license.db");
+        this.driverDAO = new DriverDAO(dbConnection.getConnection());
+        this.driverLicenseDAO = new DriverLicenseDAO(dbConnection.getConnection());
+        employeeController.openConnection();
     }
 
 }

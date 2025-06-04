@@ -20,12 +20,13 @@ public class DriverDAO {
     }
 
     public void InitializeDatabase() throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS drivers ("
-                + "id INTEGER PRIMARY KEY,"
-                + "isBusy INT" // 0 = false, 1 = true
-                + ", FOREIGN KEY (id) REFERENCES employees(id)"
-                + ")";
+        String sql = "CREATE TABLE IF NOT EXISTS drivers (" +
+                "id INTEGER PRIMARY KEY," +
+                "isBusy INT," + // 0 = false, 1 = true
+                "FOREIGN KEY (id) REFERENCES employees(id) ON DELETE CASCADE" +
+                ")";
         try (Statement stmt = connection.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println("Error initializing database: " + e.getMessage());

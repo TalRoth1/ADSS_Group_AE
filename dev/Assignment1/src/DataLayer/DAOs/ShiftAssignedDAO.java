@@ -20,18 +20,19 @@ public class ShiftAssignedDAO {
     }
 
     private void initializeTable() throws SQLException {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS shift_assigned ("
-                + "shiftId INTEGER NOT NULL, "
-                + "employeeId INT NOT NULL, "
-                + "role TEXT NOT NULL, "
-                + "PRIMARY KEY (shiftId, employeeId), "
-                + "FOREIGN KEY (shiftId) REFERENCES shifts(id),"
-                + "FOREIGN KEY (employeeId) REFERENCES employees(id)"
-                + ")";
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS shift_assigned (" +
+                "shiftId INTEGER NOT NULL, " +
+                "employeeId INT NOT NULL, " +
+                "role TEXT NOT NULL, " +
+                "PRIMARY KEY (shiftId, employeeId), " +
+                "FOREIGN KEY (shiftId) REFERENCES shifts(id) ON DELETE CASCADE, " +
+                "FOREIGN KEY (employeeId) REFERENCES employees(id) ON DELETE CASCADE" +
+                ")";
         try (Statement stmt = connection.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
-            System.out.println("Error creating shifts table: " + e.getMessage());
+            System.out.println("Error creating shift_assigned table: " + e.getMessage());
             throw e;
         }
     }
@@ -80,7 +81,7 @@ public class ShiftAssignedDAO {
         pstmt.setInt(1, shiftId);
         pstmt.setInt(2, employeeId);
         return pstmt.executeQuery();
-        
+
     }
 
     public ResultSet getAssignedShifts(int employeeId) throws SQLException {
@@ -88,7 +89,7 @@ public class ShiftAssignedDAO {
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setInt(1, employeeId);
         return pstmt.executeQuery();
-        
+
     }
 
     // view all employees of a shift
@@ -97,7 +98,7 @@ public class ShiftAssignedDAO {
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setInt(1, id);
         return pstmt.executeQuery();
-        
+
     }
 
     public String getRole(int shiftId, int employeeId) throws SQLException {
@@ -111,7 +112,7 @@ public class ShiftAssignedDAO {
         } else {
             return null; // No role found
         }
-        
+
     }
 
     public void clearTable() throws SQLException {

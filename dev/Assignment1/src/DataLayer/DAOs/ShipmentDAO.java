@@ -9,7 +9,6 @@ import java.sql.Statement;
 public class ShipmentDAO {
     private Connection connection;
 
-
     public ShipmentDAO(Connection connection) {
         this.connection = connection;
         try {
@@ -21,27 +20,29 @@ public class ShipmentDAO {
 
     public void initializeTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS shipments (" +
-                "id INT PRIMARY KEY," +
-                "dateCreated TEXT," +
-                "dateSent TEXT," +
-                "truck_id INT ," +
-                "driver_id INT ," +
-                "doc_id INT ," +
-                "status TEXT NOT NULL," +
-                "shiftType TEXT NOT NULL," +
-                "FOREIGN KEY (truck_id) REFERENCES trucks(id)," +
-                "FOREIGN KEY (driver_id) REFERENCES drivers(id)," +
-                "FOREIGN KEY (doc_id) REFERENCES documents(id)" +
+                "id INT PRIMARY KEY, " +
+                "dateCreated TEXT, " +
+                "dateSent TEXT, " +
+                "truck_id INT, " +
+                "driver_id INT, " +
+                "doc_id INT, " +
+                "status TEXT NOT NULL, " +
+                "shiftType TEXT NOT NULL, " +
+                "FOREIGN KEY (truck_id) REFERENCES trucks(id) ON DELETE CASCADE, " +
+                "FOREIGN KEY (driver_id) REFERENCES drivers(id) ON DELETE CASCADE, " +
+                "FOREIGN KEY (doc_id) REFERENCES documents(id) ON DELETE CASCADE" +
                 ")";
         try (Statement stmt = connection.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON"); // Enables enforcement & cascading
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Error initializing locations table: " + e.getMessage());
+            System.out.println("Error initializing shipments table: " + e.getMessage());
             throw e;
         }
     }
 
-    public void addShipment(int shipmentID, String dateCreated, String dateSent, int truckID, int driverID, int docID, String status, String shiftType) throws SQLException {
+    public void addShipment(int shipmentID, String dateCreated, String dateSent, int truckID, int driverID, int docID,
+            String status, String shiftType) throws SQLException {
         String sql = "INSERT INTO shipments (id, dateCreated, dateSent, truck_id, driver_id, doc_id, status, shiftType) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, shipmentID);
@@ -53,8 +54,7 @@ public class ShipmentDAO {
             pstmt.setString(7, status);
             pstmt.setString(8, shiftType);
             pstmt.executeUpdate();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error adding shipment: " + e.getMessage());
             throw e;
         }
@@ -73,7 +73,8 @@ public class ShipmentDAO {
         return stmt.executeQuery(sql);
     }
 
-    public void updateShipment(int shipmentID, String dateCreated, String dateSent, int truckID, int driverID, int docID, String status, String shiftType) throws SQLException {
+    public void updateShipment(int shipmentID, String dateCreated, String dateSent, int truckID, int driverID,
+            int docID, String status, String shiftType) throws SQLException {
         String sql = "UPDATE shipments SET dateCreated = ?, dateSent = ?, truck_id = ?, driver_id = ?, doc_id = ?, status = ?, shiftType = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, dateCreated);
@@ -129,5 +130,4 @@ public class ShipmentDAO {
         }
     }
 
-    
 }

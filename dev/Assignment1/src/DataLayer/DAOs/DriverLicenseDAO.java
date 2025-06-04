@@ -23,16 +23,18 @@ public class DriverLicenseDAO {
     }
 
     public void InitializeDatabase() throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS driver_license ("
-                + "id INTEGER ,"
-                + "LicenseType TEXT, "
-                + "PRIMARY KEY (id, LicenseType) "
-                + ")";
+        String sql = "CREATE TABLE IF NOT EXISTS driver_license (" +
+                "id INTEGER, " +
+                "LicenseType TEXT, " +
+                "PRIMARY KEY (id, LicenseType), " +
+                "FOREIGN KEY (id) REFERENCES drivers(id) ON DELETE CASCADE" +
+                ")";
         try (Statement stmt = connection.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON"); // enable FK support
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println("Error initializing database: " + e.getMessage());
-            throw e; 
+            throw e;
         }
     }
 
@@ -48,7 +50,7 @@ public class DriverLicenseDAO {
         }
     }
 
-    //dont use this method, it is not needed
+    // dont use this method, it is not needed
     private void updateDriver(int id, String licenseType) throws SQLException {
         String sql = "UPDATE driver_license SET licenseType = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -108,5 +110,5 @@ public class DriverLicenseDAO {
             throw e;
         }
     }
-    
+
 }

@@ -12,10 +12,9 @@ public class TruckController {
     private TruckDAO truckDAO;
 
     public TruckController() {
-        String DB_URL = "trucks.db";
+        String DB_URL = "main.db";
         dbConnection.connect(DB_URL);
-        this.connection = DBConnection.getConnection();
-        this.truckDAO = new TruckDAO(connection);
+        this.truckDAO = new TruckDAO(dbConnection.getConnection());
     }
 
     public void addTruck(TruckDTO truck) throws SQLException {
@@ -24,7 +23,7 @@ public class TruckController {
     }
 
     public void updateTruck(TruckDTO truck) throws SQLException {
-        truckDAO.updateTruck(   
+        truckDAO.updateTruck(
                 truck.getId(),
                 truck.getLicensePlate(),
                 truck.getMaxWeight(),
@@ -52,8 +51,7 @@ public class TruckController {
                     rst.getInt("status") == 1 ? true : false));
         }
         return trucks;
-    }    
-
+    }
 
     private TruckDTO getTruckFromResultSet(ResultSet rst) throws SQLException {
         if (rst.next()) {
@@ -71,6 +69,14 @@ public class TruckController {
     public void resetTrucksTable() throws SQLException {
         truckDAO.clearTable();
     }
-    
+
+    public void closeConnection() {
+        dbConnection.close();
+    }
+
+    public void openConnection() {
+        dbConnection.open("main.db");
+        this.truckDAO = new TruckDAO(dbConnection.getConnection());
+    }
 
 }

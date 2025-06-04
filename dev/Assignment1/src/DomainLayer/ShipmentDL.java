@@ -12,7 +12,7 @@ public class ShipmentDL {
     public Date DateSent;
     public TruckDL Truck;
     public DriverDL DriverName;
-    public List<LocationDL> Destinations; // TODO: INSTEAD OF HOLDING, GET IT FROM DOCUMENT
+    public List<LocationDL> Destinations;
     public ShipmentDocumentDL Document;
     public ShipmentStatus Status = ShipmentStatus.PENDING;
     public String ShiftType;
@@ -176,10 +176,10 @@ public class ShipmentDL {
         return "Truck: " + Truck.GetNumber()
                 + ", Driver: " + ((DriverName == null) ? "Not Assigned"
                         : DriverName.getName())
-                                + ", Origin: " + Document.getOrigin().toString()
-                                + ", Destinations: " + Document.getLocations().toString()
-                                + ", Date Created: " + DateCreated.toString()
-                                + (DateSent != null ? ", Date Sent: " + DateSent.toString() : "");
+                + ", Origin: " + Document.getOrigin().toString()
+                + ", Destinations: " + Document.getLocations().toString()
+                + ", Date Created: " + DateCreated.toString()
+                + (DateSent != null ? ", Date Sent: " + DateSent.toString() : "");
     }
 
     public void ChangeAvailablity() {

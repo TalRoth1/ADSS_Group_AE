@@ -22,9 +22,9 @@ import DataLayer.DAOs.ShiftReqRolesDAO;
 public class ShiftController {
 
     private DBConnection dbConnection = new DBConnection();
-    private DBConnection dbConnection2 = new DBConnection();
-    private DBConnection dbConnection3 = new DBConnection();
-    private DBConnection dbConnection4 = new DBConnection();
+    // rivate DBConnection dbConnection2 = new DBConnection();
+    // private DBConnection dbConnection3 = new DBConnection();
+    // private DBConnection dbConnection4 = new DBConnection();
     private ShiftAssignedDAO shiftAssignedDAO;
     private ShiftDAO shiftDAO;
     private ShiftPreferredDAO shiftPreferredDAO;
@@ -32,15 +32,15 @@ public class ShiftController {
     LocationController locationController;
 
     public ShiftController(LocationController locationController) {
-        this.dbConnection.connect("shift_assigned.db");
-        this.dbConnection2.connect("shifts.db");
-        this.dbConnection3.connect("preferred_shifts.db");
-        this.dbConnection4.connect("shift_req_roles.db");
+        this.dbConnection.connect("main.db");
+        // this.dbConnection2.connect("shifts.db");
+        // this.dbConnection3.connect("preferred_shifts.db");
+        // this.dbConnection4.connect("shift_req_roles.db");
         this.locationController = locationController;
         this.shiftAssignedDAO = new ShiftAssignedDAO(dbConnection.getConnection());
-        this.shiftDAO = new ShiftDAO(dbConnection2.getConnection());
-        this.shiftPreferredDAO = new ShiftPreferredDAO(dbConnection3.getConnection());
-        this.shiftReqRolesDAO = new ShiftReqRolesDAO(dbConnection4.getConnection());
+        this.shiftDAO = new ShiftDAO(dbConnection.getConnection());
+        this.shiftPreferredDAO = new ShiftPreferredDAO(dbConnection.getConnection());
+        this.shiftReqRolesDAO = new ShiftReqRolesDAO(dbConnection.getConnection());
     }
 
     public void addShiftAssigned(EmployeeDTO employeeDTO, ShiftDTO shiftDTO, String role) throws SQLException {
@@ -212,24 +212,21 @@ public class ShiftController {
         }
         return assignedShifts;
     }
-    
-private Date parseAnyDateToUtilDate(String dateStr) {
-    // Try ISO first
-    try {
-        return Date.from(OffsetDateTime.parse(dateStr).toInstant());
-    } catch (Exception e) {
-        // Try legacy Java Date.toString() format
+
+    private Date parseAnyDateToUtilDate(String dateStr) {
+        // Try ISO first
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-            return sdf.parse(dateStr);
-        } catch (ParseException ex) {
-            throw new RuntimeException("Failed to parse date: " + dateStr, ex);
+            return Date.from(OffsetDateTime.parse(dateStr).toInstant());
+        } catch (Exception e) {
+            // Try legacy Java Date.toString() format
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+                return sdf.parse(dateStr);
+            } catch (ParseException ex) {
+                throw new RuntimeException("Failed to parse date: " + dateStr, ex);
+            }
         }
     }
-}
-
-
-    
 
     // helper method to build ShiftDTO from ResultSet
     private ShiftDTO buildShiftDTO(ResultSet rst) throws SQLException {
@@ -284,6 +281,23 @@ private Date parseAnyDateToUtilDate(String dateStr) {
         } catch (SQLException e) {
             System.out.println("Error clearing tables: " + e.getMessage());
         }
+    }
+
+    public void closeConnection() {
+        dbConnection.close();
+        locationController.closeConnection();
+    }
+
+    public void openConnection() {
+        dbConnection.open("main.db");
+        // dbConnection2.open("shifts.db");
+        // dbConnection3.open("preferred_shifts.db");
+        // dbConnection4.open("shift_req_roles.db");
+        this.shiftAssignedDAO = new ShiftAssignedDAO(dbConnection.getConnection());
+        this.shiftDAO = new ShiftDAO(dbConnection.getConnection());
+        this.shiftPreferredDAO = new ShiftPreferredDAO(dbConnection.getConnection());
+        this.shiftReqRolesDAO = new ShiftReqRolesDAO(dbConnection.getConnection());
+        locationController.openConnection();
     }
 
 }

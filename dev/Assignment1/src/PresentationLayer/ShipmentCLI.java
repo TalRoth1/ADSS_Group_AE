@@ -696,6 +696,7 @@ public class ShipmentCLI {
             }
         }
     }
+
     public void loginCLI() {
         boolean flag = true;
         while (flag) {
@@ -737,6 +738,15 @@ public class ShipmentCLI {
             System.out.println("Predefined data created successfully.");
         } catch (Exception e) {
             System.out.println("Error creating predefined data: " + e.getMessage());
+        }
+    }
+
+    public void addFirstLocation() {
+        try {
+            shipmentFacade.addFirstLocation();
+            System.out.println("First location added successfully.");
+        } catch (Exception e) {
+            System.out.println("Error adding first location: " + e.getMessage());
         }
     }
 }

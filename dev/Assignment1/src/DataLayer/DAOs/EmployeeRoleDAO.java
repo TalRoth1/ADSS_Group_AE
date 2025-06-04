@@ -22,16 +22,17 @@ public class EmployeeRoleDAO {
     }
 
     private void initializeTable() throws SQLException {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS employee_role ("
-                + "employeeId INT NOT NULL, "
-                + "role TEXT NOT NULL, "
-                + "PRIMARY KEY (employeeId, role), "
-                + "FOREIGN KEY (employeeId) REFERENCES employees(id)"
-                + ")";
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS employee_role (" +
+                "employeeId INT NOT NULL, " +
+                "role TEXT NOT NULL, " +
+                "PRIMARY KEY (employeeId, role), " +
+                "FOREIGN KEY (employeeId) REFERENCES employees(id) ON DELETE CASCADE" +
+                ")";
         try (Statement stmt = connection.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
-            System.out.println("Error creating shifts table: " + e.getMessage());
+            System.out.println("Error creating employee_role table: " + e.getMessage());
             throw e;
         }
     }
@@ -75,7 +76,7 @@ public class EmployeeRoleDAO {
         while (rs.next()) {
             roles.add(rs.getString("role"));
         }
-        //return rs;
+        // return rs;
         return roles;
     }
 

@@ -82,47 +82,56 @@ public class EmployeeCLI {
                     .iterator();
             LocalDate endOfNextWeek = thisSunday.plusWeeks(2).minusDays(1);
 
-            while (branchIterator2.hasNext()) { // check if there are any branches with missing shifts
-                Map.Entry<LocationDL, Map<LocalDate, Shift>> branchEntry = branchIterator2.next();
-                Map<LocalDate, Shift> shiftsByDate = branchEntry.getValue();
-                Iterator<Map.Entry<LocalDate, Shift>> shiftIterator = shiftsByDate.entrySet().iterator();
-                while (shiftIterator.hasNext()) {
-                    Map.Entry<LocalDate, Shift> shiftEntry = shiftIterator.next();
-                    LocalDate shiftDate = shiftEntry.getKey();
-                    Shift shift = shiftEntry.getValue();
+            // while (branchIterator2.hasNext()) { // check if there are any branches with
+            // missing shifts
+            // Map.Entry<LocationDL, Map<LocalDate, Shift>> branchEntry =
+            // branchIterator2.next();
+            // Map<LocalDate, Shift> shiftsByDate = branchEntry.getValue();
+            // Iterator<Map.Entry<LocalDate, Shift>> shiftIterator =
+            // shiftsByDate.entrySet().iterator();
+            // while (shiftIterator.hasNext()) {
+            // Map.Entry<LocalDate, Shift> shiftEntry = shiftIterator.next();
+            // LocalDate shiftDate = shiftEntry.getKey();
+            // Shift shift = shiftEntry.getValue();
 
-                    if (!shiftDate.isBefore(now) && !shiftDate.isAfter(endOfNextWeek)) {
-                        emp.getToCompleteShifts()
-                                .computeIfAbsent(branchEntry.getKey(), k -> new HashMap<>())
-                                .put(shiftDate, shift);
-                    }
-                }
-            }
-            // looping through the toCompleteShifts
-            while (emp != null && emp.getToCompleteShifts() != null && !emp.getToCompleteShifts().isEmpty()) {
-                System.out.println("You have shifts to complete. Please complete them before proceeding.");
-                Iterator<Map.Entry<LocationDL, Map<LocalDate, Shift>>> branchIterator = emp.getToCompleteShifts()
-                        .entrySet().iterator();
-                while (branchIterator.hasNext()) {
-                    Map.Entry<LocationDL, Map<LocalDate, Shift>> branchEntry = branchIterator.next();
-                    Map<LocalDate, Shift> shiftsByDate = branchEntry.getValue();
-                    Iterator<Map.Entry<LocalDate, Shift>> shiftIterator = shiftsByDate.entrySet().iterator();
-                    while (shiftIterator.hasNext()) {
-                        Map.Entry<LocalDate, Shift> shiftEntry = shiftIterator.next();
-                        Shift shift = shiftEntry.getValue();
-                        System.out.println(
-                                "Shift on " + shift.getDate() + " in the " + shift.getShiftType().toString() + ":");
-                        int shiftManagerId = selectEmployeeForRole(shift, Role.SHIFT_MANAGER);
-                        employeeFacade.setShiftManager(emp.getId(), shift, shiftManagerId);
-                        for (Role role : Role.values()) {
-                            if (role != Role.SHIFT_MANAGER) {
-                                chooseNumOfEmployeesForShift(role, shift, userId);
-                            }
-                        }
-                        shiftIterator.remove(); // remove the shift from the list
-                    }
-                }
-            }
+            // if (!shiftDate.isBefore(now) && !shiftDate.isAfter(endOfNextWeek)) {
+            // emp.getToCompleteShifts()
+            // .computeIfAbsent(branchEntry.getKey(), k -> new HashMap<>())
+            // .put(shiftDate, shift);
+            // }
+            // }
+            // }
+            // // looping through the toCompleteShifts
+            // while (emp != null && emp.getToCompleteShifts() != null &&
+            // !emp.getToCompleteShifts().isEmpty()) {
+            // System.out.println("You have shifts to complete. Please complete them before
+            // proceeding.");
+            // Iterator<Map.Entry<LocationDL, Map<LocalDate, Shift>>> branchIterator =
+            // emp.getToCompleteShifts()
+            // .entrySet().iterator();
+            // while (branchIterator.hasNext()) {
+            // Map.Entry<LocationDL, Map<LocalDate, Shift>> branchEntry =
+            // branchIterator.next();
+            // Map<LocalDate, Shift> shiftsByDate = branchEntry.getValue();
+            // Iterator<Map.Entry<LocalDate, Shift>> shiftIterator =
+            // shiftsByDate.entrySet().iterator();
+            // while (shiftIterator.hasNext()) {
+            // Map.Entry<LocalDate, Shift> shiftEntry = shiftIterator.next();
+            // Shift shift = shiftEntry.getValue();
+            // System.out.println(
+            // "Shift on " + shift.getDate() + " in the " + shift.getShiftType().toString()
+            // + ":");
+            // int shiftManagerId = selectEmployeeForRole(shift, Role.SHIFT_MANAGER);
+            // employeeFacade.setShiftManager(emp.getId(), shift, shiftManagerId);
+            // for (Role role : Role.values()) {
+            // if (role != Role.SHIFT_MANAGER) {
+            // chooseNumOfEmployeesForShift(role, shift, userId);
+            // }
+            // }
+            // shiftIterator.remove(); // remove the shift from the list
+            // }
+            // }
+            // }
         } catch (Exception e) {
             System.out.println("Error retrieving Employee Manager: " + e.getMessage());
         }
@@ -234,7 +243,7 @@ public class EmployeeCLI {
             employeeFacade.setShiftManager(userId, shift, shiftManagerId);
             // choose number of employees for each role
             for (Role role : Role.values()) {
-                if (role != Role.SHIFT_MANAGER) {
+                if (role != Role.SHIFT_MANAGER && role != Role.CASHIER) {
                     chooseNumOfEmployeesForShift(role, shift, userId);
                 }
             }

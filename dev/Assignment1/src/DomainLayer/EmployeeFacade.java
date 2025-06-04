@@ -60,7 +60,15 @@ public class EmployeeFacade {
         } catch (Exception ex) {
             throw new Exception("Login failed: " + ex.getMessage());
         }
-        empController.login(id, password);
+        try {
+            empController.openConnection();
+            empController.login(id, password);
+        } catch (Exception ex) {
+            empController.closeConnection();
+            throw new Exception("Login failed: " + ex.getMessage());
+        } finally {
+            empController.closeConnection();
+        }
         return e;
     }
 
@@ -70,10 +78,13 @@ public class EmployeeFacade {
         }
         Employee e = getEmployee(id);
         try {
+            empController.openConnection();
             empController.logout(id);
             e.logout();
         } catch (Exception ex) {
             throw new Exception("Logout failed: " + ex.getMessage());
+        } finally {
+            empController.closeConnection();
         }
         System.out.println("Employee with ID " + id + " has logged out.");
     }
@@ -88,27 +99,11 @@ public class EmployeeFacade {
         return shiftEmployee.isShiftManager();
     }
 
-    // this is old method, we have removeEmployeeFromShift now
-    // public void removeEmployee(int employeeId, int empManagerId) {
-    // if (!isEmployeeManager(empManagerId)) {
-    // throw new RuntimeException("This action is allowed only for employee
-    // manager.");
-    // }
-    // if (!isLoggedIn(empManagerId)) {
-    // throw new RuntimeException("You are not logged in.");
-    // }
-    // EmployeeManager employeeManager = getEmployeeManager();
-    // ShiftEmployee shiftEmployee = shiftEmployees.get(employeeId);
-    // employeeManager.removeEmployee(employeeId);
-    // }
-    // check if there is a driver available for delivery and there is store kepper
-    // in each branch of the delivery
     public DriverDL assignCheck(LocalDate sentDate, String shiftType, LocationDL origin, List<LocationDL> destinations,
             String licenceType, List<LocationDL> branches) {
         try {
 
-
-         return employeeManager.assignCheck(sentDate, parseShiftType(shiftType),
+            return employeeManager.assignCheck(sentDate, parseShiftType(shiftType),
                     origin, destinations, licenceType, branches, driverController);
         } catch (Exception e) {
             System.out.println("Error in assignCheck: " + e.getMessage());
@@ -138,7 +133,16 @@ public class EmployeeFacade {
             ShiftEmployee shiftEmployee = employeeManager.hireEmployee(employeeId, employeeName, b, bankAccount,
                     salary, startDate, vacationDays, sickDays, educationFund, socialBenefits, employeePassword, role,
                     branches);
-            empController.addEmployee(employeeMapper.toDTO(shiftEmployee), role.toString());
+
+            try {
+                empController.openConnection();
+                empController.addEmployee(employeeMapper.toDTO(shiftEmployee), role.toString());
+            } catch (Exception e) {
+                empController.closeConnection();
+                throw new Exception("Failed to add employee: " + e.getMessage());
+            } finally {
+                empController.closeConnection();
+            }
             shiftEmployees.put(employeeId, shiftEmployee);
 
             System.out.println("Employee hired: " + shiftEmployee.getName() + " with ID: " + employeeId);
@@ -170,8 +174,17 @@ public class EmployeeFacade {
                     salary, startDate, vacationDays, sickDays, educationFund, socialBenefits,
                     employeePassword, licenceType, branches);
 
-            empController.addEmployee(driverMapper.toDTO(driver), Role.DRIVER.toString());
-            driverController.addDriver(driverMapper.toDTO(driver));
+            try {
+                empController.openConnection();
+                driverController.openConnection();
+                empController.addEmployee(driverMapper.toDTO(driver), Role.DRIVER.toString());
+                driverController.addDriver(driverMapper.toDTO(driver));
+            } catch (Exception e) {
+                throw new Exception("Failed to add driver: " + e.getMessage());
+            } finally {
+                empController.closeConnection();
+                driverController.closeConnection();
+            }
             shiftEmployees.put(employeeId, driver);
             System.out.println("Driver hired: " + driver.getName() + " with ID: " + employeeId);
         } catch (Exception e) {
@@ -187,11 +200,15 @@ public class EmployeeFacade {
             throw new Exception("You are not logged in.");
         }
         EmployeeManager employeeManager = getEmployeeManager();
+
         try {
+            empController.openConnection();
             empController.removeEmployee(employeeId);
             employeeManager.fireEmployee(employeeId);
         } catch (Exception e) {
             throw new Exception("Failed to fire employee: " + e.getMessage());
+        } finally {
+            empController.closeConnection();
         }
     }
 
@@ -208,12 +225,16 @@ public class EmployeeFacade {
             throw new Exception("Employee not found.");
         }
         ShiftEmployee backup = (ShiftEmployee) employee.clone(); // backup before change
+
         try {
+            empController.openConnection();
             empController.updateRole(employeeId, oldRole.toString(), newRole.toString());
             employeeManager.changeRoleToEmployee(employeeId, oldRole, newRole);
         } catch (Exception e) {
             shiftEmployees.put(employeeId, backup); // restore previous state
             throw new Exception("Failed to change role: " + e.getMessage());
+        } finally {
+            empController.closeConnection();
         }
     }
 
@@ -225,11 +246,15 @@ public class EmployeeFacade {
             throw new Exception("You are not logged in.");
         }
         EmployeeManager employeeManager = getEmployeeManager();
+
         try {
+            empController.openConnection();
             empController.addRole(employeeId, newRole.toString());
             employeeManager.addRoleToEmployee(employeeId, newRole);
         } catch (Exception e) {
             throw new Exception("Failed to add role: " + e.getMessage());
+        } finally {
+            empController.closeConnection();
         }
     }
 
@@ -241,11 +266,15 @@ public class EmployeeFacade {
             throw new Exception("You are not logged in.");
         }
         EmployeeManager employeeManager = getEmployeeManager();
+
         try {
+            empController.openConnection();
             empController.removeRole(employeeId, roleToDelete.toString());
             employeeManager.deleteRoleFromEmployee(employeeId, roleToDelete);
         } catch (Exception e) {
             throw new Exception("Failed to delete role: " + e.getMessage());
+        } finally {
+            empController.closeConnection();
         }
     }
 
@@ -264,12 +293,15 @@ public class EmployeeFacade {
         }
         ShiftEmployee backup = (ShiftEmployee) employee.clone();
         try {
+            empController.openConnection();
             empController.updateEmployeeByField(employeeId, "salary", salary);
             employeeManager.updateSalaryEmployee(employeeId, salary);
             employee.setSalary(salary);
         } catch (Exception e) {
             shiftEmployees.put(employeeId, backup);
             throw new Exception("Failed to update salary: " + e.getMessage());
+        } finally {
+            empController.closeConnection();
         }
     }
 
@@ -286,13 +318,17 @@ public class EmployeeFacade {
             throw new Exception("Employee not found.");
         }
         ShiftEmployee backup = (ShiftEmployee) employee.clone();
+
         try {
+            empController.openConnection();
             empController.updateEmployeeByField(employeeId, "bankAccount", bankAccount);
             employeeManager.updateBankAccountEmployee(employeeId, bankAccount);
             employee.setBankAccount(bankAccount);
         } catch (Exception e) {
             shiftEmployees.put(employeeId, backup);
             throw new Exception("Failed to update bank account: " + e.getMessage());
+        } finally {
+            empController.closeConnection();
         }
     }
 
@@ -309,13 +345,17 @@ public class EmployeeFacade {
             throw new Exception("Employee not found.");
         }
         ShiftEmployee backup = (ShiftEmployee) employee.clone();
+
         try {
+            empController.openConnection();
             empController.updateEmployeeByField(employeeId, "vacationDays", vacationDays);
             employeeManager.updateVacationDaysEmployee(employeeId, vacationDays);
             employee.setVacationDays(vacationDays);
         } catch (Exception e) {
             shiftEmployees.put(employeeId, backup);
             throw new Exception("Failed to update vacation days: " + e.getMessage());
+        } finally {
+            empController.closeConnection();
         }
     }
 
@@ -332,13 +372,17 @@ public class EmployeeFacade {
             throw new Exception("Employee not found.");
         }
         ShiftEmployee backup = (ShiftEmployee) employee.clone();
+
         try {
+            empController.openConnection();
             empController.updateEmployeeByField(employeeId, "sickDays", sickDays);
             employeeManager.updateSickDaysEmployee(employeeId, sickDays);
             employee.setSickDays(sickDays);
         } catch (Exception e) {
             shiftEmployees.put(employeeId, backup);
             throw new Exception("Failed to update sick days: " + e.getMessage());
+        } finally {
+            empController.closeConnection();
         }
     }
 
@@ -355,13 +399,17 @@ public class EmployeeFacade {
             throw new Exception("Employee not found.");
         }
         ShiftEmployee backup = (ShiftEmployee) employee.clone();
+
         try {
+            empController.openConnection();
             empController.updateEmployeeByField(employeeId, "educationFund", educationFund);
             employeeManager.updateEducationFund(employeeId, educationFund);
             employee.setEducationFund(educationFund);
         } catch (Exception e) {
             shiftEmployees.put(employeeId, backup);
             throw new Exception("Failed to update education fund: " + e.getMessage());
+        } finally {
+            empController.closeConnection();
         }
     }
 
@@ -378,13 +426,17 @@ public class EmployeeFacade {
             throw new Exception("Employee not found.");
         }
         ShiftEmployee backup = (ShiftEmployee) employee.clone();
+
         try {
+            empController.openConnection();
             empController.updateEmployeeByField(employeeId, "socialBenefits", socialBenefits);
             employeeManager.updateSocialBenefits(employeeId, socialBenefits);
             employee.setSocialBenefits(socialBenefits);
         } catch (Exception e) {
             shiftEmployees.put(employeeId, backup);
             throw new Exception("Failed to update social benefits: " + e.getMessage());
+        } finally {
+            empController.closeConnection();
         }
     }
 
@@ -495,36 +547,6 @@ public class EmployeeFacade {
         }
     }
 
-    // public void getAssignedEmployeeShiftsAsShiftManager(int employeeId, int
-    // shiftManagerId) throws Exception { // employee's assigned shifts for shift
-    // employee only
-    // if (!isShiftManager(shiftManagerId)) {
-    // throw new Exception("This action is allowed only for shift manager.");
-    // }
-    // if (!isLoggedIn(shiftManagerId)) {
-    // throw new Exception("You are not logged in.");
-    // }
-    // EmployeeManager anyManager = getAnyEmployeeManager();
-    // if (anyManager == null) {
-    // System.out.println("No employee manager available to process request.");
-    // }
-    // return anyManager.getAssignedEmployeeShiftsManager(employeeId);
-    // }
-    // private EmployeeManager getAnyEmployeeManager() {
-    // return employeeManagers.values().stream().findFirst().orElse(null);
-    // }
-    // public String addRole(int id, Role role) {
-    // ShiftEmployee shiftEmployee = shiftEmployees.get(id);
-    // return shiftEmployee.addRole(role);
-    // }
-    // public String removeRole(int id, Role role) {
-    // ShiftEmployee shiftEmployee = shiftEmployees.get(id);
-    // return shiftEmployee.removeRole(role);
-    // }
-    // public String changeRole(int id, Role oldRole, Role newRole) {
-    // ShiftEmployee shiftEmployee = shiftEmployees.get(id);
-    // return shiftEmployee.changeRole(oldRole, newRole);
-    // }
     // shift methods
     public Shift getShift(LocationDL branch, LocalDate date, ShiftType shiftType, int id) throws Exception {
         if (!isLoggedIn(id)) {
@@ -552,12 +574,13 @@ public class EmployeeFacade {
         }
         EmployeeManager employeeManager = getEmployeeManager();
         try {
-            // empController.changeShiftManager(oldShiftManagerId, newShiftManagerId,
-            // shift.getDate(), shift.getShiftType(), shift.getBranch());
             employeeManager.changeShiftManager(shift, oldShiftManagerId, newShiftManagerId);
+            shiftController.openConnection();
             shiftController.updateShift(shiftMapper.toDTO(shift), "shiftManagerId", newShiftManagerId);
         } catch (Exception e) {
             throw new Exception("Failed to change shift manager: " + e.getMessage());
+        } finally {
+            shiftController.closeConnection();
         }
     }
 
@@ -573,9 +596,12 @@ public class EmployeeFacade {
             Role role = shift.getAssignedEmployeesID().get(employeeId);
             employeeManager.shiftReplacement(shift.getBranch(), shift, employeeId, newEmployeeId);
             ShiftEmployee em = employeeManager.getAllEmployeesInBranch(shift.getBranch()).get(employeeId);
+            shiftController.openConnection();
             shiftController.addShiftAssigned(EmployeeMapper.toDTO(em), shiftMapper.toDTO(shift), role.toString());
         } catch (Exception e) {
             throw new Exception("Failed to replace shift: " + e.getMessage());
+        } finally {
+            shiftController.closeConnection();
         }
     }
 
@@ -607,11 +633,14 @@ public class EmployeeFacade {
             for (ShiftType type : ShiftType.values()) {
                 try {
                     manager.createDefaultShift(branch, date, type);
+                    shiftController.openConnection();
                     shiftController.addShift(shiftMapper.toDTO(manager.getShift(branch, date, type)));
                 } catch (Exception e) {
                     if (!e.getMessage().contains("already exists")) {
                         System.out.println("Failed to create shift for " + date + " " + type + ": " + e.getMessage());
                     }
+                } finally {
+                    shiftController.closeConnection();
                 }
             }
         }
@@ -627,6 +656,7 @@ public class EmployeeFacade {
         EmployeeManager employeeManager = getEmployeeManager();
         try {
             employeeManager.addEmployeeToShift(shift.getBranch(), employeeId, shift, role);
+            shiftController.openConnection();
             shiftController.addShiftAssigned(employeeMapper.toDTO(shiftEmployees.get(employeeId)),
                     shiftMapper.toDTO(shift), role.toString());
             shiftController.updateShiftReqRoles(shiftMapper.toDTO(shift), role.toString(),
@@ -634,6 +664,8 @@ public class EmployeeFacade {
             // no need of -1 because employeeManager.addEmployeeToShift already does that
         } catch (Exception e) {
             throw new Exception("Failed to add employee to shift: " + e.getMessage());
+        } finally {
+            shiftController.closeConnection();
         }
     }
 
@@ -646,6 +678,7 @@ public class EmployeeFacade {
         }
         EmployeeManager employeeManager = getEmployeeManager();
         try {
+            shiftController.openConnection();
             employeeManager.removeEmployeeFromShift(employeeId, shift);
             shiftController.deleteShiftAssigned(employeeMapper.toDTO(shiftEmployees.get(employeeId)),
                     shiftMapper.toDTO(shift));
@@ -654,6 +687,8 @@ public class EmployeeFacade {
                     role, shift.getRequiredRoles().get(role));
         } catch (Exception e) {
             throw new Exception("Failed to remove employee from shift: " + e.getMessage());
+        } finally {
+            shiftController.closeConnection();
         }
     }
 
@@ -672,25 +707,6 @@ public class EmployeeFacade {
         System.out.println("Shift Information: " + shift.toString());
     }
 
-    // public String addEmployee(int employeeId, Shift shift, int empManagerId, Role
-    // role) {
-    // if (!isEmployeeManager(empManagerId)) {
-    // return "this action is allowed only for employee manager";
-    // }
-    // if (!isLoggedIn(empManagerId)) {
-    // return "You are not logged in";
-    // }
-    // return shift.addEmployee(employeeId, role);
-    // }
-    // public String removeEmployee(int employeeId, Shift shift, int empManagerId) {
-    // if (!isEmployeeManager(empManagerId)) {
-    // return "this action is allowed only for employee manager";
-    // }
-    // if (!isLoggedIn(empManagerId)) {
-    // return "You are not logged in";
-    // }
-    // return shift.removeEmployee(employeeId);
-    // }
     public void setRequiredRoles(int empManagerId, Shift shift, Role role, int num) throws Exception {
         if (!isEmployeeManager(empManagerId)) {
             throw new Exception("This action is allowed only for employee managers.");
@@ -703,9 +719,12 @@ public class EmployeeFacade {
         }
         try {
             shift.setRequiredRoles(role, num);
+            shiftController.openConnection();
             shiftController.updateShiftReqRoles(shiftMapper.toDTO(shift), role.toString(), num);
         } catch (Exception e) {
             throw new Exception("Failed to set required roles: " + e.getMessage());
+        } finally {
+            shiftController.closeConnection();
         }
     }
 
@@ -748,9 +767,12 @@ public class EmployeeFacade {
             // shiftController.addShiftAssigned(employeeMapper.toDTO(emp),
             // shiftMapper.toDTO(shift),
             // Role.SHIFT_MANAGER.toString());
+            shiftController.openConnection();
             shiftController.updateShiftReqRoles(shiftMapper.toDTO(shift), Role.SHIFT_MANAGER.toString(), 0);
         } catch (Exception e) {
             throw new Exception("Failed to set shift manager: " + e.getMessage());
+        } finally {
+            shiftController.closeConnection();
         }
     }
 
@@ -759,9 +781,12 @@ public class EmployeeFacade {
         try {
             shiftEmployee.addPreferredShift(shift);
             String role = shift.getAssignedEmployeesID().get(id).toString();
+            shiftController.openConnection();
             shiftController.addPreferredShift(employeeMapper.toDTO(shiftEmployee), shiftMapper.toDTO(shift), role);
         } catch (Exception e) {
             throw new Exception("Failed to add preferred shift: " + e.getMessage());
+        } finally {
+            shiftController.closeConnection();
         }
     }
 
@@ -769,9 +794,12 @@ public class EmployeeFacade {
         ShiftEmployee shiftEmployee = shiftEmployees.get(id);
         try {
             shiftEmployee.removePreferredShift(shift);
+            shiftController.openConnection();
             shiftController.deletePreferredShift(employeeMapper.toDTO(shiftEmployee), shiftMapper.toDTO(shift));
         } catch (Exception e) {
             throw new Exception("Failed to remove preferred shift: " + e.getMessage());
+        } finally {
+            shiftController.closeConnection();
         }
     }
 
@@ -785,15 +813,17 @@ public class EmployeeFacade {
         ShiftEmployee shiftEmployee = shiftEmployees.get(id);
         try {
             if (!shiftEmployee.getAssignedShifts().containsKey(shift)) {
+                shiftController.openConnection();
                 shiftEmployee.addAssignedShift(shift, role);
                 shiftController.addShiftAssigned(employeeMapper.toDTO(shiftEmployee), shiftMapper.toDTO(shift),
                         role.toString());
             } else {
                 return; // Shift already assigned, no need to add again
             }
-
         } catch (Exception e) {
             throw new Exception("Failed to add assigned shift: " + e.getMessage());
+        } finally {
+            shiftController.closeConnection();
         }
     }
 
@@ -850,7 +880,7 @@ public class EmployeeFacade {
     }
 
     public boolean checkPendingShipment(LocationDL location, LocalDate date, ShiftType type) {
-        return employeeManager.checkPendingShipment(location, date, type);
+        return (employeeManager.getMissingShift().get(location).get(date) != null);
     }
 
     // just for Main
@@ -870,14 +900,22 @@ public class EmployeeFacade {
     }
 
     public List<DriverDL> getAllDrivers() {
-        List<DriverDL> drivers = new ArrayList<>();
-        List<DriverDTO> driverDTOs = driverController.getAllDrivers();
-        for (DriverDTO dto : driverDTOs) {
-            DriverMapper driverMapper = new DriverMapper();
-            DriverDL driver = driverMapper.toDL(dto);
-            drivers.add(driver);
+        try {
+            List<DriverDL> drivers = new ArrayList<>();
+            driverController.openConnection();
+            List<DriverDTO> driverDTOs = driverController.getAllDrivers();
+            for (DriverDTO dto : driverDTOs) {
+                DriverMapper driverMapper = new DriverMapper();
+                DriverDL driver = driverMapper.toDL(dto);
+                drivers.add(driver);
+            }
+            return drivers;
+        } catch (Exception e) {
+            System.out.println("Error retrieving drivers: " + e.getMessage());
+            return new ArrayList<>();
+        } finally {
+            driverController.closeConnection();
         }
-        return drivers;
     }
 
     public void addBranch(LocationDL branch) {
@@ -886,7 +924,7 @@ public class EmployeeFacade {
         }
         if (!branches.contains(branch)) {
             branches.add(branch);
-            employeeManager.addBranch(branch);
+            // employeeManager.addBranch(branch);
         } else {
             // System.out.println("Branch already exists.");
         }
@@ -901,17 +939,7 @@ public class EmployeeFacade {
         LocationDL branch2 = branches.get(2);
         addBranch(branch1);
         addBranch(branch2);
-        // try {
-        // empController.addEmployee(employeeMapper.toDTO(employeeManager),
-        // "EmployeeManager");
-        // login(0, "admin");
-        // } catch (Exception e) {
-        // System.out.println("Error logging in as default manager: " + e.getMessage());
-        // }
 
-        // Add predefined branches
-
-        // Add predefined employees
         try {
             login(0, "admin");
             hireEmployee(1, 0, branch1, "Alice", "123456789", 5000, LocalDate.now(), 20, 10, 1000f, 500f, "password123",
@@ -943,20 +971,31 @@ public class EmployeeFacade {
 
     public void ClearDataBase() {
         try {
-            empController.clearAllEmployees();
-            driverController.clearTables();
+            empController.openConnection();
+            driverController.openConnection();
+            shiftController.openConnection();
+
             shiftController.clearAllShifts();
+            driverController.clearTables();
+            empController.clearAllEmployees();
+
             shiftEmployees.clear();
             branches.clear();
+            employeeManager = null;
         } catch (Exception e) {
             System.out.println("Error clearing database: " + e.getMessage());
+        } finally {
+            empController.closeConnection();
+            driverController.closeConnection();
+            shiftController.closeConnection();
         }
-        employeeManager = null;
+
     }
 
     public void loadData() {
         try {
             // Load branches (locations)
+            locationController.openConnection();
             List<LocationDTO> locationDTOs = locationController.getAllLocations();
             List<LocationDL> loadedBranches = new ArrayList<>();
             for (LocationDTO locationDTO : locationDTOs) {
@@ -965,6 +1004,7 @@ public class EmployeeFacade {
             }
             this.branches = loadedBranches;
 
+            empController.openConnection();
             // Load employees
             List<EmployeeDTO> employeeDTOs = empController.getAllEmployees();
             shiftEmployees.clear();
@@ -981,6 +1021,7 @@ public class EmployeeFacade {
             }
 
             // Load drivers
+            driverController.openConnection();
             List<DriverDTO> driverDTOs = driverController.getAllDrivers();
             for (DriverDTO driverDTO : driverDTOs) {
                 DriverDL driver = driverMapper.toDL(driverDTO);
@@ -998,17 +1039,33 @@ public class EmployeeFacade {
         } catch (Exception e) {
             System.out.println("Error loading employee data: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            empController.closeConnection();
+            driverController.closeConnection();
+            locationController.closeConnection();
         }
     }
 
     public void addFirstEmployeeManager() {
         if (employeeManager == null) {
             employeeManager = new EmployeeManager(0, "keren", "000000000", 10000, LocalDate.now(), 30, 10,
-                    2000f, 1000f, "admin");
+                    2000f, 1000f, "admin", branches.get(0));
+            DriverDL driver = new DriverDL(-100, "Default Driver", branches.get(0), "000000000", 10000, LocalDate.now(),
+                    30, 10,
+                    2000f, 1000f, "admin", new ArrayList<>(List.of("A", "B")));
+            empController.openConnection();
             try {
                 empController.addFirstEmployeeManager(employeeMapper.toDTO(employeeManager));
+                login(0, "admin");
+                hireDriver(driver.getId(), 0, driver.getBranch(), driver.getName(),
+                        driver.getBankAccount(), driver.getSalary(), driver.getStartDate(),
+                        driver.getVacationDays(), driver.getSickDays(), driver.getEducationFund(),
+                        driver.getSocialBenefits(), driver.getPassword(), new ArrayList<>(driver.getLicenceType()));
+
             } catch (Exception e) {
                 System.out.println("Error logging in as default manager: " + e.getMessage());
+            } finally {
+                empController.closeConnection();
             }
         }
     }

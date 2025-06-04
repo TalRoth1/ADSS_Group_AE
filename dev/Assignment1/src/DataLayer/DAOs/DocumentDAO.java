@@ -18,22 +18,22 @@ public class DocumentDAO {
         }
     }
 
-
     private void initializeTable() throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS documents (" +
-                //"id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "id INTEGER PRIMARY KEY, " +
-                "originID INT ," +
+                "originID INT, " +
                 "weight FLOAT, " +
-                "FOREIGN KEY (originID) REFERENCES locations(id) " +
+                "FOREIGN KEY (originID) REFERENCES locations(id) ON DELETE CASCADE" +
                 ")";
         try (Statement stmt = connection.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
             System.out.println("Error creating documents table: " + e.getMessage());
             throw e;
         }
     }
+
     public void createDocument(int docId, int originId, float weight) throws SQLException {
         String sql = "INSERT INTO documents (id, originID, weight) VALUES (?, ? ,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -46,7 +46,6 @@ public class DocumentDAO {
             throw e;
         }
     }
-        
 
     public ResultSet getDocument(int documentId) throws SQLException {
         String sql = "SELECT * FROM documents WHERE id = ?";
@@ -66,7 +65,6 @@ public class DocumentDAO {
             System.out.println("Error updating document: " + e.getMessage());
         }
     }
-    
 
     public void updateDocumentByField(String fieldName, Object value, int documentId) {
         String sql = "UPDATE documents SET " + fieldName + " = ? WHERE id = ?";
@@ -96,12 +94,13 @@ public class DocumentDAO {
     }
 
     public void clearTable() throws SQLException {
-    try (Statement stmt = connection.createStatement()) {
-        stmt.executeUpdate("DELETE FROM documents"); // clear rows
-        //stmt.executeUpdate("DELETE FROM sqlite_sequence WHERE name='documents'"); // reset AUTOINCREMENT
-    } catch (SQLException e) {
-        System.out.println("Error clearing documents table: " + e.getMessage());
-        throw e;
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate("DELETE FROM documents"); // clear rows
+            // stmt.executeUpdate("DELETE FROM sqlite_sequence WHERE name='documents'"); //
+            // reset AUTOINCREMENT
+        } catch (SQLException e) {
+            System.out.println("Error clearing documents table: " + e.getMessage());
+            throw e;
+        }
     }
-}
 }

@@ -20,14 +20,15 @@ public class ShiftReqRolesDAO {
     }
 
     private void initializeTable() throws SQLException {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS shift_req_roles ("
-                + "shiftId INTEGER NOT NULL, "
-                + "role TEXT NOT NULL, "
-                + "amount INTEGER NOT NULL, "
-                + "PRIMARY KEY (shiftId, role), "
-                + "FOREIGN KEY (shiftId) REFERENCES shifts(id)"
-                + ")";
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS shift_req_roles (" +
+                "shiftId INTEGER NOT NULL, " +
+                "role TEXT NOT NULL, " +
+                "amount INTEGER NOT NULL, " +
+                "PRIMARY KEY (shiftId, role), " +
+                "FOREIGN KEY (shiftId) REFERENCES shifts(id) ON DELETE CASCADE" +
+                ")";
         try (Statement stmt = connection.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
             System.out.println("Error creating shift_req_roles table: " + e.getMessage());
@@ -79,7 +80,7 @@ public class ShiftReqRolesDAO {
         pstmt.setInt(1, shiftId);
         pstmt.setString(2, role);
         return pstmt.executeQuery();
-        
+
     }
 
     public ResultSet getRequiredRolesForShift(int shiftId) throws SQLException {
@@ -87,7 +88,7 @@ public class ShiftReqRolesDAO {
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setInt(1, shiftId);
         return pstmt.executeQuery();
-        
+
     }
 
     public void clearTable() throws SQLException {

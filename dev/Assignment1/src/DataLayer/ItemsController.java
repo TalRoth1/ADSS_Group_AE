@@ -1,4 +1,5 @@
 package DataLayer;
+
 import DTO.ItemDTO;
 import DataLayer.DAOs.ItemsDAO;
 
@@ -12,9 +13,9 @@ public class ItemsController {
     private ItemsDAO itemsDAO;
 
     public ItemsController() {
-        String DB_URL = "items.db";
+        String DB_URL = "main.db";
         dbConnection.connect(DB_URL);
-        this.connection = DBConnection.getConnection();
+        this.connection = dbConnection.getConnection();
         this.itemsDAO = new ItemsDAO(connection);
     }
 
@@ -50,5 +51,14 @@ public class ItemsController {
 
     public void clearAllItems() throws SQLException {
         itemsDAO.clearTable();
-    }   
+    }
+
+    public void closeConnection() {
+        dbConnection.close();
+    }
+
+    public void openConnection() {
+        dbConnection.open("main.db");
+        this.itemsDAO = new ItemsDAO(dbConnection.getConnection());
+    }
 }

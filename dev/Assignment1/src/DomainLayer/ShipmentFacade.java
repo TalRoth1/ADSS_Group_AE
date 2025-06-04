@@ -69,10 +69,13 @@ public class ShipmentFacade {
             driverToSend = null; // No driver assigned, handle accordingly
         }
         try {
+            shipmentController.openConnection();
             shipmentController.addShipment(shipmentMapper.toDTO(shipment));
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("Error creating shipment: " + e.getMessage());
+        } finally {
+            shipmentController.closeConnection();
         }
         shipments.add(shipment);
     }
@@ -98,11 +101,14 @@ public class ShipmentFacade {
         }
 
         try {
+            shipmentController.openConnection();
             shipmentController.updateShipment(shipmentMapper.toDTO(shipment));
         } catch (Exception e) {
             e.printStackTrace();
             shipment = temp; // revert to original shipment
             throw new Exception("Error changing shipment status: " + e.getMessage());
+        } finally {
+            shipmentController.closeConnection();
         }
     }
 
@@ -118,10 +124,13 @@ public class ShipmentFacade {
 
     public void RemoveShipment(ShipmentDL shipment) {
         try {
+            shipmentController.openConnection();
             shipmentController.deleteShipment(shipmentMapper.toDTO(shipment));
         } catch (Exception e) {
             e.printStackTrace();
             return;
+        } finally {
+            shipmentController.closeConnection();
         }
         shipments.remove(shipment);
     }
@@ -131,10 +140,13 @@ public class ShipmentFacade {
         LocationDL location = new LocationDL(getHighestLocationId(), street, streetNumber, city, contactNumber,
                 contactName, zone);
         try {
+            locationController.openConnection();
             locationController.addLocation(locationMapper.toDTO(location));
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            locationController.closeConnection();
         }
         locations.add(location);
         employeeFacade.addBranch(location);
@@ -144,10 +156,13 @@ public class ShipmentFacade {
     public TruckDL AddTruck(int number, String model, String type, float maxWeight) {
         TruckDL truck = new TruckDL(number, model, type, maxWeight);
         try {
+            truckController.openConnection();
             truckController.addTruck(truckMapper.toDTO(truck));
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            truckController.closeConnection();
         }
         trucks.add(truck);
         return truck;
@@ -155,10 +170,13 @@ public class ShipmentFacade {
 
     public void AddItem(String itemName, float weight) {
         try {
+            itemsController.openConnection();
             itemsController.addItem(new ItemDTO(itemName, weight));
         } catch (Exception e) {
             e.printStackTrace();
             return;
+        } finally {
+            itemsController.closeConnection();
         }
         Items.put(itemName, weight);
     }
@@ -225,11 +243,14 @@ public class ShipmentFacade {
                 shipmentToEdit.setDateSent(dateToSend);
             }
             tryToAssignShifts(shipmentToEdit);
+            shipmentController.openConnection();
             shipmentController.updateShipment(ShipmentMapper.toDTO(shipmentToEdit));
         } catch (Exception e) {
             e.printStackTrace();
             shipmentToEdit = temp; // revert to original shipment
             throw new Exception("Error editing shipment: " + e.getMessage());
+        } finally {
+            shipmentController.closeConnection();
         }
     }
 
@@ -259,6 +280,10 @@ public class ShipmentFacade {
 
     public void LoadData() {
         try {
+            locationController.openConnection();
+            truckController.openConnection();
+            itemsController.openConnection();
+            shipmentController.openConnection();
             List<LocationDTO> locationDTOs = locationController.getAllLocations();
             for (LocationDTO locationDTO : locationDTOs) {
                 LocationDL location = locationMapper.toDomain(locationDTO);
@@ -281,29 +306,46 @@ public class ShipmentFacade {
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            locationController.closeConnection();
+            truckController.closeConnection();
+            itemsController.closeConnection();
+            shipmentController.closeConnection();
         }
     }
 
     public void ClearDataBase() {
         try {
+            locationController.openConnection();
+            truckController.openConnection();
+            itemsController.openConnection();
+            shipmentController.openConnection();
+            shipmentController.clearAllShipments();
             locationController.resetLocationsTable();
             truckController.resetTrucksTable();
             itemsController.clearAllItems();
-            shipmentController.clearAllShipments();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            locationController.closeConnection();
+            truckController.closeConnection();
+            itemsController.closeConnection();
+            shipmentController.closeConnection();
         }
     }
 
     public void MakePredefinedData() {
         ClearDataBase();
-        LocationDL loc1 = new LocationDL(1, "First St", 1, "CityA", "123456789", "John Doe", "1");
-        LocationDL loc2 = new LocationDL(2, "Main St", 1, "CityA", "123456789", "Spiderman", "1");
-        LocationDL loc3 = new LocationDL(3, "Second St", 2, "CityB", "987654321", "Peter Griffin", "2");
+        LocationDL loc1 = new LocationDL(0, "First St", 1, "CityA", "123456789", "John Doe", "1");
+        LocationDL loc2 = new LocationDL(1, "Main St", 1, "CityA", "123456789", "Spiderman", "1");
+        LocationDL loc3 = new LocationDL(2, "Second St", 2, "CityB", "987654321", "Peter Griffin", "2");
         TruckDL truck1 = new TruckDL(1, "ModelX", "A", 10f);
         TruckDL truck2 = new TruckDL(2, "ModelY", "B", 15f);
         TruckDL truck3 = new TruckDL(3, "ModelZ", "C", 20f);
         try {
+            locationController.openConnection();
+            truckController.openConnection();
+            itemsController.openConnection();
             locationController.addLocation(locationMapper.toDTO(loc1));
             locationController.addLocation(locationMapper.toDTO(loc2));
             locationController.addLocation(locationMapper.toDTO(loc3));
@@ -319,6 +361,10 @@ public class ShipmentFacade {
         } catch (Exception e) {
             e.printStackTrace();
             return;
+        } finally {
+            locationController.closeConnection();
+            truckController.closeConnection();
+            itemsController.closeConnection();
         }
 
     }
@@ -351,5 +397,17 @@ public class ShipmentFacade {
             }
         }
         return maxId + 1; // Return the next available shipment ID
+    }
+
+    public void addFirstLocation() {
+        LocationDL firstLocation = new LocationDL(0, "First St", 1, "CityA", "123456789", "John Doe", "1");
+        try {
+            locationController.openConnection();
+            locationController.addLocation(locationMapper.toDTO(firstLocation));
+            locations.add(firstLocation);
+            employeeFacade.addBranch(firstLocation);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

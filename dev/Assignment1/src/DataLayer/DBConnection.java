@@ -25,4 +25,24 @@ public class DBConnection {
     public static Connection getConnection() {
         return connection;
     }
+
+    public static void close() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException("Failed to close the database connection", e);
+            }
+        }
+    }
+
+    public static void open(String DB_NAME) {
+        try {
+            if (connection == null || connection.isClosed()) {
+                connect(DB_NAME);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to open the database connection", e);
+        }
+    }
 }

@@ -19,17 +19,17 @@ import DataLayer.DAOs.EmployeeRoleDAO;
 public class EmployeeController {
 
     private DBConnection dbConnection = new DBConnection();
-    private DBConnection dbConnection2 = new DBConnection();
+    // private DBConnection dbConnection2 = new DBConnection();
     private EmployeeDAO employeeDAO;
     private EmployeeRoleDAO employeeRoleDAO;
     private LocationController locationController;
     private ShiftController shiftController;
 
     public EmployeeController(LocationController locationController, ShiftController shiftController) {
-        this.dbConnection.connect("employees.db");
-        this.dbConnection2.connect("employee_role.db");
+        this.dbConnection.connect("main.db");
+        // //this.dbConnection2.connect("employee_role.db");
         this.employeeDAO = new EmployeeDAO(dbConnection.getConnection());
-        this.employeeRoleDAO = new EmployeeRoleDAO(dbConnection2.getConnection());
+        this.employeeRoleDAO = new EmployeeRoleDAO(dbConnection.getConnection());
         this.locationController = locationController;
         this.shiftController = shiftController;
     }
@@ -149,9 +149,9 @@ public class EmployeeController {
     public List<String> getRolesForEmployee(int employeeId) throws SQLException {
         try {
             List<String> roles = employeeRoleDAO.getRolesForEmployee(employeeId);
-            //List<String> roles = new ArrayList<>();
+            // List<String> roles = new ArrayList<>();
             // while (rs.next()) {
-            //     roles.add(rs.getString("role"));
+            // roles.add(rs.getString("role"));
             // }
             return roles;
         } catch (SQLException e) {
@@ -192,9 +192,13 @@ public class EmployeeController {
 
     public void clearAllEmployees() throws SQLException {
         try {
+
             employeeRoleDAO.clearTable();
             employeeDAO.clearTable();
-        } catch (SQLException e) {
+
+        } catch (
+
+        SQLException e) {
             System.out.println("Error clearing all employees: " + e.getMessage());
             throw e;
         }
@@ -218,11 +222,12 @@ public class EmployeeController {
         String password = rst.getString("password");
         Boolean isFinishedWorking = rst.getInt("isFired") == 1;
 
-        //ResultSet rolesResult = employeeRoleDAO.getRolesForEmployee(id);
+        // ResultSet rolesResult = employeeRoleDAO.getRolesForEmployee(id);
         List<String> rolesList = employeeRoleDAO.getRolesForEmployee(id);
         // while (rolesResult.next()) {
-        //     rolesList.add(rolesResult.getString("role"));
+        // rolesList.add(rolesResult.getString("role"));
         // }
+        // shiftController.openConnection();
         Map<ShiftDTO, String> assignedShifts = shiftController.getAssignedShiftsForEmployee(id);
         List<ShiftDTO> prefShifts = shiftController.getAllPrefShifts(id);
 
@@ -261,6 +266,23 @@ public class EmployeeController {
 
     private Date parseIsoDateToUtilDate(String dateStr) {
         return Date.from(OffsetDateTime.parse(dateStr).toInstant());
+    }
+
+    public void closeConnection() {
+        dbConnection.close();
+        // dbConnection2.close();
+        locationController.closeConnection();
+        shiftController.closeConnection();
+    }
+
+    public void openConnection() {
+        dbConnection.open("main.db");
+        // dbConnection2.open("employee_role.db");
+        this.employeeDAO = new EmployeeDAO(dbConnection.getConnection());
+        this.employeeRoleDAO = new EmployeeRoleDAO(dbConnection.getConnection());
+        locationController.openConnection();
+        shiftController.openConnection();
+
     }
 
 }

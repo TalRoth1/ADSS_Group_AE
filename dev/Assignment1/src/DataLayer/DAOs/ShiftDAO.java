@@ -20,21 +20,21 @@ public class ShiftDAO {
     }
 
     private void initializeTable() throws SQLException {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS shifts ("
-                + "id INT NOT NULL, "
-                + "date TEXT NOT NULL, "
-                + "shiftType TEXT NOT NULL, "
-                + "startTime INT NOT NULL, "
-                + "endTime INT NOT NULL, "
-                + "shiftManagerId INT NOT NULL, "
-                + "isShipment INT NOT NULL, "
-                + // 0 false, 1 for true
-                "locationId INT NOT NULL, "
-                + "PRIMARY KEY (id), "
-                + "FOREIGN KEY (shiftManagerId) REFERENCES employees(id), "
-                + "FOREIGN KEY (locationId) REFERENCES locations(id)"
-                + ")";
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS shifts (" +
+                "id INT NOT NULL, " +
+                "date TEXT NOT NULL, " +
+                "shiftType TEXT NOT NULL, " +
+                "startTime INT NOT NULL, " +
+                "endTime INT NOT NULL, " +
+                "shiftManagerId INT NOT NULL, " +
+                "isShipment INT NOT NULL, " + // 0 = false, 1 = true
+                "locationId INT NOT NULL, " +
+                "PRIMARY KEY (id), " +
+                "FOREIGN KEY (shiftManagerId) REFERENCES employees(id) ON DELETE CASCADE, " +
+                "FOREIGN KEY (locationId) REFERENCES locations(id) ON DELETE CASCADE" +
+                ")";
         try (Statement stmt = connection.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
             System.out.println("Error creating shifts table: " + e.getMessage());

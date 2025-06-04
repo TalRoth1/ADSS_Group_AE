@@ -16,8 +16,8 @@ public class TruckDAO {
 
     public void initializeTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS trucks (" +
-                "id INTEGER PRIMARY KEY, " +  //represents truck num
-                "license_plate TEXT NOT NULL, " + //model
+                "id INTEGER PRIMARY KEY, " + // represents truck num
+                "license_plate TEXT NOT NULL, " + // model
                 "type TEXT NOT NULL, " +
                 "status INTEGER NOT NULL, " + // BOOLEAN as INTEGER: 0 = false, 1 = true; represents isBusy
                 "max_weight FLOAT NOT NULL" +
@@ -89,7 +89,7 @@ public class TruckDAO {
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setInt(1, id);
         return pstmt.executeQuery();
-        
+
     }
 
     public ResultSet getAllTrucks() throws SQLException {

@@ -20,15 +20,16 @@ public class ShiftPreferredDAO {
     }
 
     private void initializeTable() throws SQLException {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS preferred_shifts ("
-                + "shiftId INTEGER , "
-                + "employeeId INT , "
-                + "role TEXT NOT NULL, "
-                + "PRIMARY KEY (shiftId, employeeId), "
-                + "FOREIGN KEY (employeeId) REFERENCES employees(id), "
-                + "FOREIGN KEY (shiftId) REFERENCES shifts(id)"
-                + ")";
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS preferred_shifts (" +
+                "shiftId INTEGER, " +
+                "employeeId INT, " +
+                "role TEXT NOT NULL, " +
+                "PRIMARY KEY (shiftId, employeeId), " +
+                "FOREIGN KEY (employeeId) REFERENCES employees(id) ON DELETE CASCADE, " +
+                "FOREIGN KEY (shiftId) REFERENCES shifts(id) ON DELETE CASCADE" +
+                ")";
         try (Statement stmt = connection.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
             System.out.println("Error creating preferred_shifts table: " + e.getMessage());
@@ -80,7 +81,7 @@ public class ShiftPreferredDAO {
         pstmt.setInt(1, shiftId);
         pstmt.setInt(2, employeeId);
         return pstmt.executeQuery();
-        
+
     }
 
     public ResultSet getPreferredShiftsForEmployee(int employeeId) throws SQLException {
@@ -88,7 +89,7 @@ public class ShiftPreferredDAO {
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setInt(1, employeeId);
         return pstmt.executeQuery();
-        
+
     }
 
     public ResultSet getPreferredShiftsForShift(int shiftId) throws SQLException {
@@ -96,7 +97,7 @@ public class ShiftPreferredDAO {
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setInt(1, shiftId);
         return pstmt.executeQuery();
-        
+
     }
 
     public void clearTable() throws SQLException {

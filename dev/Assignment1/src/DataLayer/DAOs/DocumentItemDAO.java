@@ -26,16 +26,18 @@ public class DocumentItemDAO {
                 "itemName TEXT NOT NULL, " +
                 "amount INT NOT NULL, " +
                 "PRIMARY KEY (documentID, locationID, itemName), " +
-                "FOREIGN KEY (documentID) REFERENCES documents(id), " +
-                "FOREIGN KEY (itemName) REFERENCES items(name)" +
+                "FOREIGN KEY (documentID) REFERENCES documents(id) ON DELETE CASCADE, " +
+                "FOREIGN KEY (itemName) REFERENCES items(name) ON DELETE CASCADE" +
                 ")";
         try (Statement stmt = connection.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
             System.out.println("Error creating document_item table: " + e.getMessage());
             throw e;
         }
     }
+
     public void addDocumentItem(int documentID, int locationID, String itemName, int amount) throws SQLException {
         String insertSQL = "INSERT INTO document_item (documentID, locationID, itemName, amount) VALUES (?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
@@ -44,8 +46,7 @@ public class DocumentItemDAO {
             preparedStatement.setString(3, itemName);
             preparedStatement.setInt(4, amount);
             preparedStatement.executeUpdate();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error adding document item: " + e.getMessage());
             throw e;
         }
@@ -65,8 +66,7 @@ public class DocumentItemDAO {
             preparedStatement.setInt(2, locationID);
             preparedStatement.setString(3, itemName);
             preparedStatement.executeUpdate();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error deleting document item: " + e.getMessage());
             throw e;
         }
@@ -80,8 +80,7 @@ public class DocumentItemDAO {
             preparedStatement.setInt(3, locationID);
             preparedStatement.setString(4, itemName);
             preparedStatement.executeUpdate();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error updating document item: " + e.getMessage());
             throw e;
         }
@@ -109,6 +108,7 @@ public class DocumentItemDAO {
             throw e;
         }
     }
+
     public void clearTable() throws SQLException {
         String sql = "DELETE FROM document_item";
         try (Statement stmt = connection.createStatement()) {

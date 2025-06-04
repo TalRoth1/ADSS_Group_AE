@@ -15,13 +15,11 @@ public class LocationController {
     private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
     public LocationController() {
-        String DB_URL = "locations.db";
+        String DB_URL = "main.db";
         dbConnection.connect(DB_URL);
-        this.connection = DBConnection.getConnection();
+        this.connection = dbConnection.getConnection();
         this.locationDAO = new LocationDAO(connection);
     }
-
-
 
     public void addLocation(LocationDTO location) throws SQLException {
         locationDAO.addLocation(location.getId(), location.getStreet(), location.getStreetNumber(), location.getCity(),
@@ -85,5 +83,14 @@ public class LocationController {
 
     public void resetLocationsTable() throws SQLException {
         locationDAO.resetTable();
+    }
+
+    public void closeConnection() {
+        dbConnection.close();
+    }
+
+    public void openConnection() {
+        dbConnection.open("main.db");
+        this.locationDAO = new LocationDAO(DBConnection.getConnection());
     }
 }

@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import DataLayer.DriverController;
-import DataLayer.ShiftController;
 import DataLayer.Mappers.DriverMapper;
 
 public class EmployeeManager extends Employee {
@@ -20,11 +19,9 @@ public class EmployeeManager extends Employee {
     private Map<LocationDL, Map<LocalDate, Shift>> morningShifts;
     private Map<LocationDL, Map<LocalDate, Shift>> eveningShifts;
     private Map<LocalDate, Shift> pastShifts;
-    private ArrayList<LocationDL> branches;
     private Map<LocationDL, Map<LocalDate, Shift>> toCompleteShifts;
     private Map<LocationDL, Map<LocalDate, Shift>> missingShift;
     private static final LocationDL EMPTY_LOCATION = new LocationDL(0, "Empty", 0, "Empty", "Empty", "Empty", "Empty");
-    private ShiftController shiftController;
     private Connection locationConnection;
 
     public EmployeeManager(int id, String name, String bankAccount, int salary, LocalDate startDate,
@@ -37,7 +34,19 @@ public class EmployeeManager extends Employee {
         morningShifts = new HashMap<>();
         eveningShifts = new HashMap<>();
         pastShifts = new HashMap<>();
-        branches = new ArrayList<>();
+        missingShift = new HashMap<>();
+    }
+
+    public EmployeeManager(int id, String name, String bankAccount, int salary, LocalDate startDate,
+            int vacationDays, int sickDays, float educationFund, float socialBenefits,
+            String password, LocationDL location) {
+        super(id, name, location, bankAccount, salary, startDate, vacationDays, sickDays, educationFund,
+                socialBenefits,
+                password);
+        allEmployees = new HashMap<>();
+        morningShifts = new HashMap<>();
+        eveningShifts = new HashMap<>();
+        pastShifts = new HashMap<>();
         missingShift = new HashMap<>();
     }
 
@@ -61,12 +70,12 @@ public class EmployeeManager extends Employee {
         return maxId + 1; // Return the next available ID
     }
 
-    public void addBranch(LocationDL branch) {
-        if (branch == null) {
-            throw new IllegalArgumentException("Branch cannot be null");
-        }
-        branches.add(branch);
-    }
+    // public void addBranch(LocationDL branch) {
+    // if (branch == null) {
+    // throw new IllegalArgumentException("Branch cannot be null");
+    // }
+    // branches.add(branch);
+    // }
 
     public DriverDL assignCheck(LocalDate sentDate, ShiftType shiftType, LocationDL origin,
             List<LocationDL> destinations,
@@ -82,9 +91,7 @@ public class EmployeeManager extends Employee {
                 System.out.println("Unknown location: " + location);
                 return null;
             }
-            System.out.println("Checking location: " + location);
-            System.out.println("Shift type: " + shiftType);
-            System.out.println("Sent date: " + sentDate);
+
             Shift shift = getValidShift(location, shiftType, sentDate);
             if (shift != null) { // shift alredy exists
                 boolean hasStorekeeper = checkStorekeeperExistInShift(shift, location);
@@ -97,27 +104,31 @@ public class EmployeeManager extends Employee {
                     return null;
                 }
             } else { // shift does not exist, create a new default one
-                addDefaultShift(sentDate, shiftType, 0, location);
-                Shift newShift = getValidShift(location, shiftType, sentDate);
-                if (newShift == null) {
-                    return null;
-                }
-                DriverDL hasDriverInBranch = allEmployees.values().stream()
-                        .filter(e -> e instanceof DriverDL)
-                        .map(e -> (DriverDL) e)
-                        .filter(e -> e.getBranch().equals(location) && e.getLicenceType().contains(licenceType)
-                                && !e.isFinishWorking())
-                        .findFirst()
-                        .orElse(null);
-                boolean hasStorekeeper = allEmployees.values().stream()
-                        .anyMatch(e -> e.getBranch().equals(location) && e.getRoles().contains(Role.STORE_KEEPER)
-                                && !e.isFinishWorking());
-                if (hasDriverInBranch != null && hasStorekeeper) {
-                    newShift.setShipmentShift(true);
-                    return hasDriverInBranch;
-                } else {
-                    return null;
-                }
+                recordMissingShift(location, sentDate, shiftType);
+
+                // addDefaultShift(sentDate, shiftType, 0, location);
+                // Shift newShift = getValidShift(location, shiftType, sentDate);
+                // if (newShift == null) {
+                // return null;
+                // }
+                // DriverDL hasDriverInBranch = allEmployees.values().stream()
+                // .filter(e -> e instanceof DriverDL)
+                // .map(e -> (DriverDL) e)
+                // .filter(e -> e.getBranch().equals(location) &&
+                // e.getLicenceType().contains(licenceType)
+                // && !e.isFinishWorking())
+                // .findFirst()
+                // .orElse(null);
+                // boolean hasStorekeeper = allEmployees.values().stream()
+                // .anyMatch(e -> e.getBranch().equals(location) &&
+                // e.getRoles().contains(Role.STORE_KEEPER)
+                // && !e.isFinishWorking());
+                // if (hasDriverInBranch != null && hasStorekeeper) {
+                // newShift.setShipmentShift(true);
+                // return hasDriverInBranch;
+                // } else {
+                // return null;
+                // }
             }
         }
         return null;
@@ -128,6 +139,8 @@ public class EmployeeManager extends Employee {
             int shiftid = shiftIdCounter();
             Shift shift = new Shift(shiftid, sentDate, shiftType, 0, location);
             shift.setShipmentShift(true);
+            shift.setRequiredRoles(Role.DRIVER, 1);
+            shift.setRequiredRoles(Role.STORE_KEEPER, 1);
             shift.addEmployee(driverId, Role.DRIVER);
             for (ShiftEmployee employee : allEmployees.values()) {
                 if (employee.getBranch().equals(location) && employee.getRoles().contains(Role.STORE_KEEPER)) {
@@ -719,18 +732,20 @@ public class EmployeeManager extends Employee {
         LocalDate now = LocalDate.now();
         LocalDate thisSaturday = now.with(java.time.DayOfWeek.SATURDAY);
         LocalDate endOfNextWeek = thisSaturday.plusWeeks(1);
+        int shiftId = shiftIdCounter();
+        Shift missing = new Shift(shiftId, sentDate, shiftType, -1, location);
+        missingShift
+                .computeIfAbsent(location, loc -> new HashMap<>())
+                .put(sentDate, missing);
+        return true;
+    }
 
-        // Only track missing shifts if the date is after the end of next week
-        if (sentDate.isAfter(endOfNextWeek)) {
-            // Create a placeholder Shift object for the missing shift
-            int shiftId = shiftIdCounter();
-            Shift missing = new Shift(shiftId, sentDate, shiftType, -1, location);
-            missingShift
-                    .computeIfAbsent(location, loc -> new HashMap<>())
-                    .put(sentDate, missing);
-            return true;
-        }
-        return false;
+    private boolean isInCurrentWeek(LocalDate sentDate) {
+        LocalDate now = LocalDate.now();
+        // Get the first day (Monday) and last day (Sunday) of the current week
+        LocalDate weekStart = now.with(java.time.DayOfWeek.MONDAY);
+        LocalDate weekEnd = now.with(java.time.DayOfWeek.SUNDAY);
+        return (!sentDate.isBefore(weekStart)) && (!sentDate.isAfter(weekEnd));
     }
 
     public List<ShiftEmployee> getAllEmployeesInBranch(LocationDL branch) {
@@ -751,36 +766,38 @@ public class EmployeeManager extends Employee {
     }
 
     public DriverDL checkDriverExistInShift(Shift shift, String licenceType, LocationDL branch,
-    DriverController driverController) { // check if there is
-                                                                                                  // at least one driver
-        for (Map.Entry<Integer, Role> entry : shift.getAssignedEmployeesID().entrySet()) {
-            int employeeId = entry.getKey();
-            Role role = entry.getValue();
+            DriverController driverController) { // check if there is
+                                                 // at least one driver
+        try {
+            for (Map.Entry<Integer, Role> entry : shift.getAssignedEmployeesID().entrySet()) {
+                int employeeId = entry.getKey();
+                Role role = entry.getValue();
 
-            if (role == Role.DRIVER) {
-                // Get the driver
-                DriverMapper driverMapper = new DriverMapper();
-                DriverDL driver = driverMapper.toDL(driverController.getDriver(employeeId));
+                if (role == Role.DRIVER) {
+                    // Get the driver
+                    DriverMapper driverMapper = new DriverMapper();
+                    driverController.openConnection();
+                    DriverDL driver = driverMapper.toDL(driverController.getDriver(employeeId));
 
-                if (driver != null && driver.getLicenceType().contains(licenceType)) {
-                    return driver;
+                    if (driver != null && driver.getLicenceType().contains(licenceType)) {
+                        return driver;
+                    }
                 }
             }
+            return null; // no matching driver found
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        } finally {
+            driverController.closeConnection();
         }
-        return null; // no matching driver found
-        // return (DriverDL) shift.getAssignedEmployeesID().keySet().stream()
-        // .map(allEmployees::get)
-        // .filter(e -> e instanceof DriverDL && e.getBranch().equals(branch)
-        // && ((DriverDL) e).getLicenceType().contains(licenceType) &&
-        // !e.isFinishWorking())
-        // .findFirst()
-        // .orElse(null);
+
     }
 
     public DriverDL getDriverById(int id) {
         DriverDL emp = (DriverDL) allEmployees.get(id);
         if (emp instanceof DriverDL) {
-            return  emp;
+            return emp;
         }
         return null;
     }
@@ -793,71 +810,65 @@ public class EmployeeManager extends Employee {
         return toCompleteShifts;
     }
 
-    public void loadEmployeesFromResultSet(ResultSet rs) throws SQLException {
-        while (rs.next()) {
-            try {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                String bankAccount = rs.getString("bankAccount");
-                int salary = rs.getInt("salary");
-                LocalDate startDate = LocalDate.parse(rs.getString("startDate"));
-                int vacationDays = rs.getInt("vacationDays");
-                int sickDays = rs.getInt("sickDays");
-                float educationFund = rs.getFloat("educationFund");
-                float socialBenefits = rs.getFloat("socialBenefits");
-                String password = rs.getString("password");
-                boolean isFired = rs.getInt("isFired") == 1;
-                int locationId = rs.getInt("locationId");
+    // public void loadEmployeesFromResultSet(ResultSet rs) throws SQLException {
+    // while (rs.next()) {
+    // try {
+    // int id = rs.getInt("id");
+    // String name = rs.getString("name");
+    // String bankAccount = rs.getString("bankAccount");
+    // int salary = rs.getInt("salary");
+    // LocalDate startDate = LocalDate.parse(rs.getString("startDate"));
+    // int vacationDays = rs.getInt("vacationDays");
+    // int sickDays = rs.getInt("sickDays");
+    // float educationFund = rs.getFloat("educationFund");
+    // float socialBenefits = rs.getFloat("socialBenefits");
+    // String password = rs.getString("password");
+    // boolean isFired = rs.getInt("isFired") == 1;
+    // int locationId = rs.getInt("locationId");
 
-                // Get or create the branch
-                LocationDL branch = getBranchById(locationId);
-                if (branch == null) {
-                    // If branch doesn't exist, create a temporary one
-                    branch = new LocationDL(locationId, "Branch " + locationId, locationId,
-                            "Unknown Street", "Unknown", "Unknown", "Unknown");
-                    branches.add(branch);
-                }
+    // // Get or create the branch
+    // LocationDL branch = getBranchById(locationId);
+    // if (branch == null) {
+    // // If branch doesn't exist, create a temporary one
+    // branch = new LocationDL(locationId, "Branch " + locationId, locationId,
+    // "Unknown Street", "Unknown", "Unknown", "Unknown");
+    // branches.add(branch);
+    // }
 
-                // Check if this is a driver by looking at license_type
-                String licenseType = rs.getString("license_type");
-                String role = rs.getString("role");
+    // String licenseType = rs.getString("license_type");
+    // String role = rs.getString("role");
 
-                ShiftEmployee employee;
-                if (licenseType != null) {
-                    // Create driver with initial license type
-                    ArrayList<String> licenseTypes = new ArrayList<>();
-                    licenseTypes.add(licenseType);
-                    employee = new DriverDL(id, name, branch, bankAccount, salary, startDate,
-                            vacationDays, sickDays, educationFund, socialBenefits, password,
-                            licenseTypes);
-                } else {
-                    // Create regular employee with initial role
-                    employee = new ShiftEmployee(id, name, branch, bankAccount, salary, startDate,
-                            vacationDays, sickDays, educationFund, socialBenefits, password,
-                            Role.valueOf(role != null ? role : "CASHIER")); // Default to CASHIER if no role specified
-                }
+    // ShiftEmployee employee;
+    // if (licenseType != null) {
+    // ArrayList<String> licenseTypes = new ArrayList<>();
+    // licenseTypes.add(licenseType);
+    // employee = new DriverDL(id, name, branch, bankAccount, salary, startDate,
+    // vacationDays, sickDays, educationFund, socialBenefits, password,
+    // licenseTypes);
+    // } else {
+    // employee = new ShiftEmployee(id, name, branch, bankAccount, salary,
+    // startDate,
+    // vacationDays, sickDays, educationFund, socialBenefits, password,
+    // Role.valueOf(role != null ? role : "CASHIER"));
+    // }
 
-                // Set fired status
-                employee.setFinishWorking(isFired);
+    // employee.setFinishWorking(isFired);
+    // allEmployees.put(id, employee);
 
-                // Add to allEmployees map
-                allEmployees.put(id, employee);
+    // } catch (Exception e) {
+    // System.out.println("Error loading employee: " + e.getMessage());
+    // }
+    // }
+    // }
 
-            } catch (Exception e) {
-                System.out.println("Error loading employee: " + e.getMessage());
-                // Continue loading other employees even if one fails
-            }
-        }
-    }
-
-    private LocationDL getBranchById(int locationId) {
-        for (LocationDL branch : branches) {
-            if (branch.getId() == locationId) {
-                return branch;
-            }
-        }
-        return null;
-    }
+    // private LocationDL getBranchById(int locationId) {
+    // for (LocationDL branch : branches) {
+    // if (branch.getId() == locationId) {
+    // return branch;
+    // }
+    // }
+    // return null;
+    // }
 
     public void addEmployeeToAllEmployees(ShiftEmployee employee) {
         if (employee != null && !allEmployees.containsKey(employee.getId())) {
@@ -873,18 +884,4 @@ public class EmployeeManager extends Employee {
 
         }
     }
-
-    // public void refreshEmployees() {
-    // try {
-
-    /// DataLayer.DAOs.EmployeeDAO employeeDAO = new DataLayer.DAOs.EmployeeDAO(
-    // DataLayer.ConnectionHandler.getInstance().connect());
-    // ResultSet rs = employeeDAO.getAllEmployees();
-    // loadEmployeesFromResultSet(rs);
-    // rs.close();
-    // } catch (Exception e) {
-    // System.out.println("Error refreshing employees: " + e.getMessage());
-    // }
-    // }
-
 }
