@@ -1,0 +1,752 @@
+package PresentationLayer;
+
+import DomainLayer.DriverDL;
+import DomainLayer.EmployeeFacade;
+import DomainLayer.LocationDL;
+import DomainLayer.ShipmentDL;
+import DomainLayer.ShipmentFacade;
+import DomainLayer.TruckDL;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+public class ShipmentCLI {
+    HashMap<String, String> users = new HashMap<>(Map.of("eylon", "admin", "elad", "admin"));
+
+    public ShipmentFacade shipmentFacade;
+    Scanner scanner = new Scanner(System.in);
+
+    public ShipmentCLI(EmployeeFacade employeeFacade) {
+        shipmentFacade = new ShipmentFacade(employeeFacade);
+    }
+
+    public LocationDL ChooseStart() {
+        boolean flag = true;
+        List<LocationDL> locations = shipmentFacade.locations;
+        if (locations.size() == 0) {
+            System.out.println("No locations available. Please add a location first.");
+            return null;
+        }
+        LocationDL startLocation = null;
+        while (flag) {
+            System.out.println("Please choose a location from the list below: ");
+            for (int i = 0; i < locations.size(); i++) {
+                System.out.println(i + ": " + locations.get(i).toString());
+            }
+            System.out.println("Enter the number of the location you want to choose: ");
+            int choice = Integer.parseInt(scanner.nextLine());
+            if (choice >= 0 && choice < locations.size()) {
+                startLocation = locations.get(choice);
+                flag = false;
+            } else {
+                System.out.println("Invalid choice. Please try again.");
+            }
+
+        }
+        return startLocation;
+    }
+
+    public List<LocationDL> ChooseLocations() {
+        boolean flag = true;
+        List<LocationDL> locations = new ArrayList<>();
+        while (flag) {
+            System.out.println("Please input a zone: ");
+            String zone = scanner.nextLine();
+            List<LocationDL> locationsByZone = shipmentFacade.LocationByZone(zone);
+            if (locationsByZone.size() == 0) {
+                System.out.println("No locations found in this zone. Please add a location first.");
+                return null;
+            } else {
+                locations = locationsByZone;
+                flag = false;
+            }
+        }
+        List<LocationDL> selectedLocations = new ArrayList<>();
+        flag = true;
+        while (flag) {
+            System.out.println("Please choose a location from the list below: ");
+            for (int i = 0; i < locations.size(); i++) {
+                System.out.println(i + ": " + locations.get(i).toString());
+                if ((i + 1) == locations.size()) {
+                    System.out.println((i + 1) + ": Finish choosing locations");
+                }
+            }
+            System.out.println("Enter the number of the location you want to choose: ");
+            int choice = Integer.parseInt(scanner.nextLine());
+            if (choice >= 0 && choice < locations.size()) {
+                selectedLocations.add(locations.get(choice));
+            } else if (choice == locations.size()) {
+                flag = false;
+            } else {
+                System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        return selectedLocations;
+    }
+
+    public TruckDL ChooseTruck() {
+        boolean flag = true;
+        List<TruckDL> trucks = shipmentFacade.trucks;
+        if (trucks.size() == 0) {
+            System.out.println("No trucks available. Please add a truck first.");
+            return null;
+        }
+        TruckDL truck = null;
+        while (flag) {
+            System.out.println("Please choose a truck from the list below: ");
+            for (int i = 0; i < trucks.size(); i++) {
+                System.out.println(i + ": " + trucks.get(i).toString());
+            }
+            System.out.println("Enter the number of the truck you want to choose: ");
+            int choice = Integer.parseInt(scanner.nextLine());
+            if (choice >= 0 && choice < trucks.size()) {
+                truck = trucks.get(choice);
+                flag = false;
+            } else {
+                System.out.println("Invalid choice. Please try again.");
+            }
+
+        }
+        return truck;
+    }
+
+    /*
+     * public DriverDL ChooseDriver() {
+     * boolean flag = true;
+     * List<DriverDL> drivers = shipmentFacade.drivers;
+     * if (drivers.size() == 0) {
+     * System.out.println("No drivers available. Please add a driver first.");
+     * return null;
+     * }
+     * DriverDL driver = null;
+     * while (flag) {
+     * System.out.println("Please choose a driver from the list below: ");
+     * for (int i = 0; i < drivers.size(); i++) {
+     * System.out.println(i + ": " + drivers.get(i).toString());
+     * }
+     * System.out.println("Enter the number of the driver you want to choose: ");
+     * int choice = Integer.parseInt(scanner.nextLine());
+     * if (choice >= 0 && choice < drivers.size()) {
+     * driver = drivers.get(choice);
+     * flag = false;
+     * } else {
+     * System.out.println("Invalid choice. Please try again.");
+     * }
+     * 
+     * }
+     * return driver;
+     * }
+     */
+
+    public Map<LocationDL, Map<String, Integer>> ChooseItems(List<LocationDL> locations) {
+        boolean flag = true;
+        Map<LocationDL, Map<String, Integer>> items = new HashMap<>();
+        while (flag) {
+            System.out.println("Please choose a location from the list below to select its items: ");
+            for (int i = 0; i < locations.size(); i++) {
+                System.out.println(i + ": " + locations.get(i).toString());
+                if ((i + 1) == locations.size()) {
+                    System.out.println((i + 1) + ": Finish choosing locations");
+                }
+            }
+            System.out.println("Enter the number of the location you want to choose: ");
+            int choice = Integer.parseInt(scanner.nextLine());
+            if (choice >= 0 && choice < locations.size()) {
+                LocationDL location = locations.get(choice);
+                Map<String, Integer> itemList = new HashMap<>();
+                boolean flag2 = true;
+                while (flag2) {
+                    System.out.println("Please choose an item: ");
+                    List<String> itemsToChoose = shipmentFacade.GetItems();
+                    boolean flag3 = true;
+                    while (flag3) {
+                        for (int i = 0; i < itemsToChoose.size(); i++) {
+                            System.out.println(i + ": " + itemsToChoose.get(i));
+                        }
+                        System.out.println("Enter the number of the item you want to choose: ");
+                        int choice2 = Integer.parseInt(scanner.nextLine());
+                        if (choice2 >= 0 && choice2 < itemsToChoose.size()) {
+                            String itemName = itemsToChoose.get(choice2);
+                            flag3 = false;
+                            System.out.println("Please enter the item quantity: ");
+                            int itemQuantity = Integer.parseInt(scanner.nextLine());
+                            itemList.put(itemName, itemQuantity);
+                        } else {
+                            System.out.println("Invalid choice. Please try again.");
+                        }
+                    }
+                    System.out.println("Do you want to add more items? (y/n)");
+                    String answer = scanner.nextLine();
+                    if (answer.equalsIgnoreCase("n")) {
+                        flag2 = false;
+                    }
+                }
+                items.put(location, itemList);
+            } else if (choice == locations.size()) {
+                flag = false;
+            } else {
+                System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        return items;
+    }
+
+    public Date ChooseDate() {
+        boolean flag = true;
+        Date date = null;
+        while (flag) {
+            System.out.println("Please enter the date in the format YYYY-MM-DD: ");
+            String dateString = scanner.nextLine();
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                date = sdf.parse(dateString);
+                flag = false;
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Please try again.");
+            }
+        }
+        return date;
+    }
+
+    public String chooseShift() {
+        boolean flag = true;
+        String shift = null;
+        while (flag) {
+            System.out.println("Please choose a shift: ");
+            System.out.println("1. Morning");
+            System.out.println("2. Evening");
+            int choice = Integer.parseInt(scanner.nextLine());
+            switch (choice) {
+                case 1:
+                    shift = "Morning";
+                    flag = false;
+                    break;
+                case 2:
+                    shift = "Evening";
+                    flag = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        return shift;
+    }
+
+    public void CreateShipment() {
+        Date date = ChooseDate();
+        String shift = chooseShift();
+        LocationDL startLocation = ChooseStart();
+        if (startLocation == null) {
+            return;
+        }
+        List<LocationDL> locations = ChooseLocations();
+        if (locations == null) {
+            return;
+        }
+        TruckDL truck = ChooseTruck();
+        if (truck == null) {
+            return;
+        }
+        /*
+         * DriverDL driver = ChooseDriver();
+         * if (driver == null) {
+         * return;
+         * }
+         */
+        Map<LocationDL, Map<String, Integer>> items = ChooseItems(locations);
+
+        boolean flag = true;
+        while (flag) {
+            try {
+                shipmentFacade.CreateShipment(truck, startLocation, locations, items, shift, date);
+                flag = false;
+            } catch (Exception e) {
+                /*
+                 * if (e.getMessage().
+                 * equals("Driver does not have the right license for this truck")) {
+                 * System.out.
+                 * println("Driver does not have the right license for this truck. Please choose a different driver."
+                 * );
+                 * driver = ChooseDriver();
+                 * } else
+                 */
+                if (e.getMessage().equals("Truck is overweight")) {
+                    System.out.println("Truck is overweight. How would you like to proceed?");
+                    System.out.println("1. Choose a different truck");
+                    System.out.println("2. Edit the items in the shipment");
+                    System.out.println("3. Edit the destinations in the shipment");
+                    boolean flag2 = true;
+                    while (flag2) {
+                        int choice = Integer.parseInt(scanner.nextLine());
+                        switch (choice) {
+                            case 1:
+                                flag2 = false;
+                                truck = ChooseTruck();
+                                break;
+                            case 2:
+                                flag2 = false;
+                                items = ChooseItems(locations);
+                                break;
+                            case 3:
+                                flag2 = false;
+                                locations = ChooseLocations();
+                                items = ChooseItems(locations);
+                                break;
+                            default:
+                                System.out.println("Invalid choice. Please try again.");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void AddLocation() {
+        System.out.println("Please enter the street: ");
+        String street = scanner.nextLine();
+        System.out.println("Please enter the street number: ");
+        int streetNumber = Integer.parseInt(scanner.nextLine());
+        System.out.println("Please enter the city: ");
+        String city = scanner.nextLine();
+        System.out.println("Please enter the contact number: ");
+        String contactNumber = scanner.nextLine();
+        System.out.println("Please enter the contact name: ");
+        String contactName = scanner.nextLine();
+        System.out.println("Please enter the zone: ");
+        String zone = scanner.nextLine();
+        shipmentFacade.AddLocation(street, streetNumber, city, contactNumber, contactName, zone);
+    }
+
+    /*
+     * public void AddDriver() {
+     * System.out.println("Please enter the driver name: ");
+     * String name = scanner.nextLine();
+     * boolean flag = true;
+     * List<String> licenses = new ArrayList<>();
+     * while (flag) {
+     * System.out.println("Please enter the driver license types or finish to end: "
+     * );
+     * String licenseType = scanner.nextLine();
+     * if (licenseType.equalsIgnoreCase("Finish")) {
+     * flag = false;
+     * } else {
+     * licenses.add(licenseType);
+     * }
+     * }
+     * shipmentFacade.AddDriver(name, licenses);
+     * }
+     */
+    public void AddTruck() {
+        System.out.println("Please enter the truck number: ");
+        int number = Integer.parseInt(scanner.nextLine());
+        System.out.println("Please enter the truck model: ");
+        String model = scanner.nextLine();
+        System.out.println("Please enter the truck type: ");
+        String type = scanner.nextLine();
+        System.out.println("Please enter the truck max weight: ");
+        float maxWeight = Float.parseFloat(scanner.nextLine());
+        shipmentFacade.AddTruck(number, model, type, maxWeight);
+    }
+
+    public void AddItem() {
+        System.out.println("Please enter the item name: ");
+        String itemName = scanner.nextLine();
+        System.out.println("Please enter the item weight: ");
+        float weight = Float.parseFloat(scanner.nextLine());
+        shipmentFacade.AddItem(itemName, weight);
+    }
+
+    public void EditTruck(ShipmentDL shipment) {
+        TruckDL truck = ChooseTruck();
+        try {
+            shipmentFacade.EditShipement(shipment, truck, null, null, null, null, null, null);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /*
+     * public void EditDriver(ShipmentDL shipment) {
+     * DriverDL driver = ChooseDriver();
+     * try {
+     * shipmentFacade.EditShipement(shipment, null, driver, null, null, null, null,
+     * null);
+     * } catch (Exception e) {
+     * System.out.println(e.getMessage());
+     * }
+     * }
+     */
+
+    public void EditOrigin(ShipmentDL shipment) {
+        LocationDL origin = ChooseStart();
+        try {
+            shipmentFacade.EditShipement(shipment, null, null, origin, null, null, null, null);
+        } catch (Exception e) {
+            System.out.println("An error occurred while editing the shipment: " + e.getMessage());
+        }
+    }
+
+    public void EditDestinations(ShipmentDL shipment) {
+        List<LocationDL> locations = ChooseLocations();
+        Map<LocationDL, Map<String, Integer>> items = ChooseItems(locations);
+        try {
+            shipmentFacade.EditShipement(shipment, null, null, null, locations, items, null, null);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void EditItems(ShipmentDL shipment) {
+        List<LocationDL> locations = shipment.Destinations;
+        Map<LocationDL, Map<String, Integer>> items = ChooseItems(locations);
+        try {
+            shipmentFacade.EditShipement(shipment, null, null, null, null, items, null, null);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void EditDate(ShipmentDL shipment) {
+        Date date = ChooseDate();
+        String shift = chooseShift();
+        try {
+            shipmentFacade.EditShipement(shipment, null, null, null, null, null, date, shift);
+        } catch (Exception e) {
+        }
+    }
+
+    public void EditShipement() {
+        List<ShipmentDL> shipments = shipmentFacade.GetStatusShipement("Pending");
+        shipments.addAll(shipmentFacade.GetStatusShipement("Approved"));
+        if (shipments.size() == 0) {
+            System.out.println("There are no shipments to edit.");
+            return;
+        }
+        ShipmentDL shipment = null;
+        System.out.println("Please choose a shipment from the list below: ");
+        for (int i = 0; i < shipments.size(); i++) {
+            System.out.println(i + ": " + shipments.get(i).toString());
+        }
+        System.out.println("Enter the number of the shipment you want to edit: ");
+        int choice = Integer.parseInt(scanner.nextLine());
+        boolean flag = true;
+        while (flag) {
+            if (choice >= 0 && choice < shipments.size()) {
+                shipment = shipments.get(choice);
+                flag = false;
+            } else {
+                System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        flag = true;
+        while (flag) {
+            System.out.println("Please choose what you want to edit: ");
+            System.out.println("1. Truck");
+            // System.out.println("2. Driver");
+            System.out.println("3. Origin");
+            System.out.println("4. Destinations");
+            System.out.println("5. Items");
+            System.out.println("6. Date and Shift");
+            System.out.println("7. Finish editing shipment");
+            int choice2 = Integer.parseInt(scanner.nextLine());
+            switch (choice2) {
+                case 1:
+                    EditTruck(shipment);
+                    break;
+                // case 2:
+                // EditDriver(shipment);
+                // break;
+                case 3:
+                    EditOrigin(shipment);
+                    break;
+                case 4:
+                    EditDestinations(shipment);
+                    break;
+                case 5:
+                    EditItems(shipment);
+                    break;
+                case 6:
+                    EditDate(shipment);
+                    break;
+                case 7:
+                    flag = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+
+    }
+
+    public void ChangeStatus() {
+        System.out.println("Please choose a status from the list below (1-4): ");
+        System.out.println("1. Send");
+        System.out.println("2. Problem");
+        System.out.println("3. Cancelled");
+        System.out.println("4. Shipment Completed");
+        System.out.println("5. Dont Change");
+        int choice = Integer.parseInt(scanner.nextLine());
+        List<ShipmentDL> shipments = new ArrayList<>();
+        ShipmentDL shipment = null;
+        boolean flag;
+        switch (choice) {
+            case 1:
+                shipments = shipmentFacade.GetStatusShipement("Pending");
+                shipments.addAll(shipmentFacade.GetStatusShipement("approved"));
+                if (shipments.size() == 0) {
+                    System.out.println("There are no shipments to send.");
+                    return;
+                }
+                System.out.println("Please choose a shipment from the list below: ");
+                flag = true;
+                while (flag) {
+                    for (int i = 0; i < shipments.size(); i++) {
+                        System.out.println(i + ": " + shipments.get(i).toString());
+                    }
+                    int choice2 = Integer.parseInt(scanner.nextLine());
+                    if (choice2 >= 0 && choice2 < shipments.size()) {
+                        shipment = shipments.get(choice2);
+                        flag = false;
+                    } else {
+                        System.out.println("Invalid choice. Please try again.");
+                    }
+                }
+                try {
+                    shipmentFacade.ChangeStatus(shipment, "SENT");
+                } catch (Exception e) {
+                    if (e.getMessage().equals("Driver is busy")) {
+                        System.out.println(
+                                "The driver is busy, please wait for them to finish their current shipment, or change the driver.");
+                    }
+                    if (e.getMessage().equals("Truck is busy")) {
+                        System.out.println(
+                                "The Truck is busy, please wait for it to finish its current shipment, or change the truck.");
+                    }
+                    if (e.getMessage().equals("No available driver for this shipment")) {
+                        System.out
+                                .println("Shipment cannot be sent at the current time, please choose a different time");
+                        EditDate(shipment);
+                    }
+                }
+                break;
+            case 2:
+                shipments = shipmentFacade.GetStatusShipement("Sent");
+                if (shipments.size() == 0) {
+                    System.out.println("There are no shipments to report a problem to.");
+                    return;
+                }
+                System.out.println("Please choose a shipment from the list below: ");
+                flag = true;
+                while (flag) {
+                    for (int i = 0; i < shipments.size(); i++) {
+                        System.out.println(i + ": " + shipments.get(i).toString());
+                    }
+                    int choice2 = Integer.parseInt(scanner.nextLine());
+                    if (choice2 >= 0 && choice2 < shipments.size()) {
+                        shipment = shipments.get(choice2);
+                        flag = false;
+                    } else {
+                        System.out.println("Invalid choice. Please try again.");
+                    }
+                }
+                try {
+                    shipmentFacade.ChangeStatus(shipment, "PROBLEM");
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
+            case 3:
+                shipments = shipmentFacade.GetStatusShipement("Pending");
+                shipments.addAll(shipmentFacade.GetStatusShipement("Approved"));
+                if (shipments.size() == 0) {
+                    System.out.println("There are no shipments to cancel.");
+                    return;
+                }
+                System.out.println("Please choose a shipment from the list below: ");
+                flag = true;
+                while (flag) {
+                    for (int i = 0; i < shipments.size(); i++) {
+                        System.out.println(i + ": " + shipments.get(i).toString());
+                    }
+                    int choice2 = Integer.parseInt(scanner.nextLine());
+                    if (choice2 >= 0 && choice2 < shipments.size()) {
+                        shipment = shipments.get(choice2);
+                        flag = false;
+                    } else {
+                        System.out.println("Invalid choice. Please try again.");
+                    }
+                }
+                try {
+                    shipmentFacade.ChangeStatus(shipment, "CANCELLED");
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
+            case 4:
+                shipments = shipmentFacade.GetStatusShipement("Sent");
+                if (shipments.size() == 0) {
+                    System.out.println("No shipments are able to be completed.");
+                    return;
+                }
+                System.out.println("Please choose a shipment from the list below: ");
+                flag = true;
+                while (flag) {
+                    for (int i = 0; i < shipments.size(); i++) {
+                        System.out.println(i + ": " + shipments.get(i).toString());
+                    }
+                    int choice2 = Integer.parseInt(scanner.nextLine());
+                    if (choice2 >= 0 && choice2 < shipments.size()) {
+                        shipment = shipments.get(choice2);
+                        flag = false;
+                    } else {
+                        System.out.println("Invalid choice. Please try again.");
+                    }
+                }
+                try {
+                    shipmentFacade.ChangeStatus(shipment, "COMPLETED");
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
+            case 5:
+                break;
+            default:
+                System.out.println("Invalid choice. Please try again.");
+        }
+    }
+
+    public void ShowDocuments() {
+        List<ShipmentDL> shipments = shipmentFacade.GetStatusShipement("Pending");
+        shipments.addAll(shipmentFacade.GetStatusShipement("Approved"));
+        shipments.addAll(shipmentFacade.GetStatusShipement("Sent"));
+        shipments.addAll(shipmentFacade.GetStatusShipement("Problem"));
+        shipments.addAll(shipmentFacade.GetStatusShipement("Cancelled"));
+        shipments.addAll(shipmentFacade.GetStatusShipement("Completed"));
+        if (shipments.size() == 0) {
+            System.out.println("There are no shipments to show.");
+            return;
+        }
+        System.out.println("Please choose a shipment from the list below: ");
+        boolean flag = true;
+        ShipmentDL shipment = null;
+        while (flag) {
+            for (int i = 0; i < shipments.size(); i++) {
+                System.out.println(i + ": " + shipments.get(i).toString());
+            }
+            int choice = Integer.parseInt(scanner.nextLine());
+            if (choice >= 0 && choice < shipments.size()) {
+                shipment = shipments.get(choice);
+                flag = false;
+            } else {
+                System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        System.out.println(shipmentFacade.GetDocumentString(shipment));
+    }
+
+    public void SetEmployeeFacade(EmployeeFacade employeeFacade) {
+        shipmentFacade.SetEmployeeFacade(employeeFacade);
+    }
+
+    public void ShipmentMenu() {
+        boolean flag = true;
+        while (flag) {
+            System.out.println("Please choose an option from the list below: ");
+            System.out.println("1. Create Shipment");
+            System.out.println("2. Edit Shipment");
+            System.out.println("3. Change Shipment Status");
+            System.out.println("4. Show Shipment Documents");
+            System.out.println("5. Add Location");
+            System.out.println("6. Add Truck");
+            System.out.println("7. Add Item");
+            System.out.println("8. Exit Shipment Menu");
+            int choice = Integer.parseInt(scanner.nextLine());
+            switch (choice) {
+                case 1:
+                    CreateShipment();
+                    break;
+                case 2:
+                    EditShipement();
+                    break;
+                case 3:
+                    ChangeStatus();
+                    break;
+                case 4:
+                    ShowDocuments();
+                    break;
+                case 5:
+                    AddLocation();
+                    break;
+                case 6:
+                    AddTruck();
+                    break;
+                case 7:
+                    AddItem();
+                    break;
+                case 8:
+                    flag = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    public void loginCLI() {
+        boolean flag = true;
+        while (flag) {
+            System.out.println("Please enter your username: ");
+            String username = scanner.nextLine();
+            System.out.println("Please enter your password: ");
+            String password = scanner.nextLine();
+            if (users.containsKey(username) && users.get(username).equals(password)) {
+                System.out.println("Login successful!");
+                ShipmentMenu();
+                flag = false;
+            } else {
+                System.out.println("Invalid username or password. Please try again.");
+            }
+        }
+    }
+
+    public void loadData() {
+        try {
+            shipmentFacade.LoadData();
+            System.out.println("Data loaded successfully.");
+        } catch (Exception e) {
+            System.out.println("Error loading data: " + e.getMessage());
+        }
+    }
+
+    public void ClearDataBase() {
+        try {
+            shipmentFacade.ClearDataBase();
+            System.out.println("Database cleared successfully.");
+        } catch (Exception e) {
+            System.out.println("Error clearing database: " + e.getMessage());
+        }
+    }
+
+    public void MakePredefinedData() {
+        try {
+            shipmentFacade.MakePredefinedData();
+            System.out.println("Predefined data created successfully.");
+        } catch (Exception e) {
+            System.out.println("Error creating predefined data: " + e.getMessage());
+        }
+    }
+
+    public void addFirstLocation() {
+        try {
+            shipmentFacade.addFirstLocation();
+            System.out.println("First location added successfully.");
+        } catch (Exception e) {
+            System.out.println("Error adding first location: " + e.getMessage());
+        }
+    }
+}
