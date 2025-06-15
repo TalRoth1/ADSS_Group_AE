@@ -11,15 +11,11 @@ public class BranchController
 {
     private final String tableName = "Branches";
     private final String currentDir = System.getProperty("user.dir");
-    private final String dbPath = currentDir + File.separator + "Data.db";
+    private final String dbPath = (Globals.useFakeData) ? currentDir + File.separator + "FakeData.db" : currentDir + File.separator + "Data.db";
     private final String url = "jdbc:sqlite:" + dbPath;
 
     public BranchController() 
     {
-        if(Globals.useFakeData) 
-        {
-            return; // Skip initialization if using fake data
-        }
         try 
         {
             Class.forName("org.sqlite.JDBC");
